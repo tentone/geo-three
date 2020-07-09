@@ -1,3 +1,5 @@
+import {Mesh, MeshBasicMaterial, Vector2, Vector3, Raycaster} from "three";
+
 /**
  * Map viewer is used to read and display map tiles from a server.
  * 
@@ -6,12 +8,12 @@
  * The map is drawn in plane map nodes using a quad tree that is subdivided as necessary to guaratee good map quality.
  *
  * @class MapView
- * @extends {THREE.Mesh}
+ * @extends {Mesh}
  * @param {String} mode Map view node modes.
  * @param {Number} provider Map color tile provider.
  * @param {Number} heightProvider Map height tile provider.
  */
-class MapView extends THREE.Mesh {
+class MapView extends Mesh {
     constructor(mode, provider, heightProvider) {
         /**
          * Define the type of map view in use.
@@ -33,7 +35,7 @@ class MapView extends THREE.Mesh {
             geometry = MapPlaneNode.GEOMETRY;
         }
 
-        super(geometry, new THREE.MeshBasicMaterial({transparent:true, opacity:0.0}));
+        super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
 
         /**
          * Map tile color layer provider.
@@ -109,9 +111,9 @@ class MapView extends THREE.Mesh {
         }
         this.add(this.root);
 
-        this._raycaster = new THREE.Raycaster();
-        this._mouse = new THREE.Vector2();
-        this._vector = new THREE.Vector3();
+        this._raycaster = new Raycaster();
+        this._mouse = new Vector2();
+        this._vector = new Vector3();
     }
 
     /**

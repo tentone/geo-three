@@ -1,16 +1,18 @@
+import {Float32BufferAttribute, BufferGeometry} from "three";
+
 /**
  * Map node geometry is a geometry used to represent the map nodes.
  *
  * Consists of a XZ plane with normals facing +Y.
  *
  * @class MapNodeGeometry
- * @extends {THREE.BufferGeometry}
+ * @extends {BufferGeometry}
  * @param {Number} width Width of the node.
  * @param {Number} height Height of the node.
  * @param {Number} widthSegments Number of subdivisions along the width.
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
-class MapNodeGeometry extends THREE.BufferGeometry {
+class MapNodeGeometry extends BufferGeometry {
     constructor(width, height, widthSegments, heightSegments) {
         super();
 
@@ -62,8 +64,8 @@ class MapNodeGeometry extends THREE.BufferGeometry {
         }
 
         this.setIndex(indices);
-        this.addAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-        this.addAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
-        this.addAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+        this.addAttribute("position", new Float32BufferAttribute(vertices, 3));
+        this.addAttribute("normal", new Float32BufferAttribute(normals, 3));
+        this.addAttribute("uv", new Float32BufferAttribute(uvs, 2));
     }
 }

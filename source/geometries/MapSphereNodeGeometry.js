@@ -1,14 +1,16 @@
+import {Float32BufferAttribute, BufferGeometry} from "three";
+
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
  *
  * @class MapSphereNodeGeometry
- * @extends {THREE.BufferGeometry}
+ * @extends {BufferGeometry}
  * @param {Number} width Width of the node.
  * @param {Number} height Height of the node.
  * @param {Number} widthSegments Number of subdivisions along the width.
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
-class MapSphereNodeGeometry extends THREE.BufferGeometry {
+class MapSphereNodeGeometry extends BufferGeometry {
     constructor(
         radius,
         widthSegments,
@@ -23,8 +25,8 @@ class MapSphereNodeGeometry extends THREE.BufferGeometry {
         const thetaEnd = thetaStart + thetaLength;
         let index = 0;
         const grid = [];
-        const vertex = new THREE.Vector3();
-        const normal = new THREE.Vector3();
+        const vertex = new Vector3();
+        const normal = new Vector3();
 
         //Buffers
         const indices = [];
@@ -84,8 +86,8 @@ class MapSphereNodeGeometry extends THREE.BufferGeometry {
         }
 
         this.setIndex(indices);
-        this.addAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-        this.addAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
-        this.addAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+        this.addAttribute("position", new Float32BufferAttribute(vertices, 3));
+        this.addAttribute("normal", new Float32BufferAttribute(normals, 3));
+        this.addAttribute("uv", new Float32BufferAttribute(uvs, 2));
     }
 }

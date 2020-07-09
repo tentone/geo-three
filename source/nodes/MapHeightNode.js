@@ -1,3 +1,5 @@
+import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader} from "three";
+
 /** 
  * Represents a map tile node.
  * 
@@ -8,9 +10,9 @@
  *
  * @class MapHeightNode
  */
-class MapHeightNode extends THREE.Mesh {
+class MapHeightNode extends Mesh {
     constructor(parentNode, mapView, location, level, x, y) {
-        const material = new THREE.MeshPhongMaterial(
+        const material = new MeshPhongMaterial(
         {
             color: 0x000000,
             specular: 0x000000,
@@ -48,16 +50,16 @@ class MapHeightNode extends THREE.Mesh {
      * @method loadTexture
      */
     loadTexture() {
-        const texture = new THREE.Texture();
+        const texture = new Texture();
         texture.generateMipmaps = false;
-        texture.format = THREE.RGBFormat;
-        texture.magFilter = THREE.LinearFilter;
-        texture.minFilter = THREE.LinearFilter;
+        texture.format = RGBFormat;
+        texture.magFilter = LinearFilter;
+        texture.minFilter = LinearFilter;
         texture.needsUpdate = false;
 
         this.material.emissiveMap = texture;
 
-        const loader = new THREE.ImageLoader();
+        const loader = new ImageLoader();
         loader.setCrossOrigin("anonymous");
         loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
         {
@@ -170,11 +172,11 @@ class MapHeightNode extends THREE.Mesh {
 
             context.putImageData(imageData, 0, 0);
 
-            const displacement = new THREE.CanvasTexture(canvas);
+            const displacement = new CanvasTexture(canvas);
             displacement.generateMipmaps = false;
-            displacement.format = THREE.RGBFormat;
-            displacement.magFilter = THREE.LinearFilter;
-            displacement.minFilter = THREE.LinearFilter;
+            displacement.format = RGBFormat;
+            displacement.magFilter = LinearFilter;
+            displacement.minFilter = LinearFilter;
 
             material.displacementMap = displacement;
             material.displacementScale = 1.0;
@@ -228,7 +230,7 @@ class MapHeightNode extends THREE.Mesh {
     raycast(raycaster, intersects) {
         if(this.isMesh === true)
         {
-            return THREE.Mesh.prototype.raycast.call(this, raycaster, intersects);
+            return Mesh.prototype.raycast.call(this, raycaster, intersects);
         }
 
         return false;
@@ -291,6 +293,6 @@ MapHeightNode.GEOMETRY_SIZE = 16;
  *
  * @static
  * @attribute GEOMETRY
- * @type {THREE.PlaneBufferGeometry}
+ * @type {PlaneBufferGeometry}
  */
 MapHeightNode.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);

@@ -6,29 +6,29 @@
  * @class OpenStreetMapsProvider
  */
 class OpenStreetMapsProvider extends MapProvider {
- constructor(address) {
-     super();
+	constructor(address) {
+		super();
 
-     /**
-      * Map server address.
-      *
-      * By default the open OSM tile server is used.
-      * 
-      * @attribute address
-      * @type {String}
-      */
-     this.address = address !== undefined ? address : "https://a.tile.openstreetmap.org/";
+		/**
+		* Map server address.
+		*
+		* By default the open OSM tile server is used.
+		* 
+		* @attribute address
+		* @type {String}
+		*/
+		this.address = address !== undefined ? address : "https://a.tile.openstreetmap.org/";
 
-     /**
-      * Map image tile format.
-      * 
-      * @attribute format
-      * @type {String}
-      */
-     this.format = "png";
- }
+		/**
+		* Map image tile format.
+		* 
+		* @attribute format
+		* @type {String}
+		*/
+		this.format = "png";
+	}
 
- fetchTile(zoom, x, y) {
-     return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
- }
+	fetchTile(zoom, x, y) {
+		return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+	}
 }

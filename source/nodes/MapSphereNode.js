@@ -1,3 +1,5 @@
+import {Mesh, MeshBasicMaterial, Vector3, Matrix4, Quaternion} from "three";
+
 /** 
  * Represents a map tile node.
  * 
@@ -5,11 +7,11 @@
  * 
  * @class MapSphereNode
  */
-class MapSphereNode extends THREE.Mesh {
+class MapSphereNode extends Mesh {
     constructor(parentNode, mapView, location, level, x, y) {
         super(
             MapSphereNode.createGeometry(level, x, y),
-            new THREE.MeshBasicMaterial({wireframe:false})
+            new MeshBasicMaterial({wireframe:false})
         );
         MapNode.call(this, parentNode, mapView, location, level, x, y);
 
@@ -67,10 +69,10 @@ class MapSphereNode extends THREE.Mesh {
         this.geometry.computeBoundingBox();
 
         const box = this.geometry.boundingBox.clone();
-        const center = box.getCenter(new THREE.Vector3());
+        const center = box.getCenter(new Vector3());
 
-        const matrix = new THREE.Matrix4();
-        matrix.compose(new THREE.Vector3(-center.x, -center.y, -center.z), new THREE.Quaternion(), new THREE.Vector3(GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS));
+        const matrix = new Matrix4();
+        matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS));
         this.geometry.applyMatrix(matrix);
 
         this.position.copy(center);
@@ -127,7 +129,7 @@ class MapSphereNode extends THREE.Mesh {
     raycast(raycaster, intersects) {
         if(this.isMesh === true)
         {
-            return THREE.Mesh.prototype.raycast.call(this, raycaster, intersects);
+            return Mesh.prototype.raycast.call(this, raycaster, intersects);
         }
 
         return false;

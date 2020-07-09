@@ -1,3 +1,5 @@
+import {Mesh, MeshBasicMaterial} from "three";
+
 /** 
  * Represents a map tile node.
  * 
@@ -5,9 +7,9 @@
  * 
  * @class MapPlaneNode
  */
-class MapPlaneNode extends THREE.Mesh {
+class MapPlaneNode extends Mesh {
  constructor(parentNode, mapView, location, level, x, y) {
-     super(MapPlaneNode.GEOMETRY, new THREE.MeshBasicMaterial({wireframe: false}));
+     super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}));
      MapNode.call(this, parentNode, mapView, location, level, x, y);
 
      this.matrixAutoUpdate = false;
@@ -72,7 +74,7 @@ class MapPlaneNode extends THREE.Mesh {
  raycast(raycaster, intersects) {
      if(this.isMesh === true)
      {
-         return THREE.Mesh.prototype.raycast.call(this, raycaster, intersects);
+         return Mesh.prototype.raycast.call(this, raycaster, intersects);
      }
 
      return false;
@@ -86,6 +88,6 @@ Object.assign(MapPlaneNode.prototype, MapNode.prototype);
  *
  * @static
  * @attribute GEOMETRY
- * @type {THREE.PlaneBufferGeometry}
+ * @type {PlaneBufferGeometry}
  */
 MapPlaneNode.GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
