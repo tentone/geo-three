@@ -191,7 +191,7 @@ class MapView extends THREE.Mesh {
             for(var i = 0; i < intersects.length; i++)
             {
                 var node = intersects[i].object;
-                const distance = intersects[i].distance * Math.pow(2, node.level);
+                const distance = intersects[i].distance * 2 ** node.level;
 
                 if(distance < this.thresholdUp)
                 {

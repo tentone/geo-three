@@ -43,7 +43,7 @@ class MapSphereNode extends THREE.Mesh {
      * @param {Number} y
      */
     static createGeometry(zoom, x, y) {
-        const range = Math.pow(2, zoom);
+        const range = 2 ** zoom;
         const max = 40;
         const segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
 
