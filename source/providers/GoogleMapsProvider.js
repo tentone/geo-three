@@ -9,107 +9,104 @@
  *
  * @class GoogleMapsProvider
  */
-function GoogleMapsProvider(apiToken)
-{
-	MapProvider.call(this);
+class GoogleMapsProvider extends MapProvider {
+ constructor(apiToken) {
+     super();
 
-	/**
-	 * Server API access token.
-	 * 
-	 * @attribute apiToken
-	 * @type {String}
-	 */
-	this.apiToken = apiToken !== undefined ? apiToken : "";
+     /**
+      * Server API access token.
+      * 
+      * @attribute apiToken
+      * @type {String}
+      */
+     this.apiToken = apiToken !== undefined ? apiToken : "";
 
-	/**
-	 * After the first call a session token is stored.
-	 *
-	 * The session token is required for subsequent requests for tile and viewport information.
-	 *
-	 * @attribute sessionToken
-	 * @type {String}
-	 */
-	this.sessionToken = null;
+     /**
+      * After the first call a session token is stored.
+      *
+      * The session token is required for subsequent requests for tile and viewport information.
+      *
+      * @attribute sessionToken
+      * @type {String}
+      */
+     this.sessionToken = null;
 
-	/**
-	 * The map orientation in degrees.
-	 *
-	 * Can be 0, 90, 180 or 270.
-	 *
-	 * @attribute orientation
-	 * @type {Number}
-	 */
-	this.orientation = 0;
+     /**
+      * The map orientation in degrees.
+      *
+      * Can be 0, 90, 180 or 270.
+      *
+      * @attribute orientation
+      * @type {Number}
+      */
+     this.orientation = 0;
 
-	/**
-	 * Map image tile format, the formats available are:
-	 *  - png PNG
-	 *  - jpg JPG
-	 *
-	 * @attribute format
-	 * @type {String}
-	 */
-	this.format = "png";
+     /**
+      * Map image tile format, the formats available are:
+      *  - png PNG
+      *  - jpg JPG
+      *
+      * @attribute format
+      * @type {String}
+      */
+     this.format = "png";
 
-	/** 
-	 * The type of base map. This can be one of the following:
-	 *  - roadmap: The standard Google Maps painted map tiles.
-	 *  - satellite: Satellite imagery.
-	 *  - terrain: Shaded relief maps of 3D terrain. When selecting terrain as the map type, you must also include the layerRoadmap layer type (described in the Optional fields section below).
-	 *  - streetview: Street View panoramas. See the Street View guide.
-	 *
-	 * @attribute mapType
-	 * @type {String}
-	 */
-	this.mapType = "roadmap";
+     /** 
+      * The type of base map. This can be one of the following:
+      *  - roadmap: The standard Google Maps painted map tiles.
+      *  - satellite: Satellite imagery.
+      *  - terrain: Shaded relief maps of 3D terrain. When selecting terrain as the map type, you must also include the layerRoadmap layer type (described in the Optional fields section below).
+      *  - streetview: Street View panoramas. See the Street View guide.
+      *
+      * @attribute mapType
+      * @type {String}
+      */
+     this.mapType = "roadmap";
 
-	/**
-	 * If true overlays are shown.
-	 *
-	 * @attribute overlay
-	 * @type {Boolean}
-	 */
-	this.overlay = false;
+     /**
+      * If true overlays are shown.
+      *
+      * @attribute overlay
+      * @type {Boolean}
+      */
+     this.overlay = false;
 
-	this.createSession();
+     this.createSession();
+ }
+
+ /**
+  * Create a map tile session in the maps API.
+  *
+  * This method needs to be called before using the provider
+  *
+  * @method createSession
+  */
+ createSession() {
+     const self = this;
+
+     const address = "https://www.googleapis.com/tile/v1/createSession?key=" + this.apiToken;
+     const data = JSON.stringify(
+     {
+         "mapType": this.mapType,
+         "language": "en-EN",
+         "region": "en",
+         "layerTypes": ["layerRoadmap", "layerStreetview"],
+         "overlay":  this.overlay,
+         "scale": "scaleFactor1x"
+     });
+
+     Service.request(address, "GET", null, ServiceBodyType.JSON, data, undefined, function(response, xhr)
+     {
+         console.log("Created google maps session.", response, xhr);
+         self.sessionToken = response.session;
+     },
+     function(xhr)
+     {
+         console.warn("Unable to create a google maps session.", xhr);
+     }, undefined);
+ }
+
+ fetchTile(zoom, x, y) {
+     return "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+ }
 }
-
-GoogleMapsProvider.prototype = Object.create(MapProvider.prototype);
-
-/**
- * Create a map tile session in the maps API.
- *
- * This method needs to be called before using the provider
- *
- * @method createSession
- */
-GoogleMapsProvider.prototype.createSession = function()
-{
-	var self = this;
-
-	var address = "https://www.googleapis.com/tile/v1/createSession?key=" + this.apiToken;
-	var data = JSON.stringify(
-	{
-		"mapType": this.mapType,
-		"language": "en-EN",
-		"region": "en",
-		"layerTypes": ["layerRoadmap", "layerStreetview"],
-		"overlay":  this.overlay,
-		"scale": "scaleFactor1x"
-	});
-
-	Service.request(address, "GET", null, ServiceBodyType.JSON, data, undefined, function(response, xhr)
-	{
-		console.log("Created google maps session.", response, xhr);
-		self.sessionToken = response.session;
-	},
-	function(xhr)
-	{
-		console.warn("Unable to create a google maps session.", xhr);
-	}, undefined);
-};
-
-GoogleMapsProvider.prototype.fetchTile = function(zoom, x, y)
-{
-	return "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
-};
