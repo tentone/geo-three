@@ -1,0 +1,35 @@
+{
+	"name": "escher.js",
+	"version": "0.0.1",
+	"description": "escher.js is a web library for building interactive diagrams and graphs.",
+	"main": "build/escher.min.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tentone/escher.js.git"
+	},
+	"scripts": {
+		"start": "rollup -c rollup.dev.js",
+		"build": "rollup -c && npm run uglify",
+		"docs": "jsdoc -d docs -r source",
+		"uglify": "uglifyjs --compress --mangle --output build/escher.min.js -- build/escher.js",
+		"pub": "npm run build && npm run docs && npm publish --access public ."
+	},
+	"keywords": [
+		"diagram",
+		"canvas",
+		"graph",
+		"web"
+	],
+	"author": "Tentone",
+	"license": "MIT",
+	"dependencies": {
+		"three": ""
+	},
+	"devDependencies": {
+		"jsdoc": "^3.6.4",
+		"uglify-js": "^3.9.2",
+		"rollup": "^2.9.1",
+		"rollup-plugin-strip": "^1.2.2",
+		"rollup-plugin-serve": "^2.0.0-beta.0"
+	}
+}

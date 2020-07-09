@@ -1,0 +1,166 @@
+/**
+ * Bing maps tile provider.
+ *
+ * API Reference
+ *  - https://msdn.microsoft.com/en-us/library/bb259689.aspx (Bing Maps Tile System)
+ *  - https://msdn.microsoft.com/en-us/library/mt823633.aspx (Directly accessing the Bing Maps tiles)
+ *  - https://www.bingmapsportal.com/
+ *
+ * @class BingMapsProvider
+ * @param {String} apiKey Bing API key.
+ */
+function BingMapsProvider(apiKey, type)
+{
+	MapProvider.call(this);
+
+	this.maxZoom = 19;
+	
+	/**
+	 * Server API access token.
+	 * 
+	 * @attribute apiKey
+	 * @type {String}
+	 */
+	this.apiKey = apiKey !== undefined ? apiKey : "";
+
+	/** 
+	 * The type of the map used.
+	 *
+	 * @attribute type
+	 * @type {String}
+	 */
+	this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
+
+	/**
+	 * Map image tile format, the formats available are:
+	 *  - gif: Use GIF image format.
+	 *  - jpeg: Use JPEG image format. JPEG format is the default for Road, Aerial and AerialWithLabels imagery.
+	 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
+	 *
+	 * @attribute format
+	 * @type {String}
+	 */
+	this.format = "jpeg";
+
+	/**
+	 * Size of the map tiles.
+	 *
+	 * @attribute mapSize
+	 * @type {Number}
+	 */
+	this.mapSize = 512;
+
+	/**
+	 * Tile server subdomain.
+	 *
+	 * @attribute subdomain
+	 * @type {String}
+	 */
+	this.subdomain = "t1";
+}
+
+BingMapsProvider.prototype = Object.create(MapProvider.prototype);
+
+/**
+ * Display an aerial view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.AERIAL = "a";
+
+/**
+ * Display a road view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.ROAD = "r";
+
+/**
+ * Display an aerial view of the map with labels.
+ *
+ * @static
+ * @attribute AERIAL_LABELS
+ * @type {String}
+ */
+BingMapsProvider.AERIAL_LABELS = "h";
+
+/**
+ * Use this value to display a bird's eye (oblique) view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.OBLIQUE = "o";
+
+/**
+ * Display a bird's eye (oblique) with labels view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.OBLIQUE_LABELS = "b";
+
+/** 
+ * Get the base URL for the map configuration requested.
+
+ * Uses the format 
+ * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
+ *
+ * @method getMetaData
+ */
+BingMapsProvider.prototype.getMetaData = function()
+{
+	var self = this;
+	var address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=" + this.apiKey;
+	
+	FileUtils.readFile(address, false, undefined, function(data)
+	{
+		var meta = JSON.parse(data);
+
+		//TODO <FILL METADA>
+	});
+};
+
+/**
+ * Convert x, y, zoom quadtree to a bing maps specific quadkey.
+ *
+ * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
+ *
+ * @method quadKey
+ * @param {Number} x
+ */
+BingMapsProvider.quadKey = function(zoom, x, y)
+{
+	var quad = "";
+
+	for(var i = zoom; i > 0; i--)
+	{
+		var mask = 1 << (i - 1);
+		var cell = 0;
+		
+		if((x & mask) != 0)
+		{
+			cell++;	
+		}
+		
+		if((y & mask) != 0)
+		{
+			cell += 2;
+		}
+
+		quad += cell; 
+	}
+
+	return quad; 
+};
+
+BingMapsProvider.prototype.fetchTile = function(zoom, x, y)
+{
+	return "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+};
