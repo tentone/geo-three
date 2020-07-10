@@ -1,3 +1,5 @@
+import {MapProvider} from "./MapProvider.js";
+
 /**
  * Map tiler provider API.
  *
@@ -9,7 +11,7 @@
  * @class MapTilerProvider
  * @param {String} apiKey
  */
-class MapTilerProvider extends MapProvider {
+export class MapTilerProvider extends MapProvider {
 	constructor(apiKey, type, style, format) {
 		super();
 

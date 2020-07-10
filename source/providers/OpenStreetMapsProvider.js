@@ -1,3 +1,5 @@
+import {MapProvider} from "./MapProvider.js";
+
 /**
  * Open street maps tile server.
  *
@@ -5,7 +7,7 @@
  *
  * @class OpenStreetMapsProvider
  */
-class OpenStreetMapsProvider extends MapProvider {
+export class OpenStreetMapsProvider extends MapProvider {
 	constructor(address) {
 		super();
 

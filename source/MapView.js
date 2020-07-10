@@ -1,4 +1,9 @@
 import {Mesh, MeshBasicMaterial, Vector2, Vector3, Raycaster} from "three";
+import {MapSphereNodeGeometry} from "./geometries/MapSphereNodeGeometry.js";
+import {OpenStreetMapsProvider} from "./providers/OpenStreetMapsProvider.js";
+import {MapHeightNode} from "./nodes/MapHeightNode.js";
+import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
+import {MapSphereNode} from "./nodes/MapSphereNode.js";
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -13,229 +18,229 @@ import {Mesh, MeshBasicMaterial, Vector2, Vector3, Raycaster} from "three";
  * @param {Number} provider Map color tile provider.
  * @param {Number} heightProvider Map height tile provider.
  */
-class MapView extends Mesh {
-    constructor(mode, provider, heightProvider) {
-        /**
-         * Define the type of map view in use.
-         *
-         * This value can only be set on creation
-         *
-         * @attribute mode
-         * @type {Number}
-         */
-        this.mode = mode !== undefined ? mode : MapView.PLANAR;
+export class MapView extends Mesh {
+	constructor(mode, provider, heightProvider) {
+		/**
+		 * Define the type of map view in use.
+		 *
+		 * This value can only be set on creation
+		 *
+		 * @attribute mode
+		 * @type {Number}
+		 */
+		this.mode = mode !== undefined ? mode : MapView.PLANAR;
 
-        let geometry;
-        if(this.mode === MapView.SPHERICAL)
-        {
-            geometry = new MapSphereNodeGeometry(GeolocationUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-        }
-        else if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-        {
-            geometry = MapPlaneNode.GEOMETRY;
-        }
+		let geometry;
+		if(this.mode === MapView.SPHERICAL)
+		{
+			geometry = new MapSphereNodeGeometry(GeolocationUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+		}
+		else if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+		{
+			geometry = MapPlaneNode.GEOMETRY;
+		}
 
-        super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
 
-        /**
-         * Map tile color layer provider.
-         *
-         * @attribute provider
-         * @type {MapProvider}
-         */
-        this.provider = provider !== undefined ? provider : new OpenStreetMapsProvider();
+		/**
+		 * Map tile color layer provider.
+		 *
+		 * @attribute provider
+		 * @type {MapProvider}
+		 */
+		this.provider = provider !== undefined ? provider : new OpenStreetMapsProvider();
 
-        /**
-         * Map height (terrain elevation) layer provider.
-         *
-         * @attribute heightProvider
-         * @type {MapProvider}
-         */
-        this.heightProvider = heightProvider !== undefined ? heightProvider : null;
+		/**
+		 * Map height (terrain elevation) layer provider.
+		 *
+		 * @attribute heightProvider
+		 * @type {MapProvider}
+		 */
+		this.heightProvider = heightProvider !== undefined ? heightProvider : null;
 
-        /**
-         * Number of rays used to test nodes and subdivide the map.
-         *
-         * One ray is cast each frame, one should be enough for must scenarios.
-         *
-         * @attribute subdivisionRays
-         * @type {Boolean}
-         */
-        this.subdivisionRays = 1;
+		/**
+		 * Number of rays used to test nodes and subdivide the map.
+		 *
+		 * One ray is cast each frame, one should be enough for must scenarios.
+		 *
+		 * @attribute subdivisionRays
+		 * @type {Boolean}
+		 */
+		this.subdivisionRays = 1;
 
-        /**
-         * Threshold to subdivide the map tiles.
-         * 
-         * Lower value will subdivide earlier (less zoom required to subdivide).
-         * 
-         * @attribute thresholdUp
-         * @type {Number}
-         */
-        this.thresholdUp = 0.8;
+		/**
+		 * Threshold to subdivide the map tiles.
+		 * 
+		 * Lower value will subdivide earlier (less zoom required to subdivide).
+		 * 
+		 * @attribute thresholdUp
+		 * @type {Number}
+		 */
+		this.thresholdUp = 0.8;
 
-        /**
-         * Threshold to simplify the map tiles.
-         * 
-         * Higher value will simplify earlier.
-         *
-         * @attribute thresholdDown
-         * @type {Number}
-         */
-        this.thresholdDown = 0.2;
-        
-        /**
-         * Root map node.
-         *
-         * @attribute root
-         * @type {MapPlaneNode}
-         */
-        this.root = null;
+		/**
+		 * Threshold to simplify the map tiles.
+		 * 
+		 * Higher value will simplify earlier.
+		 *
+		 * @attribute thresholdDown
+		 * @type {Number}
+		 */
+		this.thresholdDown = 0.2;
+		
+		/**
+		 * Root map node.
+		 *
+		 * @attribute root
+		 * @type {MapPlaneNode}
+		 */
+		this.root = null;
 
-        if(this.mode === MapView.PLANAR)
-        {
-            this.scale.set(GeolocationUtils.EARTH_PERIMETER, 1, GeolocationUtils.EARTH_PERIMETER);
-            this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
-        }
-        else if(this.mode === MapView.HEIGHT)
-        {
-            this.scale.set(GeolocationUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, GeolocationUtils.EARTH_PERIMETER);
-            this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-            this.thresholdUp = 0.5;
-            this.thresholdDown = 0.1;
-        }
-        else if(this.mode === MapView.SPHERICAL)
-        {
-            this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
-            this.thresholdUp = 7e7;
-            this.thresholdDown = 2e8;
-        }
-        this.add(this.root);
+		if(this.mode === MapView.PLANAR)
+		{
+			this.scale.set(GeolocationUtils.EARTH_PERIMETER, 1, GeolocationUtils.EARTH_PERIMETER);
+			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
+		}
+		else if(this.mode === MapView.HEIGHT)
+		{
+			this.scale.set(GeolocationUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, GeolocationUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 0.5;
+			this.thresholdDown = 0.1;
+		}
+		else if(this.mode === MapView.SPHERICAL)
+		{
+			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 7e7;
+			this.thresholdDown = 2e8;
+		}
+		this.add(this.root);
 
-        this._raycaster = new Raycaster();
-        this._mouse = new Vector2();
-        this._vector = new Vector3();
-    }
+		this._raycaster = new Raycaster();
+		this._mouse = new Vector2();
+		this._vector = new Vector3();
+	}
 
-    /**
-     * Change the map provider of this map view.
-     *
-     * Will discard all the tiles already loaded using the old provider.
-     *
-     * @method setProvider
-     */
-    setProvider(provider) {
-        if(provider !== this.provider)
-        {
-            this.provider = provider;
+	/**
+	 * Change the map provider of this map view.
+	 *
+	 * Will discard all the tiles already loaded using the old provider.
+	 *
+	 * @method setProvider
+	 */
+	setProvider(provider) {
+		if(provider !== this.provider)
+		{
+			this.provider = provider;
 
-            //Clear cache and reload tiles
-            this.traverse(function(children)
-            {
-                if(children.childrenCache !== undefined && children.childrenCache !== null)
-                {
-                    children.childrenCache = null;
-                }
+			//Clear cache and reload tiles
+			this.traverse(function(children)
+			{
+				if(children.childrenCache !== undefined && children.childrenCache !== null)
+				{
+					children.childrenCache = null;
+				}
 
-                if(children.loadTexture !== undefined)
-                {
-                    children.loadTexture();
-                }
-            });
-        }
-    }
+				if(children.loadTexture !== undefined)
+				{
+					children.loadTexture();
+				}
+			});
+		}
+	}
 
-    /**
-     * Ajust node configuration depending on the camera distance.
-     *
-     * Called everytime before render. 
-     *
-     * @method onBeforeRender
-     */
-    onBeforeRender(renderer, scene, camera, geometry, material, group) {
-        const intersects = [];
+	/**
+	 * Ajust node configuration depending on the camera distance.
+	 *
+	 * Called everytime before render. 
+	 *
+	 * @method onBeforeRender
+	 */
+	onBeforeRender(renderer, scene, camera, geometry, material, group) {
+		const intersects = [];
 
-        for(let t = 0; t < this.subdivisionRays; t++)
-        {
-            //Raycast from random point
-            this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
-            
-            //Check intersection
-            this._raycaster.setFromCamera(this._mouse, camera);
-            this._raycaster.intersectObjects(this.children, true, intersects);
-        }
+		for(let t = 0; t < this.subdivisionRays; t++)
+		{
+			//Raycast from random point
+			this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+			
+			//Check intersection
+			this._raycaster.setFromCamera(this._mouse, camera);
+			this._raycaster.intersectObjects(this.children, true, intersects);
+		}
 
-        if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-        {
-            for(var i = 0; i < intersects.length; i++)
-            {
-                var node = intersects[i].object;
-                const matrix = node.matrixWorld.elements;
-                const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
-                const value = scaleX / intersects[i].distance;
+		if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+		{
+			for(var i = 0; i < intersects.length; i++)
+			{
+				var node = intersects[i].object;
+				const matrix = node.matrixWorld.elements;
+				const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
+				const value = scaleX / intersects[i].distance;
 
-                if(value > this.thresholdUp)
-                {
-                    node.subdivide();
-                    return;
-                }
-                else if(value < this.thresholdDown)
-                {
-                    if(node.parentNode !== null)
-                    {
-                        node.parentNode.simplify();
-                        return;
-                    }
-                }
-            }
-        }
-        else if(this.mode === MapView.SPHERICAL)
-        {
-            for(var i = 0; i < intersects.length; i++)
-            {
-                var node = intersects[i].object;
-                const distance = intersects[i].distance * 2 ** node.level;
+				if(value > this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if(value < this.thresholdDown)
+				{
+					if(node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
+			}
+		}
+		else if(this.mode === MapView.SPHERICAL)
+		{
+			for(var i = 0; i < intersects.length; i++)
+			{
+				var node = intersects[i].object;
+				const distance = intersects[i].distance * 2 ** node.level;
 
-                if(distance < this.thresholdUp)
-                {
-                    node.subdivide();
-                    return;
-                }
-                else if(distance > this.thresholdDown)
-                {
-                    if(node.parentNode !== null)
-                    {
-                        node.parentNode.simplify();
-                        return;
-                    }
-                }
-            }
-        }
-    }
+				if(distance < this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if(distance > this.thresholdDown)
+				{
+					if(node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
+			}
+		}
+	}
 
-    /**
-     * Get map meta data from server if supported.
-     * 
-     * @method getMetaData
-     */
-    getMetaData() {
-        this.provider.getMetaData();
-    }
+	/**
+	 * Get map meta data from server if supported.
+	 * 
+	 * @method getMetaData
+	 */
+	getMetaData() {
+		this.provider.getMetaData();
+	}
 
-    /**
-     * Fetch tile image URL using its quadtree position and zoom level.
-     * 
-     * @method fetchTile
-     * @param {Number} zoom Zoom level.
-     * @param {Number} x Tile x.
-     * @param {Number} y Tile y.
-     */
-    fetchTile(zoom, x, y) {
-        return this.provider.fetchTile(zoom, x, y);
-    }
+	/**
+	 * Fetch tile image URL using its quadtree position and zoom level.
+	 * 
+	 * @method fetchTile
+	 * @param {Number} zoom Zoom level.
+	 * @param {Number} x Tile x.
+	 * @param {Number} y Tile y.
+	 */
+	fetchTile(zoom, x, y) {
+		return this.provider.fetchTile(zoom, x, y);
+	}
 
-    raycast(raycaster, intersects) {
-        return false;
-    }
+	raycast(raycaster, intersects) {
+		return false;
+	}
 }
 
 /**

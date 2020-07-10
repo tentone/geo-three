@@ -7,50 +7,50 @@
  *
  * @class MapProvider
  */
-class MapProvider {
- constructor() {
-		 /** 
-			* Name of the map provider
-			*
-			* @attribute name
-			* @type {String}
-			*/
-		 this.name = "";
-		 
-		 /**
-			* Minimum tile level.
-			* 
-			* @attribute minZoom
-			* @type {Number}
-			*/
-		 this.minZoom = 0;
+export class MapProvider {
+	constructor() {
+		/** 
+		* Name of the map provider
+		*
+		* @attribute name
+		* @type {String}
+		*/
+		this.name = "";
+		
+		/**
+		* Minimum tile level.
+		* 
+		* @attribute minZoom
+		* @type {Number}
+		*/
+		this.minZoom = 0;
 
-		 /**
-			* Maximum tile level.
-			* 
-			* @attribute maxZoom
-			* @type {Number}
-			*/
-		 this.maxZoom = 20;
+		/**
+		* Maximum tile level.
+		* 
+		* @attribute maxZoom
+		* @type {Number}
+		*/
+		this.maxZoom = 20;
 
-		 /**
-			* Map bounds.
-			*
-			* @attribute bounds
-			* @type {Array}
-			*/
-		 this.bounds = [];
+		/**
+		* Map bounds.
+		*
+		* @attribute bounds
+		* @type {Array}
+		*/
+		this.bounds = [];
 
-		 /**
-			* Map center point.
-			*
-			* @attribute center
-			* @type {Array}
-			*/
-		 this.center = [];
- }
+		/**
+		* Map center point.
+		*
+		* @attribute center
+		* @type {Array}
+		*/
+		this.center = [];
+	}
 
- /**
+	/**
 	* Get a tile for the x, y, configuration provided.
 	*
 	* @method fetchTile
@@ -58,14 +58,14 @@ class MapProvider {
 	* @param {Number} x Tile x.
 	* @param {Number} y Tile y.
 	*/
- fetchTile(zoom, x, y) {}
+	fetchTile(zoom, x, y) {}
 
- /**
+	/**
 	* Get map meta data from server if supported.
 	*
 	* Usually map server have a method to retrieve TileJSON metadata.
 	* 
 	* @method getMetaData
 	*/
- getMetaData() {}
+	getMetaData() {}
 }

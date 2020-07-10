@@ -1,3 +1,6 @@
+import {MapProvider} from "./MapProvider.js";
+import {XHRUtils} from "../utils/XHRUtils.js";
+
 /**
  * Open tile map server tile provider.
  *
@@ -6,7 +9,7 @@
  *
  * @class OpenMapTilesProvider
  */
-class OpenMapTilesProvider extends MapProvider {
+export class OpenMapTilesProvider extends MapProvider {
 	constructor(address) {
 		super();
 
@@ -45,7 +48,7 @@ class OpenMapTilesProvider extends MapProvider {
 		const self = this;
 		const address = this.address + "styles/" + this.theme + ".json";
 
-		FileUtils.readFile(address, false, undefined, function(data)
+		XHRUtils.get(address, function(data)
 		{
 			const meta = JSON.parse(data);
 
@@ -55,10 +58,10 @@ class OpenMapTilesProvider extends MapProvider {
 			self.maxZoom = meta.maxZoom;
 			self.bounds = meta.bounds;
 			self.center = meta.center;
-			});
-		}
+		});
+	}
 
-		fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y) {
 		return this.address + "styles/" + this.theme + "/" + zoom + "/" + x + "/" + y + "." + this.format;
 	}
 }

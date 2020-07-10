@@ -12,60 +12,60 @@ import {Float32BufferAttribute, BufferGeometry} from "three";
  * @param {Number} widthSegments Number of subdivisions along the width.
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
-class MapNodeGeometry extends BufferGeometry {
-    constructor(width, height, widthSegments, heightSegments) {
-        super();
+export class MapNodeGeometry extends BufferGeometry {
+	constructor(width, height, widthSegments, heightSegments) {
+		super();
 
-        const widthHalf = width / 2;
-        const heightHalf = height / 2;
+		const widthHalf = width / 2;
+		const heightHalf = height / 2;
 
-        const gridX = widthSegments + 1;
-        const gridZ = heightSegments + 1;
+		const gridX = widthSegments + 1;
+		const gridZ = heightSegments + 1;
 
-        const segmentWidth = width / widthSegments;
-        const segmentHeight = height / heightSegments;
+		const segmentWidth = width / widthSegments;
+		const segmentHeight = height / heightSegments;
 
-        //Buffers
-        const indices = [];
-        const vertices = [];
-        const normals = [];
-        const uvs = [];
+		//Buffers
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
-        //Generate vertices, normals and uvs
-        for(var iz = 0; iz < gridZ; iz++)
-        {
-            const z = iz * segmentHeight - heightHalf;
+		//Generate vertices, normals and uvs
+		for(var iz = 0; iz < gridZ; iz++)
+		{
+			const z = iz * segmentHeight - heightHalf;
 
-            for(var ix = 0; ix < gridX; ix++)
-            {
-                const x = ix * segmentWidth - widthHalf;
+			for(var ix = 0; ix < gridX; ix++)
+			{
+				const x = ix * segmentWidth - widthHalf;
 
-                vertices.push(x, 0, z);
-                normals.push(0, 1, 0);
-                uvs.push(ix / widthSegments);
-                uvs.push(1 - (iz / heightSegments));
-            }
-        }
+				vertices.push(x, 0, z);
+				normals.push(0, 1, 0);
+				uvs.push(ix / widthSegments);
+				uvs.push(1 - (iz / heightSegments));
+			}
+		}
 
-        //Indices
-        for(var iz = 0; iz < heightSegments; iz++)
-        {
-            for(var ix = 0; ix < widthSegments; ix++)
-            {
-                const a = ix + gridX * iz;
-                const b = ix + gridX * (iz + 1);
-                const c = (ix + 1) + gridX * (iz + 1);
-                const d = (ix + 1) + gridX * iz;
+		//Indices
+		for(var iz = 0; iz < heightSegments; iz++)
+		{
+			for(var ix = 0; ix < widthSegments; ix++)
+			{
+				const a = ix + gridX * iz;
+				const b = ix + gridX * (iz + 1);
+				const c = (ix + 1) + gridX * (iz + 1);
+				const d = (ix + 1) + gridX * iz;
 
-                //faces
-                indices.push(a, b, d);
-                indices.push(b, c, d);
-            }
-        }
+				//faces
+				indices.push(a, b, d);
+				indices.push(b, c, d);
+			}
+		}
 
-        this.setIndex(indices);
-        this.addAttribute("position", new Float32BufferAttribute(vertices, 3));
-        this.addAttribute("normal", new Float32BufferAttribute(normals, 3));
-        this.addAttribute("uv", new Float32BufferAttribute(uvs, 2));
-    }
+		this.setIndex(indices);
+		this.addAttribute("position", new Float32BufferAttribute(vertices, 3));
+		this.addAttribute("normal", new Float32BufferAttribute(normals, 3));
+		this.addAttribute("uv", new Float32BufferAttribute(uvs, 2));
+	}
 }
