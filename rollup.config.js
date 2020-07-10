@@ -1,7 +1,7 @@
 import strip from "rollup-plugin-strip";
 
 export default {
-	input: "source/Maps.js",
+	input: "source/Main.js",
 	plugins: [
 		strip(
 		{
@@ -13,13 +13,13 @@ export default {
 	output: [
 		{
 			format: "umd",
-			name: "Maps",
-			file: "dist/maps.js",
+			name: "Geo",
+			file: "build/geothree.js",
 			indent: "\t"
 		},
 		{
 			format: "es",
-			file: "dist/maps.module.js",
+			file: "build/geothree.module.js",
 			indent: "\t"
 		}
 	]
