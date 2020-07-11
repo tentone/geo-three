@@ -66,7 +66,7 @@ export class MapView extends Mesh {
 		/**
 		 * Number of rays used to test nodes and subdivide the map.
 		 *
-		 * One ray is cast each frame, one should be enough for must scenarios.
+		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 		 *
 		 * @attribute subdivisionRays
 		 * @type {Boolean}

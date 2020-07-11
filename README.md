@@ -16,12 +16,6 @@
 
 
 
-### Service Comparison
-
-- 
-
-
-
 ### License
 
 - Project uses a MIT license that allow for commercial usage of the platform without any cost.

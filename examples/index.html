@@ -6,7 +6,6 @@
 <body>
 	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
 	<script type="text/javascript" src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-	<script type="text/javascript" src="https://threejs.org/examples/js/objects/Sky.js"></script>
 	<script type="text/javascript" src="../build/geo-three.js"></script>
 	<script type="text/javascript">
 		var canvas = document.createElement("canvas");
@@ -24,34 +23,6 @@
 		var scene = new THREE.Scene();
 		scene.background = new THREE.Color(0.4, 0.4, 0.4);
 
-		var sky = new THREE.Sky();
-		sky.scale.setScalar(10e10);
-		scene.add(sky);
-
-		var effectController = {
-			turbidity: 10,
-			rayleigh: 3,
-			mieCoefficient: 0.003,
-			mieDirectionalG: 0.95,
-			inclination: 0.3,
-			azimuth: 0.4
-		};
-
-		var theta = Math.PI * (effectController.inclination - 0.5);
-		var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
-
-		var sun = new THREE.Vector3();
-		sun.x = Math.cos(phi);
-		sun.y = Math.sin(phi) * Math.sin(theta);
-		sun.z = Math.sin(phi) * Math.cos(theta);
-
-		var uniforms = sky.material.uniforms;
-		uniforms["turbidity" ].value = effectController.turbidity;
-		uniforms["rayleigh" ].value = effectController.rayleigh;
-		uniforms["mieCoefficient" ].value = effectController.mieCoefficient;
-		uniforms["mieDirectionalG" ].value = effectController.mieDirectionalG;
-		uniforms["sunPosition"].value.copy(sun);
-
 		var DEV_MAPBOX_API_KEY = "pk.eyJ1IjoidGVudG9uZSIsImEiOiJjazBwNHU4eDQwZzE4M2VzOGhibWY5NXo5In0.8xpF1DEcT6Y4000vNhjj1g";
 		var DEV_HEREMAPS_APP_ID = "HqSchC7XT2PA9qCfxzFq";
 		var DEV_HEREMAPS_APP_CODE = "5rob9QcZ70J-m18Er8-rIA";
@@ -68,10 +39,15 @@
 			["Here Maps Night", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.night")],
 			["Here Maps Terrain", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "terrain.day")],
 			["Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.ROAD)],
-			["Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "styles", "basic")]
+			["Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "styles", "basic")],
+			["Satellite Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.satellite", Geo.MapBoxProvider.MAP_ID, "jpg70", false)],
+			["Satellite Map Box Labels", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/satellite-streets-v10", Geo.MapBoxProvider.STYLE, "jpg70")],
+			["Satellite Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "satellite.day", "jpg")],
+			["Satellite Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.AERIAL)],
+			["Satellite Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "data", "satellite", "jpg")]
 		];
 
-		var map = new Geo.MapView(Geo.MapView.PLANAR, providers[2][1], providers[3][1]);
+		var map = new Geo.MapView(Geo.MapView.HEIGHT, providers[9][1], providers[3][1]);
 		scene.add(map);
 		map.updateMatrixWorld(true);
 		
@@ -82,6 +58,10 @@
 		var controls = new THREE.MapControls(camera, canvas);
 		controls.minDistance = 1e3;
 		controls.zoomSpeed = 2.0;
+
+		controls.target.set(-903962.8060267984, -4.814428263109778e-12, -5133753.346552399);
+		camera.position.set(-904365.4101032199, 1334.1534013962676, -5130994.46642316);
+		camera.quaternion.set(-0.22072872069139535, -0.07059530917508659, -0.01602065586665935, 0.9726450908579224);
 
 		scene.add(new THREE.AmbientLight(0x777777));
 
