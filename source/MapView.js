@@ -133,25 +133,51 @@ export class MapView extends Mesh {
 	 *
 	 * @method setProvider
 	 */
-	setProvider(provider) {
+	setProvider(provider)
+	{
 		if(provider !== this.provider)
 		{
 			this.provider = provider;
-
-			//Clear cache and reload tiles
-			this.traverse(function(children)
-			{
-				if(children.childrenCache !== undefined && children.childrenCache !== null)
-				{
-					children.childrenCache = null;
-				}
-
-				if(children.loadTexture !== undefined)
-				{
-					children.loadTexture();
-				}
-			});
+			this.clear();
 		}
+	}
+
+	/**
+	 * Change the map height provider of this map view.
+	 *
+	 * Will discard all the tiles already loaded using the old provider.
+	 *
+	 * @method setHeightProvider
+	 */
+	setHeightProvider(heightProvider)
+	{
+		if(heightProvider !== this.heightProvider)
+		{
+			this.heightProvider = heightProvider;
+			this.clear();
+		}
+	}
+
+	/**
+	 * Clears all tiles from memory and reloads data. Used when changing the provider.
+	 * 
+	 * Should be called manually if any changed to the provider are made without setting the provider.
+	 * 
+	 * @method clear
+	 */
+	clear() {
+		this.traverse(function(children)
+		{
+			if(children.childrenCache !== undefined && children.childrenCache !== null)
+			{
+				children.childrenCache = null;
+			}
+
+			if(children.loadTexture !== undefined)
+			{
+				children.loadTexture();
+			}
+		});
 	}
 
 	/**

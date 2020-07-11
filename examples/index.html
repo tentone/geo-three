@@ -4,21 +4,23 @@
 	<title></title>
 </head>
 <body>
+	<!-- GUI -->
+	<canvas id="canvas" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;"></canvas>
+	<select id="mode" style="position: absolute; top: 20px; right: 20px; width: 200px; height: 25px;"></select>
+	<select id="providerColor" style="position: absolute; top: 50px; right: 20px; width: 200px; height: 25px;"></select>
+	<select id="providerHeight" style="position: absolute; top: 80px; right: 20px; width: 200px; height: 25px;"></select>
+
+	<!-- Code -->
 	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
 	<script type="text/javascript" src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
 	<script type="text/javascript" src="../build/geo-three.js"></script>
 	<script type="text/javascript">
-		var canvas = document.createElement("canvas");
-		canvas.style.position = "absolute";
-		canvas.style.top = "0px";
-		canvas.style.left = "0px";
-		document.body.appendChild(canvas);
+		var canvas = document.getElementById("canvas");
 
 		var renderer = new THREE.WebGLRenderer({
 			canvas: canvas,
 			antialias: true
 		});
-		renderer.shadowMap.enabled = false;
 
 		var scene = new THREE.Scene();
 		scene.background = new THREE.Color(0.4, 0.4, 0.4);
@@ -47,11 +49,69 @@
 			["Satellite Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "data", "satellite", "jpg")]
 		];
 
-		var map = new Geo.MapView(Geo.MapView.HEIGHT, providers[9][1], providers[3][1]);
+		var modes = [
+			["Planar", Geo.MapView.PLANAR],
+			["Height", Geo.MapView.HEIGHT],
+			["Spherical", Geo.MapView.SPHERICAL]
+		];
+
+		var mode = document.getElementById("mode");
+		mode.onchange = function(event)
+		{
+			if(map !== undefined)
+			{
+				scene.remove(map);
+
+				map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
+				scene.add(map);
+			}
+		};
+		for(var i = 0; i < modes.length; i++)
+		{
+			var option = document.createElement("option");
+			option.innerHTML = modes[i][0];
+			mode.appendChild(option);
+		}
+
+		var providerColor = document.getElementById("providerColor");
+		providerColor.onchange = function(event)
+		{
+			if(map !== undefined)
+			{
+				map.setProvider(providers[event.target.selectedIndex][1]);
+			}
+		};
+		for(var i = 0; i < providers.length; i++)
+		{
+			var option = document.createElement("option");
+			option.innerHTML = providers[i][0];
+			providerColor.appendChild(option);
+		}
+
+		var providerHeight = document.getElementById("providerHeight");
+
+		providerHeight.onchange = function(event)
+		{
+			if(map !== undefined)
+			{
+				map.setHeightProvider(providers[event.target.selectedIndex][1]);
+			}
+		};
+		for(var i = 0; i < providers.length; i++)
+		{
+			var option = document.createElement("option");
+			option.innerHTML = providers[i][0];
+			providerHeight.appendChild(option);
+		}
+
+		mode.selectedIndex = 1;
+		providerColor.selectedIndex = 9;
+		providerHeight.selectedIndex = 3;
+
+		var map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
 		scene.add(map);
 		map.updateMatrixWorld(true);
 		
-		//map.setProvider(providers[3][1]);
 		
 		var camera = new THREE.PerspectiveCamera(80, 1, 1e2, 1e12);
 

@@ -1,4 +1,4 @@
-import {Float32BufferAttribute, BufferGeometry} from "three";
+import {Float32BufferAttribute, BufferGeometry, Vector3} from "three";
 
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
