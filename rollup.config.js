@@ -14,12 +14,12 @@ export default {
 		{
 			format: "umd",
 			name: "Geo",
-			file: "build/geothree.js",
+			file: "build/geo-three.js",
 			indent: "\t"
 		},
 		{
 			format: "es",
-			file: "build/geothree.module.js",
+			file: "build/geo-three.module.js",
 			indent: "\t"
 		}
 	]

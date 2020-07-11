@@ -15,7 +15,7 @@ export default {
 		{
 			format: "umd",
 			name: "Geo",
-			file: "build/geothree.js",
+			file: "build/geo-three.js",
 			indent: "\t"
 		},
 	]
