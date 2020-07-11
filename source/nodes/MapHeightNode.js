@@ -1,5 +1,6 @@
 import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader} from "three";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
+import {MapNode} from "./MapNode.js";
 
 /** 
  * Represents a map tile node.
