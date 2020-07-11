@@ -64,12 +64,12 @@ export class BingMapsProvider extends MapProvider {
 
 	/** 
 	 * Get the base URL for the map configuration requested.
-
-	* Uses the format 
-	* http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
-	*
-	* @method getMetaData
-	*/
+	 *
+	 * Uses the follwing format 
+	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
+	 *
+	 * @method getMetaData
+	 */
 	getMetaData() {
 		const self = this;
 		const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=" + this.apiKey;

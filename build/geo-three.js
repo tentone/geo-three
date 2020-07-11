@@ -1676,12 +1676,12 @@
 
 		/** 
 		 * Get the base URL for the map configuration requested.
-
-		* Uses the format 
-		* http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
-		*
-		* @method getMetaData
-		*/
+		 *
+		 * Uses the follwing format 
+		 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
+		 *
+		 * @method getMetaData
+		 */
 		getMetaData() {
 			const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=" + this.apiKey;
 			
@@ -2321,7 +2321,6 @@
 		}
 
 		fetchTile(zoom, x, y) {
-			
 			const canvas = document.createElement('canvas'); // new OffscreenCanvas(this.resolution, this.resolution);
 			canvas.width = this.resolution;
 			canvas.height = this.resolution;
@@ -2340,8 +2339,9 @@
 			context.fillStyle = "#000000";
 			context.textAlign = "center";
 			context.textBaseline = "middle";
-			context.font = "bold 20px arial";
-			context.fillText("(" + zoom + ", " + x + ", " + y + ")", this.resolution / 2, this.resolution / 2);
+			context.font = "bold " + (this.resolution * 0.1) + "px arial";
+			context.fillText("(" + zoom + ")", this.resolution / 2, this.resolution * 0.4);
+			context.fillText("(" + x + ", " + y + ")", this.resolution / 2, this.resolution * 0.6);
 
 			return canvas.toDataURL();
 		}
