@@ -25,8 +25,10 @@ export class DebugProvider extends MapProvider {
 		
 		const color = zoom / this.maxZoom;
 		context.textAlign = "center";
+		context.textBaseline = "middle";
+		context.font = "bold 48px serif";
 		context.fillText("(" 	+ x + ", " + y + ")", this.resolution / 2, this.resolution / 2);
 
-		return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		return context.toDataURL();
 	}
 }

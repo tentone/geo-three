@@ -8,6 +8,7 @@ export {MapProvider} from "./providers/MapProvider.js";
 export {MapTilerProvider} from "./providers/MapTilerProvider.js";
 export {OpenMapTilesProvider} from "./providers/OpenMapTilesProvider.js";
 export {OpenStreetMapsProvider} from "./providers/OpenStreetMapsProvider.js";
+export {DebugProvider} from "./providers/DebugProvider.js";
 
 export {MapNodeGeometry} from "./geometries/MapNodeGeometry.js";
 export {MapSphereNodeGeometry} from "./geometries/MapSphereNodeGeometry.js";
