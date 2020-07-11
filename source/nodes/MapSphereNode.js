@@ -1,7 +1,7 @@
 import {Mesh, MeshBasicMaterial, Vector3, Matrix4, Quaternion} from "three";
 import {MapNode} from "./MapNode.js";
 import {MapSphereNodeGeometry} from "../geometries/MapSphereNodeGeometry.js";
-import {GeolocationUtils} from "../utils/GeolocationUtils.js";
+import {UnitsUtils} from "../utils/UnitsUtils.js";
 
 /** 
  * Represents a map tile node.
@@ -86,7 +86,7 @@ MapSphereNode.prototype.applyScaleNode = function()
 	var center = box.getCenter(new Vector3());
 
 	var matrix = new Matrix4();
-	matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS));
+	matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS));
 	this.geometry.applyMatrix(matrix);
 
 	this.position.copy(center);

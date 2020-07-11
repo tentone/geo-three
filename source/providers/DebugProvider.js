@@ -1,4 +1,5 @@
 import {MapProvider} from "./MapProvider.js";
+import {Color} from "three";
 
 /**
  * Debug provider can be used to debug the levels of the map three based on the zoom level they change between green and red.
@@ -20,15 +21,27 @@ export class DebugProvider extends MapProvider {
 
 	fetchTile(zoom, x, y) {
 		
-		const canvas = new OffscreenCanvas(this.resolution, this.resolution);
+		const canvas = document.createElement('canvas'); // new OffscreenCanvas(this.resolution, this.resolution);
+		canvas.width = this.resolution;
+		canvas.height = this.resolution;
 		const context = canvas.getContext('2d');
 		
-		const color = zoom / this.maxZoom;
+		const green = new Color(0x00FF00);
+		const red = new Color(0xFF0000);
+
+		const color = green.lerpHSL(red, (zoom - this.minZoom) / (this.maxZoom - this.minZoom));
+	
+
+		context.fillStyle = color.getStyle();
+		context.fillRect(0, 0, this.resolution, this.resolution);
+
+
+		context.fillStyle = "#000000";
 		context.textAlign = "center";
 		context.textBaseline = "middle";
-		context.font = "bold 48px serif";
-		context.fillText("(" 	+ x + ", " + y + ")", this.resolution / 2, this.resolution / 2);
+		context.font = "bold 20px arial";
+		context.fillText("(" + zoom + ", " + x + ", " + y + ")", this.resolution / 2, this.resolution / 2);
 
-		return context.toDataURL();
+		return canvas.toDataURL();
 	}
 }
