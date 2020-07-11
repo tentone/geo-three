@@ -6,7 +6,7 @@ export default {
 		serve({
 			open: true,
 			contentBase: '.',
-			openPage: '/example',
+			openPage: '/examples',
 			host: 'localhost',
 			port: 8080
 		})

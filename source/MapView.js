@@ -1,9 +1,11 @@
 import {Mesh, MeshBasicMaterial, Vector2, Vector3, Raycaster} from "three";
 import {MapSphereNodeGeometry} from "./geometries/MapSphereNodeGeometry.js";
 import {OpenStreetMapsProvider} from "./providers/OpenStreetMapsProvider.js";
+import {MapNode} from "./nodes/MapNode.js";
 import {MapHeightNode} from "./nodes/MapHeightNode.js";
 import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 import {MapSphereNode} from "./nodes/MapSphereNode.js";
+import {UnitsUtils} from "./utils/UnitsUtils.js";
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -14,12 +16,27 @@ import {MapSphereNode} from "./nodes/MapSphereNode.js";
  *
  * @class MapView
  * @extends {Mesh}
- * @param {String} mode Map view node modes.
- * @param {Number} provider Map color tile provider.
- * @param {Number} heightProvider Map height tile provider.
+ * @param {String} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+ * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+ * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
  */
 export class MapView extends Mesh {
 	constructor(mode, provider, heightProvider) {
+		mode = mode !== undefined ? mode : MapView.PLANAR;
+
+		var geometry;
+
+		if(mode === MapView.SPHERICAL)
+		{
+			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+		}
+		else if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
+		{
+			geometry = MapPlaneNode.GEOMETRY;
+		}
+
+		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		
 		/**
 		 * Define the type of map view in use.
 		 *
@@ -28,19 +45,7 @@ export class MapView extends Mesh {
 		 * @attribute mode
 		 * @type {Number}
 		 */
-		this.mode = mode !== undefined ? mode : MapView.PLANAR;
-
-		let geometry;
-		if(this.mode === MapView.SPHERICAL)
-		{
-			geometry = new MapSphereNodeGeometry(GeolocationUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-		}
-		else if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-		{
-			geometry = MapPlaneNode.GEOMETRY;
-		}
-
-		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		this.mode = mode;
 
 		/**
 		 * Map tile color layer provider.
@@ -98,12 +103,12 @@ export class MapView extends Mesh {
 
 		if(this.mode === MapView.PLANAR)
 		{
-			this.scale.set(GeolocationUtils.EARTH_PERIMETER, 1, GeolocationUtils.EARTH_PERIMETER);
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 		}
 		else if(this.mode === MapView.HEIGHT)
 		{
-			this.scale.set(GeolocationUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, GeolocationUtils.EARTH_PERIMETER);
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 0.5;
 			this.thresholdDown = 0.1;

@@ -16,6 +16,8 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  */
 export class MapBoxProvider extends MapProvider {
 	constructor(apiToken, id, mode, format, useHDPI) {
+		super();
+
 		/**
 		* Server API access token.
 		* 

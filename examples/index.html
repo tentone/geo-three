@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
+	<script type="text/javascript" src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+	<script type="text/javascript" src="https://threejs.org/examples/js/objects/Sky.js"></script>
+	<script type="text/javascript" src="../build/geo-three.js"></script>
+	<script type="text/javascript">
+		var canvas = document.createElement("canvas");
+		canvas.style.position = "absolute";
+		canvas.style.top = "0px";
+		canvas.style.left = "0px";
+		document.body.appendChild(canvas);
+
+		var renderer = new THREE.WebGLRenderer({
+			canvas: canvas,
+			antialias: true
+		});
+		renderer.shadowMap.enabled = false;
+
+		var scene = new THREE.Scene();
+		scene.background = new THREE.Color(0.4, 0.4, 0.4);
+
+		var sky = new THREE.Sky();
+		sky.scale.setScalar(10e10);
+		scene.add(sky);
+
+		var effectController = {
+			turbidity: 10,
+			rayleigh: 3,
+			mieCoefficient: 0.003,
+			mieDirectionalG: 0.95,
+			inclination: 0.3,
+			azimuth: 0.4
+		};
+
+		var theta = Math.PI * (effectController.inclination - 0.5);
+		var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
+
+		var sun = new THREE.Vector3();
+		sun.x = Math.cos(phi);
+		sun.y = Math.sin(phi) * Math.sin(theta);
+		sun.z = Math.sin(phi) * Math.cos(theta);
+
+		var uniforms = sky.material.uniforms;
+		uniforms["turbidity" ].value = effectController.turbidity;
+		uniforms["rayleigh" ].value = effectController.rayleigh;
+		uniforms["mieCoefficient" ].value = effectController.mieCoefficient;
+		uniforms["mieDirectionalG" ].value = effectController.mieDirectionalG;
+		uniforms["sunPosition"].value.copy(sun);
+
+		var DEV_MAPBOX_API_KEY = "pk.eyJ1IjoidGVudG9uZSIsImEiOiJjazBwNHU4eDQwZzE4M2VzOGhibWY5NXo5In0.8xpF1DEcT6Y4000vNhjj1g";
+		var DEV_HEREMAPS_APP_ID = "HqSchC7XT2PA9qCfxzFq";
+		var DEV_HEREMAPS_APP_CODE = "5rob9QcZ70J-m18Er8-rIA";
+		var DEV_BING_API_KEY = "AuViYD_FXGfc3dxc0pNa8ZEJxyZyPq1lwOLPCOydV3f0tlEVH-HKMgxZ9ilcRj-T";
+		var DEV_MAPTILER_API_KEY = "74crANH65xbcgRlGGhhO";
+		var OPEN_MAP_TILES_SERVER_MAP = "";
+		
+		var providers = [
+			["OpenSteet Maps", new Geo.OpenStreetMapsProvider()],
+			["OpenTile Maps", new Geo.OpenMapTilesProvider(OPEN_MAP_TILES_SERVER_MAP)],
+			["Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/streets-v10", Geo.MapBoxProvider.STYLE)],
+			["Map Box Height", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw")],
+			["Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.day")],
+			["Here Maps Night", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.night")],
+			["Here Maps Terrain", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "terrain.day")],
+			["Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.ROAD)],
+			["Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "styles", "basic")]
+		];
+
+		var map = new Geo.MapView(Geo.MapView.PLANAR, providers[2][1], providers[3][1]);
+		scene.add(map);
+		map.updateMatrixWorld(true);
+		
+		//map.setProvider(providers[3][1]);
+		
+		var camera = new THREE.PerspectiveCamera(80, 1, 1e2, 1e12);
+
+		var controls = new THREE.MapControls(camera, canvas);
+		controls.minDistance = 1e3;
+		controls.zoomSpeed = 2.0;
+
+		scene.add(new THREE.AmbientLight(0x777777));
+
+		var directional = new THREE.DirectionalLight(0x777777);
+		directional.position.set(100, 10000, 700);
+		scene.add(directional);
+
+		document.body.onresize = function()
+		{
+			var width = window.innerWidth;
+			var height = window.innerHeight;
+			renderer.setSize(width, height);
+			camera.aspect = width / height;
+			camera.updateProjectionMatrix();
+		}
+		document.body.onresize();
+
+		function animate()
+		{
+			requestAnimationFrame(animate);
+			controls.update();
+			renderer.render(scene, camera);
+		}
+		animate();
+	</script>
+</body>
+</html>

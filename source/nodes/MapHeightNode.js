@@ -12,233 +12,39 @@ import {MapNode} from "./MapNode.js";
  *
  * @class MapHeightNode
  */
-export class MapHeightNode extends Mesh {
-	constructor(parentNode, mapView, location, level, x, y) {
-		const material = new MeshPhongMaterial(
-		{
-			color: 0x000000,
-			specular: 0x000000,
-			shininess: 0,
-			wireframe: false,
-			emissive: 0xFFFFFF
-		});
+function MapHeightNode(parentNode, mapView, location, level, x, y)
+{
+	var material = new MeshPhongMaterial(
+	{
+		color: 0x000000,
+		specular: 0x000000,
+		shininess: 0,
+		wireframe: false,
+		emissive: 0xFFFFFF
+	});
 
-		super(MapHeightNode.GEOMETRY, material);
-		MapNode.call(this, parentNode, mapView, location, level, x, y);
+	Mesh.call(this, MapHeightNode.GEOMETRY, material);
+	MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-
-		/**
-		 * Cache with the children objects created from subdivision.
-		 * 
-		 * Used to avoid recreate object after simplification and subdivision.
-		 * 
-		 * The default value is null.
-		 *
-		 * @attribute childrenCache
-		 * @type {Array}
-		 */
-		this.childrenCache = null;
-
-		this.loadTexture();
-	}
+	this.matrixAutoUpdate = false;
+	this.isMesh = true;
 
 	/**
-	 * Load tile texture from the server.
+	 * Cache with the children objects created from subdivision.
 	 * 
-	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
-	 *
-	 * @method loadTexture
-	 */
-	loadTexture() {
-		const texture = new Texture();
-		texture.generateMipmaps = false;
-		texture.format = RGBFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.needsUpdate = false;
-
-		this.material.emissiveMap = texture;
-
-		const loader = new ImageLoader();
-		loader.setCrossOrigin("anonymous");
-		loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
-		{
-			texture.image = image;
-			texture.needsUpdate = true;
-		});
-
-		if(MapHeightNode.USE_DISPLACEMENT)
-		{
-			this.loadHeightDisplacement();
-		}
-		else
-		{
-			this.loadHeightGeometry();
-		}
-	}
-
-	/** 
-	 * Load height texture from the server and create a geometry to match it.
-	 *
-	 + @method loadHeightGeometry
-	 */
-	loadHeightGeometry() {
-		const self = this;
-		
-		const geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-		const vertices = geometry.attributes.position.array;
-		const itemSize = geometry.attributes.position.itemSize;
-
-		const image = document.createElement("img");
-		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		image.crossOrigin = "Anonymous";
-		image.onload = function()
-		{
-			const canvas = document.createElement("canvas");
-			canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
-			canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
-
-			const context = canvas.getContext("2d");
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-			
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			const data = imageData.data;
-			for(let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
-			{
-				const r = data[i];
-				const g = data[i + 1];
-				const b = data[i + 2];
-
-				//The value will be composed of the bits RGB
-				const value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
-
-				vertices[j + 1] = value;
-			}
-
-			self.geometry = geometry;
-			self.nodeReady();
-		};
-	}
-
-	/** 
-	 * Load height texture from the server and create a displacement map from it.
-	 *
-	 + @method loadHeightDisplacement
-	 */
-	loadHeightDisplacement() {
-		const self = this;
-		const material = this.material;
-
-		const image = document.createElement("img");
-		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		image.crossOrigin = "Anonymous";
-		image.onload = function()
-		{
-			const canvas = document.createElement("canvas");
-			canvas.width = MapHeightNode.GEOMETRY_SIZE;
-			canvas.height = MapHeightNode.GEOMETRY_SIZE;
-
-			const context = canvas.getContext("2d");
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-			
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			const data = imageData.data;
-
-			for(let i = 0; i < data.length; i += 4)
-			{
-				const r = data[i];
-				const g = data[i + 1];
-				const b = data[i + 2];
-
-				//The value will be composed of the bits RGB
-				let value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
-
-				//Limit value to fit 1 byte
-				if(value < 0)
-				{
-					value = 0;
-				}
-				else if(value > 255)
-				{
-					value = 255;
-				}
-
-				data[i] = value;
-				data[i + 1] = value;
-				data[i + 2] = value;
-			}
-
-			context.putImageData(imageData, 0, 0);
-
-			const displacement = new CanvasTexture(canvas);
-			displacement.generateMipmaps = false;
-			displacement.format = RGBFormat;
-			displacement.magFilter = LinearFilter;
-			displacement.minFilter = LinearFilter;
-
-			material.displacementMap = displacement;
-			material.displacementScale = 1.0;
-			material.displacementBias = 0.0;
-			material.needsUpdate = true;
-
-			self.nodeReady();
-		};
-	}
-
-	createChildNodes() {
-		const level = this.level + 1;
-
-		const x = this.x * 2;
-		const y = this.y * 2;
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-	}
-
-	/**
-	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * Used to avoid recreate object after simplification and subdivision.
 	 * 
-	 * @method raycast
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
 	 */
-	raycast(raycaster, intersects) {
-		if(this.isMesh === true)
-		{
-			return Mesh.prototype.raycast.call(this, raycaster, intersects);
-		}
+	this.childrenCache = null;
 
-		return false;
-	}
+	this.loadTexture();
 }
 
+MapHeightNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapHeightNode.prototype, MapNode.prototype);
 
 /**
@@ -298,3 +104,204 @@ MapHeightNode.GEOMETRY_SIZE = 16;
  * @type {PlaneBufferGeometry}
  */
 MapHeightNode.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+
+/**
+ * Load tile texture from the server.
+ * 
+ * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
+ *
+ * @method loadTexture
+ */
+MapHeightNode.prototype.loadTexture = function()
+{
+	var texture = new Texture();
+	texture.generateMipmaps = false;
+	texture.format = RGBFormat;
+	texture.magFilter = LinearFilter;
+	texture.minFilter = LinearFilter;
+	texture.needsUpdate = false;
+
+	this.material.emissiveMap = texture;
+
+	var loader = new ImageLoader();
+	loader.setCrossOrigin("anonymous");
+	loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+	{
+		texture.image = image;
+		texture.needsUpdate = true;
+	});
+
+	if(MapHeightNode.USE_DISPLACEMENT)
+	{
+		this.loadHeightDisplacement();
+	}
+	else
+	{
+		this.loadHeightGeometry();
+	}
+};
+
+/** 
+ * Load height texture from the server and create a geometry to match it.
+ *
+ + @method loadHeightGeometry
+ */
+MapHeightNode.prototype.loadHeightGeometry = function()
+{
+	var self = this;
+	
+	var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	var vertices = geometry.attributes.position.array;
+	var itemSize = geometry.attributes.position.itemSize;
+
+	var image = document.createElement("img");
+	image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	image.crossOrigin = "Anonymous";
+	image.onload = function()
+	{
+		var canvas = document.createElement("canvas");
+		canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
+		canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
+
+		var context = canvas.getContext("2d");
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+		
+		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+		for(var i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
+		{
+			var r = data[i];
+			var g = data[i + 1];
+			var b = data[i + 2];
+
+			//The value will be composed of the bits RGB
+			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+
+			vertices[j + 1] = value;
+		}
+
+		self.geometry = geometry;
+		self.nodeReady();
+	};
+};
+
+/** 
+ * Load height texture from the server and create a displacement map from it.
+ *
+ + @method loadHeightDisplacement
+ */
+MapHeightNode.prototype.loadHeightDisplacement = function()
+{
+	var self = this;
+	var material = this.material;
+
+	var image = document.createElement("img");
+	image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	image.crossOrigin = "Anonymous";
+	image.onload = function()
+	{
+		var canvas = document.createElement("canvas");
+		canvas.width = MapHeightNode.GEOMETRY_SIZE;
+		canvas.height = MapHeightNode.GEOMETRY_SIZE;
+
+		var context = canvas.getContext("2d");
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+		
+		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+
+		for(var i = 0; i < data.length; i += 4)
+		{
+			var r = data[i];
+			var g = data[i + 1];
+			var b = data[i + 2];
+
+			//The value will be composed of the bits RGB
+			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
+
+			//Limit value to fit 1 byte
+			if(value < 0)
+			{
+				value = 0;
+			}
+			else if(value > 255)
+			{
+				value = 255;
+			}
+
+			data[i] = value;
+			data[i + 1] = value;
+			data[i + 2] = value;
+		}
+
+		context.putImageData(imageData, 0, 0);
+
+		var displacement = new CanvasTexture(canvas);
+		displacement.generateMipmaps = false;
+		displacement.format = RGBFormat;
+		displacement.magFilter = LinearFilter;
+		displacement.minFilter = LinearFilter;
+
+		material.displacementMap = displacement;
+		material.displacementScale = 1.0;
+		material.displacementBias = 0.0;
+		material.needsUpdate = true;
+
+		self.nodeReady();
+	};
+};
+
+MapHeightNode.prototype.createChildNodes = function()
+{
+	var level = this.level + 1;
+
+	var x = this.x * 2;
+	var y = this.y * 2;
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+};
+
+/**
+ * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+ * 
+ * @method raycast
+ */
+MapHeightNode.prototype.raycast = function(raycaster, intersects)
+{
+	if(this.isMesh === true)
+	{
+		return Mesh.prototype.raycast.call(this, raycaster, intersects);
+	}
+
+	return false;
+};
+
+export {MapHeightNode};

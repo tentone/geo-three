@@ -203,6 +203,301 @@
 		}
 	}
 
+	/** 
+	 * Represents a map tile node inside of the quadtree
+	 * 
+	 * A map node can be subdivided into other nodes (Quadtree).
+	 * 
+	 * It is intended to be used as a base class for other map node implementations.
+	 * 
+	 * @class MapNode
+	 */
+	function MapNode(parentNode, mapView, location, level, x, y)
+	{
+		/**
+		 * The map view.
+		 *
+		 * @attribute mapView
+		 * @type {MapView}
+		 */
+		this.mapView = mapView;
+
+		/**
+		 * Parent node (from an upper tile level).
+		 * 
+		 * @attribute parentNode
+		 * @type {MapPlaneNode}
+		 */
+		this.parentNode = parentNode;
+		
+		/**
+		 * Index of the map node in the quad-tree parent node.
+		 *
+		 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
+		 *
+		 * @attribute location
+		 * @type {Number}
+		 */
+		this.location = location;
+
+		/**
+		 * Tile level of this node.
+		 * 
+		 * @attribute level
+		 * @type {Number}
+		 */
+		this.level = level;
+
+		/**
+		 * Tile x position.
+		 * 
+		 * @attribute x
+		 * @type {Number}
+		 */
+		this.x = x;
+
+		/**
+		 * Tile y position.
+		 * 
+		 * @attribute y
+		 * @type {Number}
+		 */
+		this.y = y;
+
+		/**
+		 * Indicates how many children nodes where loaded.
+		 *
+		 * @attribute nodesLoaded
+		 * @type {Number}
+		 */
+		this.nodesLoaded = 0;
+
+		/** 
+		 * Variable to check if the node is subdivided.
+		 *
+		 * To avoid bad visibility changes on node load.
+		 *
+		 * @attribute subdivided
+		 * @type {Boolean}
+		 */
+		this.subdivided = false;
+	}
+
+	/**
+	 * How many children each branch of the tree has.
+	 *
+	 * For a quad-tree this value is 4.
+	 *
+	 * @static
+	 * @attribute CHILDRENS
+	 * @type {Number}
+	 */
+	MapNode.CHILDRENS = 4;
+
+	/**
+	 * Root node has no location.
+	 *
+	 * @static
+	 * @attribute ROOT
+	 * @type {Number}
+	 */
+	MapNode.ROOT = -1;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 *
+	 * @static
+	 * @attribute TOP_LEFT
+	 * @type {Number}
+	 */
+	MapNode.TOP_LEFT = 0;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 *
+	 * @static
+	 * @attribute TOP_RIGHT
+	 * @type {Number}
+	 */
+	MapNode.TOP_RIGHT = 1;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 *
+	 * @static
+	 * @attribute BOTTOM_LEFT
+	 * @type {Number}
+	 */
+	MapNode.BOTTOM_LEFT = 2;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 *
+	 * @static
+	 * @attribute BOTTOM_RIGHT
+	 * @type {Number}
+	 */
+	MapNode.BOTTOM_RIGHT = 3;
+
+	/**
+	 * Create the child nodes to represent the next tree level.
+	 *
+	 * These nodes should be added to the object, and their transformations matrix should be updated.
+	 *
+	 * @method createChildNodes 
+	 */
+	MapNode.prototype.createChildNodes = function(){};
+
+	/**
+	 * Subdivide node,check the maximum depth allowed for the tile provider.
+	 *
+	 * Uses the createChildNodes to actually create the child nodes that represent the next tree level.
+	 * 
+	 * @method subdivide
+	 */
+	MapNode.prototype.subdivide =  function()
+	{
+		if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom)
+		{
+			return;
+		}
+
+		this.subdivided = true;
+
+		if(this.childrenCache !== null)
+		{
+			this.isMesh = false;
+			this.children = this.childrenCache;
+		}
+		else
+		{
+			this.createChildNodes();
+		}
+	};
+
+	/**
+	 * Simplify node, remove all children from node, store them in cache.
+	 *
+	 * Reset the subdivided flag and restore the visibility.
+	 *
+	 * This base method assumes that the node implementation is based off Mesh and that the isMesh property is used to toggle visibility.
+	 *
+	 * @method simplify
+	 */
+	MapNode.prototype.simplify = function()
+	{
+		if(this.children.length > 0)
+		{
+			this.childrenCache = this.children;
+		}
+
+		this.subdivided = false;
+		this.isMesh = true;
+		this.children = [];
+	};
+
+	/**
+	 * Get a neighbor in a specific direction.
+	 *
+	 * @method getNeighbor
+	 * @param {Number} direction
+	 * @return {MapNode} The neighbor node if found, null otherwise.
+	 */
+	MapNode.prototype.getNeighbor = function(direction)
+	{
+		//TODO <ADD CODE HERE>
+
+		return null;
+	};
+
+	/**
+	 * Get the quad tree neighbors (left, right, top, down) in an array.
+	 *
+	 * @method getNeighbors
+	 * @return {Array} The neighbors array, not found neighbors will be returned null.
+	 */
+	MapNode.prototype.getNeighbors = function()
+	{
+		var neighbors = [];
+
+		//TODO <ADD CODE HERE>
+
+		return neighbors;
+	};
+
+
+	/**
+	 * Load tile texture from the server.
+	 * 
+	 * This base method assumes the existence of a material attribute with a map texture.
+	 *
+	 * @method loadTexture
+	 * @param {Function} onLoad 
+	 */
+	MapNode.prototype.loadTexture = function(onLoad)
+	{
+		var texture = new three.Texture();
+		texture.generateMipmaps = false;
+		texture.format = three.RGBFormat;
+		texture.magFilter = three.LinearFilter;
+		texture.minFilter = three.LinearFilter;
+		texture.needsUpdate = false;
+
+		this.material.map = texture;
+
+		var self = this;
+		var loader = new three.ImageLoader();
+		loader.setCrossOrigin("anonymous");
+		loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+		{
+			texture.image = image;
+			texture.needsUpdate = true;
+			self.nodeReady();
+		});
+	};
+
+	/** 
+	 * Increment the child loaded counter.
+	 *
+	 * Should be called after a map node is ready for display.
+	 *
+	 * @method nodeReady
+	 */
+	MapNode.prototype.nodeReady = function()
+	{
+		//Update parent nodes loaded
+		if(this.parentNode !== null)
+		{
+			this.parentNode.nodesLoaded++;
+
+			if(this.parentNode.nodesLoaded >= MapNode.CHILDRENS)
+			{
+				if(this.parentNode.subdivided === true)
+				{
+					this.parentNode.isMesh = false;
+				}
+
+				for(var i = 0; i < this.parentNode.children.length; i++)
+				{
+					this.parentNode.children[i].visible = true;
+				}
+			}
+		}
+		//If its the root object just set visible
+		else
+		{
+			this.visible = true;
+		}
+	};
+
 	/**
 	 * Map node geometry is a geometry used to represent the map nodes.
 	 *
@@ -274,295 +569,6 @@
 	}
 
 	/** 
-	 * Represents a map tile node inside of the quadtree
-	 * 
-	 * A map node can be subdivided into other nodes (Quadtree).
-	 * 
-	 * It is intended to be used as a base class for other map node implementations.
-	 * 
-	 * @class MapNode
-	 */
-	class MapNode$1 {
-		constructor(parentNode, mapView, location, level, x, y) {
-			/**
-			 * The map view.
-			 *
-			 * @attribute mapView
-			 * @type {MapView}
-			 */
-			this.mapView = mapView;
-
-			/**
-			 * Parent node (from an upper tile level).
-			 * 
-			 * @attribute parentNode
-			 * @type {MapPlaneNode}
-			 */
-			this.parentNode = parentNode;
-
-			/**
-			 * Index of the map node in the quad-tree parent node.
-			 *
-			 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
-			 *
-			 * @attribute location
-			 * @type {Number}
-			 */
-			this.location = location;
-
-			/**
-			 * Tile level of this node.
-			 * 
-			 * @attribute level
-			 * @type {Number}
-			 */
-			this.level = level;
-
-			/**
-			 * Tile x position.
-			 * 
-			 * @attribute x
-			 * @type {Number}
-			 */
-			this.x = x;
-
-			/**
-			 * Tile y position.
-			 * 
-			 * @attribute y
-			 * @type {Number}
-			 */
-			this.y = y;
-
-			/**
-			 * Indicates how many children nodes where loaded.
-			 *
-			 * @attribute nodesLoaded
-			 * @type {Number}
-			 */
-			this.nodesLoaded = 0;
-
-			/** 
-			 * Variable to check if the node is subdivided.
-			 *
-			 * To avoid bad visibility changes on node load.
-			 *
-			 * @attribute subdivided
-			 * @type {Boolean}
-			 */
-			this.subdivided = false;
-	 	}
-
-		/**
-		 * Create the child nodes to represent the next tree level.
-		 *
-		 * These nodes should be added to the object, and their transformations matrix should be updated.
-		 *
-		 * @method createChildNodes 
-		 */
-		createChildNodes() {}
-
-		/**
-		 * Subdivide node,check the maximum depth allowed for the tile provider.
-		 *
-		 * Uses the createChildNodes to actually create the child nodes that represent the next tree level.
-		 * 
-		 * @method subdivide
-		 */
-		subdivide() {
-			if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom)
-			{
-				return;
-			}
-
-			this.subdivided = true;
-
-			if(this.childrenCache !== null)
-			{
-				this.isMesh = false;
-				this.children = this.childrenCache;
-			}
-			else
-			{
-				this.createChildNodes();
-			}
-		}
-
-		/**
-		 * Simplify node, remove all children from node, store them in cache.
-		 *
-		 * Reset the subdivided flag and restore the visibility.
-		 *
-		 * This base method assumes that the node implementation is based off THREE.Mesh and that the isMesh property is used to toggle visibility.
-		 *
-		 * @method simplify
-		 */
-		simplify() {
-			if(this.children.length > 0)
-			{
-				this.childrenCache = this.children;
-			}
-
-			this.subdivided = false;
-			this.isMesh = true;
-			this.children = [];
-		}
-
-	 /**
-	  * Get a neighbor in a specific direction.
-	  *
-	  * @method getNeighbor
-	  * @param {Number} direction
-	  * @return {MapNode} The neighbor node if found, null otherwise.
-	  */
-	 getNeighbor(direction) {
-		 //TODO <ADD CODE HERE>
-
-		 return null;
-	 }
-
-	 /**
-	  * Get the quad tree neighbors (left, right, top, down) in an array.
-	  *
-	  * @method getNeighbors
-	  * @return {Array} The neighbors array, not found neighbors will be returned null.
-	  */
-	 getNeighbors() {
-		 const neighbors = [];
-
-		 //TODO <ADD CODE HERE>
-
-		 return neighbors;
-	 }
-
-	 /**
-	  * Load tile texture from the server.
-	  * 
-	  * This base method assumes the existence of a material attribute with a map texture.
-	  *
-	  * @method loadTexture
-	  * @param {Function} onLoad 
-	  */
-	 loadTexture(onLoad) {
-		 const texture = new three.Texture();
-		 texture.generateMipmaps = false;
-		 texture.format = three.RGBFormat;
-		 texture.magFilter = three.LinearFilter;
-		 texture.minFilter = three.LinearFilter;
-		 texture.needsUpdate = false;
-		 
-		 this.material.map = texture;
-
-		 const self = this;
-		 const loader = new three.ImageLoader();
-		 loader.setCrossOrigin("anonymous");
-		 loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
-		 {
-			 texture.image = image;
-			 texture.needsUpdate = true;
-			 self.nodeReady();
-		 });
-	 }
-
-	 /** 
-	  * Increment the child loaded counter.
-	  *
-	  * Should be called after a map node is ready for display.
-	  *
-	  * @method nodeReady
-	  */
-	 nodeReady() {
-		 //Update parent nodes loaded
-		 if(this.parentNode !== null)
-		 {
-			 this.parentNode.nodesLoaded++;
-
-			 if(this.parentNode.nodesLoaded >= MapNode$1.CHILDRENS)
-			 {
-				 if(this.parentNode.subdivided === true)
-				 {
-					 this.parentNode.isMesh = false;
-				 }
-
-				 for(let i = 0; i < this.parentNode.children.length; i++)
-				 {
-					 this.parentNode.children[i].visible = true;
-				 }
-			 }
-		 }
-		 //If its the root object just set visible
-		 else
-		 {
-			 this.visible = true;
-		 }
-	 }
-	}
-
-	/**
-	 * How many children each branch of the tree has.
-	 *
-	 * For a quad-tree this value is 4.
-	 *
-	 * @static
-	 * @attribute CHILDRENS
-	 * @type {Number}
-	 */
-	MapNode$1.CHILDRENS = 4;
-
-	/**
-	 * Root node has no location.
-	 *
-	 * @static
-	 * @attribute ROOT
-	 * @type {Number}
-	 */
-	MapNode$1.ROOT = -1;
-
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute TOP_LEFT
-	 * @type {Number}
-	 */
-	MapNode$1.TOP_LEFT = 0;
-
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute TOP_RIGHT
-	 * @type {Number}
-	 */
-	MapNode$1.TOP_RIGHT = 1;
-
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute BOTTOM_LEFT
-	 * @type {Number}
-	 */
-	MapNode$1.BOTTOM_LEFT = 2;
-
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute BOTTOM_RIGHT
-	 * @type {Number}
-	 */
-	MapNode$1.BOTTOM_RIGHT = 3;
-
-	/** 
 	 * Represents a map tile node.
 	 * 
 	 * A map node can be subdivided into other nodes (Quadtree).
@@ -572,234 +578,40 @@
 	 *
 	 * @class MapHeightNode
 	 */
-	class MapHeightNode extends three.Mesh {
-		constructor(parentNode, mapView, location, level, x, y) {
-			const material = new three.MeshPhongMaterial(
-			{
-				color: 0x000000,
-				specular: 0x000000,
-				shininess: 0,
-				wireframe: false,
-				emissive: 0xFFFFFF
-			});
+	function MapHeightNode(parentNode, mapView, location, level, x, y)
+	{
+		var material = new three.MeshPhongMaterial(
+		{
+			color: 0x000000,
+			specular: 0x000000,
+			shininess: 0,
+			wireframe: false,
+			emissive: 0xFFFFFF
+		});
 
-			super(MapHeightNode.GEOMETRY, material);
-			MapNode$1.call(this, parentNode, mapView, location, level, x, y);
+		three.Mesh.call(this, MapHeightNode.GEOMETRY, material);
+		MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-			this.matrixAutoUpdate = false;
-			this.isMesh = true;
-
-			/**
-			 * Cache with the children objects created from subdivision.
-			 * 
-			 * Used to avoid recreate object after simplification and subdivision.
-			 * 
-			 * The default value is null.
-			 *
-			 * @attribute childrenCache
-			 * @type {Array}
-			 */
-			this.childrenCache = null;
-
-			this.loadTexture();
-		}
+		this.matrixAutoUpdate = false;
+		this.isMesh = true;
 
 		/**
-		 * Load tile texture from the server.
+		 * Cache with the children objects created from subdivision.
 		 * 
-		 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
-		 *
-		 * @method loadTexture
-		 */
-		loadTexture() {
-			const texture = new three.Texture();
-			texture.generateMipmaps = false;
-			texture.format = three.RGBFormat;
-			texture.magFilter = three.LinearFilter;
-			texture.minFilter = three.LinearFilter;
-			texture.needsUpdate = false;
-
-			this.material.emissiveMap = texture;
-
-			const loader = new three.ImageLoader();
-			loader.setCrossOrigin("anonymous");
-			loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
-			{
-				texture.image = image;
-				texture.needsUpdate = true;
-			});
-
-			if(MapHeightNode.USE_DISPLACEMENT)
-			{
-				this.loadHeightDisplacement();
-			}
-			else
-			{
-				this.loadHeightGeometry();
-			}
-		}
-
-		/** 
-		 * Load height texture from the server and create a geometry to match it.
-		 *
-		 + @method loadHeightGeometry
-		 */
-		loadHeightGeometry() {
-			const self = this;
-			
-			const geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-			const vertices = geometry.attributes.position.array;
-			const itemSize = geometry.attributes.position.itemSize;
-
-			const image = document.createElement("img");
-			image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-			image.crossOrigin = "Anonymous";
-			image.onload = function()
-			{
-				const canvas = document.createElement("canvas");
-				canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
-				canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
-
-				const context = canvas.getContext("2d");
-				context.imageSmoothingEnabled = false;
-				context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-				
-				const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-				const data = imageData.data;
-				for(let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
-				{
-					const r = data[i];
-					const g = data[i + 1];
-					const b = data[i + 2];
-
-					//The value will be composed of the bits RGB
-					const value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
-
-					vertices[j + 1] = value;
-				}
-
-				self.geometry = geometry;
-				self.nodeReady();
-			};
-		}
-
-		/** 
-		 * Load height texture from the server and create a displacement map from it.
-		 *
-		 + @method loadHeightDisplacement
-		 */
-		loadHeightDisplacement() {
-			const self = this;
-			const material = this.material;
-
-			const image = document.createElement("img");
-			image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-			image.crossOrigin = "Anonymous";
-			image.onload = function()
-			{
-				const canvas = document.createElement("canvas");
-				canvas.width = MapHeightNode.GEOMETRY_SIZE;
-				canvas.height = MapHeightNode.GEOMETRY_SIZE;
-
-				const context = canvas.getContext("2d");
-				context.imageSmoothingEnabled = false;
-				context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-				
-				const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-				const data = imageData.data;
-
-				for(let i = 0; i < data.length; i += 4)
-				{
-					const r = data[i];
-					const g = data[i + 1];
-					const b = data[i + 2];
-
-					//The value will be composed of the bits RGB
-					let value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
-
-					//Limit value to fit 1 byte
-					if(value < 0)
-					{
-						value = 0;
-					}
-					else if(value > 255)
-					{
-						value = 255;
-					}
-
-					data[i] = value;
-					data[i + 1] = value;
-					data[i + 2] = value;
-				}
-
-				context.putImageData(imageData, 0, 0);
-
-				const displacement = new CanvasTexture(canvas);
-				displacement.generateMipmaps = false;
-				displacement.format = three.RGBFormat;
-				displacement.magFilter = three.LinearFilter;
-				displacement.minFilter = three.LinearFilter;
-
-				material.displacementMap = displacement;
-				material.displacementScale = 1.0;
-				material.displacementBias = 0.0;
-				material.needsUpdate = true;
-
-				self.nodeReady();
-			};
-		}
-
-		createChildNodes() {
-			const level = this.level + 1;
-
-			const x = this.x * 2;
-			const y = this.y * 2;
-
-			var node = new MapHeightNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(-0.25, 0, -0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapHeightNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(0.25, 0, -0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapHeightNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(-0.25, 0, 0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapHeightNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(0.25, 0, 0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		}
-
-		/**
-		 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+		 * Used to avoid recreate object after simplification and subdivision.
 		 * 
-		 * @method raycast
+		 * The default value is null.
+		 *
+		 * @attribute childrenCache
+		 * @type {Array}
 		 */
-		raycast(raycaster, intersects) {
-			if(this.isMesh === true)
-			{
-				return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
-			}
+		this.childrenCache = null;
 
-			return false;
-		}
+		this.loadTexture();
 	}
 
-	Object.assign(MapHeightNode.prototype, MapNode$1.prototype);
+	MapHeightNode.prototype = Object.create(three.Mesh.prototype);
+	Object.assign(MapHeightNode.prototype, MapNode.prototype);
 
 	/**
 	 * If true a displacement map is used for surface deformation.
@@ -859,6 +671,205 @@
 	 */
 	MapHeightNode.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
+	/**
+	 * Load tile texture from the server.
+	 * 
+	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
+	 *
+	 * @method loadTexture
+	 */
+	MapHeightNode.prototype.loadTexture = function()
+	{
+		var texture = new three.Texture();
+		texture.generateMipmaps = false;
+		texture.format = three.RGBFormat;
+		texture.magFilter = three.LinearFilter;
+		texture.minFilter = three.LinearFilter;
+		texture.needsUpdate = false;
+
+		this.material.emissiveMap = texture;
+
+		var loader = new three.ImageLoader();
+		loader.setCrossOrigin("anonymous");
+		loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+		{
+			texture.image = image;
+			texture.needsUpdate = true;
+		});
+
+		if(MapHeightNode.USE_DISPLACEMENT)
+		{
+			this.loadHeightDisplacement();
+		}
+		else
+		{
+			this.loadHeightGeometry();
+		}
+	};
+
+	/** 
+	 * Load height texture from the server and create a geometry to match it.
+	 *
+	 + @method loadHeightGeometry
+	 */
+	MapHeightNode.prototype.loadHeightGeometry = function()
+	{
+		var self = this;
+		
+		var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+		var vertices = geometry.attributes.position.array;
+		var itemSize = geometry.attributes.position.itemSize;
+
+		var image = document.createElement("img");
+		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+		image.crossOrigin = "Anonymous";
+		image.onload = function()
+		{
+			var canvas = document.createElement("canvas");
+			canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
+			canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
+
+			var context = canvas.getContext("2d");
+			context.imageSmoothingEnabled = false;
+			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+			
+			var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+			var data = imageData.data;
+			for(var i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
+			{
+				var r = data[i];
+				var g = data[i + 1];
+				var b = data[i + 2];
+
+				//The value will be composed of the bits RGB
+				var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+
+				vertices[j + 1] = value;
+			}
+
+			self.geometry = geometry;
+			self.nodeReady();
+		};
+	};
+
+	/** 
+	 * Load height texture from the server and create a displacement map from it.
+	 *
+	 + @method loadHeightDisplacement
+	 */
+	MapHeightNode.prototype.loadHeightDisplacement = function()
+	{
+		var self = this;
+		var material = this.material;
+
+		var image = document.createElement("img");
+		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+		image.crossOrigin = "Anonymous";
+		image.onload = function()
+		{
+			var canvas = document.createElement("canvas");
+			canvas.width = MapHeightNode.GEOMETRY_SIZE;
+			canvas.height = MapHeightNode.GEOMETRY_SIZE;
+
+			var context = canvas.getContext("2d");
+			context.imageSmoothingEnabled = false;
+			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+			
+			var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+			var data = imageData.data;
+
+			for(var i = 0; i < data.length; i += 4)
+			{
+				var r = data[i];
+				var g = data[i + 1];
+				var b = data[i + 2];
+
+				//The value will be composed of the bits RGB
+				var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
+
+				//Limit value to fit 1 byte
+				if(value < 0)
+				{
+					value = 0;
+				}
+				else if(value > 255)
+				{
+					value = 255;
+				}
+
+				data[i] = value;
+				data[i + 1] = value;
+				data[i + 2] = value;
+			}
+
+			context.putImageData(imageData, 0, 0);
+
+			var displacement = new CanvasTexture(canvas);
+			displacement.generateMipmaps = false;
+			displacement.format = three.RGBFormat;
+			displacement.magFilter = three.LinearFilter;
+			displacement.minFilter = three.LinearFilter;
+
+			material.displacementMap = displacement;
+			material.displacementScale = 1.0;
+			material.displacementBias = 0.0;
+			material.needsUpdate = true;
+
+			self.nodeReady();
+		};
+	};
+
+	MapHeightNode.prototype.createChildNodes = function()
+	{
+		var level = this.level + 1;
+
+		var x = this.x * 2;
+		var y = this.y * 2;
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(-0.25, 0, -0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(0.25, 0, -0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(-0.25, 0, 0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(0.25, 0, 0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	};
+
+	/**
+	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * 
+	 * @method raycast
+	 */
+	MapHeightNode.prototype.raycast = function(raycaster, intersects)
+	{
+		if(this.isMesh === true)
+		{
+			return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
+		}
+
+		return false;
+	};
+
 	/** 
 	 * Represents a map tile node.
 	 * 
@@ -866,81 +877,32 @@
 	 * 
 	 * @class MapPlaneNode
 	 */
-	class MapPlaneNode extends three.Mesh {
-		constructor(parentNode, mapView, location, level, x, y) {
-			super(MapPlaneNode.GEOMETRY, new three.MeshBasicMaterial({wireframe: false}));
-			MapNode$1.call(this, parentNode, mapView, location, level, x, y);
+	function MapPlaneNode(parentNode, mapView, location, level, x, y)
+	{
+		three.Mesh.call(this, MapPlaneNode.GEOMETRY, new three.MeshBasicMaterial({wireframe: false}));
+		MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-			this.matrixAutoUpdate = false;
-			this.isMesh = true;
-			this.visible = false;
-
-			/**
-			 * Cache with the children objects created from subdivision.
-			 * 
-			 * Used to avoid recreate object after simplification and subdivision.
-			 * 
-			 * The default value is null.
-			 *
-			 * @attribute childrenCache
-			 * @type {Array}
-			 */
-			this.childrenCache = null;
-			
-			this.loadTexture();
-		}
-
-		createChildNodes() {
-			const level = this.level + 1;
-
-			const x = this.x * 2;
-			const y = this.y * 2;
-
-			var node = new MapPlaneNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(-0.25, 0, -0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapPlaneNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(0.25, 0, -0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapPlaneNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(-0.25, 0, 0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapPlaneNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(0.25, 0, 0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		}
+		this.matrixAutoUpdate = false;
+		this.isMesh = true;
+		this.visible = false;
 
 		/**
-		 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+		 * Cache with the children objects created from subdivision.
 		 * 
-		 * @method raycast
+		 * Used to avoid recreate object after simplification and subdivision.
+		 * 
+		 * The default value is null.
+		 *
+		 * @attribute childrenCache
+		 * @type {Array}
 		 */
-		raycast(raycaster, intersects) {
-			if(this.isMesh === true)
-			{
-				return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
-			}
-
-			return false;
-		}
+		this.childrenCache = null;
+		
+		this.loadTexture();
 	}
 
-	Object.assign(MapPlaneNode.prototype, MapNode$1.prototype);
+	MapPlaneNode.prototype = Object.create(three.Mesh.prototype);
+	Object.assign(MapPlaneNode.prototype, MapNode.prototype);
 
 	/**
 	 * Map node plane geometry.
@@ -951,6 +913,57 @@
 	 */
 	MapPlaneNode.GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
 
+	MapPlaneNode.prototype.createChildNodes = function()
+	{
+		var level = this.level + 1;
+
+		var x = this.x * 2;
+		var y = this.y * 2;
+
+		var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(-0.25, 0, -0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(0.25, 0, -0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(-0.25, 0, 0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(0.25, 0, 0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	};
+
+	/**
+	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * 
+	 * @method raycast
+	 */
+	MapPlaneNode.prototype.raycast = function(raycaster, intersects)
+	{
+		if(this.isMesh === true)
+		{
+			return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
+		}
+
+		return false;
+	};
+
 	/** 
 	 * Represents a map tile node.
 	 * 
@@ -958,136 +971,34 @@
 	 * 
 	 * @class MapSphereNode
 	 */
-	class MapSphereNode extends three.Mesh {
-		constructor(parentNode, mapView, location, level, x, y) {
-			super(
-				MapSphereNode.createGeometry(level, x, y),
-				new three.MeshBasicMaterial({wireframe:false})
-			);
-			MapNode$1.call(this, parentNode, mapView, location, level, x, y);
+	function MapSphereNode(parentNode, mapView, location, level, x, y)
+	{
+		three.Mesh.call(this, MapSphereNode.createGeometry(level, x, y), new three.MeshBasicMaterial({wireframe:false}));
+		MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-			this.applyScaleNode();
+		this.applyScaleNode();
 
-			this.matrixAutoUpdate = false;
-			this.isMesh = true;
-			this.visible = false;
-
-			/**
-			 * Cache with the children objects created from subdivision.
-			 * 
-			 * Used to avoid recreate object after simplification and subdivision.
-			 * 
-			 * The default value is null.
-			 *
-			 * @attribute childrenCache
-			 * @type {Array}
-			 */
-			this.childrenCache = null;
-
-			this.loadTexture();
-		}
+		this.matrixAutoUpdate = false;
+		this.isMesh = true;
+		this.visible = false;
 
 		/**
-		 * Create a geometry for a sphere map node.
-		 *
-		 * @method createGeometry
-		 * @param {Number} zoom
-		 * @param {Number} x
-		 * @param {Number} y
-		 */
-		static createGeometry(zoom, x, y) {
-			const range = 2 ** zoom;
-			const max = 40;
-			const segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
-
-			//X
-			const phiLength = (1 / range) * 2 * Math.PI;
-			const phiStart = x * phiLength;
-
-			//Y
-			const thetaLength = (1 / range) * Math.PI;
-			const thetaStart = y * thetaLength;
-
-			return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
-		}
-
-		/** 
-		 * Apply scale and offset position to the sphere node geometry.
-		 *
-		 * @method applyScaleNode
-		 */
-		applyScaleNode() {
-			this.geometry.computeBoundingBox();
-
-			const box = this.geometry.boundingBox.clone();
-			const center = box.getCenter(new three.Vector3());
-
-			const matrix = new three.Matrix4();
-			matrix.compose(new three.Vector3(-center.x, -center.y, -center.z), new three.Quaternion(), new three.Vector3(GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS));
-			this.geometry.applyMatrix(matrix);
-
-			this.position.copy(center);
-
-			this.updateMatrix();
-			this.updateMatrixWorld();
-		}
-
-		updateMatrix() {
-			this.matrix.setPosition(this.position);
-			this.matrixWorldNeedsUpdate = true;
-		}
-
-		updateMatrixWorld(force) {
-			if(this.matrixWorldNeedsUpdate || force)
-			{
-				this.matrixWorld.copy(this.matrix);
-				this.matrixWorldNeedsUpdate = false;
-			}
-		}
-
-		createChildNodes() {
-			const level = this.level + 1;
-
-			const x = this.x * 2;
-			const y = this.y * 2;
-
-			var node = new MapSphereNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapSphereNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapSphereNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-
-			var node = new MapSphereNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		}
-
-		/**
-		 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+		 * Cache with the children objects created from subdivision.
 		 * 
-		 * @method raycast
+		 * Used to avoid recreate object after simplification and subdivision.
+		 * 
+		 * The default value is null.
+		 *
+		 * @attribute childrenCache
+		 * @type {Array}
 		 */
-		raycast(raycaster, intersects) {
-			if(this.isMesh === true)
-			{
-				return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
-			}
+		this.childrenCache = null;
 
-			return false;
-		}
+		this.loadTexture();
 	}
 
-	Object.assign(MapSphereNode.prototype, MapNode$1.prototype);
+	MapSphereNode.prototype = Object.create(three.Mesh.prototype);
+	Object.assign(MapSphereNode.prototype, MapNode.prototype);
 
 	/**
 	 * Number of segments per node geometry.
@@ -1099,6 +1010,209 @@
 	MapSphereNode.SEGMENTS = 80;
 
 	/**
+	 * Create a geometry for a sphere map node.
+	 *
+	 * @method createGeometry
+	 * @param {Number} zoom
+	 * @param {Number} x
+	 * @param {Number} y
+	 */
+	MapSphereNode.createGeometry = function(zoom, x, y)
+	{
+		var range = Math.pow(2, zoom);
+		var max = 40;
+		var segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
+
+		//X
+		var phiLength = (1 / range) * 2 * Math.PI;
+		var phiStart = x * phiLength;
+
+		//Y
+		var thetaLength = (1 / range) * Math.PI;
+		var thetaStart = y * thetaLength;
+
+		return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
+	};
+
+	/** 
+	 * Apply scale and offset position to the sphere node geometry.
+	 *
+	 * @method applyScaleNode
+	 */
+	MapSphereNode.prototype.applyScaleNode = function()
+	{
+		this.geometry.computeBoundingBox();
+
+		var box = this.geometry.boundingBox.clone();
+		var center = box.getCenter(new three.Vector3());
+
+		var matrix = new three.Matrix4();
+		matrix.compose(new three.Vector3(-center.x, -center.y, -center.z), new three.Quaternion(), new three.Vector3(GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS));
+		this.geometry.applyMatrix(matrix);
+
+		this.position.copy(center);
+
+		this.updateMatrix();
+		this.updateMatrixWorld();
+	};
+
+	MapSphereNode.prototype.updateMatrix = function()
+	{
+		this.matrix.setPosition(this.position);
+		this.matrixWorldNeedsUpdate = true;
+	};
+
+	MapSphereNode.prototype.updateMatrixWorld = function(force)
+	{
+		if(this.matrixWorldNeedsUpdate || force)
+		{
+			this.matrixWorld.copy(this.matrix);
+			this.matrixWorldNeedsUpdate = false;
+		}
+	};
+
+	MapSphereNode.prototype.createChildNodes = function()
+	{
+		var level = this.level + 1;
+
+		var x = this.x * 2;
+		var y = this.y * 2;
+
+		var node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	};
+
+	/**
+	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * 
+	 * @method raycast
+	 */
+	MapSphereNode.prototype.raycast = function(raycaster, intersects)
+	{
+		if(this.isMesh === true)
+		{
+			return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
+		}
+
+		return false;
+	};
+
+	/**
+	 * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
+	 *
+	 * Devices with a GPS, for example, can take a minute or more to get a GPS fix, so less accurate data (IP location or wifi) may be returned.
+	 *
+	 * @static
+	 * @class UnitsUtils
+	 */
+	class UnitsUtils {
+		/**
+		 * Get the current geolocation from the browser using the location API.
+		 * 
+		 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
+		 *
+		 * @method get
+		 * @param {Function} onResult Callback function onResult(coords, timestamp).
+		 */
+		static get(onResult, onError) {
+			navigator.geolocation.getCurrentPosition(function(result)
+			{
+				onResult(result.coords, result.timestamp);
+			}, onError);
+		}
+
+		/**
+		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
+		 *
+		 * @method datumsToSpherical
+		 * @param {Number} latitude
+		 * @param {Number} longitude
+		 */
+		static datumsToSpherical(latitude, longitude) {
+			var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
+			var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
+
+			y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
+
+			return {x:x, y:y};
+		}
+
+		/**
+		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
+		 *
+		 * @method sphericalToDatums
+		 * @param {Number} x
+		 * @param {Number} y
+		 */
+		static sphericalToDatums(x, y) {
+			var longitude = (x / UnitsUtils.EARTH_ORIGIN) * 180.0;
+			var latitude = (y / UnitsUtils.EARTH_ORIGIN) * 180.0;
+
+			latitude = (180.0 / Math.PI) * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
+
+			return {latitude:latitude, longitude:longitude};
+		}
+
+		/**
+		 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
+		 *
+		 * @method quadtreeToDatums
+		 * @param {Number} zoom
+		 * @param {Number} x
+		 * @param {Number} y
+		 */
+		static quadtreeToDatums(zoom, x, y) {
+			var n = Math.pow(2.0, zoom);
+			var longitude = x / n * 360.0 - 180.0;
+			var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
+			var latitude = 180.0 * (latitudeRad / Math.PI);
+
+			return {latitude:latitude, longitude:longitude};
+		}
+	}
+
+	/**
+	 * Aproximated radius of earth in meters.
+	 *
+	 * @static
+	 * @attribute EARTH_RADIUS
+	 */
+	UnitsUtils.EARTH_RADIUS = 6378137;
+
+	/**
+	 * Earth equator perimeter in meters.
+	 *
+	 * @static
+	 * @attribute EARTH_RADIUS
+	 */
+	UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
+
+	/**
+	 * Earth equator perimeter in meters.
+	 *
+	 * @static
+	 * @attribute EARTH_ORIGIN
+	 */
+	UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
+
+	/**
 	 * Map viewer is used to read and display map tiles from a server.
 	 * 
 	 * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
@@ -1107,12 +1221,27 @@
 	 *
 	 * @class MapView
 	 * @extends {Mesh}
-	 * @param {String} mode Map view node modes.
-	 * @param {Number} provider Map color tile provider.
-	 * @param {Number} heightProvider Map height tile provider.
+	 * @param {String} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+	 * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+	 * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
 	class MapView extends three.Mesh {
 		constructor(mode, provider, heightProvider) {
+			mode = mode !== undefined ? mode : MapView.PLANAR;
+
+			var geometry;
+
+			if(mode === MapView.SPHERICAL)
+			{
+				geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+			}
+			else if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
+			{
+				geometry = MapPlaneNode.GEOMETRY;
+			}
+
+			super(geometry, new three.MeshBasicMaterial({transparent:true, opacity:0.0}));
+			
 			/**
 			 * Define the type of map view in use.
 			 *
@@ -1121,19 +1250,7 @@
 			 * @attribute mode
 			 * @type {Number}
 			 */
-			this.mode = mode !== undefined ? mode : MapView.PLANAR;
-
-			let geometry;
-			if(this.mode === MapView.SPHERICAL)
-			{
-				geometry = new MapSphereNodeGeometry(GeolocationUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-			}
-			else if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-			{
-				geometry = MapPlaneNode.GEOMETRY;
-			}
-
-			super(geometry, new three.MeshBasicMaterial({transparent:true, opacity:0.0}));
+			this.mode = mode;
 
 			/**
 			 * Map tile color layer provider.
@@ -1191,12 +1308,12 @@
 
 			if(this.mode === MapView.PLANAR)
 			{
-				this.scale.set(GeolocationUtils.EARTH_PERIMETER, 1, GeolocationUtils.EARTH_PERIMETER);
+				this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 			}
 			else if(this.mode === MapView.HEIGHT)
 			{
-				this.scale.set(GeolocationUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, GeolocationUtils.EARTH_PERIMETER);
+				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
 				this.thresholdUp = 0.5;
 				this.thresholdDown = 0.1;
@@ -1893,6 +2010,8 @@
 	 */
 	class MapBoxProvider extends MapProvider {
 		constructor(apiToken, id, mode, format, useHDPI) {
+			super();
+
 			/**
 			* Server API access token.
 			* 
@@ -2160,7 +2279,7 @@
 	exports.HereMapsProvider = HereMapsProvider;
 	exports.MapBoxProvider = MapBoxProvider;
 	exports.MapHeightNode = MapHeightNode;
-	exports.MapNode = MapNode$1;
+	exports.MapNode = MapNode;
 	exports.MapNodeGeometry = MapNodeGeometry;
 	exports.MapPlaneNode = MapPlaneNode;
 	exports.MapProvider = MapProvider;
