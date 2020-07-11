@@ -1,4 +1,5 @@
-import strip from "rollup-plugin-strip";
+import strip from '@rollup/plugin-strip';
+import {uglify} from "rollup-plugin-uglify";
 
 export default {
 	input: "source/Main.js",
@@ -8,8 +9,12 @@ export default {
 			functions: ["assert.*", "debug", "alert"],
 			debugger: false,
 			sourceMap: false
-		})
+		}),
+		uglify()
 	],
+	globals: {
+		"three": "THREE"
+	},
 	output: [
 		{
 			format: "umd",

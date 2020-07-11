@@ -1,5 +1,6 @@
 import serve from "rollup-plugin-serve";
 
+
 export default {
 	input: "source/Main.js",
 	plugins: [
@@ -11,6 +12,9 @@ export default {
 			port: 8080
 		})
 	],
+	globals: {
+		"three": "THREE"
+	},
 	output: [
 		{
 			format: "umd",
