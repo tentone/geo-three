@@ -14,33 +14,33 @@ export class OpenMapTilesProvider extends MapProvider {
 		super();
 
 		/**
-		* Map server address.
-		*
-		* By default the open OSM tile server is used.
-		* 
-		* @attribute address
-		* @type {String}
-		*/
+		 * Map server address.
+		 *
+		 * By default the open OSM tile server is used.
+		 * 
+		 * @attribute address
+		 * @type {String}
+		 */
 		this.address = address;
 
 		/**
-		* Map image tile format.
-		* 
-		* @attribute format
-		* @type {String}
-		*/
+		 * Map image tile format.
+		 * 
+		 * @attribute format
+		 * @type {String}
+		 */
 		this.format = "png";
 
 		/**
-		* Map tile theme, some of the styles available.
-		* - dark-matter
-		* - klokantech-basic
-		* - osm-bright
-		* - positron
-		* 
-		* @attribute theme
-		* @type {String}
-		*/
+		 * Map tile theme, some of the styles available.
+		 * - dark-matter
+		 * - klokantech-basic
+		 * - osm-bright
+		 * - positron
+		 * 
+		 * @attribute theme
+		 * @type {String}
+		 */
 		this.theme = "klokantech-basic";
 	}
 

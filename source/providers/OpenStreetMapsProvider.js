@@ -12,21 +12,21 @@ export class OpenStreetMapsProvider extends MapProvider {
 		super();
 
 		/**
-		* Map server address.
-		*
-		* By default the open OSM tile server is used.
-		* 
-		* @attribute address
-		* @type {String}
-		*/
+		 * Map server address.
+		 *
+		 * By default the open OSM tile server is used.
+		 * 
+		 * @attribute address
+		 * @type {String}
+		 */
 		this.address = address !== undefined ? address : "https://a.tile.openstreetmap.org/";
 
 		/**
-		* Map image tile format.
-		* 
-		* @attribute format
-		* @type {String}
-		*/
+		 * Map image tile format.
+		 * 
+		 * @attribute format
+		 * @type {String}
+		 */
 		this.format = "png";
 	}
 
