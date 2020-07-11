@@ -9,9 +9,9 @@
 	},
 	"scripts": {
 		"start": "rollup -c rollup.dev.js",
-		"build": "rollup -c && npm run uglify",
+		"build": "rollup -c",
 		"docs": "jsdoc -d docs -r source",
-		"uglify": "uglifyjs --compress --mangle --output build/geothree.min.js -- build/geothree.js",
+		"uglify": "uglifyjs --compress --mangle --output build/geo-three.min.js -- build/geo-three.js",
 		"pub": "npm run build && npm run docs && npm publish --access public ."
 	},
 	"keywords": [
