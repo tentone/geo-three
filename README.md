@@ -31,7 +31,7 @@ scene.add(map);
 - The library as support for multiple data providers that have to be configured beforehand. Most of these data providers rely on external API that differ from service to service.
 - Each one of them has its own provider object implementation of the `MapProvider` interface.
 
-- The debug provider provides information about the 
+- The debug provider provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
 
 
 
