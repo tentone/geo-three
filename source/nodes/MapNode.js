@@ -1,9 +1,9 @@
 import {Texture, ImageLoader, RGBFormat, LinearFilter} from "three";
 
 /** 
- * Represents a map tile node inside of the quadtree
+ * Represents a map tile node inside of the tiles quad-tree
  * 
- * A map node can be subdivided into other nodes (Quadtree).
+ * Each map node can be subdivided into other nodes.
  * 
  * It is intended to be used as a base class for other map node implementations.
  * 

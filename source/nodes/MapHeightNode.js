@@ -3,12 +3,11 @@ import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
 import {MapNode} from "./MapNode.js";
 
 /** 
- * Represents a map tile node.
+ * Represents a height map tile node that can be subdivided into other height nodes.
  * 
- * A map node can be subdivided into other nodes (Quadtree).
+ * Its important to update match the height of the tile with the neighbors nodes edge heights to ensure proper continuity of the surface.
  * 
- * The height node is designed to use MapBox elevation data.
- *  - https://www.mapbox.com/help/access-elevation-data/
+ * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
  *
  * @class MapHeightNode
  */

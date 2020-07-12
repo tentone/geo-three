@@ -3,9 +3,7 @@ import {MapNode} from "./MapNode.js";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
 
 /** 
- * Represents a map tile node.
- * 
- * A map node can be subdivided into other nodes (Quadtree).
+ * Represents a basic plane tile node.
  * 
  * @class MapPlaneNode
  */
