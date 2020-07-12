@@ -14,8 +14,10 @@ import {MapProvider} from "./MapProvider.js";
  * @param {String} format Image format.
  * @param {Number} size Tile size.
  */
-export class HereMapsProvider extends MapProvider {
-	constructor(appId, appCode, style, scheme, format, size) {
+export class HereMapsProvider extends MapProvider
+{
+	constructor(appId, appCode, style, scheme, format, size)
+	{
 		super();
 
 		/**
@@ -120,13 +122,15 @@ export class HereMapsProvider extends MapProvider {
 	 *
 	 * @method nextServer
 	 */
-	nextServer() {
+	nextServer()
+	{
 		this.server = (this.server % 4 === 0 ? 1 : this.server + 1);
 	}
 
 	getMetaData() {}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		this.nextServer();
 
 		return "https://" + this.server + "." + this.style + ".maps.api.here.com/maptile/2.1/maptile/" + this.version + "/" + this.scheme + "/" + zoom + "/" + x + "/" + y + "/" + this.size + "/" + this.format + "?app_id=" + this.appId + "&app_code=" + this.appCode;

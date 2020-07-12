@@ -20,8 +20,10 @@ import {UnitsUtils} from "./utils/UnitsUtils.js";
  * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
  * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
  */
-export class MapView extends Mesh {
-	constructor(mode, provider, heightProvider) {
+export class MapView extends Mesh
+{
+	constructor(mode, provider, heightProvider)
+	{
 		mode = mode !== undefined ? mode : MapView.PLANAR;
 
 		var geometry;
@@ -165,7 +167,8 @@ export class MapView extends Mesh {
 	 * 
 	 * @method clear
 	 */
-	clear() {
+	clear()
+	{
 		this.traverse(function(children)
 		{
 			if(children.childrenCache !== undefined && children.childrenCache !== null)
@@ -187,7 +190,8 @@ export class MapView extends Mesh {
 	 *
 	 * @method onBeforeRender
 	 */
-	onBeforeRender(renderer, scene, camera, geometry, material, group) {
+	onBeforeRender(renderer, scene, camera, geometry, material, group)
+	{
 		const intersects = [];
 
 		for(let t = 0; t < this.subdivisionRays; t++)
@@ -253,7 +257,8 @@ export class MapView extends Mesh {
 	 * 
 	 * @method getMetaData
 	 */
-	getMetaData() {
+	getMetaData()
+	{
 		this.provider.getMetaData();
 	}
 
@@ -265,11 +270,13 @@ export class MapView extends Mesh {
 	 * @param {Number} x Tile x.
 	 * @param {Number} y Tile y.
 	 */
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return this.provider.fetchTile(zoom, x, y);
 	}
 
-	raycast(raycaster, intersects) {
+	raycast(raycaster, intersects)
+	{
 		return false;
 	}
 }

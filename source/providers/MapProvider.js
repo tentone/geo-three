@@ -7,8 +7,10 @@
  *
  * @class MapProvider
  */
-export class MapProvider {
-	constructor() {
+export class MapProvider
+{
+	constructor()
+	{
 		/** 
 		 * Name of the map provider
 		 *
@@ -65,7 +67,7 @@ export class MapProvider {
 	/**
 	 * Get map meta data from server if supported.
 	 *
-	 * Usually map server have a method to retrieve TileJSON metadata.
+	 * Usually map server have API method to retrieve TileJSON metadata.
 	 * 
 	 * @method getMetaData
 	 */

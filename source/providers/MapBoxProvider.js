@@ -14,8 +14,10 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  * @param {String} format Image format.
  * @param {Boolean} useHDPI
  */
-export class MapBoxProvider extends MapProvider {
-	constructor(apiToken, id, mode, format, useHDPI) {
+export class MapBoxProvider extends MapProvider
+{
+	constructor(apiToken, id, mode, format, useHDPI)
+	{
 		super();
 
 		/**
@@ -97,7 +99,8 @@ export class MapBoxProvider extends MapProvider {
 		this.style = id !== undefined ? id : "";
 	}
 
-	getMetaData() {
+	getMetaData()
+	{
 		const self = this;
 		const address = MapBoxProvider.ADDRESS + this.version + "/" + this.mapId + ".json?access_token=" + this.apiToken;
 
@@ -113,7 +116,8 @@ export class MapBoxProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		if(this.mode === MapBoxProvider.STYLE)
 		{
 			return MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;

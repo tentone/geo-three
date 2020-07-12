@@ -144,7 +144,7 @@ MapHeightNode.prototype.loadTexture = function()
 /** 
  * Load height texture from the server and create a geometry to match it.
  *
- + @method loadHeightGeometry
+ * @method loadHeightGeometry
  */
 MapHeightNode.prototype.loadHeightGeometry = function()
 {
@@ -152,7 +152,6 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 	
 	var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 	var vertices = geometry.attributes.position.array;
-	var itemSize = geometry.attributes.position.itemSize;
 
 	var image = document.createElement("img");
 	image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
@@ -189,7 +188,7 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 /** 
  * Load height texture from the server and create a displacement map from it.
  *
- + @method loadHeightDisplacement
+ * @method loadHeightDisplacement
  */
 MapHeightNode.prototype.loadHeightDisplacement = function()
 {

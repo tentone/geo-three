@@ -12,8 +12,10 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  * @class BingMapsProvider
  * @param {String} apiKey Bing API key.
  */
-export class BingMapsProvider extends MapProvider {
-	constructor(apiKey, type) {
+export class BingMapsProvider extends MapProvider
+{
+	constructor(apiKey, type)
+	{
 		super();
 
 		this.maxZoom = 19;
@@ -70,7 +72,8 @@ export class BingMapsProvider extends MapProvider {
 	 *
 	 * @method getMetaData
 	 */
-	getMetaData() {
+	getMetaData()
+	{
 		const self = this;
 		const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=" + this.apiKey;
 		
@@ -90,7 +93,8 @@ export class BingMapsProvider extends MapProvider {
 	 * @method quadKey
 	 * @param {Number} x
 	 */
-	static quadKey(zoom, x, y) {
+	static quadKey(zoom, x, y)
+	{
 		let quad = "";
 
 		for(let i = zoom; i > 0; i--)
@@ -114,7 +118,8 @@ export class BingMapsProvider extends MapProvider {
 		return quad; 
 	}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
 	}
 }

@@ -12,8 +12,10 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  *
  * @class GoogleMapsProvider
  */
-export class GoogleMapsProvider extends MapProvider {
-	constructor(apiToken) {
+export class GoogleMapsProvider extends MapProvider
+{
+	constructor(apiToken)
+	{
 		super();
 
 		/**
@@ -84,7 +86,8 @@ export class GoogleMapsProvider extends MapProvider {
 	 *
 	 * @method createSession
 	 */
-	createSession() {
+	createSession()
+	{
 		const self = this;
 
 		const address = "https://www.googleapis.com/tile/v1/createSession?key=" + this.apiToken;
@@ -109,7 +112,8 @@ export class GoogleMapsProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
 	}
 }

@@ -6,7 +6,7 @@
  */
 export class XHRUtils {
 	/**
-	 * Read file data from URL, using XHR.
+	 * Get file data from URL as text, using a XHR call.
 	 * 
 	 * @method readFile
 	 * @param {String} fname File URL.
@@ -14,7 +14,8 @@ export class XHRUtils {
 	 * @param {Function} onLoad On load callback.
 	 * @param {Function} onError On progress callback.
 	 */
-	static get(fname, onLoad, onError) {
+	static get(fname, onLoad, onError)
+	{
 		var file = new XMLHttpRequest();
 		file.overrideMimeType("text/plain");
 		file.open("GET", fname, true);
@@ -48,7 +49,8 @@ export class XHRUtils {
 	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
 	 * @param {Function} onError XHR onError callback.
 	 */
-	static request(url, type, header, body, onLoad, onError) {
+	static request(url, type, header, body, onLoad, onError)
+	{
 		function parseResponse(response)
 		{
 			try

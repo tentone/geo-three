@@ -11,8 +11,10 @@ import {MapProvider} from "./MapProvider.js";
  * @class MapTilerProvider
  * @param {String} apiKey
  */
-export class MapTilerProvider extends MapProvider {
-	constructor(apiKey, type, style, format) {
+export class MapTilerProvider extends MapProvider
+{
+	constructor(apiKey, type, style, format)
+	{
 		super();
 
 		/**
@@ -65,7 +67,8 @@ export class MapTilerProvider extends MapProvider {
 		this.style = style !== undefined ? style : "klokantech-basic";
 	}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return "https://maps.tilehosting.com/" + this.type + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
 	}
 }

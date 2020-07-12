@@ -11,15 +11,8 @@ import {Float32BufferAttribute, BufferGeometry, Vector3} from "three";
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
 export class MapSphereNodeGeometry extends BufferGeometry {
-	constructor(
-		radius,
-		widthSegments,
-		heightSegments,
-		phiStart,
-		phiLength,
-		thetaStart,
-		thetaLength
-	) {
+	constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+	{
 		super();
 
 		const thetaEnd = thetaStart + thetaLength;

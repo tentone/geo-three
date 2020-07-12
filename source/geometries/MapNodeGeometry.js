@@ -12,8 +12,10 @@ import {Float32BufferAttribute, BufferGeometry} from "three";
  * @param {Number} widthSegments Number of subdivisions along the width.
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
-export class MapNodeGeometry extends BufferGeometry {
-	constructor(width, height, widthSegments, heightSegments) {
+export class MapNodeGeometry extends BufferGeometry
+{
+	constructor(width, height, widthSegments, heightSegments)
+	{
 		super();
 
 		const widthHalf = width / 2;

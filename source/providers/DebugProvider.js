@@ -6,8 +6,10 @@ import {Color} from "three";
  *
  * @class DebugProvider
  */
-export class DebugProvider extends MapProvider {
-	constructor() {
+export class DebugProvider extends MapProvider
+{
+	constructor()
+	{
 		super();
 		
 		/**
@@ -19,8 +21,9 @@ export class DebugProvider extends MapProvider {
 		this.resolution = 256;
 	}
 
-	fetchTile(zoom, x, y) {
-		const canvas = document.createElement('canvas'); // new OffscreenCanvas(this.resolution, this.resolution);
+	fetchTile(zoom, x, y)
+	{
+		const canvas = document.createElement('canvas');
 		canvas.width = this.resolution;
 		canvas.height = this.resolution;
 		const context = canvas.getContext('2d');
@@ -29,11 +32,9 @@ export class DebugProvider extends MapProvider {
 		const red = new Color(0xFF0000);
 
 		const color = green.lerpHSL(red, (zoom - this.minZoom) / (this.maxZoom - this.minZoom));
-	
 
 		context.fillStyle = color.getStyle();
 		context.fillRect(0, 0, this.resolution, this.resolution);
-
 
 		context.fillStyle = "#000000";
 		context.textAlign = "center";

@@ -7,8 +7,10 @@ import {MapProvider} from "./MapProvider.js";
  *
  * @class OpenStreetMapsProvider
  */
-export class OpenStreetMapsProvider extends MapProvider {
-	constructor(address) {
+export class OpenStreetMapsProvider extends MapProvider
+{
+	constructor(address)
+	{
 		super();
 
 		/**
@@ -30,7 +32,8 @@ export class OpenStreetMapsProvider extends MapProvider {
 		this.format = "png";
 	}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
 	}
 }

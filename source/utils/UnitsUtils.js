@@ -15,7 +15,8 @@ export class UnitsUtils {
 	 * @method get
 	 * @param {Function} onResult Callback function onResult(coords, timestamp).
 	 */
-	static get(onResult, onError) {
+	static get(onResult, onError)
+	{
 		navigator.geolocation.getCurrentPosition(function(result)
 		{
 			onResult(result.coords, result.timestamp);
@@ -29,7 +30,8 @@ export class UnitsUtils {
 	 * @param {Number} latitude
 	 * @param {Number} longitude
 	 */
-	static datumsToSpherical(latitude, longitude) {
+	static datumsToSpherical(latitude, longitude)
+	{
 		var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
 		var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
 
@@ -45,7 +47,8 @@ export class UnitsUtils {
 	 * @param {Number} x
 	 * @param {Number} y
 	 */
-	static sphericalToDatums(x, y) {
+	static sphericalToDatums(x, y)
+	{
 		var longitude = (x / UnitsUtils.EARTH_ORIGIN) * 180.0;
 		var latitude = (y / UnitsUtils.EARTH_ORIGIN) * 180.0;
 
@@ -62,7 +65,8 @@ export class UnitsUtils {
 	 * @param {Number} x
 	 * @param {Number} y
 	 */
-	static quadtreeToDatums(zoom, x, y) {
+	static quadtreeToDatums(zoom, x, y)
+	{
 		var n = Math.pow(2.0, zoom);
 		var longitude = x / n * 360.0 - 180.0;
 		var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));

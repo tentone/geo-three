@@ -9,8 +9,10 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  *
  * @class OpenMapTilesProvider
  */
-export class OpenMapTilesProvider extends MapProvider {
-	constructor(address) {
+export class OpenMapTilesProvider extends MapProvider
+{
+	constructor(address)
+	{
 		super();
 
 		/**
@@ -44,7 +46,8 @@ export class OpenMapTilesProvider extends MapProvider {
 		this.theme = "klokantech-basic";
 	}
 
-	getMetaData() {
+	getMetaData()
+	{
 		const self = this;
 		const address = this.address + "styles/" + this.theme + ".json";
 
@@ -61,7 +64,8 @@ export class OpenMapTilesProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return this.address + "styles/" + this.theme + "/" + zoom + "/" + x + "/" + y + "." + this.format;
 	}
 }
