@@ -15,15 +15,8 @@
 	 * @param {Number} heightSegments Number of subdivisions along the height.
 	 */
 	class MapSphereNodeGeometry extends three.BufferGeometry {
-		constructor(
-			radius,
-			widthSegments,
-			heightSegments,
-			phiStart,
-			phiLength,
-			thetaStart,
-			thetaLength
-		) {
+		constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+		{
 			super();
 
 			const thetaEnd = thetaStart + thetaLength;
@@ -105,8 +98,10 @@
 	 *
 	 * @class MapProvider
 	 */
-	class MapProvider {
-		constructor() {
+	class MapProvider
+	{
+		constructor()
+		{
 			/** 
 			 * Name of the map provider
 			 *
@@ -150,20 +145,21 @@
 
 		/**
 		 * Get a tile for the x, y, zoom based on the provider configuration.
+		 * 
+		 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
 		 *
-		 * The URL provided by this method
 		 * @method fetchTile
 		 * @param {Number} zoom Zoom level.
 		 * @param {Number} x Tile x.
 		 * @param {Number} y Tile y.
-		 * @return {string} URL to the image of the tile (or base64 encoded data with the tile)
+		 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 		 */
 		fetchTile(zoom, x, y) {}
 
 		/**
 		 * Get map meta data from server if supported.
 		 *
-		 * Usually map server have a method to retrieve TileJSON metadata.
+		 * Usually map server have API method to retrieve TileJSON metadata.
 		 * 
 		 * @method getMetaData
 		 */
@@ -177,8 +173,10 @@
 	 *
 	 * @class OpenStreetMapsProvider
 	 */
-	class OpenStreetMapsProvider extends MapProvider {
-		constructor(address) {
+	class OpenStreetMapsProvider extends MapProvider
+	{
+		constructor(address)
+		{
 			super();
 
 			/**
@@ -200,8 +198,16 @@
 			this.format = "png";
 		}
 
-		fetchTile(zoom, x, y) {
-			return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		fetchTile(zoom, x, y)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+				image.src = this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+			});
 		}
 	}
 
@@ -456,9 +462,8 @@
 		this.material.map = texture;
 
 		var self = this;
-		var loader = new three.ImageLoader();
-		loader.setCrossOrigin("anonymous");
-		loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+		
+		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			texture.image = image;
 			texture.needsUpdate = true;
@@ -512,8 +517,10 @@
 	 * @param {Number} widthSegments Number of subdivisions along the width.
 	 * @param {Number} heightSegments Number of subdivisions along the height.
 	 */
-	class MapNodeGeometry extends three.BufferGeometry {
-		constructor(width, height, widthSegments, heightSegments) {
+	class MapNodeGeometry extends three.BufferGeometry
+	{
+		constructor(width, height, widthSegments, heightSegments)
+		{
 			super();
 
 			const widthHalf = width / 2;
@@ -690,10 +697,8 @@
 		texture.needsUpdate = false;
 
 		this.material.emissiveMap = texture;
-
-		var loader = new three.ImageLoader();
-		loader.setCrossOrigin("anonymous");
-		loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+		
+		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			texture.image = image;
 			texture.needsUpdate = true;
@@ -712,7 +717,7 @@
 	/** 
 	 * Load height texture from the server and create a geometry to match it.
 	 *
-	 + @method loadHeightGeometry
+	 * @method loadHeightGeometry
 	 */
 	MapHeightNode.prototype.loadHeightGeometry = function()
 	{
@@ -720,16 +725,10 @@
 		
 		var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 		var vertices = geometry.attributes.position.array;
-		var itemSize = geometry.attributes.position.itemSize;
 
-		var image = document.createElement("img");
-		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		image.crossOrigin = "Anonymous";
-		image.onload = function()
+		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			var canvas = document.createElement("canvas");
-			canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
-			canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
+			var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE + 1, MapHeightNode.GEOMETRY_SIZE + 1);
 
 			var context = canvas.getContext("2d");
 			context.imageSmoothingEnabled = false;
@@ -751,27 +750,22 @@
 
 			self.geometry = geometry;
 			self.nodeReady();
-		};
+		});
 	};
 
 	/** 
 	 * Load height texture from the server and create a displacement map from it.
 	 *
-	 + @method loadHeightDisplacement
+	 * @method loadHeightDisplacement
 	 */
 	MapHeightNode.prototype.loadHeightDisplacement = function()
 	{
 		var self = this;
 		var material = this.material;
 
-		var image = document.createElement("img");
-		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		image.crossOrigin = "Anonymous";
-		image.onload = function()
+		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			var canvas = document.createElement("canvas");
-			canvas.width = MapHeightNode.GEOMETRY_SIZE;
-			canvas.height = MapHeightNode.GEOMETRY_SIZE;
+			var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
 			var context = canvas.getContext("2d");
 			context.imageSmoothingEnabled = false;
@@ -806,7 +800,7 @@
 
 			context.putImageData(imageData, 0, 0);
 
-			var displacement = new CanvasTexture(canvas);
+			var displacement = new three.CanvasTexture(canvas);
 			displacement.generateMipmaps = false;
 			displacement.format = three.RGBFormat;
 			displacement.magFilter = three.LinearFilter;
@@ -818,7 +812,7 @@
 			material.needsUpdate = true;
 
 			self.nodeReady();
-		};
+		});
 	};
 
 	MapHeightNode.prototype.createChildNodes = function()
@@ -983,7 +977,8 @@
 		 * @method get
 		 * @param {Function} onResult Callback function onResult(coords, timestamp).
 		 */
-		static get(onResult, onError) {
+		static get(onResult, onError)
+		{
 			navigator.geolocation.getCurrentPosition(function(result)
 			{
 				onResult(result.coords, result.timestamp);
@@ -997,7 +992,8 @@
 		 * @param {Number} latitude
 		 * @param {Number} longitude
 		 */
-		static datumsToSpherical(latitude, longitude) {
+		static datumsToSpherical(latitude, longitude)
+		{
 			var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
 			var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
 
@@ -1013,7 +1009,8 @@
 		 * @param {Number} x
 		 * @param {Number} y
 		 */
-		static sphericalToDatums(x, y) {
+		static sphericalToDatums(x, y)
+		{
 			var longitude = (x / UnitsUtils.EARTH_ORIGIN) * 180.0;
 			var latitude = (y / UnitsUtils.EARTH_ORIGIN) * 180.0;
 
@@ -1030,7 +1027,8 @@
 		 * @param {Number} x
 		 * @param {Number} y
 		 */
-		static quadtreeToDatums(zoom, x, y) {
+		static quadtreeToDatums(zoom, x, y)
+		{
 			var n = Math.pow(2.0, zoom);
 			var longitude = x / n * 360.0 - 180.0;
 			var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
@@ -1227,8 +1225,10 @@
 	 * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
-	class MapView extends three.Mesh {
-		constructor(mode, provider, heightProvider) {
+	class MapView extends three.Mesh
+	{
+		constructor(mode, provider, heightProvider)
+		{
 			mode = mode !== undefined ? mode : MapView.PLANAR;
 
 			var geometry;
@@ -1372,7 +1372,8 @@
 		 * 
 		 * @method clear
 		 */
-		clear() {
+		clear()
+		{
 			this.traverse(function(children)
 			{
 				if(children.childrenCache !== undefined && children.childrenCache !== null)
@@ -1394,7 +1395,8 @@
 		 *
 		 * @method onBeforeRender
 		 */
-		onBeforeRender(renderer, scene, camera, geometry, material, group) {
+		onBeforeRender(renderer, scene, camera, geometry, material, group)
+		{
 			const intersects = [];
 
 			for(let t = 0; t < this.subdivisionRays; t++)
@@ -1460,7 +1462,8 @@
 		 * 
 		 * @method getMetaData
 		 */
-		getMetaData() {
+		getMetaData()
+		{
 			this.provider.getMetaData();
 		}
 
@@ -1472,11 +1475,13 @@
 		 * @param {Number} x Tile x.
 		 * @param {Number} y Tile y.
 		 */
-		fetchTile(zoom, x, y) {
+		fetchTile(zoom, x, y)
+		{
 			return this.provider.fetchTile(zoom, x, y);
 		}
 
-		raycast(raycaster, intersects) {
+		raycast(raycaster, intersects)
+		{
 			return false;
 		}
 	}
@@ -1516,7 +1521,7 @@
 	 */
 	class XHRUtils {
 		/**
-		 * Read file data from URL, using XHR.
+		 * Get file data from URL as text, using a XHR call.
 		 * 
 		 * @method readFile
 		 * @param {String} fname File URL.
@@ -1524,7 +1529,8 @@
 		 * @param {Function} onLoad On load callback.
 		 * @param {Function} onError On progress callback.
 		 */
-		static get(fname, onLoad, onError) {
+		static get(fname, onLoad, onError)
+		{
 			var file = new XMLHttpRequest();
 			file.overrideMimeType("text/plain");
 			file.open("GET", fname, true);
@@ -1558,7 +1564,8 @@
 		 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
 		 * @param {Function} onError XHR onError callback.
 		 */
-		static request(url, type, header, body, onLoad, onError) {
+		static request(url, type, header, body, onLoad, onError)
+		{
 			function parseResponse(response)
 			{
 				try
@@ -1624,8 +1631,10 @@
 	 * @class BingMapsProvider
 	 * @param {String} apiKey Bing API key.
 	 */
-	class BingMapsProvider extends MapProvider {
-		constructor(apiKey, type) {
+	class BingMapsProvider extends MapProvider
+	{
+		constructor(apiKey, type)
+		{
 			super();
 
 			this.maxZoom = 19;
@@ -1682,7 +1691,8 @@
 		 *
 		 * @method getMetaData
 		 */
-		getMetaData() {
+		getMetaData()
+		{
 			const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=" + this.apiKey;
 			
 			XHRUtils.get(address, function(data)
@@ -1701,7 +1711,8 @@
 		 * @method quadKey
 		 * @param {Number} x
 		 */
-		static quadKey(zoom, x, y) {
+		static quadKey(zoom, x, y)
+		{
 			let quad = "";
 
 			for(let i = zoom; i > 0; i--)
@@ -1725,8 +1736,16 @@
 			return quad; 
 		}
 
-		fetchTile(zoom, x, y) {
-			return "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+		fetchTile(zoom, x, y)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+				image.src = "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+			});
 		}
 	}
 
@@ -1786,8 +1805,10 @@
 	 *
 	 * @class GoogleMapsProvider
 	 */
-	class GoogleMapsProvider extends MapProvider {
-		constructor(apiToken) {
+	class GoogleMapsProvider extends MapProvider
+	{
+		constructor(apiToken)
+		{
 			super();
 
 			/**
@@ -1858,7 +1879,8 @@
 		 *
 		 * @method createSession
 		 */
-		createSession() {
+		createSession()
+		{
 			const self = this;
 
 			const address = "https://www.googleapis.com/tile/v1/createSession?key=" + this.apiToken;
@@ -1883,8 +1905,16 @@
 			});
 		}
 
-		fetchTile(zoom, x, y) {
-			return "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+		fetchTile(zoom, x, y)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+				image.src = "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+			});
 		}
 	}
 
@@ -1902,8 +1932,10 @@
 	 * @param {String} format Image format.
 	 * @param {Number} size Tile size.
 	 */
-	class HereMapsProvider extends MapProvider {
-		constructor(appId, appCode, style, scheme, format, size) {
+	class HereMapsProvider extends MapProvider
+	{
+		constructor(appId, appCode, style, scheme, format, size)
+		{
 			super();
 
 			/**
@@ -2008,16 +2040,25 @@
 		 *
 		 * @method nextServer
 		 */
-		nextServer() {
+		nextServer()
+		{
 			this.server = (this.server % 4 === 0 ? 1 : this.server + 1);
 		}
 
 		getMetaData() {}
 
-		fetchTile(zoom, x, y) {
+		fetchTile(zoom, x, y)
+		{
 			this.nextServer();
 
-			return "https://" + this.server + "." + this.style + ".maps.api.here.com/maptile/2.1/maptile/" + this.version + "/" + this.scheme + "/" + zoom + "/" + x + "/" + y + "/" + this.size + "/" + this.format + "?app_id=" + this.appId + "&app_code=" + this.appCode;
+			return new Promise((resolve, reject) =>
+			{
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+				image.src = "https://" + this.server + "." + this.style + ".maps.api.here.com/maptile/2.1/maptile/" + this.version + "/" + this.scheme + "/" + zoom + "/" + x + "/" + y + "/" + this.size + "/" + this.format + "?app_id=" + this.appId + "&app_code=" + this.appCode;
+			});
 		}
 	}
 
@@ -2036,8 +2077,10 @@
 	 * @param {String} format Image format.
 	 * @param {Boolean} useHDPI
 	 */
-	class MapBoxProvider extends MapProvider {
-		constructor(apiToken, id, mode, format, useHDPI) {
+	class MapBoxProvider extends MapProvider
+	{
+		constructor(apiToken, id, mode, format, useHDPI)
+		{
 			super();
 
 			/**
@@ -2119,7 +2162,8 @@
 			this.style = id !== undefined ? id : "";
 		}
 
-		getMetaData() {
+		getMetaData()
+		{
 			const self = this;
 			const address = MapBoxProvider.ADDRESS + this.version + "/" + this.mapId + ".json?access_token=" + this.apiToken;
 
@@ -2135,15 +2179,24 @@
 			});
 		}
 
-		fetchTile(zoom, x, y) {
-			if(this.mode === MapBoxProvider.STYLE)
+		fetchTile(zoom, x, y)
+		{
+			return new Promise((resolve, reject) =>
 			{
-				return MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
-			}
-			else
-			{
-				return MapBoxProvider.ADDRESS + "v4/" + this.mapId + "/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x." : ".") + this.format + "?access_token=" + this.apiToken;
-			}
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+
+				if(this.mode === MapBoxProvider.STYLE)
+				{
+					image.src = MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
+				}
+				else
+				{
+					image.src = MapBoxProvider.ADDRESS + "v4/" + this.mapId + "/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x." : ".") + this.format + "?access_token=" + this.apiToken;
+				}
+			});
 		}
 	}
 
@@ -2178,8 +2231,10 @@
 	 * @class MapTilerProvider
 	 * @param {String} apiKey
 	 */
-	class MapTilerProvider extends MapProvider {
-		constructor(apiKey, type, style, format) {
+	class MapTilerProvider extends MapProvider
+	{
+		constructor(apiKey, type, style, format)
+		{
 			super();
 
 			/**
@@ -2232,8 +2287,16 @@
 			this.style = style !== undefined ? style : "klokantech-basic";
 		}
 
-		fetchTile(zoom, x, y) {
-			return "https://maps.tilehosting.com/" + this.type + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
+		fetchTile(zoom, x, y)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+				image.src = "https://maps.tilehosting.com/" + this.type + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
+			});
 		}
 	}
 
@@ -2245,8 +2308,10 @@
 	 *
 	 * @class OpenMapTilesProvider
 	 */
-	class OpenMapTilesProvider extends MapProvider {
-		constructor(address) {
+	class OpenMapTilesProvider extends MapProvider
+	{
+		constructor(address)
+		{
 			super();
 
 			/**
@@ -2280,7 +2345,8 @@
 			this.theme = "klokantech-basic";
 		}
 
-		getMetaData() {
+		getMetaData()
+		{
 			const self = this;
 			const address = this.address + "styles/" + this.theme + ".json";
 
@@ -2297,8 +2363,16 @@
 			});
 		}
 
-		fetchTile(zoom, x, y) {
-			return this.address + "styles/" + this.theme + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		fetchTile(zoom, x, y)
+		{
+			return new Promise((resolve, reject) =>
+			{
+				var image = document.createElement("img");
+				image.onload = function(){resolve(image);};
+				image.onerror = function(){reject();};
+				image.crossOrigin = "Anonymous";
+				image.src = this.address + "styles/" + this.theme + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+			});
 		}
 	}
 
@@ -2307,8 +2381,10 @@
 	 *
 	 * @class DebugProvider
 	 */
-	class DebugProvider extends MapProvider {
-		constructor() {
+	class DebugProvider extends MapProvider
+	{
+		constructor()
+		{
 			super();
 			
 			/**
@@ -2320,21 +2396,18 @@
 			this.resolution = 256;
 		}
 
-		fetchTile(zoom, x, y) {
-			const canvas = document.createElement('canvas'); // new OffscreenCanvas(this.resolution, this.resolution);
-			canvas.width = this.resolution;
-			canvas.height = this.resolution;
+		fetchTile(zoom, x, y)
+		{
+			const canvas = new OffscreenCanvas(this.resolution, this.resolution);
 			const context = canvas.getContext('2d');
 			
 			const green = new three.Color(0x00FF00);
 			const red = new three.Color(0xFF0000);
 
 			const color = green.lerpHSL(red, (zoom - this.minZoom) / (this.maxZoom - this.minZoom));
-		
 
 			context.fillStyle = color.getStyle();
 			context.fillRect(0, 0, this.resolution, this.resolution);
-
 
 			context.fillStyle = "#000000";
 			context.textAlign = "center";
@@ -2343,7 +2416,7 @@
 			context.fillText("(" + zoom + ")", this.resolution / 2, this.resolution * 0.4);
 			context.fillText("(" + x + ", " + y + ")", this.resolution / 2, this.resolution * 0.6);
 
-			return canvas.toDataURL();
+			return Promise.resolve(canvas);
 		}
 	}
 

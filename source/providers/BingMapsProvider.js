@@ -120,7 +120,14 @@ export class BingMapsProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		return "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+		});
 	}
 }
 

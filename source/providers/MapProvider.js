@@ -54,13 +54,14 @@ export class MapProvider
 
 	/**
 	 * Get a tile for the x, y, zoom based on the provider configuration.
+	 * 
+	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
 	 *
-	 * The URL provided by this method
 	 * @method fetchTile
 	 * @param {Number} zoom Zoom level.
 	 * @param {Number} x Tile x.
 	 * @param {Number} y Tile y.
-	 * @return {string} URL to the image of the tile (or base64 encoded data with the tile)
+	 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 	 */
 	fetchTile(zoom, x, y) {}
 

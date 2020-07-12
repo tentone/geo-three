@@ -34,6 +34,13 @@ export class OpenStreetMapsProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		});
 	}
 }

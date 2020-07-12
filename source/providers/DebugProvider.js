@@ -23,9 +23,7 @@ export class DebugProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		const canvas = document.createElement('canvas');
-		canvas.width = this.resolution;
-		canvas.height = this.resolution;
+		const canvas = new OffscreenCanvas(this.resolution, this.resolution);
 		const context = canvas.getContext('2d');
 		
 		const green = new Color(0x00FF00);
@@ -43,6 +41,6 @@ export class DebugProvider extends MapProvider
 		context.fillText("(" + zoom + ")", this.resolution / 2, this.resolution * 0.4);
 		context.fillText("(" + x + ", " + y + ")", this.resolution / 2, this.resolution * 0.6);
 
-		return canvas.toDataURL();
+		return Promise.resolve(canvas);
 	}
 }

@@ -114,6 +114,13 @@ export class GoogleMapsProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		return "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+		});
 	}
 }

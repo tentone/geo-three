@@ -118,14 +118,22 @@ export class MapBoxProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		if(this.mode === MapBoxProvider.STYLE)
+		return new Promise((resolve, reject) =>
 		{
-			return MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
-		}
-		else
-		{
-			return MapBoxProvider.ADDRESS + "v4/" + this.mapId + "/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x." : ".") + this.format + "?access_token=" + this.apiToken;
-		}
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+
+			if(this.mode === MapBoxProvider.STYLE)
+			{
+				image.src = MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
+			}
+			else
+			{
+				image.src = MapBoxProvider.ADDRESS + "v4/" + this.mapId + "/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x." : ".") + this.format + "?access_token=" + this.apiToken;
+			}
+		});
 	}
 }
 

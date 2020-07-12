@@ -251,9 +251,8 @@ MapNode.prototype.loadTexture = function(onLoad)
 	this.material.map = texture;
 
 	var self = this;
-	var loader = new ImageLoader();
-	loader.setCrossOrigin("anonymous");
-	loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+	
+	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
 		texture.image = image;
 		texture.needsUpdate = true;

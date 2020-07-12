@@ -1,4 +1,4 @@
-import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader} from "three";
+import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader, CanvasTexture} from "three";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
 import {MapNode} from "./MapNode.js";
 
@@ -122,10 +122,8 @@ MapHeightNode.prototype.loadTexture = function()
 	texture.needsUpdate = false;
 
 	this.material.emissiveMap = texture;
-
-	var loader = new ImageLoader();
-	loader.setCrossOrigin("anonymous");
-	loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
+	
+	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
 		texture.image = image;
 		texture.needsUpdate = true;
@@ -153,14 +151,9 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 	var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 	var vertices = geometry.attributes.position.array;
 
-	var image = document.createElement("img");
-	image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-	image.crossOrigin = "Anonymous";
-	image.onload = function()
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		var canvas = document.createElement("canvas");
-		canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
-		canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
+		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE + 1, MapHeightNode.GEOMETRY_SIZE + 1);
 
 		var context = canvas.getContext("2d");
 		context.imageSmoothingEnabled = false;
@@ -182,7 +175,7 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 
 		self.geometry = geometry;
 		self.nodeReady();
-	};
+	});
 };
 
 /** 
@@ -195,14 +188,9 @@ MapHeightNode.prototype.loadHeightDisplacement = function()
 	var self = this;
 	var material = this.material;
 
-	var image = document.createElement("img");
-	image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-	image.crossOrigin = "Anonymous";
-	image.onload = function()
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		var canvas = document.createElement("canvas");
-		canvas.width = MapHeightNode.GEOMETRY_SIZE;
-		canvas.height = MapHeightNode.GEOMETRY_SIZE;
+		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
 		var context = canvas.getContext("2d");
 		context.imageSmoothingEnabled = false;
@@ -249,7 +237,7 @@ MapHeightNode.prototype.loadHeightDisplacement = function()
 		material.needsUpdate = true;
 
 		self.nodeReady();
-	};
+	});
 };
 
 MapHeightNode.prototype.createChildNodes = function()
