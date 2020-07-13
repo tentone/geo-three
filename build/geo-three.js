@@ -212,9 +212,9 @@
 	}
 
 	/** 
-	 * Represents a map tile node inside of the quadtree
+	 * Represents a map tile node inside of the tiles quad-tree
 	 * 
-	 * A map node can be subdivided into other nodes (Quadtree).
+	 * Each map node can be subdivided into other nodes.
 	 * 
 	 * It is intended to be used as a base class for other map node implementations.
 	 * 
@@ -367,13 +367,13 @@
 	/**
 	 * Subdivide node,check the maximum depth allowed for the tile provider.
 	 *
-	 * Uses the createChildNodes to actually create the child nodes that represent the next tree level.
+	 * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
 	 * 
 	 * @method subdivide
 	 */
 	MapNode.prototype.subdivide =  function()
 	{
-		if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom)
+		if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom || (this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS))
 		{
 			return;
 		}
@@ -413,36 +413,6 @@
 	};
 
 	/**
-	 * Get a neighbor in a specific direction.
-	 *
-	 * @method getNeighbor
-	 * @param {Number} direction
-	 * @return {MapNode} The neighbor node if found, null otherwise.
-	 */
-	MapNode.prototype.getNeighbor = function(direction)
-	{
-		//TODO <ADD CODE HERE>
-
-		return null;
-	};
-
-	/**
-	 * Get the quad tree neighbors (left, right, top, down) in an array.
-	 *
-	 * @method getNeighbors
-	 * @return {Array} The neighbors array, not found neighbors will be returned null.
-	 */
-	MapNode.prototype.getNeighbors = function()
-	{
-		var neighbors = [];
-
-		//TODO <ADD CODE HERE>
-
-		return neighbors;
-	};
-
-
-	/**
 	 * Load tile texture from the server.
 	 * 
 	 * This base method assumes the existence of a material attribute with a map texture.
@@ -466,6 +436,15 @@
 		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			texture.image = image;
+			texture.needsUpdate = true;
+			self.nodeReady();
+		}).catch(function()
+		{
+			var canvas = new OffscreenCanvas(1, 1);
+			var context = canvas.getContext("2d");
+			context.fillStyle = "#FF0000";
+			context.fillRect(0, 0, 1, 1);
+			texture.image = canvas;
 			texture.needsUpdate = true;
 			self.nodeReady();
 		});
@@ -503,6 +482,35 @@
 		{
 			this.visible = true;
 		}
+	};
+
+	/**
+	 * Get all the neighbors in a specific direction (left, right, up down).
+	 *
+	 * @method getNeighborsDirection
+	 * @param {Number} direction
+	 * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+	 */
+	MapNode.prototype.getNeighborsDirection = function(direction)
+	{
+		//TODO <ADD CODE HERE>
+
+		return null;
+	};
+
+	/**
+	 * Get all the quad tree nodes neighbors. Are considered neighbors all the nodes directly in contact with a edge of this node.
+	 *
+	 * @method getNeighbors
+	 * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+	 */
+	MapNode.prototype.getNeighbors = function()
+	{
+		var neighbors = [];
+
+		//TODO <ADD CODE HERE>
+
+		return neighbors;
 	};
 
 	/**
@@ -578,12 +586,11 @@
 	}
 
 	/** 
-	 * Represents a map tile node.
+	 * Represents a height map tile node that can be subdivided into other height nodes.
 	 * 
-	 * A map node can be subdivided into other nodes (Quadtree).
+	 * Its important to update match the height of the tile with the neighbors nodes edge heights to ensure proper continuity of the surface.
 	 * 
-	 * The height node is designed to use MapBox elevation data.
-	 *  - https://www.mapbox.com/help/access-elevation-data/
+	 * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
 	 *
 	 * @class MapHeightNode
 	 */
@@ -603,6 +610,22 @@
 
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;
+		
+		/**
+		 * Flag indicating if the tile texture was loaded.
+		 * 
+		 * @attribute textureLoaded
+		 * @type {boolean}
+		 */
+		this.textureLoaded = false;
+
+		/**
+		 * Flag indicating if the tile height data was loaded.
+		 * 
+		 * @attribute heightLoaded
+		 * @type {boolean}
+		 */
+		this.heightLoaded = false;
 
 		/**
 		 * Cache with the children objects created from subdivision.
@@ -698,10 +721,15 @@
 
 		this.material.emissiveMap = texture;
 		
+		var self = this;
+
 		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			texture.image = image;
 			texture.needsUpdate = true;
+
+			self.textureLoaded = true;
+			self.nodeReady();
 		});
 
 		if(MapHeightNode.USE_DISPLACEMENT)
@@ -714,20 +742,67 @@
 		}
 	};
 
+	MapHeightNode.prototype.nodeReady = function()
+	{
+		if(!this.heightLoaded || !this.textureLoaded)
+		{
+			return;
+		}
+
+		MapNode.prototype.nodeReady.call(this);
+	};
+
+	MapHeightNode.prototype.createChildNodes = function()
+	{
+		var level = this.level + 1;
+
+		var x = this.x * 2;
+		var y = this.y * 2;
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(-0.25, 0, -0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(0.25, 0, -0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(-0.25, 0, 0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+
+		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node.scale.set(0.5, 1, 0.5);
+		node.position.set(0.25, 0, 0.25);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	};
+
 	/** 
 	 * Load height texture from the server and create a geometry to match it.
 	 *
 	 * @method loadHeightGeometry
+	 * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
 	 */
 	MapHeightNode.prototype.loadHeightGeometry = function()
 	{
 		var self = this;
-		
-		var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-		var vertices = geometry.attributes.position.array;
 
 		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
+			var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+			var vertices = geometry.attributes.position.array;
+		
 			var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE + 1, MapHeightNode.GEOMETRY_SIZE + 1);
 
 			var context = canvas.getContext("2d");
@@ -749,6 +824,12 @@
 			}
 
 			self.geometry = geometry;
+			self.heightLoaded = true;
+			self.nodeReady();
+		}).catch(function()
+		{
+			console.error("GeoThree: Failed to load height node data.", this);
+			self.heightLoaded = true;
 			self.nodeReady();
 		});
 	};
@@ -757,11 +838,11 @@
 	 * Load height texture from the server and create a displacement map from it.
 	 *
 	 * @method loadHeightDisplacement
+	 * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
 	 */
 	MapHeightNode.prototype.loadHeightDisplacement = function()
 	{
 		var self = this;
-		var material = this.material;
 
 		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
@@ -806,49 +887,19 @@
 			displacement.magFilter = three.LinearFilter;
 			displacement.minFilter = three.LinearFilter;
 
-			material.displacementMap = displacement;
-			material.displacementScale = 1.0;
-			material.displacementBias = 0.0;
-			material.needsUpdate = true;
+			self.material.displacementMap = displacement;
+			self.material.displacementScale = 1.0;
+			self.material.displacementBias = 0.0;
+			self.material.needsUpdate = true;
 
+			self.heightLoaded = true;
+			self.nodeReady();
+		}).catch(function()
+		{
+			console.error("GeoThree: Failed to load height node data.", this);
+			self.heightLoaded = true;
 			self.nodeReady();
 		});
-	};
-
-	MapHeightNode.prototype.createChildNodes = function()
-	{
-		var level = this.level + 1;
-
-		var x = this.x * 2;
-		var y = this.y * 2;
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
 	};
 
 	/**
@@ -867,9 +918,7 @@
 	};
 
 	/** 
-	 * Represents a map tile node.
-	 * 
-	 * A map node can be subdivided into other nodes (Quadtree).
+	 * Represents a basic plane tile node.
 	 * 
 	 * @class MapPlaneNode
 	 */

@@ -156,13 +156,13 @@ MapNode.prototype.createChildNodes = function(){};
 /**
  * Subdivide node,check the maximum depth allowed for the tile provider.
  *
- * Uses the createChildNodes to actually create the child nodes that represent the next tree level.
+ * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
  * 
  * @method subdivide
  */
 MapNode.prototype.subdivide =  function()
 {
-	if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom)
+	if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom || (this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS))
 	{
 		return;
 	}
@@ -202,36 +202,6 @@ MapNode.prototype.simplify = function()
 };
 
 /**
- * Get a neighbor in a specific direction.
- *
- * @method getNeighbor
- * @param {Number} direction
- * @return {MapNode} The neighbor node if found, null otherwise.
- */
-MapNode.prototype.getNeighbor = function(direction)
-{
-	//TODO <ADD CODE HERE>
-
-	return null;
-};
-
-/**
- * Get the quad tree neighbors (left, right, top, down) in an array.
- *
- * @method getNeighbors
- * @return {Array} The neighbors array, not found neighbors will be returned null.
- */
-MapNode.prototype.getNeighbors = function()
-{
-	var neighbors = [];
-
-	//TODO <ADD CODE HERE>
-
-	return neighbors;
-};
-
-
-/**
  * Load tile texture from the server.
  * 
  * This base method assumes the existence of a material attribute with a map texture.
@@ -255,6 +225,15 @@ MapNode.prototype.loadTexture = function(onLoad)
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
 		texture.image = image;
+		texture.needsUpdate = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		var canvas = new OffscreenCanvas(1, 1);
+		var context = canvas.getContext("2d");
+		context.fillStyle = "#FF0000";
+		context.fillRect(0, 0, 1, 1);
+		texture.image = canvas;
 		texture.needsUpdate = true;
 		self.nodeReady();
 	});
@@ -293,5 +272,35 @@ MapNode.prototype.nodeReady = function()
 		this.visible = true;
 	}
 };
+
+/**
+ * Get all the neighbors in a specific direction (left, right, up down).
+ *
+ * @method getNeighborsDirection
+ * @param {Number} direction
+ * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+ */
+MapNode.prototype.getNeighborsDirection = function(direction)
+{
+	//TODO <ADD CODE HERE>
+
+	return null;
+};
+
+/**
+ * Get all the quad tree nodes neighbors. Are considered neighbors all the nodes directly in contact with a edge of this node.
+ *
+ * @method getNeighbors
+ * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+ */
+MapNode.prototype.getNeighbors = function()
+{
+	var neighbors = [];
+
+	//TODO <ADD CODE HERE>
+
+	return neighbors;
+};
+
 
 export {MapNode};

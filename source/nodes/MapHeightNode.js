@@ -27,6 +27,22 @@ function MapHeightNode(parentNode, mapView, location, level, x, y)
 
 	this.matrixAutoUpdate = false;
 	this.isMesh = true;
+	
+	/**
+	 * Flag indicating if the tile texture was loaded.
+	 * 
+	 * @attribute textureLoaded
+	 * @type {boolean}
+	 */
+	this.textureLoaded = false;
+
+	/**
+	 * Flag indicating if the tile height data was loaded.
+	 * 
+	 * @attribute heightLoaded
+	 * @type {boolean}
+	 */
+	this.heightLoaded = false;
 
 	/**
 	 * Cache with the children objects created from subdivision.
@@ -122,10 +138,15 @@ MapHeightNode.prototype.loadTexture = function()
 
 	this.material.emissiveMap = texture;
 	
+	var self = this;
+
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
 		texture.image = image;
 		texture.needsUpdate = true;
+
+		self.textureLoaded = true;
+		self.nodeReady();
 	});
 
 	if(MapHeightNode.USE_DISPLACEMENT)
@@ -138,20 +159,67 @@ MapHeightNode.prototype.loadTexture = function()
 	}
 };
 
+MapHeightNode.prototype.nodeReady = function()
+{
+	if(!this.heightLoaded || !this.textureLoaded)
+	{
+		return;
+	}
+
+	MapNode.prototype.nodeReady.call(this);
+};
+
+MapHeightNode.prototype.createChildNodes = function()
+{
+	var level = this.level + 1;
+
+	var x = this.x * 2;
+	var y = this.y * 2;
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+};
+
 /** 
  * Load height texture from the server and create a geometry to match it.
  *
  * @method loadHeightGeometry
+ * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
  */
 MapHeightNode.prototype.loadHeightGeometry = function()
 {
 	var self = this;
-	
-	var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-	var vertices = geometry.attributes.position.array;
 
 	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
+		var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+		var vertices = geometry.attributes.position.array;
+	
 		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE + 1, MapHeightNode.GEOMETRY_SIZE + 1);
 
 		var context = canvas.getContext("2d");
@@ -173,6 +241,12 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 		}
 
 		self.geometry = geometry;
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		console.error("GeoThree: Failed to load height node data.", this);
+		self.heightLoaded = true;
 		self.nodeReady();
 	});
 };
@@ -181,11 +255,11 @@ MapHeightNode.prototype.loadHeightGeometry = function()
  * Load height texture from the server and create a displacement map from it.
  *
  * @method loadHeightDisplacement
+ * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
  */
 MapHeightNode.prototype.loadHeightDisplacement = function()
 {
 	var self = this;
-	var material = this.material;
 
 	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
@@ -230,49 +304,19 @@ MapHeightNode.prototype.loadHeightDisplacement = function()
 		displacement.magFilter = LinearFilter;
 		displacement.minFilter = LinearFilter;
 
-		material.displacementMap = displacement;
-		material.displacementScale = 1.0;
-		material.displacementBias = 0.0;
-		material.needsUpdate = true;
+		self.material.displacementMap = displacement;
+		self.material.displacementScale = 1.0;
+		self.material.displacementBias = 0.0;
+		self.material.needsUpdate = true;
 
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		console.error("GeoThree: Failed to load height node data.", this);
+		self.heightLoaded = true;
 		self.nodeReady();
 	});
-};
-
-MapHeightNode.prototype.createChildNodes = function()
-{
-	var level = this.level + 1;
-
-	var x = this.x * 2;
-	var y = this.y * 2;
-
-	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
-	node.scale.set(0.5, 1, 0.5);
-	node.position.set(-0.25, 0, -0.25);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-
-	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
-	node.scale.set(0.5, 1, 0.5);
-	node.position.set(0.25, 0, -0.25);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-
-	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
-	node.scale.set(0.5, 1, 0.5);
-	node.position.set(-0.25, 0, 0.25);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-
-	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
-	node.scale.set(0.5, 1, 0.5);
-	node.position.set(0.25, 0, 0.25);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
 };
 
 /**
