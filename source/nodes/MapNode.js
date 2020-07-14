@@ -302,5 +302,4 @@ MapNode.prototype.getNeighbors = function()
 	return neighbors;
 };
 
-
 export {MapNode};

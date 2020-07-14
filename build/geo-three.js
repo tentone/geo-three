@@ -2282,7 +2282,7 @@
 	 */
 	class MapTilerProvider extends MapProvider
 	{
-		constructor(apiKey, type, style, format)
+		constructor(apiKey, category, style, format)
 		{
 			super();
 
@@ -2295,45 +2295,36 @@
 			this.apiKey = apiKey !== undefined ? apiKey : "";
 
 			/**
-			 * Map image tile format.
-			 *  - png
-			 *  - jpg
+			 * Map image tile file format (e.g png, jpg)
 			 *
+			 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
+			 * 
 			 * @attribute format
 			 * @type {String}
 			 */
 			this.format = format !== undefined ? format : "png";
 
-			/** 
-			 * The type of the map being provided, can be
-			 *  - styles For vectorial map styles
-			 *  - data For data map styles.
+			/**
+			 * Tile category (e.g. maps, tiles), 
 			 *
-			 * @attribute type
+			 * @attribute category
 			 * @type {String}
 			 */
-			this.type = type !== undefined ? type : "styles";
+			this.category = category !== undefined ? category : "maps";
 
 			/**
-			 * Map tile style, some of the vectorial styles available.
-			 * - basic
-			 * - bright
-			 * - darkmatter
-			 * - hybrid
-			 * - positron
-			 * - streets
-			 * - topo
-			 * - voyager
+			 * Map tile type, some of the vectorial styles available.
+			 * 
+			 * Can be used for rasterized vectorial maps (e.g, basic, bright, darkmatter, hybrid, positron, streets, topo, voyager).
 			 *
-			 * Data styles:
-			 * - hillshades
-			 * - terrain-rgb
-			 * - satellite
+			 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
 			 *
 			 * @attribute style
 			 * @type {String}
 			 */
-			this.style = style !== undefined ? style : "klokantech-basic";
+			this.style = style !== undefined ? style : "satellite";
+
+			this.resolution = 512;
 		}
 
 		fetchTile(zoom, x, y)
@@ -2344,7 +2335,7 @@
 				image.onload = function(){resolve(image);};
 				image.onerror = function(){reject();};
 				image.crossOrigin = "Anonymous";
-				image.src = "https://maps.tilehosting.com/" + this.type + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
+				image.src = "https://api.maptiler.com/" + this.category + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
 			});
 		}
 	}
