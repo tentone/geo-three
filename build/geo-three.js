@@ -611,6 +611,8 @@
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;
 		
+		this.visible = false;
+
 		/**
 		 * Flag indicating if the tile texture was loaded.
 		 * 
@@ -748,6 +750,8 @@
 		{
 			return;
 		}
+
+		this.visible = true;
 
 		MapNode.prototype.nodeReady.call(this);
 	};
