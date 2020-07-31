@@ -26,6 +26,22 @@ scene.add(map);
 
 
 
+### Tile Loading
+
+- Tiles are fetched from the service API configured, each on of the services requires specific configuration using the specific `MapProvider` object.
+
+- Base tiles are always loaded at the beginning of the process, then each frame a couple of rays are casted into the tile tree. The number of rays can be configured using the `MapView` `subdivisionRays` attribute.
+
+- The distance of the ray to the camera is used to define if the node needs to simplified or sub-divided. These values can be configured using the `thresholdUp` and `thresholdDown` values.
+
+  ​    
+
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="290">
+
+
+
+
+
 ### Data Providers
 
 - The library as support for multiple data providers that have to be configured beforehand. Most of these data providers rely on external API that differ from service to service.
@@ -33,7 +49,7 @@ scene.add(map);
 
 - The debug provider provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
 
-
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="290">
 
 ### License
 
