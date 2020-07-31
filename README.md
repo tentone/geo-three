@@ -36,7 +36,7 @@ scene.add(map);
 
   ​    
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="290">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="280">
 
 
 
@@ -49,7 +49,7 @@ scene.add(map);
 
 - The debug provider provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="290"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="290">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="280">
 
 ### License
 
