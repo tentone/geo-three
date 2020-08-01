@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: providers/BingMapsProvider.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: providers/BingMapsProvider.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import {MapProvider} from "./MapProvider.js";
+import {XHRUtils} from "../utils/XHRUtils.js";
+
+/**
+ * Bing maps tile provider.
+ *
+ * API Reference
+ *  - https://msdn.microsoft.com/en-us/library/bb259689.aspx (Bing Maps Tile System)
+ *  - https://msdn.microsoft.com/en-us/library/mt823633.aspx (Directly accessing the Bing Maps tiles)
+ *  - https://www.bingmapsportal.com/
+ *
+ * @class BingMapsProvider
+ * @param {String} apiKey Bing API key.
+ */
+export class BingMapsProvider extends MapProvider
+{
+	constructor(apiKey, type)
+	{
+		super();
+
+		this.maxZoom = 19;
+		
+		/**
+		 * Server API access token.
+		 * 
+		 * @attribute apiKey
+		 * @type {String}
+		 */
+		this.apiKey = apiKey !== undefined ? apiKey : "";
+
+		/** 
+		 * The type of the map used.
+		 *
+		 * @attribute type
+		 * @type {String}
+		 */
+		this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
+
+		/**
+		 * Map image tile format, the formats available are:
+		 *  - gif: Use GIF image format.
+		 *  - jpeg: Use JPEG image format. JPEG format is the default for Road, Aerial and AerialWithLabels imagery.
+		 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
+		 *
+		 * @attribute format
+		 * @type {String}
+		 */
+		this.format = "jpeg";
+
+		/**
+		 * Size of the map tiles.
+		 *
+		 * @attribute mapSize
+		 * @type {Number}
+		 */
+		this.mapSize = 512;
+
+		/**
+		 * Tile server subdomain.
+		 *
+		 * @attribute subdomain
+		 * @type {String}
+		 */
+		this.subdomain = "t1";
+	}
+
+	/** 
+	 * Get the base URL for the map configuration requested.
+	 *
+	 * Uses the follwing format 
+	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&amp;mkt={culture}&amp;shading=hill&amp;stl=H
+	 *
+	 * @method getMetaData
+	 */
+	getMetaData()
+	{
+		const self = this;
+		const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&amp;include=ImageryProviders&amp;key=" + this.apiKey;
+		
+		XHRUtils.get(address, function(data)
+		{
+			const meta = JSON.parse(data);
+
+			//TODO &lt;FILL METADATA>
+		});
+	}
+
+	/**
+	 * Convert x, y, zoom quadtree to a bing maps specific quadkey.
+	 *
+	 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
+	 *
+	 * @method quadKey
+	 * @param {Number} x
+	 */
+	static quadKey(zoom, x, y)
+	{
+		let quad = "";
+
+		for(let i = zoom; i > 0; i--)
+		{
+			const mask = 1 &lt;&lt; (i - 1);
+			let cell = 0;
+			
+			if((x &amp; mask) != 0)
+			{
+				cell++;	
+			}
+			
+			if((y &amp; mask) != 0)
+			{
+				cell += 2;
+			}
+
+			quad += cell; 
+		}
+
+		return quad; 
+	}
+
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+		});
+	}
+}
+
+/**
+ * Display an aerial view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.AERIAL = "a";
+
+/**
+ * Display a road view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.ROAD = "r";
+
+/**
+ * Display an aerial view of the map with labels.
+ *
+ * @static
+ * @attribute AERIAL_LABELS
+ * @type {String}
+ */
+BingMapsProvider.AERIAL_LABELS = "h";
+
+/**
+ * Use this value to display a bird's eye (oblique) view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.OBLIQUE = "o";
+
+/**
+ * Display a bird's eye (oblique) with labels view of the map.
+ *
+ * @static
+ * @attribute AERIAL
+ * @type {String}
+ */
+BingMapsProvider.OBLIQUE_LABELS = "b";</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightDisplacement">loadHeightDisplacement</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Aug 01 2020 11:44:18 GMT+0100 (Western European Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

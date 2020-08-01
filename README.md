@@ -1,12 +1,16 @@
 # Geo-Three
 
+[![npm version](https://badge.fury.io/js/geo-three.svg)](https://badge.fury.io/js/geo-three)[![GitHub version](https://badge.fury.io/gh/tentone%2Fgeo-three.svg)](https://badge.fury.io/gh/tentone%2Fgeo-three)
+
 - Library to display maps using `three.js`. Allows for full world scale visualization of geographic data using tile based chunks.
 - Can generate 3D geometry for terrain from terrain height data using software generated tiles or using GPU displacement maps.
 - Supports multiple maps service providers ([BingMaps](https://www.microsoft.com/en-us/maps), [GoogleMaps](https://developers.google.com/maps/documentation), [HereMaps](https://developer.here.com/), [MapBox](https://docs.mapbox.com/api/), [MapTiler](https://www.maptiler.com/), [OpenMapTiles](https://openmaptiles.org/), [OpenStreetMaps](https://www.openstreetmap.org/)).
   - Each one of these map providers require a developer account and a API configuration to be used.
   - Its possible to implement new provides using the `MapProvider` interface.
   - Providers should have a tile based map system to be supported by the library.
+ - You can test the [live demo of the library running](https://tentone.github.io/geo-three/examples/index.html) from the GitHub page.
 
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_a.png" width="330"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_b.png" width="348">
 
 
 
@@ -36,7 +40,7 @@ scene.add(map);
 
   ​    
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="280">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="270">
 
 
 
@@ -47,9 +51,11 @@ scene.add(map);
 - The library as support for multiple data providers that have to be configured beforehand. Most of these data providers rely on external API that differ from service to service.
 - Each one of them has its own provider object implementation of the `MapProvider` interface.
 
-- The debug provider provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
+- The `DebugProvider` provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="280"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="280">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="270">
+
+
 
 ### License
 

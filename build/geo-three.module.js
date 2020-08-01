@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader, MeshBasicMaterial, Vector3 as Vector3$1, Matrix4, Quaternion, Raycaster, Vector2 } from 'three';
+import { BufferGeometry, Vector3, Float32BufferAttribute, Texture, RGBFormat, LinearFilter, MeshPhongMaterial, Mesh, CanvasTexture, MeshBasicMaterial, Matrix4, Quaternion, Raycaster, Vector2, Color } from 'three';
 
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
@@ -11,15 +11,8 @@ import { BufferGeometry, Float32BufferAttribute, Mesh, MeshPhongMaterial, Textur
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
 class MapSphereNodeGeometry extends BufferGeometry {
-	constructor(
-		radius,
-		widthSegments,
-		heightSegments,
-		phiStart,
-		phiLength,
-		thetaStart,
-		thetaLength
-	) {
+	constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+	{
 		super();
 
 		const thetaEnd = thetaStart + thetaLength;
@@ -86,9 +79,9 @@ class MapSphereNodeGeometry extends BufferGeometry {
 		}
 
 		this.setIndex(indices);
-		this.addAttribute("position", new Float32BufferAttribute(vertices, 3));
-		this.addAttribute("normal", new Float32BufferAttribute(normals, 3));
-		this.addAttribute("uv", new Float32BufferAttribute(uvs, 2));
+		this.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+		this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
+		this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
 	}
 }
 
@@ -101,66 +94,71 @@ class MapSphereNodeGeometry extends BufferGeometry {
  *
  * @class MapProvider
  */
-class MapProvider {
-	constructor() {
+class MapProvider
+{
+	constructor()
+	{
 		/** 
-		* Name of the map provider
-		*
-		* @attribute name
-		* @type {String}
-		*/
+		 * Name of the map provider
+		 *
+		 * @attribute name
+		 * @type {String}
+		 */
 		this.name = "";
 		
 		/**
-		* Minimum tile level.
-		* 
-		* @attribute minZoom
-		* @type {Number}
-		*/
+		 * Minimum tile level.
+		 * 
+		 * @attribute minZoom
+		 * @type {Number}
+		 */
 		this.minZoom = 0;
 
 		/**
-		* Maximum tile level.
-		* 
-		* @attribute maxZoom
-		* @type {Number}
-		*/
+		 * Maximum tile level.
+		 * 
+		 * @attribute maxZoom
+		 * @type {Number}
+		 */
 		this.maxZoom = 20;
 
 		/**
-		* Map bounds.
-		*
-		* @attribute bounds
-		* @type {Array}
-		*/
+		 * Map bounds.
+		 *
+		 * @attribute bounds
+		 * @type {Array}
+		 */
 		this.bounds = [];
 
 		/**
-		* Map center point.
-		*
-		* @attribute center
-		* @type {Array}
-		*/
+		 * Map center point.
+		 *
+		 * @attribute center
+		 * @type {Array}
+		 */
 		this.center = [];
 	}
 
 	/**
-	* Get a tile for the x, y, configuration provided.
-	*
-	* @method fetchTile
-	* @param {Number} zoom Zoom level.
-	* @param {Number} x Tile x.
-	* @param {Number} y Tile y.
-	*/
+	 * Get a tile for the x, y, zoom based on the provider configuration.
+	 * 
+	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
+	 *
+	 * @method fetchTile
+	 * @param {Number} zoom Zoom level.
+	 * @param {Number} x Tile x.
+	 * @param {Number} y Tile y.
+	 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
+	 */
 	fetchTile(zoom, x, y) {}
 
 	/**
-	* Get map meta data from server if supported.
-	*
-	* Usually map server have a method to retrieve TileJSON metadata.
-	* 
-	* @method getMetaData
-	*/
+	 * Get map meta data from server if supported.
+	 *
+	 * Usually map server have API method to retrieve TileJSON metadata.
+	 * 
+	 * @method getMetaData
+	 */
 	getMetaData() {}
 }
 
@@ -171,33 +169,345 @@ class MapProvider {
  *
  * @class OpenStreetMapsProvider
  */
-class OpenStreetMapsProvider extends MapProvider {
-	constructor(address) {
+class OpenStreetMapsProvider extends MapProvider
+{
+	constructor(address)
+	{
 		super();
 
 		/**
-		* Map server address.
-		*
-		* By default the open OSM tile server is used.
-		* 
-		* @attribute address
-		* @type {String}
-		*/
+		 * Map server address.
+		 *
+		 * By default the open OSM tile server is used.
+		 * 
+		 * @attribute address
+		 * @type {String}
+		 */
 		this.address = address !== undefined ? address : "https://a.tile.openstreetmap.org/";
 
 		/**
-		* Map image tile format.
-		* 
-		* @attribute format
-		* @type {String}
-		*/
+		 * Map image tile format.
+		 * 
+		 * @attribute format
+		 * @type {String}
+		 */
 		this.format = "png";
 	}
 
-	fetchTile(zoom, x, y) {
-		return this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = this.address + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		});
 	}
 }
+
+/** 
+ * Represents a map tile node inside of the tiles quad-tree
+ * 
+ * Each map node can be subdivided into other nodes.
+ * 
+ * It is intended to be used as a base class for other map node implementations.
+ * 
+ * @class MapNode
+ */
+function MapNode(parentNode, mapView, location, level, x, y)
+{
+	/**
+	 * The map view.
+	 *
+	 * @attribute mapView
+	 * @type {MapView}
+	 */
+	this.mapView = mapView;
+
+	/**
+	 * Parent node (from an upper tile level).
+	 * 
+	 * @attribute parentNode
+	 * @type {MapPlaneNode}
+	 */
+	this.parentNode = parentNode;
+	
+	/**
+	 * Index of the map node in the quad-tree parent node.
+	 *
+	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
+	 *
+	 * @attribute location
+	 * @type {Number}
+	 */
+	this.location = location;
+
+	/**
+	 * Tile level of this node.
+	 * 
+	 * @attribute level
+	 * @type {Number}
+	 */
+	this.level = level;
+
+	/**
+	 * Tile x position.
+	 * 
+	 * @attribute x
+	 * @type {Number}
+	 */
+	this.x = x;
+
+	/**
+	 * Tile y position.
+	 * 
+	 * @attribute y
+	 * @type {Number}
+	 */
+	this.y = y;
+
+	/**
+	 * Indicates how many children nodes where loaded.
+	 *
+	 * @attribute nodesLoaded
+	 * @type {Number}
+	 */
+	this.nodesLoaded = 0;
+
+	/** 
+	 * Variable to check if the node is subdivided.
+	 *
+	 * To avoid bad visibility changes on node load.
+	 *
+	 * @attribute subdivided
+	 * @type {Boolean}
+	 */
+	this.subdivided = false;
+}
+
+/**
+ * How many children each branch of the tree has.
+ *
+ * For a quad-tree this value is 4.
+ *
+ * @static
+ * @attribute CHILDRENS
+ * @type {Number}
+ */
+MapNode.CHILDRENS = 4;
+
+/**
+ * Root node has no location.
+ *
+ * @static
+ * @attribute ROOT
+ * @type {Number}
+ */
+MapNode.ROOT = -1;
+
+/**
+ * Index of top left quad-tree branch node.
+ *
+ * Can be used to navigate the children array looking for neighbors.
+ *
+ * @static
+ * @attribute TOP_LEFT
+ * @type {Number}
+ */
+MapNode.TOP_LEFT = 0;
+
+/**
+ * Index of top left quad-tree branch node.
+ *
+ * Can be used to navigate the children array looking for neighbors.
+ *
+ * @static
+ * @attribute TOP_RIGHT
+ * @type {Number}
+ */
+MapNode.TOP_RIGHT = 1;
+
+/**
+ * Index of top left quad-tree branch node.
+ *
+ * Can be used to navigate the children array looking for neighbors.
+ *
+ * @static
+ * @attribute BOTTOM_LEFT
+ * @type {Number}
+ */
+MapNode.BOTTOM_LEFT = 2;
+
+/**
+ * Index of top left quad-tree branch node.
+ *
+ * Can be used to navigate the children array looking for neighbors.
+ *
+ * @static
+ * @attribute BOTTOM_RIGHT
+ * @type {Number}
+ */
+MapNode.BOTTOM_RIGHT = 3;
+
+/**
+ * Create the child nodes to represent the next tree level.
+ *
+ * These nodes should be added to the object, and their transformations matrix should be updated.
+ *
+ * @method createChildNodes 
+ */
+MapNode.prototype.createChildNodes = function(){};
+
+/**
+ * Subdivide node,check the maximum depth allowed for the tile provider.
+ *
+ * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
+ * 
+ * @method subdivide
+ */
+MapNode.prototype.subdivide =  function()
+{
+	if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom || (this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS))
+	{
+		return;
+	}
+
+	this.subdivided = true;
+
+	if(this.childrenCache !== null)
+	{
+		this.isMesh = false;
+		this.children = this.childrenCache;
+	}
+	else
+	{
+		this.createChildNodes();
+	}
+};
+
+/**
+ * Simplify node, remove all children from node, store them in cache.
+ *
+ * Reset the subdivided flag and restore the visibility.
+ *
+ * This base method assumes that the node implementation is based off Mesh and that the isMesh property is used to toggle visibility.
+ *
+ * @method simplify
+ */
+MapNode.prototype.simplify = function()
+{
+	if(this.children.length > 0)
+	{
+		this.childrenCache = this.children;
+	}
+
+	this.subdivided = false;
+	this.isMesh = true;
+	this.children = [];
+};
+
+/**
+ * Load tile texture from the server.
+ * 
+ * This base method assumes the existence of a material attribute with a map texture.
+ *
+ * @method loadTexture
+ * @param {Function} onLoad 
+ */
+MapNode.prototype.loadTexture = function(onLoad)
+{
+	var texture = new Texture();
+	texture.generateMipmaps = false;
+	texture.format = RGBFormat;
+	texture.magFilter = LinearFilter;
+	texture.minFilter = LinearFilter;
+	texture.needsUpdate = false;
+
+	this.material.map = texture;
+
+	var self = this;
+	
+	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		texture.image = image;
+		texture.needsUpdate = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		var canvas = new OffscreenCanvas(1, 1);
+		var context = canvas.getContext("2d");
+		context.fillStyle = "#FF0000";
+		context.fillRect(0, 0, 1, 1);
+		texture.image = canvas;
+		texture.needsUpdate = true;
+		self.nodeReady();
+	});
+};
+
+/** 
+ * Increment the child loaded counter.
+ *
+ * Should be called after a map node is ready for display.
+ *
+ * @method nodeReady
+ */
+MapNode.prototype.nodeReady = function()
+{
+	//Update parent nodes loaded
+	if(this.parentNode !== null)
+	{
+		this.parentNode.nodesLoaded++;
+
+		if(this.parentNode.nodesLoaded >= MapNode.CHILDRENS)
+		{
+			if(this.parentNode.subdivided === true)
+			{
+				this.parentNode.isMesh = false;
+			}
+
+			for(var i = 0; i < this.parentNode.children.length; i++)
+			{
+				this.parentNode.children[i].visible = true;
+			}
+		}
+	}
+	//If its the root object just set visible
+	else
+	{
+		this.visible = true;
+	}
+};
+
+/**
+ * Get all the neighbors in a specific direction (left, right, up down).
+ *
+ * @method getNeighborsDirection
+ * @param {Number} direction
+ * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+ */
+MapNode.prototype.getNeighborsDirection = function(direction)
+{
+	//TODO <ADD CODE HERE>
+
+	return null;
+};
+
+/**
+ * Get all the quad tree nodes neighbors. Are considered neighbors all the nodes directly in contact with a edge of this node.
+ *
+ * @method getNeighbors
+ * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+ */
+MapNode.prototype.getNeighbors = function()
+{
+	var neighbors = [];
+
+	//TODO <ADD CODE HERE>
+
+	return neighbors;
+};
 
 /**
  * Map node geometry is a geometry used to represent the map nodes.
@@ -211,8 +521,10 @@ class OpenStreetMapsProvider extends MapProvider {
  * @param {Number} widthSegments Number of subdivisions along the width.
  * @param {Number} heightSegments Number of subdivisions along the height.
  */
-class MapNodeGeometry extends BufferGeometry {
-	constructor(width, height, widthSegments, heightSegments) {
+class MapNodeGeometry extends BufferGeometry
+{
+	constructor(width, height, widthSegments, heightSegments)
+	{
 		super();
 
 		const widthHalf = width / 2;
@@ -263,249 +575,72 @@ class MapNodeGeometry extends BufferGeometry {
 		}
 
 		this.setIndex(indices);
-		this.addAttribute("position", new Float32BufferAttribute(vertices, 3));
-		this.addAttribute("normal", new Float32BufferAttribute(normals, 3));
-		this.addAttribute("uv", new Float32BufferAttribute(uvs, 2));
+		this.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+		this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
+		this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
 	}
 }
 
 /** 
- * Represents a map tile node.
+ * Represents a height map tile node that can be subdivided into other height nodes.
  * 
- * A map node can be subdivided into other nodes (Quadtree).
+ * Its important to update match the height of the tile with the neighbors nodes edge heights to ensure proper continuity of the surface.
  * 
- * The height node is designed to use MapBox elevation data.
- *  - https://www.mapbox.com/help/access-elevation-data/
+ * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
  *
  * @class MapHeightNode
  */
-class MapHeightNode extends Mesh {
-	constructor(parentNode, mapView, location, level, x, y) {
-		const material = new MeshPhongMaterial(
-		{
-			color: 0x000000,
-			specular: 0x000000,
-			shininess: 0,
-			wireframe: false,
-			emissive: 0xFFFFFF
-		});
+function MapHeightNode(parentNode, mapView, location, level, x, y)
+{
+	var material = new MeshPhongMaterial(
+	{
+		color: 0x000000,
+		specular: 0x000000,
+		shininess: 0,
+		wireframe: false,
+		emissive: 0xFFFFFF
+	});
 
-		super(MapHeightNode.GEOMETRY, material);
-		MapNode.call(this, parentNode, mapView, location, level, x, y);
+	Mesh.call(this, MapHeightNode.GEOMETRY, material);
+	MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-
-		/**
-		 * Cache with the children objects created from subdivision.
-		 * 
-		 * Used to avoid recreate object after simplification and subdivision.
-		 * 
-		 * The default value is null.
-		 *
-		 * @attribute childrenCache
-		 * @type {Array}
-		 */
-		this.childrenCache = null;
-
-		this.loadTexture();
-	}
+	this.matrixAutoUpdate = false;
+	this.isMesh = true;
+	
+	this.visible = false;
 
 	/**
-	 * Load tile texture from the server.
+	 * Flag indicating if the tile texture was loaded.
 	 * 
-	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
-	 *
-	 * @method loadTexture
+	 * @attribute textureLoaded
+	 * @type {boolean}
 	 */
-	loadTexture() {
-		const texture = new Texture();
-		texture.generateMipmaps = false;
-		texture.format = RGBFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.needsUpdate = false;
-
-		this.material.emissiveMap = texture;
-
-		const loader = new ImageLoader();
-		loader.setCrossOrigin("anonymous");
-		loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
-		{
-			texture.image = image;
-			texture.needsUpdate = true;
-		});
-
-		if(MapHeightNode.USE_DISPLACEMENT)
-		{
-			this.loadHeightDisplacement();
-		}
-		else
-		{
-			this.loadHeightGeometry();
-		}
-	}
-
-	/** 
-	 * Load height texture from the server and create a geometry to match it.
-	 *
-	 + @method loadHeightGeometry
-	 */
-	loadHeightGeometry() {
-		const self = this;
-		
-		const geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-		const vertices = geometry.attributes.position.array;
-		const itemSize = geometry.attributes.position.itemSize;
-
-		const image = document.createElement("img");
-		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		image.crossOrigin = "Anonymous";
-		image.onload = function()
-		{
-			const canvas = document.createElement("canvas");
-			canvas.width = MapHeightNode.GEOMETRY_SIZE + 1;
-			canvas.height = MapHeightNode.GEOMETRY_SIZE + 1;
-
-			const context = canvas.getContext("2d");
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-			
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			const data = imageData.data;
-			for(let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
-			{
-				const r = data[i];
-				const g = data[i + 1];
-				const b = data[i + 2];
-
-				//The value will be composed of the bits RGB
-				const value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
-
-				vertices[j + 1] = value;
-			}
-
-			self.geometry = geometry;
-			self.nodeReady();
-		};
-	}
-
-	/** 
-	 * Load height texture from the server and create a displacement map from it.
-	 *
-	 + @method loadHeightDisplacement
-	 */
-	loadHeightDisplacement() {
-		const self = this;
-		const material = this.material;
-
-		const image = document.createElement("img");
-		image.src = this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		image.crossOrigin = "Anonymous";
-		image.onload = function()
-		{
-			const canvas = document.createElement("canvas");
-			canvas.width = MapHeightNode.GEOMETRY_SIZE;
-			canvas.height = MapHeightNode.GEOMETRY_SIZE;
-
-			const context = canvas.getContext("2d");
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-			
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			const data = imageData.data;
-
-			for(let i = 0; i < data.length; i += 4)
-			{
-				const r = data[i];
-				const g = data[i + 1];
-				const b = data[i + 2];
-
-				//The value will be composed of the bits RGB
-				let value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
-
-				//Limit value to fit 1 byte
-				if(value < 0)
-				{
-					value = 0;
-				}
-				else if(value > 255)
-				{
-					value = 255;
-				}
-
-				data[i] = value;
-				data[i + 1] = value;
-				data[i + 2] = value;
-			}
-
-			context.putImageData(imageData, 0, 0);
-
-			const displacement = new CanvasTexture(canvas);
-			displacement.generateMipmaps = false;
-			displacement.format = RGBFormat;
-			displacement.magFilter = LinearFilter;
-			displacement.minFilter = LinearFilter;
-
-			material.displacementMap = displacement;
-			material.displacementScale = 1.0;
-			material.displacementBias = 0.0;
-			material.needsUpdate = true;
-
-			self.nodeReady();
-		};
-	}
-
-	createChildNodes() {
-		const level = this.level + 1;
-
-		const x = this.x * 2;
-		const y = this.y * 2;
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-	}
+	this.textureLoaded = false;
 
 	/**
-	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * Flag indicating if the tile height data was loaded.
 	 * 
-	 * @method raycast
+	 * @attribute heightLoaded
+	 * @type {boolean}
 	 */
-	raycast(raycaster, intersects) {
-		if(this.isMesh === true)
-		{
-			return Mesh.prototype.raycast.call(this, raycaster, intersects);
-		}
+	this.heightLoaded = false;
 
-		return false;
-	}
+	/**
+	 * Cache with the children objects created from subdivision.
+	 * 
+	 * Used to avoid recreate object after simplification and subdivision.
+	 * 
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
+	 */
+	this.childrenCache = null;
+
+	this.loadTexture();
 }
 
+MapHeightNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapHeightNode.prototype, MapNode.prototype);
 
 /**
@@ -566,377 +701,253 @@ MapHeightNode.GEOMETRY_SIZE = 16;
  */
 MapHeightNode.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
-/** 
- * Represents a map tile node inside of the quadtree
+/**
+ * Load tile texture from the server.
  * 
- * A map node can be subdivided into other nodes (Quadtree).
- * 
- * It is intended to be used as a base class for other map node implementations.
- * 
- * @class MapNode
+ * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
+ *
+ * @method loadTexture
  */
-class MapNode$1 {
-	constructor(parentNode, mapView, location, level, x, y) {
-		/**
-		 * The map view.
-		 *
-		 * @attribute mapView
-		 * @type {MapView}
-		 */
-		this.mapView = mapView;
+MapHeightNode.prototype.loadTexture = function()
+{
+	var texture = new Texture();
+	texture.generateMipmaps = false;
+	texture.format = RGBFormat;
+	texture.magFilter = LinearFilter;
+	texture.minFilter = LinearFilter;
+	texture.needsUpdate = false;
 
-		/**
-		 * Parent node (from an upper tile level).
-		 * 
-		 * @attribute parentNode
-		 * @type {MapPlaneNode}
-		 */
-		this.parentNode = parentNode;
+	this.material.emissiveMap = texture;
+	
+	var self = this;
 
-		/**
-		 * Index of the map node in the quad-tree parent node.
-		 *
-		 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
-		 *
-		 * @attribute location
-		 * @type {Number}
-		 */
-		this.location = location;
+	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		texture.image = image;
+		texture.needsUpdate = true;
 
-		/**
-		 * Tile level of this node.
-		 * 
-		 * @attribute level
-		 * @type {Number}
-		 */
-		this.level = level;
+		self.textureLoaded = true;
+		self.nodeReady();
+	});
 
-		/**
-		 * Tile x position.
-		 * 
-		 * @attribute x
-		 * @type {Number}
-		 */
-		this.x = x;
+	if(MapHeightNode.USE_DISPLACEMENT)
+	{
+		this.loadHeightDisplacement();
+	}
+	else
+	{
+		this.loadHeightGeometry();
+	}
+};
 
-		/**
-		 * Tile y position.
-		 * 
-		 * @attribute y
-		 * @type {Number}
-		 */
-		this.y = y;
-
-		/**
-		 * Indicates how many children nodes where loaded.
-		 *
-		 * @attribute nodesLoaded
-		 * @type {Number}
-		 */
-		this.nodesLoaded = 0;
-
-		/** 
-		 * Variable to check if the node is subdivided.
-		 *
-		 * To avoid bad visibility changes on node load.
-		 *
-		 * @attribute subdivided
-		 * @type {Boolean}
-		 */
-		this.subdivided = false;
- 	}
-
-	/**
-	 * Create the child nodes to represent the next tree level.
-	 *
-	 * These nodes should be added to the object, and their transformations matrix should be updated.
-	 *
-	 * @method createChildNodes 
-	 */
-	createChildNodes() {}
-
-	/**
-	 * Subdivide node,check the maximum depth allowed for the tile provider.
-	 *
-	 * Uses the createChildNodes to actually create the child nodes that represent the next tree level.
-	 * 
-	 * @method subdivide
-	 */
-	subdivide() {
-		if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom)
-		{
-			return;
-		}
-
-		this.subdivided = true;
-
-		if(this.childrenCache !== null)
-		{
-			this.isMesh = false;
-			this.children = this.childrenCache;
-		}
-		else
-		{
-			this.createChildNodes();
-		}
+MapHeightNode.prototype.nodeReady = function()
+{
+	if(!this.heightLoaded || !this.textureLoaded)
+	{
+		return;
 	}
 
-	/**
-	 * Simplify node, remove all children from node, store them in cache.
-	 *
-	 * Reset the subdivided flag and restore the visibility.
-	 *
-	 * This base method assumes that the node implementation is based off THREE.Mesh and that the isMesh property is used to toggle visibility.
-	 *
-	 * @method simplify
-	 */
-	simplify() {
-		if(this.children.length > 0)
-		{
-			this.childrenCache = this.children;
-		}
+	this.visible = true;
 
-		this.subdivided = false;
-		this.isMesh = true;
-		this.children = [];
-	}
+	MapNode.prototype.nodeReady.call(this);
+};
 
- /**
-  * Get a neighbor in a specific direction.
-  *
-  * @method getNeighbor
-  * @param {Number} direction
-  * @return {MapNode} The neighbor node if found, null otherwise.
-  */
- getNeighbor(direction) {
-	 //TODO <ADD CODE HERE>
+MapHeightNode.prototype.createChildNodes = function()
+{
+	var level = this.level + 1;
 
-	 return null;
- }
+	var x = this.x * 2;
+	var y = this.y * 2;
 
- /**
-  * Get the quad tree neighbors (left, right, top, down) in an array.
-  *
-  * @method getNeighbors
-  * @return {Array} The neighbors array, not found neighbors will be returned null.
-  */
- getNeighbors() {
-	 const neighbors = [];
+	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
 
-	 //TODO <ADD CODE HERE>
+	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
 
-	 return neighbors;
- }
+	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
 
- /**
-  * Load tile texture from the server.
-  * 
-  * This base method assumes the existence of a material attribute with a map texture.
-  *
-  * @method loadTexture
-  * @param {Function} onLoad 
-  */
- loadTexture(onLoad) {
-	 const texture = new Texture();
-	 texture.generateMipmaps = false;
-	 texture.format = RGBFormat;
-	 texture.magFilter = LinearFilter;
-	 texture.minFilter = LinearFilter;
-	 texture.needsUpdate = false;
-	 
-	 this.material.map = texture;
-
-	 const self = this;
-	 const loader = new ImageLoader();
-	 loader.setCrossOrigin("anonymous");
-	 loader.load(this.mapView.fetchTile(this.level, this.x, this.y), function(image)
-	 {
-		 texture.image = image;
-		 texture.needsUpdate = true;
-		 self.nodeReady();
-	 });
- }
-
- /** 
-  * Increment the child loaded counter.
-  *
-  * Should be called after a map node is ready for display.
-  *
-  * @method nodeReady
-  */
- nodeReady() {
-	 //Update parent nodes loaded
-	 if(this.parentNode !== null)
-	 {
-		 this.parentNode.nodesLoaded++;
-
-		 if(this.parentNode.nodesLoaded >= MapNode$1.CHILDRENS)
-		 {
-			 if(this.parentNode.subdivided === true)
-			 {
-				 this.parentNode.isMesh = false;
-			 }
-
-			 for(let i = 0; i < this.parentNode.children.length; i++)
-			 {
-				 this.parentNode.children[i].visible = true;
-			 }
-		 }
-	 }
-	 //If its the root object just set visible
-	 else
-	 {
-		 this.visible = true;
-	 }
- }
-}
-
-/**
- * How many children each branch of the tree has.
- *
- * For a quad-tree this value is 4.
- *
- * @static
- * @attribute CHILDRENS
- * @type {Number}
- */
-MapNode$1.CHILDRENS = 4;
-
-/**
- * Root node has no location.
- *
- * @static
- * @attribute ROOT
- * @type {Number}
- */
-MapNode$1.ROOT = -1;
-
-/**
- * Index of top left quad-tree branch node.
- *
- * Can be used to navigate the children array looking for neighbors.
- *
- * @static
- * @attribute TOP_LEFT
- * @type {Number}
- */
-MapNode$1.TOP_LEFT = 0;
-
-/**
- * Index of top left quad-tree branch node.
- *
- * Can be used to navigate the children array looking for neighbors.
- *
- * @static
- * @attribute TOP_RIGHT
- * @type {Number}
- */
-MapNode$1.TOP_RIGHT = 1;
-
-/**
- * Index of top left quad-tree branch node.
- *
- * Can be used to navigate the children array looking for neighbors.
- *
- * @static
- * @attribute BOTTOM_LEFT
- * @type {Number}
- */
-MapNode$1.BOTTOM_LEFT = 2;
-
-/**
- * Index of top left quad-tree branch node.
- *
- * Can be used to navigate the children array looking for neighbors.
- *
- * @static
- * @attribute BOTTOM_RIGHT
- * @type {Number}
- */
-MapNode$1.BOTTOM_RIGHT = 3;
+	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+};
 
 /** 
- * Represents a map tile node.
+ * Load height texture from the server and create a geometry to match it.
+ *
+ * @method loadHeightGeometry
+ * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
+ */
+MapHeightNode.prototype.loadHeightGeometry = function()
+{
+	var self = this;
+
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+		var vertices = geometry.attributes.position.array;
+	
+		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE + 1, MapHeightNode.GEOMETRY_SIZE + 1);
+
+		var context = canvas.getContext("2d");
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+		
+		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+		for(var i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
+		{
+			var r = data[i];
+			var g = data[i + 1];
+			var b = data[i + 2];
+
+			//The value will be composed of the bits RGB
+			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+
+			vertices[j + 1] = value;
+		}
+
+		self.geometry = geometry;
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		console.error("GeoThree: Failed to load height node data.", this);
+		self.heightLoaded = true;
+		self.nodeReady();
+	});
+};
+
+/** 
+ * Load height texture from the server and create a displacement map from it.
+ *
+ * @method loadHeightDisplacement
+ * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
+ */
+MapHeightNode.prototype.loadHeightDisplacement = function()
+{
+	var self = this;
+
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+
+		var context = canvas.getContext("2d");
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+		
+		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+
+		for(var i = 0; i < data.length; i += 4)
+		{
+			var r = data[i];
+			var g = data[i + 1];
+			var b = data[i + 2];
+
+			//The value will be composed of the bits RGB
+			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
+
+			//Limit value to fit 1 byte
+			if(value < 0)
+			{
+				value = 0;
+			}
+			else if(value > 255)
+			{
+				value = 255;
+			}
+
+			data[i] = value;
+			data[i + 1] = value;
+			data[i + 2] = value;
+		}
+
+		context.putImageData(imageData, 0, 0);
+
+		var displacement = new CanvasTexture(canvas);
+		displacement.generateMipmaps = false;
+		displacement.format = RGBFormat;
+		displacement.magFilter = LinearFilter;
+		displacement.minFilter = LinearFilter;
+
+		self.material.displacementMap = displacement;
+		self.material.displacementScale = 1.0;
+		self.material.displacementBias = 0.0;
+		self.material.needsUpdate = true;
+
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		console.error("GeoThree: Failed to load height node data.", this);
+		self.heightLoaded = true;
+		self.nodeReady();
+	});
+};
+
+/**
+ * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
  * 
- * A map node can be subdivided into other nodes (Quadtree).
+ * @method raycast
+ */
+MapHeightNode.prototype.raycast = function(raycaster, intersects)
+{
+	if(this.isMesh === true)
+	{
+		return Mesh.prototype.raycast.call(this, raycaster, intersects);
+	}
+
+	return false;
+};
+
+/** 
+ * Represents a basic plane tile node.
  * 
  * @class MapPlaneNode
  */
-class MapPlaneNode extends Mesh {
-	constructor(parentNode, mapView, location, level, x, y) {
-		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}));
-		MapNode$1.call(this, parentNode, mapView, location, level, x, y);
+function MapPlaneNode(parentNode, mapView, location, level, x, y)
+{
+	Mesh.call(this, MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}));
+	MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-		this.visible = false;
-
-		/**
-		 * Cache with the children objects created from subdivision.
-		 * 
-		 * Used to avoid recreate object after simplification and subdivision.
-		 * 
-		 * The default value is null.
-		 *
-		 * @attribute childrenCache
-		 * @type {Array}
-		 */
-		this.childrenCache = null;
-		
-		this.loadTexture();
-	}
-
-	createChildNodes() {
-		const level = this.level + 1;
-
-		const x = this.x * 2;
-		const y = this.y * 2;
-
-		var node = new MapPlaneNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapPlaneNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, -0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapPlaneNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(-0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapPlaneNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
-		node.scale.set(0.5, 1, 0.5);
-		node.position.set(0.25, 0, 0.25);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-	}
+	this.matrixAutoUpdate = false;
+	this.isMesh = true;
+	this.visible = false;
 
 	/**
-	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * Cache with the children objects created from subdivision.
 	 * 
-	 * @method raycast
+	 * Used to avoid recreate object after simplification and subdivision.
+	 * 
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
 	 */
-	raycast(raycaster, intersects) {
-		if(this.isMesh === true)
-		{
-			return Mesh.prototype.raycast.call(this, raycaster, intersects);
-		}
-
-		return false;
-	}
+	this.childrenCache = null;
+	
+	this.loadTexture();
 }
 
-Object.assign(MapPlaneNode.prototype, MapNode$1.prototype);
+MapPlaneNode.prototype = Object.create(Mesh.prototype);
+Object.assign(MapPlaneNode.prototype, MapNode.prototype);
 
 /**
  * Map node plane geometry.
@@ -947,6 +958,159 @@ Object.assign(MapPlaneNode.prototype, MapNode$1.prototype);
  */
 MapPlaneNode.GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
 
+MapPlaneNode.prototype.createChildNodes = function()
+{
+	var level = this.level + 1;
+
+	var x = this.x * 2;
+	var y = this.y * 2;
+
+	var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, -0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(-0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	node.scale.set(0.5, 1, 0.5);
+	node.position.set(0.25, 0, 0.25);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+};
+
+/**
+ * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+ * 
+ * @method raycast
+ */
+MapPlaneNode.prototype.raycast = function(raycaster, intersects)
+{
+	if(this.isMesh === true)
+	{
+		return Mesh.prototype.raycast.call(this, raycaster, intersects);
+	}
+
+	return false;
+};
+
+/**
+ * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
+ *
+ * Devices with a GPS, for example, can take a minute or more to get a GPS fix, so less accurate data (IP location or wifi) may be returned.
+ *
+ * @static
+ * @class UnitsUtils
+ */
+class UnitsUtils {
+	/**
+	 * Get the current geolocation from the browser using the location API.
+	 * 
+	 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
+	 *
+	 * @method get
+	 * @param {Function} onResult Callback function onResult(coords, timestamp).
+	 */
+	static get(onResult, onError)
+	{
+		navigator.geolocation.getCurrentPosition(function(result)
+		{
+			onResult(result.coords, result.timestamp);
+		}, onError);
+	}
+
+	/**
+	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
+	 *
+	 * @method datumsToSpherical
+	 * @param {Number} latitude
+	 * @param {Number} longitude
+	 */
+	static datumsToSpherical(latitude, longitude)
+	{
+		var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
+		var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
+
+		y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
+
+		return {x:x, y:y};
+	}
+
+	/**
+	 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
+	 *
+	 * @method sphericalToDatums
+	 * @param {Number} x
+	 * @param {Number} y
+	 */
+	static sphericalToDatums(x, y)
+	{
+		var longitude = (x / UnitsUtils.EARTH_ORIGIN) * 180.0;
+		var latitude = (y / UnitsUtils.EARTH_ORIGIN) * 180.0;
+
+		latitude = (180.0 / Math.PI) * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
+
+		return {latitude:latitude, longitude:longitude};
+	}
+
+	/**
+	 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
+	 *
+	 * @method quadtreeToDatums
+	 * @param {Number} zoom
+	 * @param {Number} x
+	 * @param {Number} y
+	 */
+	static quadtreeToDatums(zoom, x, y)
+	{
+		var n = Math.pow(2.0, zoom);
+		var longitude = x / n * 360.0 - 180.0;
+		var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
+		var latitude = 180.0 * (latitudeRad / Math.PI);
+
+		return {latitude:latitude, longitude:longitude};
+	}
+}
+
+/**
+ * Aproximated radius of earth in meters.
+ *
+ * @static
+ * @attribute EARTH_RADIUS
+ */
+UnitsUtils.EARTH_RADIUS = 6378137;
+
+/**
+ * Earth equator perimeter in meters.
+ *
+ * @static
+ * @attribute EARTH_RADIUS
+ */
+UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
+
+/**
+ * Earth equator perimeter in meters.
+ *
+ * @static
+ * @attribute EARTH_ORIGIN
+ */
+UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
+
 /** 
  * Represents a map tile node.
  * 
@@ -954,136 +1118,34 @@ MapPlaneNode.GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
  * 
  * @class MapSphereNode
  */
-class MapSphereNode extends Mesh {
-	constructor(parentNode, mapView, location, level, x, y) {
-		super(
-			MapSphereNode.createGeometry(level, x, y),
-			new MeshBasicMaterial({wireframe:false})
-		);
-		MapNode$1.call(this, parentNode, mapView, location, level, x, y);
+function MapSphereNode(parentNode, mapView, location, level, x, y)
+{
+	Mesh.call(this, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe:false}));
+	MapNode.call(this, parentNode, mapView, location, level, x, y);
 
-		this.applyScaleNode();
+	this.applyScaleNode();
 
-		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-		this.visible = false;
-
-		/**
-		 * Cache with the children objects created from subdivision.
-		 * 
-		 * Used to avoid recreate object after simplification and subdivision.
-		 * 
-		 * The default value is null.
-		 *
-		 * @attribute childrenCache
-		 * @type {Array}
-		 */
-		this.childrenCache = null;
-
-		this.loadTexture();
-	}
+	this.matrixAutoUpdate = false;
+	this.isMesh = true;
+	this.visible = false;
 
 	/**
-	 * Create a geometry for a sphere map node.
-	 *
-	 * @method createGeometry
-	 * @param {Number} zoom
-	 * @param {Number} x
-	 * @param {Number} y
-	 */
-	static createGeometry(zoom, x, y) {
-		const range = 2 ** zoom;
-		const max = 40;
-		const segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
-
-		//X
-		const phiLength = (1 / range) * 2 * Math.PI;
-		const phiStart = x * phiLength;
-
-		//Y
-		const thetaLength = (1 / range) * Math.PI;
-		const thetaStart = y * thetaLength;
-
-		return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
-	}
-
-	/** 
-	 * Apply scale and offset position to the sphere node geometry.
-	 *
-	 * @method applyScaleNode
-	 */
-	applyScaleNode() {
-		this.geometry.computeBoundingBox();
-
-		const box = this.geometry.boundingBox.clone();
-		const center = box.getCenter(new Vector3$1());
-
-		const matrix = new Matrix4();
-		matrix.compose(new Vector3$1(-center.x, -center.y, -center.z), new Quaternion(), new Vector3$1(GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS, GeolocationUtils.EARTH_RADIUS));
-		this.geometry.applyMatrix(matrix);
-
-		this.position.copy(center);
-
-		this.updateMatrix();
-		this.updateMatrixWorld();
-	}
-
-	updateMatrix() {
-		this.matrix.setPosition(this.position);
-		this.matrixWorldNeedsUpdate = true;
-	}
-
-	updateMatrixWorld(force) {
-		if(this.matrixWorldNeedsUpdate || force)
-		{
-			this.matrixWorld.copy(this.matrix);
-			this.matrixWorldNeedsUpdate = false;
-		}
-	}
-
-	createChildNodes() {
-		const level = this.level + 1;
-
-		const x = this.x * 2;
-		const y = this.y * 2;
-
-		var node = new MapSphereNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapSphereNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapSphereNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-
-		var node = new MapSphereNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
-		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
-	}
-
-	/**
-	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * Cache with the children objects created from subdivision.
 	 * 
-	 * @method raycast
+	 * Used to avoid recreate object after simplification and subdivision.
+	 * 
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
 	 */
-	raycast(raycaster, intersects) {
-		if(this.isMesh === true)
-		{
-			return Mesh.prototype.raycast.call(this, raycaster, intersects);
-		}
+	this.childrenCache = null;
 
-		return false;
-	}
+	this.loadTexture();
 }
 
-Object.assign(MapSphereNode.prototype, MapNode$1.prototype);
+MapSphereNode.prototype = Object.create(Mesh.prototype);
+Object.assign(MapSphereNode.prototype, MapNode.prototype);
 
 /**
  * Number of segments per node geometry.
@@ -1095,6 +1157,111 @@ Object.assign(MapSphereNode.prototype, MapNode$1.prototype);
 MapSphereNode.SEGMENTS = 80;
 
 /**
+ * Create a geometry for a sphere map node.
+ *
+ * @method createGeometry
+ * @param {Number} zoom
+ * @param {Number} x
+ * @param {Number} y
+ */
+MapSphereNode.createGeometry = function(zoom, x, y)
+{
+	var range = Math.pow(2, zoom);
+	var max = 40;
+	var segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
+
+	//X
+	var phiLength = (1 / range) * 2 * Math.PI;
+	var phiStart = x * phiLength;
+
+	//Y
+	var thetaLength = (1 / range) * Math.PI;
+	var thetaStart = y * thetaLength;
+
+	return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
+};
+
+/** 
+ * Apply scale and offset position to the sphere node geometry.
+ *
+ * @method applyScaleNode
+ */
+MapSphereNode.prototype.applyScaleNode = function()
+{
+	this.geometry.computeBoundingBox();
+
+	var box = this.geometry.boundingBox.clone();
+	var center = box.getCenter(new Vector3());
+
+	var matrix = new Matrix4();
+	matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS));
+	this.geometry.applyMatrix(matrix);
+
+	this.position.copy(center);
+
+	this.updateMatrix();
+	this.updateMatrixWorld();
+};
+
+MapSphereNode.prototype.updateMatrix = function()
+{
+	this.matrix.setPosition(this.position);
+	this.matrixWorldNeedsUpdate = true;
+};
+
+MapSphereNode.prototype.updateMatrixWorld = function(force)
+{
+	if(this.matrixWorldNeedsUpdate || force)
+	{
+		this.matrixWorld.copy(this.matrix);
+		this.matrixWorldNeedsUpdate = false;
+	}
+};
+
+MapSphereNode.prototype.createChildNodes = function()
+{
+	var level = this.level + 1;
+
+	var x = this.x * 2;
+	var y = this.y * 2;
+
+	var node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+
+	var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	this.add(node);
+	node.updateMatrix();
+	node.updateMatrixWorld(true);
+};
+
+/**
+ * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+ * 
+ * @method raycast
+ */
+MapSphereNode.prototype.raycast = function(raycaster, intersects)
+{
+	if(this.isMesh === true)
+	{
+		return Mesh.prototype.raycast.call(this, raycaster, intersects);
+	}
+
+	return false;
+};
+
+/**
  * Map viewer is used to read and display map tiles from a server.
  * 
  * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
@@ -1103,12 +1270,29 @@ MapSphereNode.SEGMENTS = 80;
  *
  * @class MapView
  * @extends {Mesh}
- * @param {String} mode Map view node modes.
- * @param {Number} provider Map color tile provider.
- * @param {Number} heightProvider Map height tile provider.
+ * @param {String} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+ * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+ * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
  */
-class MapView extends Mesh {
-	constructor(mode, provider, heightProvider) {
+class MapView extends Mesh
+{
+	constructor(mode, provider, heightProvider)
+	{
+		mode = mode !== undefined ? mode : MapView.PLANAR;
+
+		var geometry;
+
+		if(mode === MapView.SPHERICAL)
+		{
+			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+		}
+		else if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
+		{
+			geometry = MapPlaneNode.GEOMETRY;
+		}
+
+		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		
 		/**
 		 * Define the type of map view in use.
 		 *
@@ -1117,19 +1301,7 @@ class MapView extends Mesh {
 		 * @attribute mode
 		 * @type {Number}
 		 */
-		this.mode = mode !== undefined ? mode : MapView.PLANAR;
-
-		let geometry;
-		if(this.mode === MapView.SPHERICAL)
-		{
-			geometry = new MapSphereNodeGeometry(GeolocationUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-		}
-		else if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-		{
-			geometry = MapPlaneNode.GEOMETRY;
-		}
-
-		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		this.mode = mode;
 
 		/**
 		 * Map tile color layer provider.
@@ -1150,7 +1322,7 @@ class MapView extends Mesh {
 		/**
 		 * Number of rays used to test nodes and subdivide the map.
 		 *
-		 * One ray is cast each frame, one should be enough for must scenarios.
+		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 		 *
 		 * @attribute subdivisionRays
 		 * @type {Boolean}
@@ -1187,12 +1359,12 @@ class MapView extends Mesh {
 
 		if(this.mode === MapView.PLANAR)
 		{
-			this.scale.set(GeolocationUtils.EARTH_PERIMETER, 1, GeolocationUtils.EARTH_PERIMETER);
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 		}
 		else if(this.mode === MapView.HEIGHT)
 		{
-			this.scale.set(GeolocationUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, GeolocationUtils.EARTH_PERIMETER);
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 0.5;
 			this.thresholdDown = 0.1;
@@ -1207,7 +1379,7 @@ class MapView extends Mesh {
 
 		this._raycaster = new Raycaster();
 		this._mouse = new Vector2();
-		this._vector = new Vector3$1();
+		this._vector = new Vector3();
 	}
 
 	/**
@@ -1217,25 +1389,52 @@ class MapView extends Mesh {
 	 *
 	 * @method setProvider
 	 */
-	setProvider(provider) {
+	setProvider(provider)
+	{
 		if(provider !== this.provider)
 		{
 			this.provider = provider;
-
-			//Clear cache and reload tiles
-			this.traverse(function(children)
-			{
-				if(children.childrenCache !== undefined && children.childrenCache !== null)
-				{
-					children.childrenCache = null;
-				}
-
-				if(children.loadTexture !== undefined)
-				{
-					children.loadTexture();
-				}
-			});
+			this.clear();
 		}
+	}
+
+	/**
+	 * Change the map height provider of this map view.
+	 *
+	 * Will discard all the tiles already loaded using the old provider.
+	 *
+	 * @method setHeightProvider
+	 */
+	setHeightProvider(heightProvider)
+	{
+		if(heightProvider !== this.heightProvider)
+		{
+			this.heightProvider = heightProvider;
+			this.clear();
+		}
+	}
+
+	/**
+	 * Clears all tiles from memory and reloads data. Used when changing the provider.
+	 * 
+	 * Should be called manually if any changed to the provider are made without setting the provider.
+	 * 
+	 * @method clear
+	 */
+	clear()
+	{
+		this.traverse(function(children)
+		{
+			if(children.childrenCache !== undefined && children.childrenCache !== null)
+			{
+				children.childrenCache = null;
+			}
+
+			if(children.loadTexture !== undefined)
+			{
+				children.loadTexture();
+			}
+		});
 	}
 
 	/**
@@ -1245,7 +1444,8 @@ class MapView extends Mesh {
 	 *
 	 * @method onBeforeRender
 	 */
-	onBeforeRender(renderer, scene, camera, geometry, material, group) {
+	onBeforeRender(renderer, scene, camera, geometry, material, group)
+	{
 		const intersects = [];
 
 		for(let t = 0; t < this.subdivisionRays; t++)
@@ -1311,7 +1511,8 @@ class MapView extends Mesh {
 	 * 
 	 * @method getMetaData
 	 */
-	getMetaData() {
+	getMetaData()
+	{
 		this.provider.getMetaData();
 	}
 
@@ -1323,11 +1524,13 @@ class MapView extends Mesh {
 	 * @param {Number} x Tile x.
 	 * @param {Number} y Tile y.
 	 */
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		return this.provider.fetchTile(zoom, x, y);
 	}
 
-	raycast(raycaster, intersects) {
+	raycast(raycaster, intersects)
+	{
 		return false;
 	}
 }
@@ -1367,7 +1570,7 @@ MapView.HEIGHT = 202;
  */
 class XHRUtils {
 	/**
-	 * Read file data from URL, using XHR.
+	 * Get file data from URL as text, using a XHR call.
 	 * 
 	 * @method readFile
 	 * @param {String} fname File URL.
@@ -1375,7 +1578,8 @@ class XHRUtils {
 	 * @param {Function} onLoad On load callback.
 	 * @param {Function} onError On progress callback.
 	 */
-	static get(fname, onLoad, onError) {
+	static get(fname, onLoad, onError)
+	{
 		var file = new XMLHttpRequest();
 		file.overrideMimeType("text/plain");
 		file.open("GET", fname, true);
@@ -1409,7 +1613,8 @@ class XHRUtils {
 	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
 	 * @param {Function} onError XHR onError callback.
 	 */
-	static request(url, type, header, body, onLoad, onError) {
+	static request(url, type, header, body, onLoad, onError)
+	{
 		function parseResponse(response)
 		{
 			try
@@ -1475,8 +1680,10 @@ class XHRUtils {
  * @class BingMapsProvider
  * @param {String} apiKey Bing API key.
  */
-class BingMapsProvider extends MapProvider {
-	constructor(apiKey, type) {
+class BingMapsProvider extends MapProvider
+{
+	constructor(apiKey, type)
+	{
 		super();
 
 		this.maxZoom = 19;
@@ -1527,13 +1734,14 @@ class BingMapsProvider extends MapProvider {
 
 	/** 
 	 * Get the base URL for the map configuration requested.
-
-	* Uses the format 
-	* http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
-	*
-	* @method getMetaData
-	*/
-	getMetaData() {
+	 *
+	 * Uses the follwing format 
+	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
+	 *
+	 * @method getMetaData
+	 */
+	getMetaData()
+	{
 		const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=" + this.apiKey;
 		
 		XHRUtils.get(address, function(data)
@@ -1552,7 +1760,8 @@ class BingMapsProvider extends MapProvider {
 	 * @method quadKey
 	 * @param {Number} x
 	 */
-	static quadKey(zoom, x, y) {
+	static quadKey(zoom, x, y)
+	{
 		let quad = "";
 
 		for(let i = zoom; i > 0; i--)
@@ -1576,8 +1785,16 @@ class BingMapsProvider extends MapProvider {
 		return quad; 
 	}
 
-	fetchTile(zoom, x, y) {
-		return "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
+		});
 	}
 }
 
@@ -1637,8 +1854,10 @@ BingMapsProvider.OBLIQUE_LABELS = "b";
  *
  * @class GoogleMapsProvider
  */
-class GoogleMapsProvider extends MapProvider {
-	constructor(apiToken) {
+class GoogleMapsProvider extends MapProvider
+{
+	constructor(apiToken)
+	{
 		super();
 
 		/**
@@ -1709,7 +1928,8 @@ class GoogleMapsProvider extends MapProvider {
 	 *
 	 * @method createSession
 	 */
-	createSession() {
+	createSession()
+	{
 		const self = this;
 
 		const address = "https://www.googleapis.com/tile/v1/createSession?key=" + this.apiToken;
@@ -1734,8 +1954,16 @@ class GoogleMapsProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
-		return "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
+		});
 	}
 }
 
@@ -1753,8 +1981,10 @@ class GoogleMapsProvider extends MapProvider {
  * @param {String} format Image format.
  * @param {Number} size Tile size.
  */
-class HereMapsProvider extends MapProvider {
-	constructor(appId, appCode, style, scheme, format, size) {
+class HereMapsProvider extends MapProvider
+{
+	constructor(appId, appCode, style, scheme, format, size)
+	{
 		super();
 
 		/**
@@ -1859,16 +2089,25 @@ class HereMapsProvider extends MapProvider {
 	 *
 	 * @method nextServer
 	 */
-	nextServer() {
+	nextServer()
+	{
 		this.server = (this.server % 4 === 0 ? 1 : this.server + 1);
 	}
 
 	getMetaData() {}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y)
+	{
 		this.nextServer();
 
-		return "https://" + this.server + "." + this.style + ".maps.api.here.com/maptile/2.1/maptile/" + this.version + "/" + this.scheme + "/" + zoom + "/" + x + "/" + y + "/" + this.size + "/" + this.format + "?app_id=" + this.appId + "&app_code=" + this.appCode;
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "https://" + this.server + "." + this.style + ".maps.api.here.com/maptile/2.1/maptile/" + this.version + "/" + this.scheme + "/" + zoom + "/" + x + "/" + y + "/" + this.size + "/" + this.format + "?app_id=" + this.appId + "&app_code=" + this.appCode;
+		});
 	}
 }
 
@@ -1887,88 +2126,93 @@ HereMapsProvider.PATH = "/maptile/2.1/";
  * @param {String} format Image format.
  * @param {Boolean} useHDPI
  */
-class MapBoxProvider extends MapProvider {
-	constructor(apiToken, id, mode, format, useHDPI) {
+class MapBoxProvider extends MapProvider
+{
+	constructor(apiToken, id, mode, format, useHDPI)
+	{
+		super();
+
 		/**
-		* Server API access token.
-		* 
-		* @attribute apiToken
-		* @type {String}
-		*/
+		 * Server API access token.
+		 * 
+		 * @attribute apiToken
+		 * @type {String}
+		 */
 		this.apiToken = apiToken !== undefined ? apiToken : "";
 
 		/**
-		* Map image tile format, the formats available are:
-		*  - png True color PNG
-		*  - png32 32 color indexed PNG
-		*  - png64 64 color indexed PNG
-		*  - png128 128 color indexed PNG
-		*  - png256 256 color indexed PNG
-		*  - jpg70 70% quality JPG
-		*  - jpg80 80% quality JPG
-		*  - jpg90 90% quality JPG
-		*  - pngraw Raw png (no interpolation)
-		*
-		* @attribute format
-		* @type {String}
-		*/
+		 * Map image tile format, the formats available are:
+		 *  - png True color PNG
+		 *  - png32 32 color indexed PNG
+		 *  - png64 64 color indexed PNG
+		 *  - png128 128 color indexed PNG
+		 *  - png256 256 color indexed PNG
+		 *  - jpg70 70% quality JPG
+		 *  - jpg80 80% quality JPG
+		 *  - jpg90 90% quality JPG
+		 *  - pngraw Raw png (no interpolation)
+		 *
+		 * @attribute format
+		 * @type {String}
+		 */
 		this.format = format !== undefined ? format : "png";
 
 		/**
-		* Flag to indicate if should use high resolution tiles
-		*
-		* @attribute useHDPI
-		* @type {Boolean}
-		*/
+		 * Flag to indicate if should use high resolution tiles
+		 *
+		 * @attribute useHDPI
+		 * @type {Boolean}
+		 */
 		this.useHDPI = useHDPI !== undefined ? useHDPI : false;
 
 		/** 
-		* Map tile access mode
-		*  - MapBoxProvider.STYLE
-		*  - MapBoxProvider.MAP_ID
-		*
-		* @attribute mode
-		* @type {Number}
-		*/
+		 * Map tile access mode
+		 *  - MapBoxProvider.STYLE
+		 *  - MapBoxProvider.MAP_ID
+		 *
+		 * @attribute mode
+		 * @type {Number}
+		 */
 		this.mode = mode !== undefined ? mode : MapBoxProvider.STYLE;
 
 		/**
-		* Map identifier composed of {username}.{style}
-		*
-		* Some examples of the public mapbox identifiers:
-		*  - mapbox.mapbox-streets-v7
-		*  - mapbox.satellite
-		*  - mapbox.mapbox-terrain-v2
-		*  - mapbox.mapbox-traffic-v1
-		*  - mapbox.terrain-rgb
-		*
-		* @attribute mapId
-		* @type {String}
-		*/
+		 * Map identifier composed of {username}.{style}
+		 *
+		 * Some examples of the public mapbox identifiers:
+		 *  - mapbox.mapbox-streets-v7
+		 *  - mapbox.satellite
+		 *  - mapbox.mapbox-terrain-v2
+		 *  - mapbox.mapbox-traffic-v1
+		 *  - mapbox.terrain-rgb
+		 *
+		 * @attribute mapId
+		 * @type {String}
+		 */
 		this.mapId = id !== undefined ? id : "";
 
 		/**
-		* Map style to be used composed of {username}/{style_id}
-		*
-		* Some example of the syles available:
-		*  - mapbox/streets-v10
-		*  - mapbox/outdoors-v10
-		*  - mapbox/light-v9
-		*  - mapbox/dark-v9
-		*  - mapbox/satellite-v9
-		*  - mapbox/satellite-streets-v10
-		*  - mapbox/navigation-preview-day-v4
-		*  - mapbox/navigation-preview-night-v4
-		*  - mapbox/navigation-guidance-day-v4
-		*  - mapbox/navigation-guidance-night-v4
-		*
-		* @attribute style
-		* @type {String}
-		*/
+		 * Map style to be used composed of {username}/{style_id}
+		 *
+		 * Some example of the syles available:
+		 *  - mapbox/streets-v10
+		 *  - mapbox/outdoors-v10
+		 *  - mapbox/light-v9
+		 *  - mapbox/dark-v9
+		 *  - mapbox/satellite-v9
+		 *  - mapbox/satellite-streets-v10
+		 *  - mapbox/navigation-preview-day-v4
+		 *  - mapbox/navigation-preview-night-v4
+		 *  - mapbox/navigation-guidance-day-v4
+		 *  - mapbox/navigation-guidance-night-v4
+		 *
+		 * @attribute style
+		 * @type {String}
+		 */
 		this.style = id !== undefined ? id : "";
 	}
 
-	getMetaData() {
+	getMetaData()
+	{
 		const self = this;
 		const address = MapBoxProvider.ADDRESS + this.version + "/" + this.mapId + ".json?access_token=" + this.apiToken;
 
@@ -1984,15 +2228,24 @@ class MapBoxProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
-		if(this.mode === MapBoxProvider.STYLE)
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
 		{
-			return MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
-		}
-		else
-		{
-			return MapBoxProvider.ADDRESS + "v4/" + this.mapId + "/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x." : ".") + this.format + "?access_token=" + this.apiToken;
-		}
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+
+			if(this.mode === MapBoxProvider.STYLE)
+			{
+				image.src = MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
+			}
+			else
+			{
+				image.src = MapBoxProvider.ADDRESS + "v4/" + this.mapId + "/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x." : ".") + this.format + "?access_token=" + this.apiToken;
+			}
+		});
 	}
 }
 
@@ -2027,62 +2280,63 @@ MapBoxProvider.MAP_ID = 101;
  * @class MapTilerProvider
  * @param {String} apiKey
  */
-class MapTilerProvider extends MapProvider {
-	constructor(apiKey, type, style, format) {
+class MapTilerProvider extends MapProvider
+{
+	constructor(apiKey, category, style, format)
+	{
 		super();
 
 		/**
-		* Server API access token.
-		* 
-		* @attribute apiToken
-		* @type {String}
-		*/
+		 * Server API access token.
+		 * 
+		 * @attribute apiToken
+		 * @type {String}
+		 */
 		this.apiKey = apiKey !== undefined ? apiKey : "";
 
 		/**
-		* Map image tile format.
-		*  - png
-		*  - jpg
-		*
-		* @attribute format
-		* @type {String}
-		*/
+		 * Map image tile file format (e.g png, jpg)
+		 *
+		 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
+		 * 
+		 * @attribute format
+		 * @type {String}
+		 */
 		this.format = format !== undefined ? format : "png";
 
-		/** 
-		* The type of the map being provided, can be
-		*  - styles For vectorial map styles
-		*  - data For data map styles.
-		*
-		* @attribute type
-		* @type {String}
-		*/
-		this.type = type !== undefined ? type : "styles";
+		/**
+		 * Tile category (e.g. maps, tiles), 
+		 *
+		 * @attribute category
+		 * @type {String}
+		 */
+		this.category = category !== undefined ? category : "maps";
 
 		/**
-		* Map tile style, some of the vectorial styles available.
-		* - basic
-		* - bright
-		* - darkmatter
-		* - hybrid
-		* - positron
-		* - streets
-		* - topo
-		* - voyager
-		*
-		* Data styles:
-		* - hillshades
-		* - terrain-rgb
-		* - satellite
-		*
-		* @attribute style
-		* @type {String}
-		*/
-		this.style = style !== undefined ? style : "klokantech-basic";
+		 * Map tile type, some of the vectorial styles available.
+		 * 
+		 * Can be used for rasterized vectorial maps (e.g, basic, bright, darkmatter, hybrid, positron, streets, topo, voyager).
+		 *
+		 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
+		 *
+		 * @attribute style
+		 * @type {String}
+		 */
+		this.style = style !== undefined ? style : "satellite";
+
+		this.resolution = 512;
 	}
 
-	fetchTile(zoom, x, y) {
-		return "https://maps.tilehosting.com/" + this.type + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "https://api.maptiler.com/" + this.category + "/" + this.style + "/" + zoom + "/" + x + "/" + y + "." + this.format + "?key=" + this.apiKey;
+		});
 	}
 }
 
@@ -2094,42 +2348,45 @@ class MapTilerProvider extends MapProvider {
  *
  * @class OpenMapTilesProvider
  */
-class OpenMapTilesProvider extends MapProvider {
-	constructor(address) {
+class OpenMapTilesProvider extends MapProvider
+{
+	constructor(address)
+	{
 		super();
 
 		/**
-		* Map server address.
-		*
-		* By default the open OSM tile server is used.
-		* 
-		* @attribute address
-		* @type {String}
-		*/
+		 * Map server address.
+		 *
+		 * By default the open OSM tile server is used.
+		 * 
+		 * @attribute address
+		 * @type {String}
+		 */
 		this.address = address;
 
 		/**
-		* Map image tile format.
-		* 
-		* @attribute format
-		* @type {String}
-		*/
+		 * Map image tile format.
+		 * 
+		 * @attribute format
+		 * @type {String}
+		 */
 		this.format = "png";
 
 		/**
-		* Map tile theme, some of the styles available.
-		* - dark-matter
-		* - klokantech-basic
-		* - osm-bright
-		* - positron
-		* 
-		* @attribute theme
-		* @type {String}
-		*/
+		 * Map tile theme, some of the styles available.
+		 * - dark-matter
+		 * - klokantech-basic
+		 * - osm-bright
+		 * - positron
+		 * 
+		 * @attribute theme
+		 * @type {String}
+		 */
 		this.theme = "klokantech-basic";
 	}
 
-	getMetaData() {
+	getMetaData()
+	{
 		const self = this;
 		const address = this.address + "styles/" + this.theme + ".json";
 
@@ -2146,9 +2403,61 @@ class OpenMapTilesProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
-		return this.address + "styles/" + this.theme + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = this.address + "styles/" + this.theme + "/" + zoom + "/" + x + "/" + y + "." + this.format;
+		});
 	}
 }
 
-export { BingMapsProvider, GoogleMapsProvider, HereMapsProvider, MapBoxProvider, MapHeightNode, MapNode$1 as MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider };
+/**
+ * Debug provider can be used to debug the levels of the map three based on the zoom level they change between green and red.
+ *
+ * @class DebugProvider
+ */
+class DebugProvider extends MapProvider
+{
+	constructor()
+	{
+		super();
+		
+		/**
+		 * Resolution in px of each tile.
+		 * 
+		 * @attribute resolution
+		 * @type {Number}
+		 */
+		this.resolution = 256;
+	}
+
+	fetchTile(zoom, x, y)
+	{
+		const canvas = new OffscreenCanvas(this.resolution, this.resolution);
+		const context = canvas.getContext('2d');
+		
+		const green = new Color(0x00FF00);
+		const red = new Color(0xFF0000);
+
+		const color = green.lerpHSL(red, (zoom - this.minZoom) / (this.maxZoom - this.minZoom));
+
+		context.fillStyle = color.getStyle();
+		context.fillRect(0, 0, this.resolution, this.resolution);
+
+		context.fillStyle = "#000000";
+		context.textAlign = "center";
+		context.textBaseline = "middle";
+		context.font = "bold " + (this.resolution * 0.1) + "px arial";
+		context.fillText("(" + zoom + ")", this.resolution / 2, this.resolution * 0.4);
+		context.fillText("(" + x + ", " + y + ")", this.resolution / 2, this.resolution * 0.6);
+
+		return Promise.resolve(canvas);
+	}
+}
+
+export { BingMapsProvider, DebugProvider, GoogleMapsProvider, HereMapsProvider, MapBoxProvider, MapHeightNode, MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider };
