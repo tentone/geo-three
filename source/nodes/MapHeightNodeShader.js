@@ -12,9 +12,9 @@ import {MapHeightNode} from "./MapHeightNode.js";
  * @param x {number} X position of the node in the tile tree.
  * @param y {number} Y position of the node in the tile tree.
  */
-function MapHeightNodeShader(parentNode, mapView, location, level, x, y, material)
+function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 {
-	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
 }
 
 MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);

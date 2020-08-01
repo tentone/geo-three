@@ -40,7 +40,7 @@ scene.add(map);
 
   ​    
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="270">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="350">
 
 
 
@@ -56,6 +56,38 @@ scene.add(map);
 <img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="270">
 
 
+
+### Custom Data Providers
+
+- It is possible to create new data providers to access data other tile sources. New data sources have to provide access to the rasterized tile as a compatible DOM element (e.g. [Image](https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement), [Canvas](https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement), ...)
+- Custom providers have to extend the base `MapProvider` class and implement the `fetchTile(zoom, x, y)` method that returns a `Promise` with access to the tile data.
+- Bellow is an implementation of a provider to access [OpenStreetMaps](https://www.openstreetmap.org/) tile data using the [Tile API](https://wiki.openstreetmap.org/wiki/Tiles) the provider simply loads the URL data into a image element.
+- These methods are called directly by nodes being loaded into the scene. These should be always asynchronous and should avoid any blocking actions.
+
+```javascript
+export class OpenStreetMapsProvider extends MapProvider
+{
+	constructor(address) {super();}
+
+	fetchTile(zoom, x, y)
+	{
+		return new Promise((resolve, reject) =>
+		{
+			var image = document.createElement("img");
+			image.onload = function(){resolve(image);};
+			image.onerror = function(){reject();};
+			image.crossOrigin = "Anonymous";
+			image.src = "https://a.tile.openstreetmap.org/" + zoom + "/" + x + "/" + y + ".png";
+		});
+	}
+}
+```
+
+- Tiles coordinates for each zoom level are counted from the left-top corner sequentially across the tiles.
+- Different API's might use different methods to index these tiles (e.g. [Bing maps](https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system) uses a different indexing method).
+  - These coordinates need to be adapted to ensure correct loading when using this library.
+
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/coords.png" width="600">
 
 ### License
 

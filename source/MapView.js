@@ -6,6 +6,8 @@ import {MapHeightNode} from "./nodes/MapHeightNode.js";
 import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 import {MapSphereNode} from "./nodes/MapSphereNode.js";
 import {UnitsUtils} from "./utils/UnitsUtils.js";
+import {MapHeightNodeDisplacement} from "./nodes/MapHeightNodeDisplacement.js";
+import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -32,7 +34,7 @@ export class MapView extends Mesh
 		{
 			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 		}
-		else if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
+		else // if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
 		{
 			geometry = MapPlaneNode.GEOMETRY;
 		}
@@ -112,6 +114,20 @@ export class MapView extends Mesh
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 0.5;
+			this.thresholdDown = 0.1;
+		}
+		else if(this.mode === MapView.HEIGHT_DISPLACEMENT)
+		{
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNodeDisplacement(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 0.5;
+			this.thresholdDown = 0.1;
+		}
+		else if(this.mode === MapView.HEIGHT_SHADER)
+		{
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 0.5;
 			this.thresholdDown = 0.1;
 		}
@@ -307,3 +323,21 @@ MapView.SPHERICAL = 201;
  * @type {number}
  */
 MapView.HEIGHT = 202;
+
+/**
+ * Planar map projection with height deformation using the GPU for height generation.
+ *
+ * @static
+ * @attribute HEIGHT_DISPLACEMENT
+ * @type {number}
+ */
+MapView.HEIGHT_SHADER = 203;
+
+/**
+ * Planar map projection with height deformation using displacement mapping.
+ *
+ * @static
+ * @attribute HEIGHT_DISPLACEMENT
+ * @type {number}
+ */
+MapView.HEIGHT_DISPLACEMENT = 204;

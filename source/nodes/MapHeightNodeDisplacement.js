@@ -16,7 +16,7 @@ import {MapHeightNode} from "./MapHeightNode.js";
  */
 function MapHeightNodeDisplacement(parentNode, mapView, location, level, x, y)
 {
-	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
 }
 
 MapHeightNodeDisplacement.prototype = Object.create(MapHeightNode.prototype);
