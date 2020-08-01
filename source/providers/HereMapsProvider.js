@@ -7,12 +7,12 @@ import {MapProvider} from "./MapProvider.js";
  *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
  *
  * @class HereMapsProvider
- * @param {String} appId HERE maps app id.
- * @param {String} appCode HERE maps app code.
- * @param {String} style Map style.
- * @param {Number} scheme Map scheme.
- * @param {String} format Image format.
- * @param {Number} size Tile size.
+ * @param {string} appId HERE maps app id.
+ * @param {string} appCode HERE maps app code.
+ * @param {string} style Map style.
+ * @param {number} scheme Map scheme.
+ * @param {string} format Image format.
+ * @param {number} size Tile size.
  */
 export class HereMapsProvider extends MapProvider
 {
@@ -24,7 +24,7 @@ export class HereMapsProvider extends MapProvider
 		 * Service application access token.
 		 * 
 		 * @attribute appId
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.appId = appId !== undefined ? appId : "";
 
@@ -32,7 +32,7 @@ export class HereMapsProvider extends MapProvider
 		 * Service application code token.
 		 * 
 		 * @attribute appCode
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.appCode = appCode !== undefined ? appCode : "";
 
@@ -50,7 +50,7 @@ export class HereMapsProvider extends MapProvider
 		 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = style !== undefined ? style : "base";
 		
@@ -66,7 +66,7 @@ export class HereMapsProvider extends MapProvider
 		 * Be aware that invalid combinations of schemes and tiles are rejected. For all satellite, hybrid and terrain schemes, you need to use the Aerial Tiles base URL instead of the normal one.
 		 * 
 		 * @attribute scheme
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.scheme = scheme !== undefined ? scheme : "normal.day";
 
@@ -77,7 +77,7 @@ export class HereMapsProvider extends MapProvider
 		 *  - jpg JPG at 90% quality
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -90,7 +90,7 @@ export class HereMapsProvider extends MapProvider
 		 *  - 128 (deprecated, although usage is still accepted)
 		 *
 		 * @attribute size
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.size = size !== undefined ? size : 512;
 
@@ -98,7 +98,7 @@ export class HereMapsProvider extends MapProvider
 		 * Specifies the map version, either newest or with a hash value.
 		 *
 		 * @attribute version
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.version = "newest";
 
@@ -110,7 +110,7 @@ export class HereMapsProvider extends MapProvider
 		 * On each request this number is updated.
 		 *
 		 * @attribute server
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.server = 1;
  	}

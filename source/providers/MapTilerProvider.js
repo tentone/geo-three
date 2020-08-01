@@ -9,7 +9,7 @@ import {MapProvider} from "./MapProvider.js";
  *  - https://www.maptiler.com/
  *
  * @class MapTilerProvider
- * @param {String} apiKey
+ * @param {string} apiKey
  */
 export class MapTilerProvider extends MapProvider
 {
@@ -21,7 +21,7 @@ export class MapTilerProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiKey = apiKey !== undefined ? apiKey : "";
 
@@ -31,7 +31,7 @@ export class MapTilerProvider extends MapProvider
 		 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
 		 * 
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -39,7 +39,7 @@ export class MapTilerProvider extends MapProvider
 		 * Tile category (e.g. maps, tiles), 
 		 *
 		 * @attribute category
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.category = category !== undefined ? category : "maps";
 
@@ -51,7 +51,7 @@ export class MapTilerProvider extends MapProvider
 		 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = style !== undefined ? style : "satellite";
 

@@ -5,10 +5,10 @@ import {Float32BufferAttribute, BufferGeometry, Vector3} from "three";
  *
  * @class MapSphereNodeGeometry
  * @extends {BufferGeometry}
- * @param {Number} width Width of the node.
- * @param {Number} height Height of the node.
- * @param {Number} widthSegments Number of subdivisions along the width.
- * @param {Number} heightSegments Number of subdivisions along the height.
+ * @param {number} width Width of the node.
+ * @param {number} height Height of the node.
+ * @param {number} widthSegments Number of subdivisions along the width.
+ * @param {number} heightSegments Number of subdivisions along the height.
  */
 export class MapSphereNodeGeometry extends BufferGeometry {
 	constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)

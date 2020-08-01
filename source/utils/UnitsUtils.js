@@ -27,8 +27,8 @@ export class UnitsUtils {
 	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 	 *
 	 * @method datumsToSpherical
-	 * @param {Number} latitude
-	 * @param {Number} longitude
+	 * @param {number} latitude
+	 * @param {number} longitude
 	 */
 	static datumsToSpherical(latitude, longitude)
 	{
@@ -44,8 +44,8 @@ export class UnitsUtils {
 	 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
 	 *
 	 * @method sphericalToDatums
-	 * @param {Number} x
-	 * @param {Number} y
+	 * @param {number} x
+	 * @param {number} y
 	 */
 	static sphericalToDatums(x, y)
 	{
@@ -61,9 +61,9 @@ export class UnitsUtils {
 	 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
 	 *
 	 * @method quadtreeToDatums
-	 * @param {Number} zoom
-	 * @param {Number} x
-	 * @param {Number} y
+	 * @param {number} zoom
+	 * @param {number} x
+	 * @param {number} y
 	 */
 	static quadtreeToDatums(zoom, x, y)
 	{

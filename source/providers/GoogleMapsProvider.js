@@ -22,7 +22,7 @@ export class GoogleMapsProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -32,7 +32,7 @@ export class GoogleMapsProvider extends MapProvider
 		 * The session token is required for subsequent requests for tile and viewport information.
 		 *
 		 * @attribute sessionToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.sessionToken = null;
 
@@ -42,7 +42,7 @@ export class GoogleMapsProvider extends MapProvider
 		 * Can be 0, 90, 180 or 270.
 		 *
 		 * @attribute orientation
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.orientation = 0;
 
@@ -52,7 +52,7 @@ export class GoogleMapsProvider extends MapProvider
 		 *  - jpg JPG
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = "png";
 
@@ -64,7 +64,7 @@ export class GoogleMapsProvider extends MapProvider
 		 *  - streetview: Street View panoramas. See the Street View guide.
 		 *
 		 * @attribute mapType
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.mapType = "roadmap";
 
@@ -72,7 +72,7 @@ export class GoogleMapsProvider extends MapProvider
 		 * If true overlays are shown.
 		 *
 		 * @attribute overlay
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.overlay = false;
 

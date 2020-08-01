@@ -10,7 +10,7 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  *  - https://www.bingmapsportal.com/
  *
  * @class BingMapsProvider
- * @param {String} apiKey Bing API key.
+ * @param {string} apiKey Bing API key.
  */
 export class BingMapsProvider extends MapProvider
 {
@@ -24,7 +24,7 @@ export class BingMapsProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiKey
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiKey = apiKey !== undefined ? apiKey : "";
 
@@ -32,7 +32,7 @@ export class BingMapsProvider extends MapProvider
 		 * The type of the map used.
 		 *
 		 * @attribute type
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
 
@@ -43,7 +43,7 @@ export class BingMapsProvider extends MapProvider
 		 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = "jpeg";
 
@@ -51,7 +51,7 @@ export class BingMapsProvider extends MapProvider
 		 * Size of the map tiles.
 		 *
 		 * @attribute mapSize
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mapSize = 512;
 
@@ -59,7 +59,7 @@ export class BingMapsProvider extends MapProvider
 		 * Tile server subdomain.
 		 *
 		 * @attribute subdomain
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.subdomain = "t1";
 	}
@@ -91,7 +91,7 @@ export class BingMapsProvider extends MapProvider
 	 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
 	 *
 	 * @method quadKey
-	 * @param {Number} x
+	 * @param {number} x
 	 */
 	static quadKey(zoom, x, y)
 	{
@@ -136,7 +136,7 @@ export class BingMapsProvider extends MapProvider
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.AERIAL = "a";
 
@@ -145,7 +145,7 @@ BingMapsProvider.AERIAL = "a";
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.ROAD = "r";
 
@@ -154,7 +154,7 @@ BingMapsProvider.ROAD = "r";
  *
  * @static
  * @attribute AERIAL_LABELS
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.AERIAL_LABELS = "h";
 
@@ -163,7 +163,7 @@ BingMapsProvider.AERIAL_LABELS = "h";
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.OBLIQUE = "o";
 
@@ -172,6 +172,6 @@ BingMapsProvider.OBLIQUE = "o";
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.OBLIQUE_LABELS = "b";

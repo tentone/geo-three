@@ -16,9 +16,9 @@ import {UnitsUtils} from "./utils/UnitsUtils.js";
  *
  * @class MapView
  * @extends {Mesh}
- * @param {String} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
- * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
- * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
+ * @param {string} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+ * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+ * @param {number} heightProvider Map height tile provider, by default no height provider is used.
  */
 export class MapView extends Mesh
 {
@@ -45,7 +45,7 @@ export class MapView extends Mesh
 		 * This value can only be set on creation
 		 *
 		 * @attribute mode
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mode = mode;
 
@@ -71,7 +71,7 @@ export class MapView extends Mesh
 		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 		 *
 		 * @attribute subdivisionRays
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.subdivisionRays = 1;
 
@@ -81,7 +81,7 @@ export class MapView extends Mesh
 		 * Lower value will subdivide earlier (less zoom required to subdivide).
 		 * 
 		 * @attribute thresholdUp
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.thresholdUp = 0.8;
 
@@ -91,7 +91,7 @@ export class MapView extends Mesh
 		 * Higher value will simplify earlier.
 		 *
 		 * @attribute thresholdDown
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.thresholdDown = 0.2;
 		
@@ -266,9 +266,9 @@ export class MapView extends Mesh
 	 * Fetch tile image URL using its quadtree position and zoom level.
 	 * 
 	 * @method fetchTile
-	 * @param {Number} zoom Zoom level.
-	 * @param {Number} x Tile x.
-	 * @param {Number} y Tile y.
+	 * @param {number} zoom Zoom level.
+	 * @param {number} x Tile x.
+	 * @param {number} y Tile y.
 	 */
 	fetchTile(zoom, x, y)
 	{
@@ -286,7 +286,7 @@ export class MapView extends Mesh
  *
  * @static
  * @attribute PLANAR
- * @type {Number}
+ * @type {number}
  */
 MapView.PLANAR = 200;
 
@@ -295,7 +295,7 @@ MapView.PLANAR = 200;
  *
  * @static
  * @attribute SPHERICAL
- * @type {Number}
+ * @type {number}
  */
 MapView.SPHERICAL = 201;
 
@@ -304,6 +304,6 @@ MapView.SPHERICAL = 201;
  *
  * @static
  * @attribute HEIGHT
- * @type {Number}
+ * @type {number}
  */
 MapView.HEIGHT = 202;

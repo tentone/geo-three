@@ -8,11 +8,11 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  *  - https://www.mapbox.com/
  *
  * @class MapBoxProvider
- * @param {String} apiToken Map box api token.
- * @param {String} id Map style or mapID if the mode is set to MAP_ID.
- * @param {Number} mode Map tile access mode.
- * @param {String} format Image format.
- * @param {Boolean} useHDPI
+ * @param {string} apiToken Map box api token.
+ * @param {string} id Map style or mapID if the mode is set to MAP_ID.
+ * @param {number} mode Map tile access mode.
+ * @param {string} format Image format.
+ * @param {boolean} useHDPI
  */
 export class MapBoxProvider extends MapProvider
 {
@@ -24,7 +24,7 @@ export class MapBoxProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -41,7 +41,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - pngraw Raw png (no interpolation)
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -49,7 +49,7 @@ export class MapBoxProvider extends MapProvider
 		 * Flag to indicate if should use high resolution tiles
 		 *
 		 * @attribute useHDPI
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.useHDPI = useHDPI !== undefined ? useHDPI : false;
 
@@ -59,7 +59,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - MapBoxProvider.MAP_ID
 		 *
 		 * @attribute mode
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mode = mode !== undefined ? mode : MapBoxProvider.STYLE;
 
@@ -74,7 +74,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - mapbox.terrain-rgb
 		 *
 		 * @attribute mapId
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.mapId = id !== undefined ? id : "";
 
@@ -94,7 +94,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - mapbox/navigation-guidance-night-v4
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = id !== undefined ? id : "";
 	}
@@ -144,7 +144,7 @@ MapBoxProvider.ADDRESS = "https://api.mapbox.com/";
  *
  * @static
  * @attribute STYLE
- * @type {Number}
+ * @type {number}
  */
 MapBoxProvider.STYLE = 100;
 
@@ -153,6 +153,6 @@ MapBoxProvider.STYLE = 100;
  *
  * @static
  * @attribute MAP_ID
- * @type {Number}
+ * @type {number}
  */
 MapBoxProvider.MAP_ID = 101;

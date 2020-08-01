@@ -39,12 +39,14 @@ function MapSphereNode(parentNode, mapView, location, level, x, y)
 MapSphereNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapSphereNode.prototype, MapNode.prototype);
 
+MapSphereNode.prototype.constructor = MapSphereNode;
+
 /**
  * Number of segments per node geometry.
  *
  * @STATIC
  * @static SEGMENTS
- * @type {Number}
+ * @type {number}
  */
 MapSphereNode.SEGMENTS = 80;
 
@@ -52,9 +54,9 @@ MapSphereNode.SEGMENTS = 80;
  * Create a geometry for a sphere map node.
  *
  * @method createGeometry
- * @param {Number} zoom
- * @param {Number} x
- * @param {Number} y
+ * @param {number} zoom
+ * @param {number} x
+ * @param {number} y
  */
 MapSphereNode.createGeometry = function(zoom, x, y)
 {

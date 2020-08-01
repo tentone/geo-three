@@ -15,7 +15,7 @@ export class MapProvider
 		 * Name of the map provider
 		 *
 		 * @attribute name
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = "";
 		
@@ -23,7 +23,7 @@ export class MapProvider
 		 * Minimum tile level.
 		 * 
 		 * @attribute minZoom
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.minZoom = 0;
 
@@ -31,7 +31,7 @@ export class MapProvider
 		 * Maximum tile level.
 		 * 
 		 * @attribute maxZoom
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.maxZoom = 20;
 
@@ -58,9 +58,9 @@ export class MapProvider
 	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
 	 *
 	 * @method fetchTile
-	 * @param {Number} zoom Zoom level.
-	 * @param {Number} x Tile x.
-	 * @param {Number} y Tile y.
+	 * @param {number} zoom Zoom level.
+	 * @param {number} x Tile x.
+	 * @param {number} y Tile y.
 	 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 	 */
 	fetchTile(zoom, x, y) {}

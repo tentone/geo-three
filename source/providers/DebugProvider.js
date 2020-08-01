@@ -16,7 +16,7 @@ export class DebugProvider extends MapProvider
 		 * Resolution in px of each tile.
 		 * 
 		 * @attribute resolution
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.resolution = 256;
 	}

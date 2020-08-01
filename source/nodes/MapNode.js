@@ -33,7 +33,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
 	 *
 	 * @attribute location
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.location = location;
 
@@ -41,7 +41,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile level of this node.
 	 * 
 	 * @attribute level
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.level = level;
 
@@ -49,7 +49,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile x position.
 	 * 
 	 * @attribute x
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.x = x;
 
@@ -57,7 +57,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile y position.
 	 * 
 	 * @attribute y
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.y = y;
 
@@ -65,7 +65,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Indicates how many children nodes where loaded.
 	 *
 	 * @attribute nodesLoaded
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.nodesLoaded = 0;
 
@@ -75,10 +75,12 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * To avoid bad visibility changes on node load.
 	 *
 	 * @attribute subdivided
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.subdivided = false;
 }
+
+MapNode.prototype.constructor = MapNode;
 
 /**
  * How many children each branch of the tree has.
@@ -87,7 +89,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
  *
  * @static
  * @attribute CHILDRENS
- * @type {Number}
+ * @type {number}
  */
 MapNode.CHILDRENS = 4;
 
@@ -96,7 +98,7 @@ MapNode.CHILDRENS = 4;
  *
  * @static
  * @attribute ROOT
- * @type {Number}
+ * @type {number}
  */
 MapNode.ROOT = -1;
 
@@ -107,7 +109,7 @@ MapNode.ROOT = -1;
  *
  * @static
  * @attribute TOP_LEFT
- * @type {Number}
+ * @type {number}
  */
 MapNode.TOP_LEFT = 0;
 
@@ -118,7 +120,7 @@ MapNode.TOP_LEFT = 0;
  *
  * @static
  * @attribute TOP_RIGHT
- * @type {Number}
+ * @type {number}
  */
 MapNode.TOP_RIGHT = 1;
 
@@ -129,7 +131,7 @@ MapNode.TOP_RIGHT = 1;
  *
  * @static
  * @attribute BOTTOM_LEFT
- * @type {Number}
+ * @type {number}
  */
 MapNode.BOTTOM_LEFT = 2;
 
@@ -140,7 +142,7 @@ MapNode.BOTTOM_LEFT = 2;
  *
  * @static
  * @attribute BOTTOM_RIGHT
- * @type {Number}
+ * @type {number}
  */
 MapNode.BOTTOM_RIGHT = 3;
 
@@ -277,7 +279,7 @@ MapNode.prototype.nodeReady = function()
  * Get all the neighbors in a specific direction (left, right, up down).
  *
  * @method getNeighborsDirection
- * @param {Number} direction
+ * @param {number} direction
  * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
  */
 MapNode.prototype.getNeighborsDirection = function(direction)

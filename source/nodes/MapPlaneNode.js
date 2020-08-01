@@ -34,6 +34,8 @@ function MapPlaneNode(parentNode, mapView, location, level, x, y)
 MapPlaneNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapPlaneNode.prototype, MapNode.prototype);
 
+MapPlaneNode.prototype.constructor = MapPlaneNode;
+
 /**
  * Map node plane geometry.
  *
