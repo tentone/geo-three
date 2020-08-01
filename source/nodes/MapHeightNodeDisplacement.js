@@ -1,64 +1,45 @@
-import {Mesh, MeshPhongMaterial, RGBFormat, LinearFilter, CanvasTexture} from "three";
-import {MapNode} from "./MapNode.js";
+import {RGBFormat, LinearFilter, CanvasTexture} from "three";
+import {MapHeightNode} from "./MapHeightNode.js";
 
 /** 
- * TODO
+ * Map height node using a displacement map for the height. This method should be avoided its clamped to 8bit height.
+ * 
+ * Uses a Phong material with a grayscale displacement map. 
  *
  * @class MapHeightNodeDisplacement
+ * @param parentNode {MapHeightNode} The parent node of this node.
+ * @param mapView {MapView} Map view object where this node is placed.
+ * @param location {number} Position in the node tree relative to the parent.
+ * @param level {number} Zoom level in the tile tree of the node.
+ * @param x {number} X position of the node in the tile tree.
+ * @param y {number} Y position of the node in the tile tree.
  */
 function MapHeightNodeDisplacement(parentNode, mapView, location, level, x, y)
 {
-	var material = new MeshPhongMaterial(
-	{
-		color: 0x000000,
-		specular: 0x000000,
-		shininess: 0,
-		wireframe: false,
-		emissive: 0xFFFFFF
-	});
-
-	Mesh.call(this, MapHeightNode.GEOMETRY, material);
-	MapNode.call(this, parentNode, mapView, location, level, x, y);
-
-	this.matrixAutoUpdate = false;
-	this.isMesh = true;
-	
-	this.visible = false;
-
-	/**
-	 * Flag indicating if the tile texture was loaded.
-	 * 
-	 * @attribute textureLoaded
-	 * @type {boolean}
-	 */
-	this.textureLoaded = false;
-
-	/**
-	 * Flag indicating if the tile height data was loaded.
-	 * 
-	 * @attribute heightLoaded
-	 * @type {boolean}
-	 */
-	this.heightLoaded = false;
-
-	/**
-	 * Cache with the children objects created from subdivision.
-	 * 
-	 * Used to avoid recreate object after simplification and subdivision.
-	 * 
-	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
-	 */
-	this.childrenCache = null;
-
-	this.loadTexture();
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
 }
 
 MapHeightNodeDisplacement.prototype = Object.create(MapHeightNode.prototype);
 
 MapHeightNodeDisplacement.prototype.constructor = MapHeightNodeDisplacement;
+
+/**
+ * Max world height allowed, applied to the displacement.
+ *
+ * @static
+ * @attribute DISPLACEMENT_SCALE
+ * @type {number}
+ */
+MapHeightNodeDisplacement.DISPLACEMENT_SCALE = 1.0;
+
+/**
+ * Dampening factor applied to the height retrieved from the server.
+ *
+ * @static
+ * @attribute HEIGHT_DAMPENING
+ * @type {number}
+ */
+MapHeightNodeDisplacement.HEIGHT_DAMPENING = 10.0;
 
 /**
  * Load tile texture from the server.
@@ -102,7 +83,7 @@ MapHeightNodeDisplacement.prototype.loadHeightDisplacement = function()
 			var b = data[i + 2];
 
 			//The value will be composed of the bits RGB
-			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
+			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNodeDisplacement.HEIGHT_DAMPENING;
 
 			//Limit value to fit 1 byte
 			if(value < 0)
@@ -128,7 +109,7 @@ MapHeightNodeDisplacement.prototype.loadHeightDisplacement = function()
 		displacement.minFilter = LinearFilter;
 
 		self.material.displacementMap = displacement;
-		self.material.displacementScale = 1.0;
+		self.material.displacementScale = MapHeightNodeDisplacement.DISPLACEMENT_SCALE;
 		self.material.displacementBias = 0.0;
 		self.material.needsUpdate = true;
 

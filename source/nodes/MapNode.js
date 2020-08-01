@@ -78,6 +78,18 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * @type {boolean}
 	 */
 	this.subdivided = false;
+	
+	/**
+	 * Cache with the children objects created from subdivision.
+	 * 
+	 * Used to avoid recreate object after simplification and subdivision.
+	 * 
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
+	 */
+	this.childrenCache = null;
 }
 
 MapNode.prototype.constructor = MapNode;

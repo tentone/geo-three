@@ -9,10 +9,10 @@
 	 *
 	 * @class MapSphereNodeGeometry
 	 * @extends {BufferGeometry}
-	 * @param {Number} width Width of the node.
-	 * @param {Number} height Height of the node.
-	 * @param {Number} widthSegments Number of subdivisions along the width.
-	 * @param {Number} heightSegments Number of subdivisions along the height.
+	 * @param {number} width Width of the node.
+	 * @param {number} height Height of the node.
+	 * @param {number} widthSegments Number of subdivisions along the width.
+	 * @param {number} heightSegments Number of subdivisions along the height.
 	 */
 	class MapSphereNodeGeometry extends three.BufferGeometry {
 		constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
@@ -106,7 +106,7 @@
 			 * Name of the map provider
 			 *
 			 * @attribute name
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.name = "";
 			
@@ -114,7 +114,7 @@
 			 * Minimum tile level.
 			 * 
 			 * @attribute minZoom
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.minZoom = 0;
 
@@ -122,7 +122,7 @@
 			 * Maximum tile level.
 			 * 
 			 * @attribute maxZoom
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.maxZoom = 20;
 
@@ -149,9 +149,9 @@
 		 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
 		 *
 		 * @method fetchTile
-		 * @param {Number} zoom Zoom level.
-		 * @param {Number} x Tile x.
-		 * @param {Number} y Tile y.
+		 * @param {number} zoom Zoom level.
+		 * @param {number} x Tile x.
+		 * @param {number} y Tile y.
 		 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 		 */
 		fetchTile(zoom, x, y) {}
@@ -185,7 +185,7 @@
 			 * By default the open OSM tile server is used.
 			 * 
 			 * @attribute address
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.address = address !== undefined ? address : "https://a.tile.openstreetmap.org/";
 
@@ -193,7 +193,7 @@
 			 * Map image tile format.
 			 * 
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = "png";
 		}
@@ -244,7 +244,7 @@
 		 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
 		 *
 		 * @attribute location
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.location = location;
 
@@ -252,7 +252,7 @@
 		 * Tile level of this node.
 		 * 
 		 * @attribute level
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.level = level;
 
@@ -260,7 +260,7 @@
 		 * Tile x position.
 		 * 
 		 * @attribute x
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.x = x;
 
@@ -268,7 +268,7 @@
 		 * Tile y position.
 		 * 
 		 * @attribute y
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.y = y;
 
@@ -276,7 +276,7 @@
 		 * Indicates how many children nodes where loaded.
 		 *
 		 * @attribute nodesLoaded
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.nodesLoaded = 0;
 
@@ -286,10 +286,12 @@
 		 * To avoid bad visibility changes on node load.
 		 *
 		 * @attribute subdivided
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.subdivided = false;
 	}
+
+	MapNode.prototype.constructor = MapNode;
 
 	/**
 	 * How many children each branch of the tree has.
@@ -298,7 +300,7 @@
 	 *
 	 * @static
 	 * @attribute CHILDRENS
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapNode.CHILDRENS = 4;
 
@@ -307,7 +309,7 @@
 	 *
 	 * @static
 	 * @attribute ROOT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapNode.ROOT = -1;
 
@@ -318,7 +320,7 @@
 	 *
 	 * @static
 	 * @attribute TOP_LEFT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapNode.TOP_LEFT = 0;
 
@@ -329,7 +331,7 @@
 	 *
 	 * @static
 	 * @attribute TOP_RIGHT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapNode.TOP_RIGHT = 1;
 
@@ -340,7 +342,7 @@
 	 *
 	 * @static
 	 * @attribute BOTTOM_LEFT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapNode.BOTTOM_LEFT = 2;
 
@@ -351,7 +353,7 @@
 	 *
 	 * @static
 	 * @attribute BOTTOM_RIGHT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapNode.BOTTOM_RIGHT = 3;
 
@@ -488,7 +490,7 @@
 	 * Get all the neighbors in a specific direction (left, right, up down).
 	 *
 	 * @method getNeighborsDirection
-	 * @param {Number} direction
+	 * @param {number} direction
 	 * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
 	 */
 	MapNode.prototype.getNeighborsDirection = function(direction)
@@ -520,10 +522,10 @@
 	 *
 	 * @class MapNodeGeometry
 	 * @extends {BufferGeometry}
-	 * @param {Number} width Width of the node.
-	 * @param {Number} height Height of the node.
-	 * @param {Number} widthSegments Number of subdivisions along the width.
-	 * @param {Number} heightSegments Number of subdivisions along the height.
+	 * @param {number} width Width of the node.
+	 * @param {number} height Height of the node.
+	 * @param {number} widthSegments Number of subdivisions along the width.
+	 * @param {number} heightSegments Number of subdivisions along the height.
 	 */
 	class MapNodeGeometry extends three.BufferGeometry
 	{
@@ -593,17 +595,27 @@
 	 * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
 	 *
 	 * @class MapHeightNode
+	 * @param parentNode {MapHeightNode} The parent node of this node.
+	 * @param mapView {MapView} Map view object where this node is placed.
+	 * @param location {number} Position in the node tree relative to the parent.
+	 * @param level {number} Zoom level in the tile tree of the node.
+	 * @param x {number} X position of the node in the tile tree.
+	 * @param y {number} Y position of the node in the tile tree.
+	 * @param material {Material} Material used to render this height node.
 	 */
-	function MapHeightNode(parentNode, mapView, location, level, x, y)
+	function MapHeightNode(parentNode, mapView, location, level, x, y, material)
 	{
-		var material = new three.MeshPhongMaterial(
+		if(material === undefined)
 		{
-			color: 0x000000,
-			specular: 0x000000,
-			shininess: 0,
-			wireframe: false,
-			emissive: 0xFFFFFF
-		});
+			material = new three.MeshPhongMaterial(
+			{
+				color: 0x000000,
+				specular: 0x000000,
+				shininess: 0,
+				wireframe: false,
+				emissive: 0xFFFFFF
+			});
+		}
 
 		three.Mesh.call(this, MapHeightNode.GEOMETRY, material);
 		MapNode.call(this, parentNode, mapView, location, level, x, y);
@@ -647,14 +659,7 @@
 	MapHeightNode.prototype = Object.create(three.Mesh.prototype);
 	Object.assign(MapHeightNode.prototype, MapNode.prototype);
 
-	/**
-	 * If true a displacement map is used for surface deformation.
-	 *
-	 * @static
-	 * @attribute USE_DISPLACEMENT
-	 * @type {Boolean}
-	 */
-	MapHeightNode.USE_DISPLACEMENT = false;
+	MapHeightNode.prototype.constructor = MapHeightNode;
 
 	/**
 	 * Max world height allowed.
@@ -663,7 +668,7 @@
 	 *
 	 * @static
 	 * @attribute MAX_HEIGHT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapHeightNode.MAX_HEIGHT = 2e3;
 
@@ -674,7 +679,7 @@
 	 *
 	 * @static
 	 * @attribute HEIGHT_DAMPENING
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapHeightNode.HEIGHT_DAMPENING = 10.0;
 
@@ -683,7 +688,7 @@
 	 *
 	 * @static
 	 * @attribute TILE_SIZE
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapHeightNode.TILE_SIZE = 256;
 
@@ -692,7 +697,7 @@
 	 *
 	 * @static
 	 * @attribute GEOMETRY_SIZE
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapHeightNode.GEOMETRY_SIZE = 16;
 
@@ -838,74 +843,6 @@
 		});
 	};
 
-	/** 
-	 * Load height texture from the server and create a displacement map from it.
-	 *
-	 * @method loadHeightDisplacement
-	 * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
-	 */
-	MapHeightNode.prototype.loadHeightDisplacement = function()
-	{
-		var self = this;
-
-		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
-		{
-			var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-
-			var context = canvas.getContext("2d");
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-			
-			var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			var data = imageData.data;
-
-			for(var i = 0; i < data.length; i += 4)
-			{
-				var r = data[i];
-				var g = data[i + 1];
-				var b = data[i + 2];
-
-				//The value will be composed of the bits RGB
-				var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
-
-				//Limit value to fit 1 byte
-				if(value < 0)
-				{
-					value = 0;
-				}
-				else if(value > 255)
-				{
-					value = 255;
-				}
-
-				data[i] = value;
-				data[i + 1] = value;
-				data[i + 2] = value;
-			}
-
-			context.putImageData(imageData, 0, 0);
-
-			var displacement = new three.CanvasTexture(canvas);
-			displacement.generateMipmaps = false;
-			displacement.format = three.RGBFormat;
-			displacement.magFilter = three.LinearFilter;
-			displacement.minFilter = three.LinearFilter;
-
-			self.material.displacementMap = displacement;
-			self.material.displacementScale = 1.0;
-			self.material.displacementBias = 0.0;
-			self.material.needsUpdate = true;
-
-			self.heightLoaded = true;
-			self.nodeReady();
-		}).catch(function()
-		{
-			console.error("GeoThree: Failed to load height node data.", this);
-			self.heightLoaded = true;
-			self.nodeReady();
-		});
-	};
-
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
 	 * 
@@ -952,6 +889,8 @@
 
 	MapPlaneNode.prototype = Object.create(three.Mesh.prototype);
 	Object.assign(MapPlaneNode.prototype, MapNode.prototype);
+
+	MapPlaneNode.prototype.constructor = MapPlaneNode;
 
 	/**
 	 * Map node plane geometry.
@@ -1042,8 +981,8 @@
 		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 		 *
 		 * @method datumsToSpherical
-		 * @param {Number} latitude
-		 * @param {Number} longitude
+		 * @param {number} latitude
+		 * @param {number} longitude
 		 */
 		static datumsToSpherical(latitude, longitude)
 		{
@@ -1059,8 +998,8 @@
 		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
 		 *
 		 * @method sphericalToDatums
-		 * @param {Number} x
-		 * @param {Number} y
+		 * @param {number} x
+		 * @param {number} y
 		 */
 		static sphericalToDatums(x, y)
 		{
@@ -1076,9 +1015,9 @@
 		 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
 		 *
 		 * @method quadtreeToDatums
-		 * @param {Number} zoom
-		 * @param {Number} x
-		 * @param {Number} y
+		 * @param {number} zoom
+		 * @param {number} x
+		 * @param {number} y
 		 */
 		static quadtreeToDatums(zoom, x, y)
 		{
@@ -1151,12 +1090,14 @@
 	MapSphereNode.prototype = Object.create(three.Mesh.prototype);
 	Object.assign(MapSphereNode.prototype, MapNode.prototype);
 
+	MapSphereNode.prototype.constructor = MapSphereNode;
+
 	/**
 	 * Number of segments per node geometry.
 	 *
 	 * @STATIC
 	 * @static SEGMENTS
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapSphereNode.SEGMENTS = 80;
 
@@ -1164,9 +1105,9 @@
 	 * Create a geometry for a sphere map node.
 	 *
 	 * @method createGeometry
-	 * @param {Number} zoom
-	 * @param {Number} x
-	 * @param {Number} y
+	 * @param {number} zoom
+	 * @param {number} x
+	 * @param {number} y
 	 */
 	MapSphereNode.createGeometry = function(zoom, x, y)
 	{
@@ -1274,9 +1215,9 @@
 	 *
 	 * @class MapView
 	 * @extends {Mesh}
-	 * @param {String} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
-	 * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
-	 * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
+	 * @param {string} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
 	class MapView extends three.Mesh
 	{
@@ -1303,7 +1244,7 @@
 			 * This value can only be set on creation
 			 *
 			 * @attribute mode
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.mode = mode;
 
@@ -1329,7 +1270,7 @@
 			 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 			 *
 			 * @attribute subdivisionRays
-			 * @type {Boolean}
+			 * @type {boolean}
 			 */
 			this.subdivisionRays = 1;
 
@@ -1339,7 +1280,7 @@
 			 * Lower value will subdivide earlier (less zoom required to subdivide).
 			 * 
 			 * @attribute thresholdUp
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.thresholdUp = 0.8;
 
@@ -1349,7 +1290,7 @@
 			 * Higher value will simplify earlier.
 			 *
 			 * @attribute thresholdDown
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.thresholdDown = 0.2;
 			
@@ -1524,9 +1465,9 @@
 		 * Fetch tile image URL using its quadtree position and zoom level.
 		 * 
 		 * @method fetchTile
-		 * @param {Number} zoom Zoom level.
-		 * @param {Number} x Tile x.
-		 * @param {Number} y Tile y.
+		 * @param {number} zoom Zoom level.
+		 * @param {number} x Tile x.
+		 * @param {number} y Tile y.
 		 */
 		fetchTile(zoom, x, y)
 		{
@@ -1544,7 +1485,7 @@
 	 *
 	 * @static
 	 * @attribute PLANAR
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapView.PLANAR = 200;
 
@@ -1553,7 +1494,7 @@
 	 *
 	 * @static
 	 * @attribute SPHERICAL
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapView.SPHERICAL = 201;
 
@@ -1562,7 +1503,7 @@
 	 *
 	 * @static
 	 * @attribute HEIGHT
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapView.HEIGHT = 202;
 
@@ -1577,8 +1518,8 @@
 		 * Get file data from URL as text, using a XHR call.
 		 * 
 		 * @method readFile
-		 * @param {String} fname File URL.
-		 * @param {Boolean} sync If set to true or undefined the file is read syncronosly.
+		 * @param {string} fname File URL.
+		 * @param {boolean} sync If set to true or undefined the file is read syncronosly.
 		 * @param {Function} onLoad On load callback.
 		 * @param {Function} onError On progress callback.
 		 */
@@ -1610,10 +1551,10 @@
 		 * Syncronous request should be avoided unless they are strictly necessary.
 		 * 
 		 * @method request
-		 * @param {String} url Target for the request.
-		 * @param {String} type Resquest type (POST, GET, ...)
-		 * @param {String} header Object with data to be added to the request header.
-		 * @param {String} body Data to be sent in the resquest.
+		 * @param {string} url Target for the request.
+		 * @param {string} type Resquest type (POST, GET, ...)
+		 * @param {string} header Object with data to be added to the request header.
+		 * @param {string} body Data to be sent in the resquest.
 		 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
 		 * @param {Function} onError XHR onError callback.
 		 */
@@ -1682,7 +1623,7 @@
 	 *  - https://www.bingmapsportal.com/
 	 *
 	 * @class BingMapsProvider
-	 * @param {String} apiKey Bing API key.
+	 * @param {string} apiKey Bing API key.
 	 */
 	class BingMapsProvider extends MapProvider
 	{
@@ -1696,7 +1637,7 @@
 			 * Server API access token.
 			 * 
 			 * @attribute apiKey
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.apiKey = apiKey !== undefined ? apiKey : "";
 
@@ -1704,7 +1645,7 @@
 			 * The type of the map used.
 			 *
 			 * @attribute type
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
 
@@ -1715,7 +1656,7 @@
 			 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
 			 *
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = "jpeg";
 
@@ -1723,7 +1664,7 @@
 			 * Size of the map tiles.
 			 *
 			 * @attribute mapSize
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.mapSize = 512;
 
@@ -1731,7 +1672,7 @@
 			 * Tile server subdomain.
 			 *
 			 * @attribute subdomain
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.subdomain = "t1";
 		}
@@ -1762,7 +1703,7 @@
 		 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
 		 *
 		 * @method quadKey
-		 * @param {Number} x
+		 * @param {number} x
 		 */
 		static quadKey(zoom, x, y)
 		{
@@ -1807,7 +1748,7 @@
 	 *
 	 * @static
 	 * @attribute AERIAL
-	 * @type {String}
+	 * @type {string}
 	 */
 	BingMapsProvider.AERIAL = "a";
 
@@ -1816,7 +1757,7 @@
 	 *
 	 * @static
 	 * @attribute AERIAL
-	 * @type {String}
+	 * @type {string}
 	 */
 	BingMapsProvider.ROAD = "r";
 
@@ -1825,7 +1766,7 @@
 	 *
 	 * @static
 	 * @attribute AERIAL_LABELS
-	 * @type {String}
+	 * @type {string}
 	 */
 	BingMapsProvider.AERIAL_LABELS = "h";
 
@@ -1834,7 +1775,7 @@
 	 *
 	 * @static
 	 * @attribute AERIAL
-	 * @type {String}
+	 * @type {string}
 	 */
 	BingMapsProvider.OBLIQUE = "o";
 
@@ -1843,7 +1784,7 @@
 	 *
 	 * @static
 	 * @attribute AERIAL
-	 * @type {String}
+	 * @type {string}
 	 */
 	BingMapsProvider.OBLIQUE_LABELS = "b";
 
@@ -1868,7 +1809,7 @@
 			 * Server API access token.
 			 * 
 			 * @attribute apiToken
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -1878,7 +1819,7 @@
 			 * The session token is required for subsequent requests for tile and viewport information.
 			 *
 			 * @attribute sessionToken
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.sessionToken = null;
 
@@ -1888,7 +1829,7 @@
 			 * Can be 0, 90, 180 or 270.
 			 *
 			 * @attribute orientation
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.orientation = 0;
 
@@ -1898,7 +1839,7 @@
 			 *  - jpg JPG
 			 *
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = "png";
 
@@ -1910,7 +1851,7 @@
 			 *  - streetview: Street View panoramas. See the Street View guide.
 			 *
 			 * @attribute mapType
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.mapType = "roadmap";
 
@@ -1918,7 +1859,7 @@
 			 * If true overlays are shown.
 			 *
 			 * @attribute overlay
-			 * @type {Boolean}
+			 * @type {boolean}
 			 */
 			this.overlay = false;
 
@@ -1978,12 +1919,12 @@
 	 *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
 	 *
 	 * @class HereMapsProvider
-	 * @param {String} appId HERE maps app id.
-	 * @param {String} appCode HERE maps app code.
-	 * @param {String} style Map style.
-	 * @param {Number} scheme Map scheme.
-	 * @param {String} format Image format.
-	 * @param {Number} size Tile size.
+	 * @param {string} appId HERE maps app id.
+	 * @param {string} appCode HERE maps app code.
+	 * @param {string} style Map style.
+	 * @param {number} scheme Map scheme.
+	 * @param {string} format Image format.
+	 * @param {number} size Tile size.
 	 */
 	class HereMapsProvider extends MapProvider
 	{
@@ -1995,7 +1936,7 @@
 			 * Service application access token.
 			 * 
 			 * @attribute appId
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.appId = appId !== undefined ? appId : "";
 
@@ -2003,7 +1944,7 @@
 			 * Service application code token.
 			 * 
 			 * @attribute appCode
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.appCode = appCode !== undefined ? appCode : "";
 
@@ -2021,7 +1962,7 @@
 			 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
 			 *
 			 * @attribute style
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.style = style !== undefined ? style : "base";
 			
@@ -2037,7 +1978,7 @@
 			 * Be aware that invalid combinations of schemes and tiles are rejected. For all satellite, hybrid and terrain schemes, you need to use the Aerial Tiles base URL instead of the normal one.
 			 * 
 			 * @attribute scheme
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.scheme = scheme !== undefined ? scheme : "normal.day";
 
@@ -2048,7 +1989,7 @@
 			 *  - jpg JPG at 90% quality
 			 *
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = format !== undefined ? format : "png";
 
@@ -2061,7 +2002,7 @@
 			 *  - 128 (deprecated, although usage is still accepted)
 			 *
 			 * @attribute size
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.size = size !== undefined ? size : 512;
 
@@ -2069,7 +2010,7 @@
 			 * Specifies the map version, either newest or with a hash value.
 			 *
 			 * @attribute version
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.version = "newest";
 
@@ -2081,7 +2022,7 @@
 			 * On each request this number is updated.
 			 *
 			 * @attribute server
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.server = 1;
 	 	}
@@ -2124,11 +2065,11 @@
 	 *  - https://www.mapbox.com/
 	 *
 	 * @class MapBoxProvider
-	 * @param {String} apiToken Map box api token.
-	 * @param {String} id Map style or mapID if the mode is set to MAP_ID.
-	 * @param {Number} mode Map tile access mode.
-	 * @param {String} format Image format.
-	 * @param {Boolean} useHDPI
+	 * @param {string} apiToken Map box api token.
+	 * @param {string} id Map style or mapID if the mode is set to MAP_ID.
+	 * @param {number} mode Map tile access mode.
+	 * @param {string} format Image format.
+	 * @param {boolean} useHDPI
 	 */
 	class MapBoxProvider extends MapProvider
 	{
@@ -2140,7 +2081,7 @@
 			 * Server API access token.
 			 * 
 			 * @attribute apiToken
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -2157,7 +2098,7 @@
 			 *  - pngraw Raw png (no interpolation)
 			 *
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = format !== undefined ? format : "png";
 
@@ -2165,7 +2106,7 @@
 			 * Flag to indicate if should use high resolution tiles
 			 *
 			 * @attribute useHDPI
-			 * @type {Boolean}
+			 * @type {boolean}
 			 */
 			this.useHDPI = useHDPI !== undefined ? useHDPI : false;
 
@@ -2175,7 +2116,7 @@
 			 *  - MapBoxProvider.MAP_ID
 			 *
 			 * @attribute mode
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.mode = mode !== undefined ? mode : MapBoxProvider.STYLE;
 
@@ -2190,7 +2131,7 @@
 			 *  - mapbox.terrain-rgb
 			 *
 			 * @attribute mapId
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.mapId = id !== undefined ? id : "";
 
@@ -2210,7 +2151,7 @@
 			 *  - mapbox/navigation-guidance-night-v4
 			 *
 			 * @attribute style
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.style = id !== undefined ? id : "";
 		}
@@ -2260,7 +2201,7 @@
 	 *
 	 * @static
 	 * @attribute STYLE
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapBoxProvider.STYLE = 100;
 
@@ -2269,7 +2210,7 @@
 	 *
 	 * @static
 	 * @attribute MAP_ID
-	 * @type {Number}
+	 * @type {number}
 	 */
 	MapBoxProvider.MAP_ID = 101;
 
@@ -2282,7 +2223,7 @@
 	 *  - https://www.maptiler.com/
 	 *
 	 * @class MapTilerProvider
-	 * @param {String} apiKey
+	 * @param {string} apiKey
 	 */
 	class MapTilerProvider extends MapProvider
 	{
@@ -2294,7 +2235,7 @@
 			 * Server API access token.
 			 * 
 			 * @attribute apiToken
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.apiKey = apiKey !== undefined ? apiKey : "";
 
@@ -2304,7 +2245,7 @@
 			 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
 			 * 
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = format !== undefined ? format : "png";
 
@@ -2312,7 +2253,7 @@
 			 * Tile category (e.g. maps, tiles), 
 			 *
 			 * @attribute category
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.category = category !== undefined ? category : "maps";
 
@@ -2324,7 +2265,7 @@
 			 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
 			 *
 			 * @attribute style
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.style = style !== undefined ? style : "satellite";
 
@@ -2364,7 +2305,7 @@
 			 * By default the open OSM tile server is used.
 			 * 
 			 * @attribute address
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.address = address;
 
@@ -2372,7 +2313,7 @@
 			 * Map image tile format.
 			 * 
 			 * @attribute format
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.format = "png";
 
@@ -2384,7 +2325,7 @@
 			 * - positron
 			 * 
 			 * @attribute theme
-			 * @type {String}
+			 * @type {string}
 			 */
 			this.theme = "klokantech-basic";
 		}
@@ -2435,7 +2376,7 @@
 			 * Resolution in px of each tile.
 			 * 
 			 * @attribute resolution
-			 * @type {Number}
+			 * @type {number}
 			 */
 			this.resolution = 256;
 		}

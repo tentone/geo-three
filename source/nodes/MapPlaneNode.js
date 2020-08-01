@@ -15,18 +15,6 @@ function MapPlaneNode(parentNode, mapView, location, level, x, y)
 	this.matrixAutoUpdate = false;
 	this.isMesh = true;
 	this.visible = false;
-
-	/**
-	 * Cache with the children objects created from subdivision.
-	 * 
-	 * Used to avoid recreate object after simplification and subdivision.
-	 * 
-	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
-	 */
-	this.childrenCache = null;
 	
 	this.loadTexture();
 }

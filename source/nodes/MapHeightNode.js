@@ -56,18 +56,6 @@ function MapHeightNode(parentNode, mapView, location, level, x, y, material)
 	 */
 	this.heightLoaded = false;
 
-	/**
-	 * Cache with the children objects created from subdivision.
-	 * 
-	 * Used to avoid recreate object after simplification and subdivision.
-	 * 
-	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
-	 */
-	this.childrenCache = null;
-
 	this.loadTexture();
 }
 
@@ -75,28 +63,6 @@ MapHeightNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapHeightNode.prototype, MapNode.prototype);
 
 MapHeightNode.prototype.constructor = MapHeightNode;
-
-/**
- * Max world height allowed.
- *
- * Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
- *
- * @static
- * @attribute MAX_HEIGHT
- * @type {number}
- */
-MapHeightNode.MAX_HEIGHT = 2e3;
-
-/**
- * Dampening factor applied to the height retrieved from the server.
- *
- * Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
- *
- * @static
- * @attribute HEIGHT_DAMPENING
- * @type {number}
- */
-MapHeightNode.HEIGHT_DAMPENING = 10.0;
 
 /**
  * Original tile size of the images retrieved from the height provider.
@@ -183,28 +149,28 @@ MapHeightNode.prototype.createChildNodes = function()
 	var x = this.x * 2;
 	var y = this.y * 2;
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, 0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, 0.25);
 	this.add(node);
