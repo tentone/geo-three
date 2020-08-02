@@ -1,14 +1,14 @@
-import { BufferGeometry, Vector3, Float32BufferAttribute, Texture, RGBFormat, LinearFilter, MeshPhongMaterial, Mesh, CanvasTexture, MeshBasicMaterial, Matrix4, Quaternion, Raycaster, Vector2, Color } from 'three';
+import { BufferGeometry, Vector3, Float32BufferAttribute, Texture, RGBFormat, LinearFilter, MeshPhongMaterial, Mesh, MeshBasicMaterial, Matrix4, Quaternion, CanvasTexture, Raycaster, Vector2, Color } from 'three';
 
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
  *
  * @class MapSphereNodeGeometry
  * @extends {BufferGeometry}
- * @param {Number} width Width of the node.
- * @param {Number} height Height of the node.
- * @param {Number} widthSegments Number of subdivisions along the width.
- * @param {Number} heightSegments Number of subdivisions along the height.
+ * @param {number} width Width of the node.
+ * @param {number} height Height of the node.
+ * @param {number} widthSegments Number of subdivisions along the width.
+ * @param {number} heightSegments Number of subdivisions along the height.
  */
 class MapSphereNodeGeometry extends BufferGeometry {
 	constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
@@ -102,7 +102,7 @@ class MapProvider
 		 * Name of the map provider
 		 *
 		 * @attribute name
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = "";
 		
@@ -110,7 +110,7 @@ class MapProvider
 		 * Minimum tile level.
 		 * 
 		 * @attribute minZoom
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.minZoom = 0;
 
@@ -118,7 +118,7 @@ class MapProvider
 		 * Maximum tile level.
 		 * 
 		 * @attribute maxZoom
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.maxZoom = 20;
 
@@ -145,9 +145,9 @@ class MapProvider
 	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
 	 *
 	 * @method fetchTile
-	 * @param {Number} zoom Zoom level.
-	 * @param {Number} x Tile x.
-	 * @param {Number} y Tile y.
+	 * @param {number} zoom Zoom level.
+	 * @param {number} x Tile x.
+	 * @param {number} y Tile y.
 	 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 	 */
 	fetchTile(zoom, x, y) {}
@@ -181,7 +181,7 @@ class OpenStreetMapsProvider extends MapProvider
 		 * By default the open OSM tile server is used.
 		 * 
 		 * @attribute address
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.address = address !== undefined ? address : "https://a.tile.openstreetmap.org/";
 
@@ -189,7 +189,7 @@ class OpenStreetMapsProvider extends MapProvider
 		 * Map image tile format.
 		 * 
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = "png";
 	}
@@ -240,7 +240,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
 	 *
 	 * @attribute location
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.location = location;
 
@@ -248,7 +248,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile level of this node.
 	 * 
 	 * @attribute level
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.level = level;
 
@@ -256,7 +256,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile x position.
 	 * 
 	 * @attribute x
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.x = x;
 
@@ -264,7 +264,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile y position.
 	 * 
 	 * @attribute y
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.y = y;
 
@@ -272,7 +272,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Indicates how many children nodes where loaded.
 	 *
 	 * @attribute nodesLoaded
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.nodesLoaded = 0;
 
@@ -282,10 +282,24 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * To avoid bad visibility changes on node load.
 	 *
 	 * @attribute subdivided
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.subdivided = false;
+	
+	/**
+	 * Cache with the children objects created from subdivision.
+	 * 
+	 * Used to avoid recreate object after simplification and subdivision.
+	 * 
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
+	 */
+	this.childrenCache = null;
 }
+
+MapNode.prototype.constructor = MapNode;
 
 /**
  * How many children each branch of the tree has.
@@ -294,7 +308,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
  *
  * @static
  * @attribute CHILDRENS
- * @type {Number}
+ * @type {number}
  */
 MapNode.CHILDRENS = 4;
 
@@ -303,7 +317,7 @@ MapNode.CHILDRENS = 4;
  *
  * @static
  * @attribute ROOT
- * @type {Number}
+ * @type {number}
  */
 MapNode.ROOT = -1;
 
@@ -314,7 +328,7 @@ MapNode.ROOT = -1;
  *
  * @static
  * @attribute TOP_LEFT
- * @type {Number}
+ * @type {number}
  */
 MapNode.TOP_LEFT = 0;
 
@@ -325,7 +339,7 @@ MapNode.TOP_LEFT = 0;
  *
  * @static
  * @attribute TOP_RIGHT
- * @type {Number}
+ * @type {number}
  */
 MapNode.TOP_RIGHT = 1;
 
@@ -336,7 +350,7 @@ MapNode.TOP_RIGHT = 1;
  *
  * @static
  * @attribute BOTTOM_LEFT
- * @type {Number}
+ * @type {number}
  */
 MapNode.BOTTOM_LEFT = 2;
 
@@ -347,7 +361,7 @@ MapNode.BOTTOM_LEFT = 2;
  *
  * @static
  * @attribute BOTTOM_RIGHT
- * @type {Number}
+ * @type {number}
  */
 MapNode.BOTTOM_RIGHT = 3;
 
@@ -484,7 +498,7 @@ MapNode.prototype.nodeReady = function()
  * Get all the neighbors in a specific direction (left, right, up down).
  *
  * @method getNeighborsDirection
- * @param {Number} direction
+ * @param {number} direction
  * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
  */
 MapNode.prototype.getNeighborsDirection = function(direction)
@@ -516,10 +530,10 @@ MapNode.prototype.getNeighbors = function()
  *
  * @class MapNodeGeometry
  * @extends {BufferGeometry}
- * @param {Number} width Width of the node.
- * @param {Number} height Height of the node.
- * @param {Number} widthSegments Number of subdivisions along the width.
- * @param {Number} heightSegments Number of subdivisions along the height.
+ * @param {number} width Width of the node.
+ * @param {number} height Height of the node.
+ * @param {number} widthSegments Number of subdivisions along the width.
+ * @param {number} heightSegments Number of subdivisions along the height.
  */
 class MapNodeGeometry extends BufferGeometry
 {
@@ -589,17 +603,27 @@ class MapNodeGeometry extends BufferGeometry
  * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
  *
  * @class MapHeightNode
+ * @param parentNode {MapHeightNode} The parent node of this node.
+ * @param mapView {MapView} Map view object where this node is placed.
+ * @param location {number} Position in the node tree relative to the parent.
+ * @param level {number} Zoom level in the tile tree of the node.
+ * @param x {number} X position of the node in the tile tree.
+ * @param y {number} Y position of the node in the tile tree.
+ * @param material {Material} Material used to render this height node.
  */
-function MapHeightNode(parentNode, mapView, location, level, x, y)
+function MapHeightNode(parentNode, mapView, location, level, x, y, material)
 {
-	var material = new MeshPhongMaterial(
+	if(material === undefined)
 	{
-		color: 0x000000,
-		specular: 0x000000,
-		shininess: 0,
-		wireframe: false,
-		emissive: 0xFFFFFF
-	});
+		material = new MeshPhongMaterial(
+		{
+			color: 0x000000,
+			specular: 0x000000,
+			shininess: 0,
+			wireframe: false,
+			emissive: 0xFFFFFF
+		});
+	}
 
 	Mesh.call(this, MapHeightNode.GEOMETRY, material);
 	MapNode.call(this, parentNode, mapView, location, level, x, y);
@@ -625,61 +649,20 @@ function MapHeightNode(parentNode, mapView, location, level, x, y)
 	 */
 	this.heightLoaded = false;
 
-	/**
-	 * Cache with the children objects created from subdivision.
-	 * 
-	 * Used to avoid recreate object after simplification and subdivision.
-	 * 
-	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
-	 */
-	this.childrenCache = null;
-
 	this.loadTexture();
 }
 
 MapHeightNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapHeightNode.prototype, MapNode.prototype);
 
-/**
- * If true a displacement map is used for surface deformation.
- *
- * @static
- * @attribute USE_DISPLACEMENT
- * @type {Boolean}
- */
-MapHeightNode.USE_DISPLACEMENT = false;
-
-/**
- * Max world height allowed.
- *
- * Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
- *
- * @static
- * @attribute MAX_HEIGHT
- * @type {Number}
- */
-MapHeightNode.MAX_HEIGHT = 2e3;
-
-/**
- * Dampening factor applied to the height retrieved from the server.
- *
- * Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
- *
- * @static
- * @attribute HEIGHT_DAMPENING
- * @type {Number}
- */
-MapHeightNode.HEIGHT_DAMPENING = 10.0;
+MapHeightNode.prototype.constructor = MapHeightNode;
 
 /**
  * Original tile size of the images retrieved from the height provider.
  *
  * @static
  * @attribute TILE_SIZE
- * @type {Number}
+ * @type {number}
  */
 MapHeightNode.TILE_SIZE = 256;
 
@@ -688,7 +671,7 @@ MapHeightNode.TILE_SIZE = 256;
  *
  * @static
  * @attribute GEOMETRY_SIZE
- * @type {Number}
+ * @type {number}
  */
 MapHeightNode.GEOMETRY_SIZE = 16;
 
@@ -730,14 +713,7 @@ MapHeightNode.prototype.loadTexture = function()
 		self.nodeReady();
 	});
 
-	if(MapHeightNode.USE_DISPLACEMENT)
-	{
-		this.loadHeightDisplacement();
-	}
-	else
-	{
-		this.loadHeightGeometry();
-	}
+	this.loadHeightGeometry();
 };
 
 MapHeightNode.prototype.nodeReady = function()
@@ -759,28 +735,28 @@ MapHeightNode.prototype.createChildNodes = function()
 	var x = this.x * 2;
 	var y = this.y * 2;
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, 0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, 0.25);
 	this.add(node);
@@ -834,74 +810,6 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 	});
 };
 
-/** 
- * Load height texture from the server and create a displacement map from it.
- *
- * @method loadHeightDisplacement
- * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
- */
-MapHeightNode.prototype.loadHeightDisplacement = function()
-{
-	var self = this;
-
-	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
-	{
-		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
-
-		var context = canvas.getContext("2d");
-		context.imageSmoothingEnabled = false;
-		context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
-		
-		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-		var data = imageData.data;
-
-		for(var i = 0; i < data.length; i += 4)
-		{
-			var r = data[i];
-			var g = data[i + 1];
-			var b = data[i + 2];
-
-			//The value will be composed of the bits RGB
-			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNode.HEIGHT_DAMPENING;
-
-			//Limit value to fit 1 byte
-			if(value < 0)
-			{
-				value = 0;
-			}
-			else if(value > 255)
-			{
-				value = 255;
-			}
-
-			data[i] = value;
-			data[i + 1] = value;
-			data[i + 2] = value;
-		}
-
-		context.putImageData(imageData, 0, 0);
-
-		var displacement = new CanvasTexture(canvas);
-		displacement.generateMipmaps = false;
-		displacement.format = RGBFormat;
-		displacement.magFilter = LinearFilter;
-		displacement.minFilter = LinearFilter;
-
-		self.material.displacementMap = displacement;
-		self.material.displacementScale = 1.0;
-		self.material.displacementBias = 0.0;
-		self.material.needsUpdate = true;
-
-		self.heightLoaded = true;
-		self.nodeReady();
-	}).catch(function()
-	{
-		console.error("GeoThree: Failed to load height node data.", this);
-		self.heightLoaded = true;
-		self.nodeReady();
-	});
-};
-
 /**
  * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
  * 
@@ -930,24 +838,14 @@ function MapPlaneNode(parentNode, mapView, location, level, x, y)
 	this.matrixAutoUpdate = false;
 	this.isMesh = true;
 	this.visible = false;
-
-	/**
-	 * Cache with the children objects created from subdivision.
-	 * 
-	 * Used to avoid recreate object after simplification and subdivision.
-	 * 
-	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
-	 */
-	this.childrenCache = null;
 	
 	this.loadTexture();
 }
 
 MapPlaneNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapPlaneNode.prototype, MapNode.prototype);
+
+MapPlaneNode.prototype.constructor = MapPlaneNode;
 
 /**
  * Map node plane geometry.
@@ -1038,8 +936,8 @@ class UnitsUtils {
 	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 	 *
 	 * @method datumsToSpherical
-	 * @param {Number} latitude
-	 * @param {Number} longitude
+	 * @param {number} latitude
+	 * @param {number} longitude
 	 */
 	static datumsToSpherical(latitude, longitude)
 	{
@@ -1055,8 +953,8 @@ class UnitsUtils {
 	 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
 	 *
 	 * @method sphericalToDatums
-	 * @param {Number} x
-	 * @param {Number} y
+	 * @param {number} x
+	 * @param {number} y
 	 */
 	static sphericalToDatums(x, y)
 	{
@@ -1072,9 +970,9 @@ class UnitsUtils {
 	 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
 	 *
 	 * @method quadtreeToDatums
-	 * @param {Number} zoom
-	 * @param {Number} x
-	 * @param {Number} y
+	 * @param {number} zoom
+	 * @param {number} x
+	 * @param {number} y
 	 */
 	static quadtreeToDatums(zoom, x, y)
 	{
@@ -1129,30 +1027,20 @@ function MapSphereNode(parentNode, mapView, location, level, x, y)
 	this.isMesh = true;
 	this.visible = false;
 
-	/**
-	 * Cache with the children objects created from subdivision.
-	 * 
-	 * Used to avoid recreate object after simplification and subdivision.
-	 * 
-	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
-	 */
-	this.childrenCache = null;
-
 	this.loadTexture();
 }
 
 MapSphereNode.prototype = Object.create(Mesh.prototype);
 Object.assign(MapSphereNode.prototype, MapNode.prototype);
 
+MapSphereNode.prototype.constructor = MapSphereNode;
+
 /**
  * Number of segments per node geometry.
  *
  * @STATIC
  * @static SEGMENTS
- * @type {Number}
+ * @type {number}
  */
 MapSphereNode.SEGMENTS = 80;
 
@@ -1160,9 +1048,9 @@ MapSphereNode.SEGMENTS = 80;
  * Create a geometry for a sphere map node.
  *
  * @method createGeometry
- * @param {Number} zoom
- * @param {Number} x
- * @param {Number} y
+ * @param {number} zoom
+ * @param {number} x
+ * @param {number} y
  */
 MapSphereNode.createGeometry = function(zoom, x, y)
 {
@@ -1261,6 +1149,139 @@ MapSphereNode.prototype.raycast = function(raycaster, intersects)
 	return false;
 };
 
+/** 
+ * Map height node using a displacement map for the height. This method should be avoided its clamped to 8bit height.
+ * 
+ * Uses a Phong material with a grayscale displacement map. 
+ *
+ * @class MapHeightNodeDisplacement
+ * @param parentNode {MapHeightNode} The parent node of this node.
+ * @param mapView {MapView} Map view object where this node is placed.
+ * @param location {number} Position in the node tree relative to the parent.
+ * @param level {number} Zoom level in the tile tree of the node.
+ * @param x {number} X position of the node in the tile tree.
+ * @param y {number} Y position of the node in the tile tree.
+ */
+function MapHeightNodeDisplacement(parentNode, mapView, location, level, x, y)
+{
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
+}
+
+MapHeightNodeDisplacement.prototype = Object.create(MapHeightNode.prototype);
+
+MapHeightNodeDisplacement.prototype.constructor = MapHeightNodeDisplacement;
+
+/**
+ * Max world height allowed, applied to the displacement.
+ *
+ * @static
+ * @attribute DISPLACEMENT_SCALE
+ * @type {number}
+ */
+MapHeightNodeDisplacement.DISPLACEMENT_SCALE = 1.0;
+
+/**
+ * Dampening factor applied to the height retrieved from the server.
+ *
+ * @static
+ * @attribute HEIGHT_DAMPENING
+ * @type {number}
+ */
+MapHeightNodeDisplacement.HEIGHT_DAMPENING = 10.0;
+
+/** 
+ * Load height texture from the server and create a displacement map from it.
+ *
+ * @method loadHeightGeometry
+ * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
+ */
+MapHeightNodeDisplacement.prototype.loadHeightGeometry = function()
+{
+	var self = this;
+
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var canvas = new OffscreenCanvas(MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+
+		var context = canvas.getContext("2d");
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.TILE_SIZE, MapHeightNode.TILE_SIZE, 0, 0, canvas.width, canvas.height);
+		
+		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
+
+		for(var i = 0; i < data.length; i += 4)
+		{
+			var r = data[i];
+			var g = data[i + 1];
+			var b = data[i + 2];
+
+			//The value will be composed of the bits RGB
+			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNodeDisplacement.HEIGHT_DAMPENING;
+
+			//Limit value to fit 1 byte
+			if(value < 0)
+			{
+				value = 0;
+			}
+			else if(value > 255)
+			{
+				value = 255;
+			}
+
+			data[i] = value;
+			data[i + 1] = value;
+			data[i + 2] = value;
+		}
+
+		context.putImageData(imageData, 0, 0);
+
+		var displacement = new CanvasTexture(canvas);
+		displacement.generateMipmaps = false;
+		displacement.format = RGBFormat;
+		displacement.magFilter = LinearFilter;
+		displacement.minFilter = LinearFilter;
+
+		self.material.displacementMap = displacement;
+		self.material.displacementScale = MapHeightNodeDisplacement.DISPLACEMENT_SCALE;
+		self.material.displacementBias = 0.0;
+		self.material.needsUpdate = true;
+
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function(e)
+	{
+		console.error("GeoThree: Failed to load height node data.", e);
+		self.heightLoaded = true;
+		self.nodeReady();
+	});
+};
+
+/** 
+ * TODO
+ *
+ * @class MapHeightNodeShader
+ * @param parentNode {MapHeightNode} The parent node of this node.
+ * @param mapView {MapView} Map view object where this node is placed.
+ * @param location {number} Position in the node tree relative to the parent.
+ * @param level {number} Zoom level in the tile tree of the node.
+ * @param x {number} X position of the node in the tile tree.
+ * @param y {number} Y position of the node in the tile tree.
+ */
+function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
+{
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
+}
+
+MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
+
+MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
+
+MapHeightNodeShader.prototype.loadHeightGeometry = function()
+{
+
+};
+
 /**
  * Map viewer is used to read and display map tiles from a server.
  * 
@@ -1270,9 +1291,9 @@ MapSphereNode.prototype.raycast = function(raycaster, intersects)
  *
  * @class MapView
  * @extends {Mesh}
- * @param {String} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
- * @param {Number} provider Map color tile provider by default a OSM maps provider is used if none specified.
- * @param {Number} heightProvider Map height tile provider, by default no height provider is used.
+ * @param {string} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+ * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+ * @param {number} heightProvider Map height tile provider, by default no height provider is used.
  */
 class MapView extends Mesh
 {
@@ -1286,7 +1307,7 @@ class MapView extends Mesh
 		{
 			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 		}
-		else if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
+		else // if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
 		{
 			geometry = MapPlaneNode.GEOMETRY;
 		}
@@ -1299,7 +1320,7 @@ class MapView extends Mesh
 		 * This value can only be set on creation
 		 *
 		 * @attribute mode
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mode = mode;
 
@@ -1325,7 +1346,7 @@ class MapView extends Mesh
 		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 		 *
 		 * @attribute subdivisionRays
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.subdivisionRays = 1;
 
@@ -1335,7 +1356,7 @@ class MapView extends Mesh
 		 * Lower value will subdivide earlier (less zoom required to subdivide).
 		 * 
 		 * @attribute thresholdUp
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.thresholdUp = 0.8;
 
@@ -1345,7 +1366,7 @@ class MapView extends Mesh
 		 * Higher value will simplify earlier.
 		 *
 		 * @attribute thresholdDown
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.thresholdDown = 0.2;
 		
@@ -1366,6 +1387,20 @@ class MapView extends Mesh
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 0.5;
+			this.thresholdDown = 0.1;
+		}
+		else if(this.mode === MapView.HEIGHT_DISPLACEMENT)
+		{
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNodeDisplacement(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 0.5;
+			this.thresholdDown = 0.1;
+		}
+		else if(this.mode === MapView.HEIGHT_SHADER)
+		{
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 0.5;
 			this.thresholdDown = 0.1;
 		}
@@ -1520,9 +1555,9 @@ class MapView extends Mesh
 	 * Fetch tile image URL using its quadtree position and zoom level.
 	 * 
 	 * @method fetchTile
-	 * @param {Number} zoom Zoom level.
-	 * @param {Number} x Tile x.
-	 * @param {Number} y Tile y.
+	 * @param {number} zoom Zoom level.
+	 * @param {number} x Tile x.
+	 * @param {number} y Tile y.
 	 */
 	fetchTile(zoom, x, y)
 	{
@@ -1540,7 +1575,7 @@ class MapView extends Mesh
  *
  * @static
  * @attribute PLANAR
- * @type {Number}
+ * @type {number}
  */
 MapView.PLANAR = 200;
 
@@ -1549,7 +1584,7 @@ MapView.PLANAR = 200;
  *
  * @static
  * @attribute SPHERICAL
- * @type {Number}
+ * @type {number}
  */
 MapView.SPHERICAL = 201;
 
@@ -1558,9 +1593,27 @@ MapView.SPHERICAL = 201;
  *
  * @static
  * @attribute HEIGHT
- * @type {Number}
+ * @type {number}
  */
 MapView.HEIGHT = 202;
+
+/**
+ * Planar map projection with height deformation using the GPU for height generation.
+ *
+ * @static
+ * @attribute HEIGHT_DISPLACEMENT
+ * @type {number}
+ */
+MapView.HEIGHT_SHADER = 203;
+
+/**
+ * Planar map projection with height deformation using displacement mapping.
+ *
+ * @static
+ * @attribute HEIGHT_DISPLACEMENT
+ * @type {number}
+ */
+MapView.HEIGHT_DISPLACEMENT = 204;
 
 /**
  * XHR utils contains static methods to allow easy access to services via XHR.
@@ -1573,8 +1626,8 @@ class XHRUtils {
 	 * Get file data from URL as text, using a XHR call.
 	 * 
 	 * @method readFile
-	 * @param {String} fname File URL.
-	 * @param {Boolean} sync If set to true or undefined the file is read syncronosly.
+	 * @param {string} fname File URL.
+	 * @param {boolean} sync If set to true or undefined the file is read syncronosly.
 	 * @param {Function} onLoad On load callback.
 	 * @param {Function} onError On progress callback.
 	 */
@@ -1606,10 +1659,10 @@ class XHRUtils {
 	 * Syncronous request should be avoided unless they are strictly necessary.
 	 * 
 	 * @method request
-	 * @param {String} url Target for the request.
-	 * @param {String} type Resquest type (POST, GET, ...)
-	 * @param {String} header Object with data to be added to the request header.
-	 * @param {String} body Data to be sent in the resquest.
+	 * @param {string} url Target for the request.
+	 * @param {string} type Resquest type (POST, GET, ...)
+	 * @param {string} header Object with data to be added to the request header.
+	 * @param {string} body Data to be sent in the resquest.
 	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
 	 * @param {Function} onError XHR onError callback.
 	 */
@@ -1678,7 +1731,7 @@ class XHRUtils {
  *  - https://www.bingmapsportal.com/
  *
  * @class BingMapsProvider
- * @param {String} apiKey Bing API key.
+ * @param {string} apiKey Bing API key.
  */
 class BingMapsProvider extends MapProvider
 {
@@ -1692,7 +1745,7 @@ class BingMapsProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiKey
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiKey = apiKey !== undefined ? apiKey : "";
 
@@ -1700,7 +1753,7 @@ class BingMapsProvider extends MapProvider
 		 * The type of the map used.
 		 *
 		 * @attribute type
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
 
@@ -1711,7 +1764,7 @@ class BingMapsProvider extends MapProvider
 		 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = "jpeg";
 
@@ -1719,7 +1772,7 @@ class BingMapsProvider extends MapProvider
 		 * Size of the map tiles.
 		 *
 		 * @attribute mapSize
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mapSize = 512;
 
@@ -1727,7 +1780,7 @@ class BingMapsProvider extends MapProvider
 		 * Tile server subdomain.
 		 *
 		 * @attribute subdomain
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.subdomain = "t1";
 	}
@@ -1758,7 +1811,7 @@ class BingMapsProvider extends MapProvider
 	 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
 	 *
 	 * @method quadKey
-	 * @param {Number} x
+	 * @param {number} x
 	 */
 	static quadKey(zoom, x, y)
 	{
@@ -1803,7 +1856,7 @@ class BingMapsProvider extends MapProvider
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.AERIAL = "a";
 
@@ -1812,7 +1865,7 @@ BingMapsProvider.AERIAL = "a";
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.ROAD = "r";
 
@@ -1821,7 +1874,7 @@ BingMapsProvider.ROAD = "r";
  *
  * @static
  * @attribute AERIAL_LABELS
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.AERIAL_LABELS = "h";
 
@@ -1830,7 +1883,7 @@ BingMapsProvider.AERIAL_LABELS = "h";
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.OBLIQUE = "o";
 
@@ -1839,7 +1892,7 @@ BingMapsProvider.OBLIQUE = "o";
  *
  * @static
  * @attribute AERIAL
- * @type {String}
+ * @type {string}
  */
 BingMapsProvider.OBLIQUE_LABELS = "b";
 
@@ -1864,7 +1917,7 @@ class GoogleMapsProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -1874,7 +1927,7 @@ class GoogleMapsProvider extends MapProvider
 		 * The session token is required for subsequent requests for tile and viewport information.
 		 *
 		 * @attribute sessionToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.sessionToken = null;
 
@@ -1884,7 +1937,7 @@ class GoogleMapsProvider extends MapProvider
 		 * Can be 0, 90, 180 or 270.
 		 *
 		 * @attribute orientation
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.orientation = 0;
 
@@ -1894,7 +1947,7 @@ class GoogleMapsProvider extends MapProvider
 		 *  - jpg JPG
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = "png";
 
@@ -1906,7 +1959,7 @@ class GoogleMapsProvider extends MapProvider
 		 *  - streetview: Street View panoramas. See the Street View guide.
 		 *
 		 * @attribute mapType
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.mapType = "roadmap";
 
@@ -1914,7 +1967,7 @@ class GoogleMapsProvider extends MapProvider
 		 * If true overlays are shown.
 		 *
 		 * @attribute overlay
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.overlay = false;
 
@@ -1974,12 +2027,12 @@ class GoogleMapsProvider extends MapProvider
  *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
  *
  * @class HereMapsProvider
- * @param {String} appId HERE maps app id.
- * @param {String} appCode HERE maps app code.
- * @param {String} style Map style.
- * @param {Number} scheme Map scheme.
- * @param {String} format Image format.
- * @param {Number} size Tile size.
+ * @param {string} appId HERE maps app id.
+ * @param {string} appCode HERE maps app code.
+ * @param {string} style Map style.
+ * @param {number} scheme Map scheme.
+ * @param {string} format Image format.
+ * @param {number} size Tile size.
  */
 class HereMapsProvider extends MapProvider
 {
@@ -1991,7 +2044,7 @@ class HereMapsProvider extends MapProvider
 		 * Service application access token.
 		 * 
 		 * @attribute appId
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.appId = appId !== undefined ? appId : "";
 
@@ -1999,7 +2052,7 @@ class HereMapsProvider extends MapProvider
 		 * Service application code token.
 		 * 
 		 * @attribute appCode
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.appCode = appCode !== undefined ? appCode : "";
 
@@ -2017,7 +2070,7 @@ class HereMapsProvider extends MapProvider
 		 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = style !== undefined ? style : "base";
 		
@@ -2033,7 +2086,7 @@ class HereMapsProvider extends MapProvider
 		 * Be aware that invalid combinations of schemes and tiles are rejected. For all satellite, hybrid and terrain schemes, you need to use the Aerial Tiles base URL instead of the normal one.
 		 * 
 		 * @attribute scheme
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.scheme = scheme !== undefined ? scheme : "normal.day";
 
@@ -2044,7 +2097,7 @@ class HereMapsProvider extends MapProvider
 		 *  - jpg JPG at 90% quality
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -2057,7 +2110,7 @@ class HereMapsProvider extends MapProvider
 		 *  - 128 (deprecated, although usage is still accepted)
 		 *
 		 * @attribute size
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.size = size !== undefined ? size : 512;
 
@@ -2065,7 +2118,7 @@ class HereMapsProvider extends MapProvider
 		 * Specifies the map version, either newest or with a hash value.
 		 *
 		 * @attribute version
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.version = "newest";
 
@@ -2077,7 +2130,7 @@ class HereMapsProvider extends MapProvider
 		 * On each request this number is updated.
 		 *
 		 * @attribute server
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.server = 1;
  	}
@@ -2120,11 +2173,11 @@ HereMapsProvider.PATH = "/maptile/2.1/";
  *  - https://www.mapbox.com/
  *
  * @class MapBoxProvider
- * @param {String} apiToken Map box api token.
- * @param {String} id Map style or mapID if the mode is set to MAP_ID.
- * @param {Number} mode Map tile access mode.
- * @param {String} format Image format.
- * @param {Boolean} useHDPI
+ * @param {string} apiToken Map box api token.
+ * @param {string} id Map style or mapID if the mode is set to MAP_ID.
+ * @param {number} mode Map tile access mode.
+ * @param {string} format Image format.
+ * @param {boolean} useHDPI
  */
 class MapBoxProvider extends MapProvider
 {
@@ -2136,7 +2189,7 @@ class MapBoxProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -2153,7 +2206,7 @@ class MapBoxProvider extends MapProvider
 		 *  - pngraw Raw png (no interpolation)
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -2161,7 +2214,7 @@ class MapBoxProvider extends MapProvider
 		 * Flag to indicate if should use high resolution tiles
 		 *
 		 * @attribute useHDPI
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.useHDPI = useHDPI !== undefined ? useHDPI : false;
 
@@ -2171,7 +2224,7 @@ class MapBoxProvider extends MapProvider
 		 *  - MapBoxProvider.MAP_ID
 		 *
 		 * @attribute mode
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mode = mode !== undefined ? mode : MapBoxProvider.STYLE;
 
@@ -2186,7 +2239,7 @@ class MapBoxProvider extends MapProvider
 		 *  - mapbox.terrain-rgb
 		 *
 		 * @attribute mapId
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.mapId = id !== undefined ? id : "";
 
@@ -2206,7 +2259,7 @@ class MapBoxProvider extends MapProvider
 		 *  - mapbox/navigation-guidance-night-v4
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = id !== undefined ? id : "";
 	}
@@ -2256,7 +2309,7 @@ MapBoxProvider.ADDRESS = "https://api.mapbox.com/";
  *
  * @static
  * @attribute STYLE
- * @type {Number}
+ * @type {number}
  */
 MapBoxProvider.STYLE = 100;
 
@@ -2265,7 +2318,7 @@ MapBoxProvider.STYLE = 100;
  *
  * @static
  * @attribute MAP_ID
- * @type {Number}
+ * @type {number}
  */
 MapBoxProvider.MAP_ID = 101;
 
@@ -2278,7 +2331,7 @@ MapBoxProvider.MAP_ID = 101;
  *  - https://www.maptiler.com/
  *
  * @class MapTilerProvider
- * @param {String} apiKey
+ * @param {string} apiKey
  */
 class MapTilerProvider extends MapProvider
 {
@@ -2290,7 +2343,7 @@ class MapTilerProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiKey = apiKey !== undefined ? apiKey : "";
 
@@ -2300,7 +2353,7 @@ class MapTilerProvider extends MapProvider
 		 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
 		 * 
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -2308,7 +2361,7 @@ class MapTilerProvider extends MapProvider
 		 * Tile category (e.g. maps, tiles), 
 		 *
 		 * @attribute category
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.category = category !== undefined ? category : "maps";
 
@@ -2320,7 +2373,7 @@ class MapTilerProvider extends MapProvider
 		 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = style !== undefined ? style : "satellite";
 
@@ -2360,7 +2413,7 @@ class OpenMapTilesProvider extends MapProvider
 		 * By default the open OSM tile server is used.
 		 * 
 		 * @attribute address
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.address = address;
 
@@ -2368,7 +2421,7 @@ class OpenMapTilesProvider extends MapProvider
 		 * Map image tile format.
 		 * 
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = "png";
 
@@ -2380,7 +2433,7 @@ class OpenMapTilesProvider extends MapProvider
 		 * - positron
 		 * 
 		 * @attribute theme
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.theme = "klokantech-basic";
 	}
@@ -2431,7 +2484,7 @@ class DebugProvider extends MapProvider
 		 * Resolution in px of each tile.
 		 * 
 		 * @attribute resolution
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.resolution = 256;
 	}
@@ -2460,4 +2513,4 @@ class DebugProvider extends MapProvider
 	}
 }
 
-export { BingMapsProvider, DebugProvider, GoogleMapsProvider, HereMapsProvider, MapBoxProvider, MapHeightNode, MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider };
+export { BingMapsProvider, DebugProvider, GoogleMapsProvider, HereMapsProvider, MapBoxProvider, MapHeightNode, MapHeightNodeDisplacement, MapHeightNodeShader, MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider };

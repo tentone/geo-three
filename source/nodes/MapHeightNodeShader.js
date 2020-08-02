@@ -21,18 +21,9 @@ MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
 
 MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
-/**
- * Load tile texture from the server.
- * 
- * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
- *
- * @method loadTexture
- */
-MapHeightNodeShader.prototype.loadTexture = function()
+MapHeightNodeShader.prototype.loadHeightGeometry = function()
 {
-	MapHeightNode.prototype.loadTexture.call(this);
 
-	this.loadHeightDisplacement();
 };
 
 export {MapHeightNodeShader};

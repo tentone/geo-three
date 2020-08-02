@@ -717,14 +717,7 @@
 			self.nodeReady();
 		});
 
-		if(MapHeightNode.USE_DISPLACEMENT)
-		{
-			this.loadHeightDisplacement();
-		}
-		else
-		{
-			this.loadHeightGeometry();
-		}
+		this.loadHeightGeometry();
 	};
 
 	MapHeightNode.prototype.nodeReady = function()
@@ -1200,27 +1193,13 @@
 	 */
 	MapHeightNodeDisplacement.HEIGHT_DAMPENING = 10.0;
 
-	/**
-	 * Load tile texture from the server.
-	 * 
-	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
-	 *
-	 * @method loadTexture
-	 */
-	MapHeightNodeDisplacement.prototype.loadTexture = function()
-	{
-		MapHeightNode.prototype.loadTexture.call(this);
-
-		this.loadHeightDisplacement();
-	};
-
 	/** 
 	 * Load height texture from the server and create a displacement map from it.
 	 *
-	 * @method loadHeightDisplacement
+	 * @method loadHeightGeometry
 	 * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
 	 */
-	MapHeightNodeDisplacement.prototype.loadHeightDisplacement = function()
+	MapHeightNodeDisplacement.prototype.loadHeightGeometry = function()
 	{
 		var self = this;
 
@@ -1274,12 +1253,37 @@
 
 			self.heightLoaded = true;
 			self.nodeReady();
-		}).catch(function()
+		}).catch(function(e)
 		{
-			console.error("GeoThree: Failed to load height node data.", this);
+			console.error("GeoThree: Failed to load height node data.", e);
 			self.heightLoaded = true;
 			self.nodeReady();
 		});
+	};
+
+	/** 
+	 * TODO
+	 *
+	 * @class MapHeightNodeShader
+	 * @param parentNode {MapHeightNode} The parent node of this node.
+	 * @param mapView {MapView} Map view object where this node is placed.
+	 * @param location {number} Position in the node tree relative to the parent.
+	 * @param level {number} Zoom level in the tile tree of the node.
+	 * @param x {number} X position of the node in the tile tree.
+	 * @param y {number} Y position of the node in the tile tree.
+	 */
+	function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
+	{
+		MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
+	}
+
+	MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
+
+	MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
+
+	MapHeightNodeShader.prototype.loadHeightGeometry = function()
+	{
+
 	};
 
 	/**
@@ -1387,15 +1391,16 @@
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-				this.thresholdUp = 0.5;
-				this.thresholdDown = 0.1;
 			}
-			else if(this.mode === MapView.HEIGHT_GPU)
+			else if(this.mode === MapView.HEIGHT_DISPLACEMENT)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNodeDisplacement(null, this, MapNode.ROOT, 0, 0, 0);
-				this.thresholdUp = 0.5;
-				this.thresholdDown = 0.1;
+			}
+			else if(this.mode === MapView.HEIGHT_SHADER)
+			{
+				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+				this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 			}
 			else if(this.mode === MapView.SPHERICAL)
 			{
@@ -1486,7 +1491,29 @@
 				this._raycaster.intersectObjects(this.children, true, intersects);
 			}
 
-			if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+			if(this.mode === MapView.SPHERICAL)
+			{
+				for(var i = 0; i < intersects.length; i++)
+				{
+					var node = intersects[i].object;
+					const distance = intersects[i].distance * 2 ** node.level;
+
+					if(distance < this.thresholdUp)
+					{
+						node.subdivide();
+						return;
+					}
+					else if(distance > this.thresholdDown)
+					{
+						if(node.parentNode !== null)
+						{
+							node.parentNode.simplify();
+							return;
+						}
+					}
+				}
+			}
+			else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
 			{
 				for(var i = 0; i < intersects.length; i++)
 				{
@@ -1501,28 +1528,6 @@
 						return;
 					}
 					else if(value < this.thresholdDown)
-					{
-						if(node.parentNode !== null)
-						{
-							node.parentNode.simplify();
-							return;
-						}
-					}
-				}
-			}
-			else if(this.mode === MapView.SPHERICAL)
-			{
-				for(var i = 0; i < intersects.length; i++)
-				{
-					var node = intersects[i].object;
-					const distance = intersects[i].distance * 2 ** node.level;
-
-					if(distance < this.thresholdUp)
-					{
-						node.subdivide();
-						return;
-					}
-					else if(distance > this.thresholdDown)
 					{
 						if(node.parentNode !== null)
 						{
@@ -1594,10 +1599,19 @@
 	 * Planar map projection with height deformation using the GPU for height generation.
 	 *
 	 * @static
-	 * @attribute HEIGHT_GPU
+	 * @attribute HEIGHT_DISPLACEMENT
 	 * @type {number}
 	 */
-	MapView.HEIGHT_GPU = 203;
+	MapView.HEIGHT_SHADER = 203;
+
+	/**
+	 * Planar map projection with height deformation using displacement mapping.
+	 *
+	 * @static
+	 * @attribute HEIGHT_DISPLACEMENT
+	 * @type {number}
+	 */
+	MapView.HEIGHT_DISPLACEMENT = 204;
 
 	/**
 	 * XHR utils contains static methods to allow easy access to services via XHR.
@@ -2496,40 +2510,6 @@
 			return Promise.resolve(canvas);
 		}
 	}
-
-	/** 
-	 * TODO
-	 *
-	 * @class MapHeightNodeShader
-	 * @param parentNode {MapHeightNode} The parent node of this node.
-	 * @param mapView {MapView} Map view object where this node is placed.
-	 * @param location {number} Position in the node tree relative to the parent.
-	 * @param level {number} Zoom level in the tile tree of the node.
-	 * @param x {number} X position of the node in the tile tree.
-	 * @param y {number} Y position of the node in the tile tree.
-	 */
-	function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
-	{
-		MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
-	}
-
-	MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
-
-	MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
-
-	/**
-	 * Load tile texture from the server.
-	 * 
-	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
-	 *
-	 * @method loadTexture
-	 */
-	MapHeightNodeShader.prototype.loadTexture = function()
-	{
-		MapHeightNode.prototype.loadTexture.call(this);
-
-		this.loadHeightDisplacement();
-	};
 
 	exports.BingMapsProvider = BingMapsProvider;
 	exports.DebugProvider = DebugProvider;

@@ -120,14 +120,7 @@ MapHeightNode.prototype.loadTexture = function()
 		self.nodeReady();
 	});
 
-	if(MapHeightNode.USE_DISPLACEMENT)
-	{
-		this.loadHeightDisplacement();
-	}
-	else
-	{
-		this.loadHeightGeometry();
-	}
+	this.loadHeightGeometry();
 };
 
 MapHeightNode.prototype.nodeReady = function()

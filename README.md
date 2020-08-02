@@ -89,6 +89,32 @@ export class OpenStreetMapsProvider extends MapProvider
 
 <img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/coords.png" width="600">
 
+- It is also possible to create fictional tiles without any external API to generate tiles by writing data directly into a canvas or even using a local image database to draw the map.
+- The code bellow shows how to implement a tile provided that draws a gradient from blue to red based on the zoom level of the tile with 16x16 pixels. This example can be used as basis for other code based tile generators.
+
+```javascript
+import {Color} from "three";
+
+export class BlueToRedProvider extends MapProvider
+{
+	fetchTile(zoom, x, y)
+	{
+		const canvas = new OffscreenCanvas(16, 16);
+		const context = canvas.getContext('2d');
+		
+		const blue = new Color(0x0000FF);
+		const red = new Color(0xFF0000);
+		const color = blue.lerpHSL(red, (zoom - this.minZoom) / (this.maxZoom - this.minZoom));
+		
+		context.fillStyle = color.getStyle();
+		context.fillRect(0, 0, 16, 16);
+		return Promise.resolve(canvas);
+	}
+}
+```
+
+
+
 ### License
 
 - Project uses a MIT license that allow for commercial usage of the platform without any cost.

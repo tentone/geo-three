@@ -114,22 +114,16 @@ export class MapView extends Mesh
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-			this.thresholdUp = 0.5;
-			this.thresholdDown = 0.1;
 		}
 		else if(this.mode === MapView.HEIGHT_DISPLACEMENT)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNodeDisplacement(null, this, MapNode.ROOT, 0, 0, 0);
-			this.thresholdUp = 0.5;
-			this.thresholdDown = 0.1;
 		}
 		else if(this.mode === MapView.HEIGHT_SHADER)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
-			this.thresholdUp = 0.5;
-			this.thresholdDown = 0.1;
 		}
 		else if(this.mode === MapView.SPHERICAL)
 		{
@@ -220,7 +214,29 @@ export class MapView extends Mesh
 			this._raycaster.intersectObjects(this.children, true, intersects);
 		}
 
-		if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+		if(this.mode === MapView.SPHERICAL)
+		{
+			for(var i = 0; i < intersects.length; i++)
+			{
+				var node = intersects[i].object;
+				const distance = intersects[i].distance * 2 ** node.level;
+
+				if(distance < this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if(distance > this.thresholdDown)
+				{
+					if(node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
+			}
+		}
+		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
 		{
 			for(var i = 0; i < intersects.length; i++)
 			{
@@ -235,28 +251,6 @@ export class MapView extends Mesh
 					return;
 				}
 				else if(value < this.thresholdDown)
-				{
-					if(node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
-				}
-			}
-		}
-		else if(this.mode === MapView.SPHERICAL)
-		{
-			for(var i = 0; i < intersects.length; i++)
-			{
-				var node = intersects[i].object;
-				const distance = intersects[i].distance * 2 ** node.level;
-
-				if(distance < this.thresholdUp)
-				{
-					node.subdivide();
-					return;
-				}
-				else if(distance > this.thresholdDown)
 				{
 					if(node.parentNode !== null)
 					{

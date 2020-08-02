@@ -41,27 +41,13 @@ MapHeightNodeDisplacement.DISPLACEMENT_SCALE = 1.0;
  */
 MapHeightNodeDisplacement.HEIGHT_DAMPENING = 10.0;
 
-/**
- * Load tile texture from the server.
- * 
- * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
- *
- * @method loadTexture
- */
-MapHeightNodeDisplacement.prototype.loadTexture = function()
-{
-	MapHeightNode.prototype.loadTexture.call(this);
-
-	this.loadHeightDisplacement();
-};
-
 /** 
  * Load height texture from the server and create a displacement map from it.
  *
- * @method loadHeightDisplacement
+ * @method loadHeightGeometry
  * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished. 
  */
-MapHeightNodeDisplacement.prototype.loadHeightDisplacement = function()
+MapHeightNodeDisplacement.prototype.loadHeightGeometry = function()
 {
 	var self = this;
 
@@ -115,9 +101,9 @@ MapHeightNodeDisplacement.prototype.loadHeightDisplacement = function()
 
 		self.heightLoaded = true;
 		self.nodeReady();
-	}).catch(function()
+	}).catch(function(e)
 	{
-		console.error("GeoThree: Failed to load height node data.", this);
+		console.error("GeoThree: Failed to load height node data.", e);
 		self.heightLoaded = true;
 		self.nodeReady();
 	});
