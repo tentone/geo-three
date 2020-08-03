@@ -1157,7 +1157,9 @@
 	};
 
 	/** 
-	 * TODO
+	 * Map height node that uses GPU height calculation to generate the deformed plane mesh.
+	 * 
+	 * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
 	 *
 	 * @class MapHeightNodeShader
 	 * @param parentNode {MapHeightNode} The parent node of this node.
@@ -1179,11 +1181,11 @@
 		vUv = uv;
 		
 		vec4 textHeight = texture2D(heightMap, vUv);
-		float height = (((textHeight.r * 65536.0 + textHeight.g * 256.0 + textHeight.b) * 0.1) - 1e4);
+		float height = (((textHeight.r * 65536.0 + textHeight.g * 256.0 + textHeight.b) * 0.1) - 10000.0);
 
-		vec3 transformed = position + height * normal;
+		vec3 transformed = position + height * normalize(normal);
 
-		gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
 	}`;
 
 		var fragmentShader = `

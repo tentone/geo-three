@@ -1,4 +1,4 @@
-import { BufferGeometry, Vector3, Float32BufferAttribute, Texture, RGBFormat, LinearFilter, MeshPhongMaterial, Mesh, MeshBasicMaterial, Matrix4, Quaternion, Raycaster, Vector2, Color } from 'three';
+import { BufferGeometry, Vector3, Float32BufferAttribute, Texture, RGBFormat, LinearFilter, MeshPhongMaterial, Mesh, MeshBasicMaterial, Matrix4, Quaternion, ShaderMaterial, Raycaster, Vector2, Color } from 'three';
 
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
@@ -432,21 +432,18 @@ MapNode.prototype.simplify = function()
  */
 MapNode.prototype.loadTexture = function(onLoad)
 {
-	var texture = new Texture();
-	texture.generateMipmaps = false;
-	texture.format = RGBFormat;
-	texture.magFilter = LinearFilter;
-	texture.minFilter = LinearFilter;
-	texture.needsUpdate = false;
-
-	this.material.map = texture;
-
 	var self = this;
 	
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		texture.image = image;
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
+
+		self.material.map = texture;
 		self.nodeReady();
 	}).catch(function()
 	{
@@ -454,8 +451,12 @@ MapNode.prototype.loadTexture = function(onLoad)
 		var context = canvas.getContext("2d");
 		context.fillStyle = "#FF0000";
 		context.fillRect(0, 0, 1, 1);
-		texture.image = canvas;
+
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
 		texture.needsUpdate = true;
+
+		self.material.map = texture;
 		self.nodeReady();
 	});
 };
@@ -693,21 +694,18 @@ MapHeightNode.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, 
  */
 MapHeightNode.prototype.loadTexture = function()
 {
-	var texture = new Texture();
-	texture.generateMipmaps = false;
-	texture.format = RGBFormat;
-	texture.magFilter = LinearFilter;
-	texture.minFilter = LinearFilter;
-	texture.needsUpdate = false;
-
-	this.material.emissiveMap = texture;
-	
 	var self = this;
 
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		texture.image = image;
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
+		
+		self.material.emissiveMap = texture;
 
 		self.textureLoaded = true;
 		self.nodeReady();
@@ -772,6 +770,11 @@ MapHeightNode.prototype.createChildNodes = function()
  */
 MapHeightNode.prototype.loadHeightGeometry = function()
 {
+	if(this.mapView.heightProvider === null)
+	{
+		throw new Error("GeoThree: MapView.heightProvider provider is null.");
+	}
+	
 	var self = this;
 
 	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
@@ -1150,7 +1153,9 @@ MapSphereNode.prototype.raycast = function(raycaster, intersects)
 };
 
 /** 
- * TODO
+ * Map height node that uses GPU height calculation to generate the deformed plane mesh.
+ * 
+ * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
  *
  * @class MapHeightNodeShader
  * @param parentNode {MapHeightNode} The parent node of this node.
@@ -1162,16 +1167,101 @@ MapSphereNode.prototype.raycast = function(raycaster, intersects)
  */
 function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 {
-	MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
+	var vertexShader = `
+	varying vec2 vUv;
+	
+	uniform sampler2D heightMap;
+
+	void main() 
+	{
+		vUv = uv;
+		
+		vec4 textHeight = texture2D(heightMap, vUv);
+		float height = (((textHeight.r * 65536.0 + textHeight.g * 256.0 + textHeight.b) * 0.1) - 10000.0);
+
+		vec3 transformed = position + height * normalize(normal);
+
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+	}`;
+
+	var fragmentShader = `
+	varying vec2 vUv;
+
+	uniform sampler2D colorMap;
+	uniform sampler2D heightMap;
+
+	void main() {
+		vec4 tcolor = texture2D(colorMap, vUv);
+		
+		gl_FragColor = vec4(tcolor.rgb, 1.0);
+	}`;
+
+	var material = new ShaderMaterial( {
+		uniforms: {
+			colorMap: {value: new Texture()},
+			heightMap: {value: new Texture()}
+		},
+		vertexShader: vertexShader,
+		fragmentShader: fragmentShader
+	});
+
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
 }
 
 MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
 
 MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
+MapHeightNodeShader.prototype.loadTexture = function()
+{
+	var self = this;
+
+	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
+		
+		self.material.uniforms.colorMap.value = texture;
+		self.textureLoaded = true;
+		self.nodeReady();
+	});
+
+	this.loadHeightGeometry();
+};
+
+
 MapHeightNodeShader.prototype.loadHeightGeometry = function()
 {
+	if(this.mapView.heightProvider === null)
+	{
+		throw new Error("GeoThree: MapView.heightProvider provider is null.");
+	}
+	
+	var self = this;
 
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		
+		self.material.uniforms.heightMap.value = texture;
+		self.material.needsUpdate = true;
+
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function()
+	{
+		console.error("GeoThree: Failed to load height node data.", this);
+		self.heightLoaded = true;
+		self.nodeReady();
+	});
 };
 
 /**
@@ -1291,6 +1381,7 @@ class MapView extends Mesh
 			this.thresholdUp = 7e7;
 			this.thresholdDown = 2e8;
 		}
+		
 		this.add(this.root);
 
 		this._raycaster = new Raycaster();
