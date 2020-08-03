@@ -1,5 +1,4 @@
 import {MapProvider} from "./MapProvider.js";
-import {Color} from "three";
 
 /**
  * Height debug provider takes a RGB encoded height map from another provider and converts it to a gradient for preview.
@@ -34,7 +33,6 @@ export class HeightDebugProvider extends MapProvider
 				const canvas = new OffscreenCanvas(resolution, resolution);
 				const context = canvas.getContext('2d');
 				
-				
 				context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
 		
 				var imageData = context.getImageData(0, 0, resolution, resolution);
@@ -46,17 +44,14 @@ export class HeightDebugProvider extends MapProvider
 					var b = data[i + 2];
 		
 					//The value will be composed of the bits RGB
-					var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4) / MapHeightNodeDisplacement.HEIGHT_DAMPENING;
-		
+					var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+					
+					var ratio = 16777215 / 255;
+					value *= ratio;
+
 					//Limit value to fit 1 byte
-					if(value < 0)
-					{
-						value = 0;
-					}
-					else if(value > 255)
-					{
-						value = 255;
-					}
+					if(value < 0) {value = 0;}
+					else if(value > 255) {value = 255;}
 		
 					data[i] = value;
 					data[i + 1] = value;
