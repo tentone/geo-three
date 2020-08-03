@@ -6,7 +6,6 @@ import {MapHeightNode} from "./nodes/MapHeightNode.js";
 import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 import {MapSphereNode} from "./nodes/MapSphereNode.js";
 import {UnitsUtils} from "./utils/UnitsUtils.js";
-import {MapHeightNodeDisplacement} from "./nodes/MapHeightNodeDisplacement.js";
 import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
 
 /**
@@ -114,11 +113,6 @@ export class MapView extends Mesh
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-		}
-		else if(this.mode === MapView.HEIGHT_DISPLACEMENT)
-		{
-			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
-			this.root = new MapHeightNodeDisplacement(null, this, MapNode.ROOT, 0, 0, 0);
 		}
 		else if(this.mode === MapView.HEIGHT_SHADER)
 		{
@@ -326,12 +320,3 @@ MapView.HEIGHT = 202;
  * @type {number}
  */
 MapView.HEIGHT_SHADER = 203;
-
-/**
- * Planar map projection with height deformation using displacement mapping.
- *
- * @static
- * @attribute HEIGHT_DISPLACEMENT
- * @type {number}
- */
-MapView.HEIGHT_DISPLACEMENT = 204;

@@ -9,6 +9,7 @@ export {MapTilerProvider} from "./providers/MapTilerProvider.js";
 export {OpenMapTilesProvider} from "./providers/OpenMapTilesProvider.js";
 export {OpenStreetMapsProvider} from "./providers/OpenStreetMapsProvider.js";
 export {DebugProvider} from "./providers/DebugProvider.js";
+export {HeightDebugProvider} from "./providers/HeightDebugProvider.js";
 
 export {MapNodeGeometry} from "./geometries/MapNodeGeometry.js";
 export {MapSphereNodeGeometry} from "./geometries/MapSphereNodeGeometry.js";
@@ -17,5 +18,4 @@ export {MapHeightNode} from "./nodes/MapHeightNode.js";
 export {MapNode} from "./nodes/MapNode.js";
 export {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 export {MapSphereNode} from "./nodes/MapSphereNode.js";
-export {MapHeightNodeDisplacement} from "./nodes/MapHeightNodeDisplacement.js";
 export {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
