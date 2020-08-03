@@ -125,6 +125,7 @@ export class MapView extends Mesh
 			this.thresholdUp = 7e7;
 			this.thresholdDown = 2e8;
 		}
+		
 		this.add(this.root);
 
 		this._raycaster = new Raycaster();

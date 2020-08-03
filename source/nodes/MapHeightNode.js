@@ -100,21 +100,18 @@ MapHeightNode.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, 
  */
 MapHeightNode.prototype.loadTexture = function()
 {
-	var texture = new Texture();
-	texture.generateMipmaps = false;
-	texture.format = RGBFormat;
-	texture.magFilter = LinearFilter;
-	texture.minFilter = LinearFilter;
-	texture.needsUpdate = false;
-
-	this.material.emissiveMap = texture;
-	
 	var self = this;
 
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		texture.image = image;
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
+		
+		self.material.emissiveMap = texture;
 
 		self.textureLoaded = true;
 		self.nodeReady();
@@ -179,6 +176,11 @@ MapHeightNode.prototype.createChildNodes = function()
  */
 MapHeightNode.prototype.loadHeightGeometry = function()
 {
+	if(this.mapView.heightProvider === null)
+	{
+		throw new Error("GeoThree: MapView.heightProvider provider is null.");
+	}
+	
 	var self = this;
 
 	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)

@@ -225,21 +225,18 @@ MapNode.prototype.simplify = function()
  */
 MapNode.prototype.loadTexture = function(onLoad)
 {
-	var texture = new Texture();
-	texture.generateMipmaps = false;
-	texture.format = RGBFormat;
-	texture.magFilter = LinearFilter;
-	texture.minFilter = LinearFilter;
-	texture.needsUpdate = false;
-
-	this.material.map = texture;
-
 	var self = this;
 	
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		texture.image = image;
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
+
+		self.material.map = texture;
 		self.nodeReady();
 	}).catch(function()
 	{
@@ -247,8 +244,12 @@ MapNode.prototype.loadTexture = function(onLoad)
 		var context = canvas.getContext("2d");
 		context.fillStyle = "#FF0000";
 		context.fillRect(0, 0, 1, 1);
-		texture.image = canvas;
+
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
 		texture.needsUpdate = true;
+
+		self.material.map = texture;
 		self.nodeReady();
 	});
 };

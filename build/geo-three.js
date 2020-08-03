@@ -436,21 +436,18 @@
 	 */
 	MapNode.prototype.loadTexture = function(onLoad)
 	{
-		var texture = new three.Texture();
-		texture.generateMipmaps = false;
-		texture.format = three.RGBFormat;
-		texture.magFilter = three.LinearFilter;
-		texture.minFilter = three.LinearFilter;
-		texture.needsUpdate = false;
-
-		this.material.map = texture;
-
 		var self = this;
 		
 		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			texture.image = image;
+			var texture = new three.Texture(image);
+			texture.generateMipmaps = false;
+			texture.format = three.RGBFormat;
+			texture.magFilter = three.LinearFilter;
+			texture.minFilter = three.LinearFilter;
 			texture.needsUpdate = true;
+
+			self.material.map = texture;
 			self.nodeReady();
 		}).catch(function()
 		{
@@ -458,8 +455,12 @@
 			var context = canvas.getContext("2d");
 			context.fillStyle = "#FF0000";
 			context.fillRect(0, 0, 1, 1);
-			texture.image = canvas;
+
+			var texture = new three.Texture(image);
+			texture.generateMipmaps = false;
 			texture.needsUpdate = true;
+
+			self.material.map = texture;
 			self.nodeReady();
 		});
 	};
@@ -697,21 +698,18 @@
 	 */
 	MapHeightNode.prototype.loadTexture = function()
 	{
-		var texture = new three.Texture();
-		texture.generateMipmaps = false;
-		texture.format = three.RGBFormat;
-		texture.magFilter = three.LinearFilter;
-		texture.minFilter = three.LinearFilter;
-		texture.needsUpdate = false;
-
-		this.material.emissiveMap = texture;
-		
 		var self = this;
 
 		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			texture.image = image;
+			var texture = new three.Texture(image);
+			texture.generateMipmaps = false;
+			texture.format = three.RGBFormat;
+			texture.magFilter = three.LinearFilter;
+			texture.minFilter = three.LinearFilter;
 			texture.needsUpdate = true;
+			
+			self.material.emissiveMap = texture;
 
 			self.textureLoaded = true;
 			self.nodeReady();
@@ -776,6 +774,11 @@
 	 */
 	MapHeightNode.prototype.loadHeightGeometry = function()
 	{
+		if(this.mapView.heightProvider === null)
+		{
+			throw new Error("GeoThree: MapView.heightProvider provider is null.");
+		}
+		
 		var self = this;
 
 		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
@@ -1166,16 +1169,101 @@
 	 */
 	function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 	{
-		MapHeightNode.call(this, parentNode, mapView, location, level, x, y);
+		var vertexShader = `
+	varying vec2 vUv;
+	
+	uniform sampler2D heightMap;
+
+	void main() 
+	{
+		vUv = uv;
+		
+		vec4 textHeight = texture2D(heightMap, vUv);
+		float height = (((textHeight.r * 65536.0 + textHeight.g * 256.0 + textHeight.b) * 0.1) - 1e4);
+
+		vec3 transformed = position + height * normal;
+
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+	}`;
+
+		var fragmentShader = `
+	varying vec2 vUv;
+
+	uniform sampler2D colorMap;
+	uniform sampler2D heightMap;
+
+	void main() {
+		vec4 tcolor = texture2D(colorMap, vUv);
+		
+		gl_FragColor = vec4(tcolor.rgb, 1.0);
+	}`;
+
+		var material = new three.ShaderMaterial( {
+			uniforms: {
+				colorMap: {value: new three.Texture()},
+				heightMap: {value: new three.Texture()}
+			},
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader
+		});
+
+		MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
 	}
 
 	MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
 
 	MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
+	MapHeightNodeShader.prototype.loadTexture = function()
+	{
+		var self = this;
+
+		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+		{
+			var texture = new three.Texture(image);
+			texture.generateMipmaps = false;
+			texture.format = three.RGBFormat;
+			texture.magFilter = three.LinearFilter;
+			texture.minFilter = three.LinearFilter;
+			texture.needsUpdate = true;
+			
+			self.material.uniforms.colorMap.value = texture;
+			self.textureLoaded = true;
+			self.nodeReady();
+		});
+
+		this.loadHeightGeometry();
+	};
+
+
 	MapHeightNodeShader.prototype.loadHeightGeometry = function()
 	{
+		if(this.mapView.heightProvider === null)
+		{
+			throw new Error("GeoThree: MapView.heightProvider provider is null.");
+		}
+		
+		var self = this;
 
+		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
+		{
+			var texture = new three.Texture(image);
+			texture.generateMipmaps = false;
+			texture.format = three.RGBFormat;
+			texture.magFilter = three.LinearFilter;
+			texture.minFilter = three.LinearFilter;
+			
+			self.material.uniforms.heightMap.value = texture;
+			self.material.needsUpdate = true;
+
+			self.heightLoaded = true;
+			self.nodeReady();
+		}).catch(function()
+		{
+			console.error("GeoThree: Failed to load height node data.", this);
+			self.heightLoaded = true;
+			self.nodeReady();
+		});
 	};
 
 	/**
@@ -1295,6 +1383,7 @@
 				this.thresholdUp = 7e7;
 				this.thresholdDown = 2e8;
 			}
+			
 			this.add(this.root);
 
 			this._raycaster = new three.Raycaster();
