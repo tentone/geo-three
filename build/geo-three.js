@@ -1181,10 +1181,8 @@
 		vUv = uv;
 		
 		vec4 theight = texture2D(heightMap, vUv);
-		
 		float height = ((theight.r * 65536.0 + theight.g * 256.0 + theight.b) * 0.1) - 10000.0;
-
-		vec3 transformed = position + height * normal;
+		vec3 transformed = position + normal * height;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
 	}`;
@@ -1222,21 +1220,23 @@
 
 		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			var texture = new three.Texture(image);
+			let texture = new three.Texture(image, three.UVMapping, three.ClampToEdgeWrapping, three.LinearFilter, three.LinearFilter, three.RGBFormat);
 			texture.generateMipmaps = false;
-			texture.format = three.RGBFormat;
-			texture.magFilter = three.LinearFilter;
-			texture.minFilter = three.LinearFilter;
-			texture.needsUpdate = true;
-			
+
 			self.material.uniforms.colorMap.value = texture;
+			self.material.uniformsNeedUpdate = true;
+
 			self.textureLoaded = true;
+			self.nodeReady();
+		}).catch(function(err)
+		{
+			console.error("GeoThree: Failed to load color node data.", err);
+			self.heightLoaded = true;
 			self.nodeReady();
 		});
 
 		this.loadHeightGeometry();
 	};
-
 
 	MapHeightNodeShader.prototype.loadHeightGeometry = function()
 	{
@@ -1249,20 +1249,19 @@
 
 		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			var texture = new three.Texture(image);
+			var texture = new three.Texture(image, three.UVMapping, three.ClampToEdgeWrapping, three.NearestFilter, three.NearestFilter, three.RGBFormat);
 			texture.generateMipmaps = false;
-			texture.format = three.RGBFormat;
-			texture.magFilter = three.LinearFilter;
-			texture.minFilter = three.LinearFilter;
-			texture.needsUpdate = true;
-			
+
 			self.material.uniforms.heightMap.value = texture;
+			self.material.uniformsNeedUpdate = true;
 
 			self.heightLoaded = true;
 			self.nodeReady();
-		}).catch(function()
+
+			console.log("GeoThree: Loaded height from ", self.level, self.x, self.y);
+		}).catch(function(err)
 		{
-			console.error("GeoThree: Failed to load height node data.", this);
+			console.error("GeoThree: Failed to load height node data.", err);
 			self.heightLoaded = true;
 			self.nodeReady();
 		});

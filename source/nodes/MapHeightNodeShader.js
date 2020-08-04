@@ -1,4 +1,4 @@
-import {Texture, LinearFilter, RGBFormat, ShaderMaterial, Color} from "three";
+import {Texture, LinearFilter, NearestFilter, RGBFormat, ShaderMaterial, UVMapping, ClampToEdgeWrapping} from "three";
 import {MapHeightNode} from "./MapHeightNode.js";
 
 /** 
@@ -43,8 +43,8 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 
 	var material = new ShaderMaterial( {
 		uniforms: {
-			colorMap: {value: new Texture()},
-			heightMap: {value: new Texture()}
+			colorMap: {type: "t", value: new Texture()},
+			heightMap: {type: "t", value: new Texture()}
 		},
 		vertexShader: vertexShader,
 		fragmentShader: fragmentShader
@@ -65,21 +65,24 @@ MapHeightNodeShader.prototype.loadTexture = function()
 
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		var texture = new Texture(image);
+		let texture = new Texture(image, UVMapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBFormat);
 		texture.generateMipmaps = false;
-		texture.format = RGBFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
-		
+
 		self.material.uniforms.colorMap.value = texture;
+		self.material.uniformsNeedUpdate = true;
+
 		self.textureLoaded = true;
+		self.nodeReady();
+	}).catch(function(err)
+	{
+		console.error("GeoThree: Failed to load color node data.", err);
+		self.heightLoaded = true;
 		self.nodeReady();
 	});
 
 	this.loadHeightGeometry();
 };
-
 
 MapHeightNodeShader.prototype.loadHeightGeometry = function()
 {
@@ -92,20 +95,18 @@ MapHeightNodeShader.prototype.loadHeightGeometry = function()
 
 	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		var texture = new Texture(image);
+		var texture = new Texture(image, UVMapping, ClampToEdgeWrapping, NearestFilter, NearestFilter, RGBFormat);
 		texture.generateMipmaps = false;
-		texture.format = RGBFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
 		
 		self.material.uniforms.heightMap.value = texture;
+		self.material.uniformsNeedUpdate = true;
 
 		self.heightLoaded = true;
 		self.nodeReady();
-	}).catch(function()
+	}).catch(function(err)
 	{
-		console.error("GeoThree: Failed to load height node data.", this);
+		console.error("GeoThree: Failed to load height node data.", err);
 		self.heightLoaded = true;
 		self.nodeReady();
 	});
