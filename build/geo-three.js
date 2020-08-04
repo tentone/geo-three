@@ -1180,10 +1180,11 @@
 	{
 		vUv = uv;
 		
-		vec4 textHeight = texture2D(heightMap, vUv);
-		float height = (((textHeight.r * 65536.0 + textHeight.g * 256.0 + textHeight.b) * 0.1) - 10000.0);
+		vec4 theight = texture2D(heightMap, vUv);
+		
+		float height = ((theight.r * 65536.0 + theight.g * 256.0 + theight.b) * 0.1) - 10000.0;
 
-		vec3 transformed = position + height * normalize(normal);
+		vec3 transformed = position + height * normal;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
 	}`;
@@ -1192,12 +1193,9 @@
 	varying vec2 vUv;
 
 	uniform sampler2D colorMap;
-	uniform sampler2D heightMap;
 
 	void main() {
-		vec4 tcolor = texture2D(colorMap, vUv);
-		
-		gl_FragColor = vec4(tcolor.rgb, 1.0);
+		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
 	}`;
 
 		var material = new three.ShaderMaterial( {
@@ -1210,6 +1208,8 @@
 		});
 
 		MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
+
+		this.frustumCulled = false;
 	}
 
 	MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
@@ -1254,9 +1254,9 @@
 			texture.format = three.RGBFormat;
 			texture.magFilter = three.LinearFilter;
 			texture.minFilter = three.LinearFilter;
+			texture.needsUpdate = true;
 			
 			self.material.uniforms.heightMap.value = texture;
-			self.material.needsUpdate = true;
 
 			self.heightLoaded = true;
 			self.nodeReady();
@@ -2526,7 +2526,10 @@
 						//The value will be composed of the bits RGB
 						var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
 						
-						var ratio = 16777215 / 255;
+						// (16777216 * 0.1) - 1e4
+						var max = 1667721.6;
+
+						var ratio = max / 255;
 						value *= ratio;
 
 						//Limit value to fit 1 byte

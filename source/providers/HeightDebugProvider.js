@@ -46,7 +46,10 @@ export class HeightDebugProvider extends MapProvider
 					//The value will be composed of the bits RGB
 					var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
 					
-					var ratio = 16777215 / 255;
+					// (16777216 * 0.1) - 1e4
+					var max = 1667721.6;
+
+					var ratio = max / 255;
 					value *= ratio;
 
 					//Limit value to fit 1 byte

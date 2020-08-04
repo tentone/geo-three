@@ -25,10 +25,9 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 	{
 		vUv = uv;
 		
-		vec4 textHeight = texture2D(heightMap, vUv);
-		float height = (((textHeight.r * 65536.0 + textHeight.g * 256.0 + textHeight.b) * 0.1) - 10000.0);
-
-		vec3 transformed = position + height * normalize(normal);
+		vec4 theight = texture2D(heightMap, vUv);
+		float height = ((theight.r * 65536.0 + theight.g * 256.0 + theight.b) * 0.1) - 10000.0;
+		vec3 transformed = position + height * normal;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
 	}`;
@@ -37,12 +36,9 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 	varying vec2 vUv;
 
 	uniform sampler2D colorMap;
-	uniform sampler2D heightMap;
 
 	void main() {
-		vec4 tcolor = texture2D(colorMap, vUv);
-		
-		gl_FragColor = vec4(tcolor.rgb, 1.0);
+		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
 	}`;
 
 	var material = new ShaderMaterial( {
@@ -55,6 +51,8 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 	});
 
 	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
+
+	this.frustumCulled = false;
 }
 
 MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
@@ -99,9 +97,9 @@ MapHeightNodeShader.prototype.loadHeightGeometry = function()
 		texture.format = RGBFormat;
 		texture.magFilter = LinearFilter;
 		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
 		
 		self.material.uniforms.heightMap.value = texture;
-		self.material.needsUpdate = true;
 
 		self.heightLoaded = true;
 		self.nodeReady();
