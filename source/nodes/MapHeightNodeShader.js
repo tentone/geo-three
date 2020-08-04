@@ -27,7 +27,7 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 		
 		vec4 theight = texture2D(heightMap, vUv);
 		float height = ((theight.r * 65536.0 + theight.g * 256.0 + theight.b) * 0.1) - 10000.0;
-		vec3 transformed = position + height * normal;
+		vec3 transformed = position + normal * height;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
 	}`;
@@ -41,10 +41,16 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
 	}`;
 
+	var colorMap = new Texture(undefined, UVMapping, ClampToEdgeWrapping, NearestFilter, LinearFilter, RGBFormat);
+	colorMap.generateMipmaps = false;
+
+	var heightMap = new Texture(undefined, UVMapping, ClampToEdgeWrapping, NearestFilter, NearestFilter, RGBFormat);
+	heightMap.generateMipmaps = false;
+
 	var material = new ShaderMaterial( {
 		uniforms: {
-			colorMap: {type: "t", value: new Texture()},
-			heightMap: {type: "t", value: new Texture()}
+			colorMap: {value: colorMap},
+			heightMap: {value: heightMap}
 		},
 		vertexShader: vertexShader,
 		fragmentShader: fragmentShader
@@ -65,19 +71,15 @@ MapHeightNodeShader.prototype.loadTexture = function()
 
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		let texture = new Texture(image, UVMapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBFormat);
-		texture.generateMipmaps = false;
-		texture.needsUpdate = true;
-
-		self.material.uniforms.colorMap.value = texture;
-		self.material.uniformsNeedUpdate = true;
+		self.material.uniforms.colorMap.value.image = image;
+		self.material.uniforms.colorMap.value.needsUpdate = true;
 
 		self.textureLoaded = true;
 		self.nodeReady();
 	}).catch(function(err)
 	{
 		console.error("GeoThree: Failed to load color node data.", err);
-		self.heightLoaded = true;
+		self.textureLoaded = true;
 		self.nodeReady();
 	});
 
@@ -95,12 +97,8 @@ MapHeightNodeShader.prototype.loadHeightGeometry = function()
 
 	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		var texture = new Texture(image, UVMapping, ClampToEdgeWrapping, NearestFilter, NearestFilter, RGBFormat);
-		texture.generateMipmaps = false;
-		texture.needsUpdate = true;
-		
-		self.material.uniforms.heightMap.value = texture;
-		self.material.uniformsNeedUpdate = true;
+		self.material.uniforms.heightMap.value.image = image;
+		self.material.uniforms.heightMap.value.needsUpdate = true;
 
 		self.heightLoaded = true;
 		self.nodeReady();

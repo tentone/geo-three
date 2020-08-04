@@ -1196,10 +1196,16 @@
 		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
 	}`;
 
+		var colorMap = new three.Texture(undefined, three.UVMapping, three.ClampToEdgeWrapping, three.NearestFilter, three.LinearFilter, three.RGBFormat);
+		colorMap.generateMipmaps = false;
+
+		var heightMap = new three.Texture(undefined, three.UVMapping, three.ClampToEdgeWrapping, three.NearestFilter, three.NearestFilter, three.RGBFormat);
+		heightMap.generateMipmaps = false;
+
 		var material = new three.ShaderMaterial( {
 			uniforms: {
-				colorMap: {value: new three.Texture()},
-				heightMap: {value: new three.Texture()}
+				colorMap: {value: colorMap},
+				heightMap: {value: heightMap}
 			},
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader
@@ -1220,18 +1226,15 @@
 
 		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			let texture = new three.Texture(image, three.UVMapping, three.ClampToEdgeWrapping, three.LinearFilter, three.LinearFilter, three.RGBFormat);
-			texture.generateMipmaps = false;
-
-			self.material.uniforms.colorMap.value = texture;
-			self.material.uniformsNeedUpdate = true;
+			self.material.uniforms.colorMap.value.image = image;
+			self.material.uniforms.colorMap.value.needsUpdate = true;
 
 			self.textureLoaded = true;
 			self.nodeReady();
 		}).catch(function(err)
 		{
 			console.error("GeoThree: Failed to load color node data.", err);
-			self.heightLoaded = true;
+			self.textureLoaded = true;
 			self.nodeReady();
 		});
 
@@ -1249,16 +1252,11 @@
 
 		this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
-			var texture = new three.Texture(image, three.UVMapping, three.ClampToEdgeWrapping, three.NearestFilter, three.NearestFilter, three.RGBFormat);
-			texture.generateMipmaps = false;
-
-			self.material.uniforms.heightMap.value = texture;
-			self.material.uniformsNeedUpdate = true;
+			self.material.uniforms.heightMap.value.image = image;
+			self.material.uniforms.heightMap.value.needsUpdate = true;
 
 			self.heightLoaded = true;
 			self.nodeReady();
-
-			console.log("GeoThree: Loaded height from ", self.level, self.x, self.y);
 		}).catch(function(err)
 		{
 			console.error("GeoThree: Failed to load height node data.", err);
