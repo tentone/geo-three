@@ -615,8 +615,9 @@
 	 * @param x {number} X position of the node in the tile tree.
 	 * @param y {number} Y position of the node in the tile tree.
 	 * @param material {Material} Material used to render this height node.
+	 * @param geometry {Geometry} Geometry used to render this height node.
 	 */
-	function MapHeightNode(parentNode, mapView, location, level, x, y, material)
+	function MapHeightNode(parentNode, mapView, location, level, x, y, material, geometry)
 	{
 		if(material === undefined)
 		{
@@ -630,7 +631,7 @@
 			});
 		}
 
-		three.Mesh.call(this, MapHeightNode.GEOMETRY, material);
+		three.Mesh.call(this, geometry === undefined ? MapHeightNode.GEOMETRY: geometry, material);
 		MapNode.call(this, parentNode, mapView, location, level, x, y);
 
 		this.matrixAutoUpdate = false;
@@ -1181,7 +1182,7 @@
 		vUv = uv;
 		
 		vec4 theight = texture2D(heightMap, vUv);
-		float height = ((theight.r * 65536.0 + theight.g * 256.0 + theight.b) * 0.1) - 10000.0;
+		float height = ((theight.r * 255.0 * 65536.0 + theight.g * 255.0 * 256.0 + theight.b * 255.0) * 0.1) - 10000.0;
 		vec3 transformed = position + height * normal;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
@@ -1196,7 +1197,6 @@
 		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
 	}`;
 
-
 		var material = new three.ShaderMaterial({
 			uniforms: {
 				colorMap: {value: MapHeightNodeShader.EMPTY_TEXTURE},
@@ -1206,7 +1206,7 @@
 			fragmentShader: fragmentShader
 		});
 
-		MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
+		MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
 
 		this.frustumCulled = false;
 	}
@@ -1216,6 +1216,24 @@
 	MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
 	MapHeightNodeShader.EMPTY_TEXTURE = new three.Texture();
+
+	/**
+	 * Size of the grid of the geometry displayed on the scene for each tile.
+	 *
+	 * @static
+	 * @attribute GEOMETRY_SIZE
+	 * @type {number}
+	 */
+	MapHeightNodeShader.GEOMETRY_SIZE = 128;
+
+	/**
+	 * Map node plane geometry.
+	 *
+	 * @static
+	 * @attribute GEOMETRY
+	 * @type {PlaneBufferGeometry}
+	 */
+	MapHeightNodeShader.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
 	MapHeightNodeShader.prototype.loadTexture = function()
 	{
@@ -1379,6 +1397,8 @@
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
+				this.thresholdUp = 0.5;
+				this.thresholdDown = 0.1;
 			}
 			else if(this.mode === MapView.HEIGHT_SHADER)
 			{
@@ -2528,7 +2548,7 @@
 		{
 			return new Promise((resolve, reject) =>
 			{
-				this.provider.fetchTile(zoom, x, y).then(function(image)
+				this.provider.fetchTile(zoom, x, y).then((image) =>
 				{
 					const resolution = 256;
 
@@ -2551,13 +2571,12 @@
 						// (16777216 * 0.1) - 1e4
 						var max = 1667721.6;
 
-						var ratio = max / 255.0;
-						value *= ratio;
-						
+						const color = this.fromColor.clone().lerpHSL(this.toColor, value / max);
+
 						// Set pixel color
-						data[i] = value;
-						data[i + 1] = value;
-						data[i + 2] = value;
+						data[i] = color.r * 255;
+						data[i + 1] = color.g * 255;
+						data[i + 2] = color.b * 255;
 					}
 			
 					context.putImageData(imageData, 0, 0);

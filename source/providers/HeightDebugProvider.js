@@ -43,7 +43,7 @@ export class HeightDebugProvider extends MapProvider
 	{
 		return new Promise((resolve, reject) =>
 		{
-			this.provider.fetchTile(zoom, x, y).then(function(image)
+			this.provider.fetchTile(zoom, x, y).then((image) =>
 			{
 				const resolution = 256;
 
@@ -66,13 +66,12 @@ export class HeightDebugProvider extends MapProvider
 					// (16777216 * 0.1) - 1e4
 					var max = 1667721.6;
 
-					var ratio = max / 255.0;
-					value *= ratio;
-					
+					const color = this.fromColor.clone().lerpHSL(this.toColor, value / max);
+
 					// Set pixel color
-					data[i] = value;
-					data[i + 1] = value;
-					data[i + 2] = value;
+					data[i] = color.r * 255;
+					data[i + 1] = color.g * 255;
+					data[i + 2] = color.b * 255;
 				}
 		
 				context.putImageData(imageData, 0, 0);

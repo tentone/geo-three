@@ -17,8 +17,9 @@ import {MapNode} from "./MapNode.js";
  * @param x {number} X position of the node in the tile tree.
  * @param y {number} Y position of the node in the tile tree.
  * @param material {Material} Material used to render this height node.
+ * @param geometry {Geometry} Geometry used to render this height node.
  */
-function MapHeightNode(parentNode, mapView, location, level, x, y, material)
+function MapHeightNode(parentNode, mapView, location, level, x, y, material, geometry)
 {
 	if(material === undefined)
 	{
@@ -32,7 +33,7 @@ function MapHeightNode(parentNode, mapView, location, level, x, y, material)
 		});
 	}
 
-	Mesh.call(this, MapHeightNode.GEOMETRY, material);
+	Mesh.call(this, geometry === undefined ? MapHeightNode.GEOMETRY: geometry, material);
 	MapNode.call(this, parentNode, mapView, location, level, x, y);
 
 	this.matrixAutoUpdate = false;

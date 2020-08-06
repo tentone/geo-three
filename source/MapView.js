@@ -113,6 +113,8 @@ export class MapView extends Mesh
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
+			this.thresholdUp = 0.5;
+			this.thresholdDown = 0.1;
 		}
 		else if(this.mode === MapView.HEIGHT_SHADER)
 		{

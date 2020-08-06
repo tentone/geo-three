@@ -1,6 +1,6 @@
-import {Texture, LinearFilter, NearestFilter, RGBFormat, ShaderMaterial, UVMapping, ClampToEdgeWrapping} from "three";
+import {Texture, LinearFilter, RGBFormat, ShaderMaterial} from "three";
 import {MapHeightNode} from "./MapHeightNode.js";
-
+import {MapNodeGeometry} from "../geometries/MapNodeGeometry.js";
 /** 
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
  * 
@@ -26,7 +26,7 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 		vUv = uv;
 		
 		vec4 theight = texture2D(heightMap, vUv);
-		float height = ((theight.r * 65536.0 + theight.g * 256.0 + theight.b) * 0.1) - 10000.0;
+		float height = ((theight.r * 255.0 * 65536.0 + theight.g * 255.0 * 256.0 + theight.b * 255.0) * 0.1) - 10000.0;
 		vec3 transformed = position + height * normal;
 
 		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
@@ -41,7 +41,6 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
 	}`;
 
-
 	var material = new ShaderMaterial({
 		uniforms: {
 			colorMap: {value: MapHeightNodeShader.EMPTY_TEXTURE},
@@ -51,7 +50,7 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 		fragmentShader: fragmentShader
 	});
 
-	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material);
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
 
 	this.frustumCulled = false;
 }
@@ -61,6 +60,24 @@ MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
 MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
 MapHeightNodeShader.EMPTY_TEXTURE = new Texture();
+
+/**
+ * Size of the grid of the geometry displayed on the scene for each tile.
+ *
+ * @static
+ * @attribute GEOMETRY_SIZE
+ * @type {number}
+ */
+MapHeightNodeShader.GEOMETRY_SIZE = 128;
+
+/**
+ * Map node plane geometry.
+ *
+ * @static
+ * @attribute GEOMETRY
+ * @type {PlaneBufferGeometry}
+ */
+MapHeightNodeShader.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
 MapHeightNodeShader.prototype.loadTexture = function()
 {
