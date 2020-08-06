@@ -2506,11 +2506,27 @@
 			 * @type {MapProvider}
 			 */
 			this.provider = provider;
+
+			/**
+			 * Initial color to be used for lower values.
+			 * 
+			 * @attribute fromColor
+			 * @type {Color}
+			 */
+			this.fromColor = new three.Color(0xFF0000);
+
+			/**
+			 * Final color to be used for higher values.
+			 * 
+			 * @attribute toColor
+			 * @type {Color}
+			 */
+			this.toColor = new three.Color(0x00FF00);
 		}
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise(function(resolve, reject)
+			return new Promise((resolve, reject) =>
 			{
 				this.provider.fetchTile(zoom, x, y).then(function(image)
 				{
@@ -2535,13 +2551,10 @@
 						// (16777216 * 0.1) - 1e4
 						var max = 1667721.6;
 
-						var ratio = max / 255;
+						var ratio = max / 255.0;
 						value *= ratio;
-
-						//Limit value to fit 1 byte
-						if(value < 0) {value = 0;}
-						else if(value > 255) {value = 255;}
-			
+						
+						// Set pixel color
 						data[i] = value;
 						data[i + 1] = value;
 						data[i + 2] = value;
