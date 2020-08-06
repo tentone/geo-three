@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: MapSphereNodeGeometry</title>
+    <title>JSDoc: Class: HeightDebugProvider</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: MapSphereNodeGeometry</h1>
+    <h1 class="page-title">Class: HeightDebugProvider</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>MapSphereNodeGeometry<span class="signature">(width, height, widthSegments, heightSegments)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>HeightDebugProvider<span class="signature">()</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="MapSphereNodeGeometry"><span class="type-signature"></span>new MapSphereNodeGeometry<span class="signature">(width, height, widthSegments, heightSegments)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="HeightDebugProvider"><span class="type-signature"></span>new HeightDebugProvider<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
@@ -49,7 +49,7 @@
 
 
 <div class="description">
-    Map node geometry is a geometry used to represent the spherical map nodes.
+    Height debug provider takes a RGB encoded height map from another provider and converts it to a gradient for preview.Usefull to preview and compare height of different providers. Can also be usefull to generate grayscale maps to be feed into other libraries (e.g. physics engine).
 </div>
 
 
@@ -58,124 +58,6 @@
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Width of the node.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Height of the node.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>widthSegments</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Number of subdivisions along the width.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>heightSegments</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Number of subdivisions along the height.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -211,7 +93,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="geometries_MapSphereNodeGeometry.js.html">geometries/MapSphereNodeGeometry.js</a>, <a href="geometries_MapSphereNodeGeometry.js.html#line3">line 3</a>
+        <a href="providers_HeightDebugProvider.js.html">providers/HeightDebugProvider.js</a>, <a href="providers_HeightDebugProvider.js.html#line4">line 4</a>
     </li></ul></dd>
     
 
@@ -245,16 +127,59 @@
     </div>
 
     
-        <h3 class="subsection-title">Extends</h3>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
 
         
+            
+<h4 class="name" id="fromColor"><span class="type-signature"></span>fromColor<span class="type-signature"> :Color</span></h4>
 
 
+
+
+<div class="description">
+    Initial color to be used for lower values.
+</div>
+
+
+
+    <h5>Type:</h5>
     <ul>
-        <li>BufferGeometry</li>
+        <li>
+            
+<span class="param-type">Color</span>
+
+
+        </li>
     </ul>
 
 
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -267,6 +192,172 @@
 
     
 
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="providers_HeightDebugProvider.js.html">providers/HeightDebugProvider.js</a>, <a href="providers_HeightDebugProvider.js.html#line31">line 31</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="provider"><span class="type-signature"></span>provider<span class="type-signature"> :<a href="MapProvider.html">MapProvider</a></span></h4>
+
+
+
+
+<div class="description">
+    The provider used to retrieve the base RGB information to be debugged.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="MapProvider.html">MapProvider</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="providers_HeightDebugProvider.js.html">providers/HeightDebugProvider.js</a>, <a href="providers_HeightDebugProvider.js.html#line23">line 23</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="toColor"><span class="type-signature"></span>toColor<span class="type-signature"> :Color</span></h4>
+
+
+
+
+<div class="description">
+    Final color to be used for higher values.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Color</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="providers_HeightDebugProvider.js.html">providers/HeightDebugProvider.js</a>, <a href="providers_HeightDebugProvider.js.html#line39">line 39</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
     
 
     

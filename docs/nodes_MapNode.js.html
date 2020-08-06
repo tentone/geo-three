@@ -61,7 +61,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
 	 *
 	 * @attribute location
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.location = location;
 
@@ -69,7 +69,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile level of this node.
 	 * 
 	 * @attribute level
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.level = level;
 
@@ -77,7 +77,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile x position.
 	 * 
 	 * @attribute x
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.x = x;
 
@@ -85,7 +85,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Tile y position.
 	 * 
 	 * @attribute y
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.y = y;
 
@@ -93,7 +93,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * Indicates how many children nodes where loaded.
 	 *
 	 * @attribute nodesLoaded
-	 * @type {Number}
+	 * @type {number}
 	 */
 	this.nodesLoaded = 0;
 
@@ -103,10 +103,24 @@ function MapNode(parentNode, mapView, location, level, x, y)
 	 * To avoid bad visibility changes on node load.
 	 *
 	 * @attribute subdivided
-	 * @type {Boolean}
+	 * @type {boolean}
 	 */
 	this.subdivided = false;
+	
+	/**
+	 * Cache with the children objects created from subdivision.
+	 * 
+	 * Used to avoid recreate object after simplification and subdivision.
+	 * 
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
+	 */
+	this.childrenCache = null;
 }
+
+MapNode.prototype.constructor = MapNode;
 
 /**
  * How many children each branch of the tree has.
@@ -115,7 +129,7 @@ function MapNode(parentNode, mapView, location, level, x, y)
  *
  * @static
  * @attribute CHILDRENS
- * @type {Number}
+ * @type {number}
  */
 MapNode.CHILDRENS = 4;
 
@@ -124,7 +138,7 @@ MapNode.CHILDRENS = 4;
  *
  * @static
  * @attribute ROOT
- * @type {Number}
+ * @type {number}
  */
 MapNode.ROOT = -1;
 
@@ -135,7 +149,7 @@ MapNode.ROOT = -1;
  *
  * @static
  * @attribute TOP_LEFT
- * @type {Number}
+ * @type {number}
  */
 MapNode.TOP_LEFT = 0;
 
@@ -146,7 +160,7 @@ MapNode.TOP_LEFT = 0;
  *
  * @static
  * @attribute TOP_RIGHT
- * @type {Number}
+ * @type {number}
  */
 MapNode.TOP_RIGHT = 1;
 
@@ -157,7 +171,7 @@ MapNode.TOP_RIGHT = 1;
  *
  * @static
  * @attribute BOTTOM_LEFT
- * @type {Number}
+ * @type {number}
  */
 MapNode.BOTTOM_LEFT = 2;
 
@@ -168,7 +182,7 @@ MapNode.BOTTOM_LEFT = 2;
  *
  * @static
  * @attribute BOTTOM_RIGHT
- * @type {Number}
+ * @type {number}
  */
 MapNode.BOTTOM_RIGHT = 3;
 
@@ -239,21 +253,18 @@ MapNode.prototype.simplify = function()
  */
 MapNode.prototype.loadTexture = function(onLoad)
 {
-	var texture = new Texture();
-	texture.generateMipmaps = false;
-	texture.format = RGBFormat;
-	texture.magFilter = LinearFilter;
-	texture.minFilter = LinearFilter;
-	texture.needsUpdate = false;
-
-	this.material.map = texture;
-
 	var self = this;
 	
 	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
 	{
-		texture.image = image;
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
 		texture.needsUpdate = true;
+
+		self.material.map = texture;
 		self.nodeReady();
 	}).catch(function()
 	{
@@ -261,8 +272,12 @@ MapNode.prototype.loadTexture = function(onLoad)
 		var context = canvas.getContext("2d");
 		context.fillStyle = "#FF0000";
 		context.fillRect(0, 0, 1, 1);
-		texture.image = canvas;
+
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
 		texture.needsUpdate = true;
+
+		self.material.map = texture;
 		self.nodeReady();
 	});
 };
@@ -305,7 +320,7 @@ MapNode.prototype.nodeReady = function()
  * Get all the neighbors in a specific direction (left, right, up down).
  *
  * @method getNeighborsDirection
- * @param {Number} direction
+ * @param {number} direction
  * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
  */
 MapNode.prototype.getNeighborsDirection = function(direction)
@@ -340,13 +355,13 @@ export {MapNode};</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightDisplacement">loadHeightDisplacement</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Aug 01 2020 11:44:18 GMT+0100 (Western European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Aug 06 2020 19:08:44 GMT+0100 (Western European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

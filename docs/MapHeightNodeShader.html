@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: MapSphereNodeGeometry</title>
+    <title>JSDoc: Class: MapHeightNodeShader</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: MapSphereNodeGeometry</h1>
+    <h1 class="page-title">Class: MapHeightNodeShader</h1>
 
     
 
@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>MapSphereNodeGeometry<span class="signature">(width, height, widthSegments, heightSegments)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>MapHeightNodeShader<span class="signature">(parentNode, mapView, location, level, x, y)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="MapSphereNodeGeometry"><span class="type-signature"></span>new MapSphereNodeGeometry<span class="signature">(width, height, widthSegments, heightSegments)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="MapHeightNodeShader"><span class="type-signature"></span>new MapHeightNodeShader<span class="signature">(parentNode, mapView, location, level, x, y)</span><span class="type-signature"></span></h4>
     
 
     
@@ -49,7 +49,9 @@
 
 
 <div class="description">
-    Map node geometry is a geometry used to represent the spherical map nodes.
+    Map height node that uses GPU height calculation to generate the deformed plane mesh.
+
+This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
 </div>
 
 
@@ -85,13 +87,13 @@
 
         <tr>
             
-                <td class="name"><code>width</code></td>
+                <td class="name"><code>parentNode</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type"><a href="MapHeightNode.html">MapHeightNode</a></span>
 
 
             
@@ -101,20 +103,20 @@
 
             
 
-            <td class="description last">Width of the node.</td>
+            <td class="description last">The parent node of this node.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>height</code></td>
+                <td class="name"><code>mapView</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type"><a href="MapView.html">MapView</a></span>
 
 
             
@@ -124,14 +126,14 @@
 
             
 
-            <td class="description last">Height of the node.</td>
+            <td class="description last">Map view object where this node is placed.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>widthSegments</code></td>
+                <td class="name"><code>location</code></td>
             
 
             <td class="type">
@@ -147,14 +149,14 @@
 
             
 
-            <td class="description last">Number of subdivisions along the width.</td>
+            <td class="description last">Position in the node tree relative to the parent.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>heightSegments</code></td>
+                <td class="name"><code>level</code></td>
             
 
             <td class="type">
@@ -170,7 +172,53 @@
 
             
 
-            <td class="description last">Number of subdivisions along the height.</td>
+            <td class="description last">Zoom level in the tile tree of the node.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">X position of the node in the tile tree.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Y position of the node in the tile tree.</td>
         </tr>
 
     
@@ -211,7 +259,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="geometries_MapSphereNodeGeometry.js.html">geometries/MapSphereNodeGeometry.js</a>, <a href="geometries_MapSphereNodeGeometry.js.html#line3">line 3</a>
+        <a href="nodes_MapHeightNodeShader.js.html">nodes/MapHeightNodeShader.js</a>, <a href="nodes_MapHeightNodeShader.js.html#line4">line 4</a>
     </li></ul></dd>
     
 
@@ -245,16 +293,59 @@
     </div>
 
     
-        <h3 class="subsection-title">Extends</h3>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
 
         
+            
+<h4 class="name" id=".GEOMETRY"><span class="type-signature">(static) </span>GEOMETRY<span class="type-signature"> :PlaneBufferGeometry</span></h4>
 
 
+
+
+<div class="description">
+    Map node plane geometry.
+</div>
+
+
+
+    <h5>Type:</h5>
     <ul>
-        <li>BufferGeometry</li>
+        <li>
+            
+<span class="param-type">PlaneBufferGeometry</span>
+
+
+        </li>
     </ul>
 
 
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     
@@ -267,6 +358,100 @@
 
     
 
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapHeightNodeShader.js.html">nodes/MapHeightNodeShader.js</a>, <a href="nodes_MapHeightNodeShader.js.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id=".GEOMETRY_SIZE"><span class="type-signature">(static) </span>GEOMETRY_SIZE<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Size of the grid of the geometry displayed on the scene for each tile.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapHeightNodeShader.js.html">nodes/MapHeightNodeShader.js</a>, <a href="nodes_MapHeightNodeShader.js.html#line71">line 71</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
     
 
     

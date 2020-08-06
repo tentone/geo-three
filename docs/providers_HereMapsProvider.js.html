@@ -35,12 +35,12 @@
  *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
  *
  * @class HereMapsProvider
- * @param {String} appId HERE maps app id.
- * @param {String} appCode HERE maps app code.
- * @param {String} style Map style.
- * @param {Number} scheme Map scheme.
- * @param {String} format Image format.
- * @param {Number} size Tile size.
+ * @param {string} appId HERE maps app id.
+ * @param {string} appCode HERE maps app code.
+ * @param {string} style Map style.
+ * @param {number} scheme Map scheme.
+ * @param {string} format Image format.
+ * @param {number} size Tile size.
  */
 export class HereMapsProvider extends MapProvider
 {
@@ -52,7 +52,7 @@ export class HereMapsProvider extends MapProvider
 		 * Service application access token.
 		 * 
 		 * @attribute appId
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.appId = appId !== undefined ? appId : "";
 
@@ -60,7 +60,7 @@ export class HereMapsProvider extends MapProvider
 		 * Service application code token.
 		 * 
 		 * @attribute appCode
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.appCode = appCode !== undefined ? appCode : "";
 
@@ -78,7 +78,7 @@ export class HereMapsProvider extends MapProvider
 		 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = style !== undefined ? style : "base";
 		
@@ -94,7 +94,7 @@ export class HereMapsProvider extends MapProvider
 		 * Be aware that invalid combinations of schemes and tiles are rejected. For all satellite, hybrid and terrain schemes, you need to use the Aerial Tiles base URL instead of the normal one.
 		 * 
 		 * @attribute scheme
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.scheme = scheme !== undefined ? scheme : "normal.day";
 
@@ -105,7 +105,7 @@ export class HereMapsProvider extends MapProvider
 		 *  - jpg JPG at 90% quality
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -118,7 +118,7 @@ export class HereMapsProvider extends MapProvider
 		 *  - 128 (deprecated, although usage is still accepted)
 		 *
 		 * @attribute size
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.size = size !== undefined ? size : 512;
 
@@ -126,7 +126,7 @@ export class HereMapsProvider extends MapProvider
 		 * Specifies the map version, either newest or with a hash value.
 		 *
 		 * @attribute version
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.version = "newest";
 
@@ -138,7 +138,7 @@ export class HereMapsProvider extends MapProvider
 		 * On each request this number is updated.
 		 *
 		 * @attribute server
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.server = 1;
  	}
@@ -182,13 +182,13 @@ HereMapsProvider.PATH = "/maptile/2.1/";</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightDisplacement">loadHeightDisplacement</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Aug 01 2020 11:44:18 GMT+0100 (Western European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Aug 06 2020 19:08:44 GMT+0100 (Western European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

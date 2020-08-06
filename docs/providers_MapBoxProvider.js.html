@@ -36,11 +36,11 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  *  - https://www.mapbox.com/
  *
  * @class MapBoxProvider
- * @param {String} apiToken Map box api token.
- * @param {String} id Map style or mapID if the mode is set to MAP_ID.
- * @param {Number} mode Map tile access mode.
- * @param {String} format Image format.
- * @param {Boolean} useHDPI
+ * @param {string} apiToken Map box api token.
+ * @param {string} id Map style or mapID if the mode is set to MAP_ID.
+ * @param {number} mode Map tile access mode.
+ * @param {string} format Image format.
+ * @param {boolean} useHDPI
  */
 export class MapBoxProvider extends MapProvider
 {
@@ -52,7 +52,7 @@ export class MapBoxProvider extends MapProvider
 		 * Server API access token.
 		 * 
 		 * @attribute apiToken
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.apiToken = apiToken !== undefined ? apiToken : "";
 
@@ -69,7 +69,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - pngraw Raw png (no interpolation)
 		 *
 		 * @attribute format
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.format = format !== undefined ? format : "png";
 
@@ -77,7 +77,7 @@ export class MapBoxProvider extends MapProvider
 		 * Flag to indicate if should use high resolution tiles
 		 *
 		 * @attribute useHDPI
-		 * @type {Boolean}
+		 * @type {boolean}
 		 */
 		this.useHDPI = useHDPI !== undefined ? useHDPI : false;
 
@@ -87,7 +87,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - MapBoxProvider.MAP_ID
 		 *
 		 * @attribute mode
-		 * @type {Number}
+		 * @type {number}
 		 */
 		this.mode = mode !== undefined ? mode : MapBoxProvider.STYLE;
 
@@ -102,7 +102,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - mapbox.terrain-rgb
 		 *
 		 * @attribute mapId
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.mapId = id !== undefined ? id : "";
 
@@ -122,7 +122,7 @@ export class MapBoxProvider extends MapProvider
 		 *  - mapbox/navigation-guidance-night-v4
 		 *
 		 * @attribute style
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.style = id !== undefined ? id : "";
 	}
@@ -172,7 +172,7 @@ MapBoxProvider.ADDRESS = "https://api.mapbox.com/";
  *
  * @static
  * @attribute STYLE
- * @type {Number}
+ * @type {number}
  */
 MapBoxProvider.STYLE = 100;
 
@@ -181,7 +181,7 @@ MapBoxProvider.STYLE = 100;
  *
  * @static
  * @attribute MAP_ID
- * @type {Number}
+ * @type {number}
  */
 MapBoxProvider.MAP_ID = 101;
 </code></pre>
@@ -194,13 +194,13 @@ MapBoxProvider.MAP_ID = 101;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightDisplacement">loadHeightDisplacement</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Aug 01 2020 11:44:18 GMT+0100 (Western European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Aug 06 2020 19:08:44 GMT+0100 (Western European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: providers/BingMapsProvider.js</title>
+    <title>JSDoc: Source: nodes/MapHeightNodeShader.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: providers/BingMapsProvider.js</h1>
+    <h1 class="page-title">Source: nodes/MapHeightNodeShader.js</h1>
 
     
 
@@ -26,183 +26,146 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {MapProvider} from "./MapProvider.js";
-import {XHRUtils} from "../utils/XHRUtils.js";
-
-/**
- * Bing maps tile provider.
+            <pre class="prettyprint source linenums"><code>import {Texture, LinearFilter, RGBFormat, ShaderMaterial} from "three";
+import {MapHeightNode} from "./MapHeightNode.js";
+import {MapNodeGeometry} from "../geometries/MapNodeGeometry.js";
+/** 
+ * Map height node that uses GPU height calculation to generate the deformed plane mesh.
+ * 
+ * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
  *
- * API Reference
- *  - https://msdn.microsoft.com/en-us/library/bb259689.aspx (Bing Maps Tile System)
- *  - https://msdn.microsoft.com/en-us/library/mt823633.aspx (Directly accessing the Bing Maps tiles)
- *  - https://www.bingmapsportal.com/
- *
- * @class BingMapsProvider
- * @param {string} apiKey Bing API key.
+ * @class MapHeightNodeShader
+ * @param parentNode {MapHeightNode} The parent node of this node.
+ * @param mapView {MapView} Map view object where this node is placed.
+ * @param location {number} Position in the node tree relative to the parent.
+ * @param level {number} Zoom level in the tile tree of the node.
+ * @param x {number} X position of the node in the tile tree.
+ * @param y {number} Y position of the node in the tile tree.
  */
-export class BingMapsProvider extends MapProvider
+function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 {
-	constructor(apiKey, type)
-	{
-		super();
+	var vertexShader = `
+	varying vec2 vUv;
+	
+	uniform sampler2D heightMap;
 
-		this.maxZoom = 19;
+	void main() 
+	{
+		vUv = uv;
 		
-		/**
-		 * Server API access token.
-		 * 
-		 * @attribute apiKey
-		 * @type {string}
-		 */
-		this.apiKey = apiKey !== undefined ? apiKey : "";
+		vec4 theight = texture2D(heightMap, vUv);
+		float height = ((theight.r * 255.0 * 65536.0 + theight.g * 255.0 * 256.0 + theight.b * 255.0) * 0.1) - 10000.0;
+		vec3 transformed = position + height * normal;
 
-		/** 
-		 * The type of the map used.
-		 *
-		 * @attribute type
-		 * @type {string}
-		 */
-		this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+	}`;
 
-		/**
-		 * Map image tile format, the formats available are:
-		 *  - gif: Use GIF image format.
-		 *  - jpeg: Use JPEG image format. JPEG format is the default for Road, Aerial and AerialWithLabels imagery.
-		 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
-		 *
-		 * @attribute format
-		 * @type {string}
-		 */
-		this.format = "jpeg";
+	var fragmentShader = `
+	varying vec2 vUv;
 
-		/**
-		 * Size of the map tiles.
-		 *
-		 * @attribute mapSize
-		 * @type {number}
-		 */
-		this.mapSize = 512;
+	uniform sampler2D colorMap;
 
-		/**
-		 * Tile server subdomain.
-		 *
-		 * @attribute subdomain
-		 * @type {string}
-		 */
-		this.subdomain = "t1";
-	}
+	void main() {
+		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
+	}`;
 
-	/** 
-	 * Get the base URL for the map configuration requested.
-	 *
-	 * Uses the follwing format 
-	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&amp;mkt={culture}&amp;shading=hill&amp;stl=H
-	 *
-	 * @method getMetaData
-	 */
-	getMetaData()
-	{
-		const self = this;
-		const address = "http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&amp;include=ImageryProviders&amp;key=" + this.apiKey;
-		
-		XHRUtils.get(address, function(data)
-		{
-			const meta = JSON.parse(data);
+	var material = new ShaderMaterial({
+		uniforms: {
+			colorMap: {value: MapHeightNodeShader.EMPTY_TEXTURE},
+			heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}
+		},
+		vertexShader: vertexShader,
+		fragmentShader: fragmentShader
+	});
 
-			//TODO &lt;FILL METADATA>
-		});
-	}
+	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
 
-	/**
-	 * Convert x, y, zoom quadtree to a bing maps specific quadkey.
-	 *
-	 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
-	 *
-	 * @method quadKey
-	 * @param {number} x
-	 */
-	static quadKey(zoom, x, y)
-	{
-		let quad = "";
-
-		for(let i = zoom; i > 0; i--)
-		{
-			const mask = 1 &lt;&lt; (i - 1);
-			let cell = 0;
-			
-			if((x &amp; mask) != 0)
-			{
-				cell++;	
-			}
-			
-			if((y &amp; mask) != 0)
-			{
-				cell += 2;
-			}
-
-			quad += cell; 
-		}
-
-		return quad; 
-	}
-
-	fetchTile(zoom, x, y)
-	{
-		return new Promise((resolve, reject) =>
-		{
-			var image = document.createElement("img");
-			image.onload = function(){resolve(image);};
-			image.onerror = function(){reject();};
-			image.crossOrigin = "Anonymous";
-			image.src = "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
-		});
-	}
+	this.frustumCulled = false;
 }
 
-/**
- * Display an aerial view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.AERIAL = "a";
+MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
+
+MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
+
+MapHeightNodeShader.EMPTY_TEXTURE = new Texture();
 
 /**
- * Display a road view of the map.
+ * Size of the grid of the geometry displayed on the scene for each tile.
  *
  * @static
- * @attribute AERIAL
- * @type {string}
+ * @attribute GEOMETRY_SIZE
+ * @type {number}
  */
-BingMapsProvider.ROAD = "r";
+MapHeightNodeShader.GEOMETRY_SIZE = 128;
 
 /**
- * Display an aerial view of the map with labels.
+ * Map node plane geometry.
  *
  * @static
- * @attribute AERIAL_LABELS
- * @type {string}
+ * @attribute GEOMETRY
+ * @type {PlaneBufferGeometry}
  */
-BingMapsProvider.AERIAL_LABELS = "h";
+MapHeightNodeShader.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
-/**
- * Use this value to display a bird's eye (oblique) view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.OBLIQUE = "o";
+MapHeightNodeShader.prototype.loadTexture = function()
+{
+	var self = this;
 
-/**
- * Display a bird's eye (oblique) with labels view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.OBLIQUE_LABELS = "b";</code></pre>
+	this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
+
+		self.material.uniforms.colorMap.value = texture;
+
+		self.textureLoaded = true;
+		self.nodeReady();
+	}).catch(function(err)
+	{
+		console.error("GeoThree: Failed to load color node data.", err);
+		self.textureLoaded = true;
+		self.nodeReady();
+	});
+
+	this.loadHeightGeometry();
+};
+
+MapHeightNodeShader.prototype.loadHeightGeometry = function()
+{
+	if(this.mapView.heightProvider === null)
+	{
+		throw new Error("GeoThree: MapView.heightProvider provider is null.");
+	}
+	
+	var self = this;
+
+	this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image)
+	{
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
+
+		self.material.uniforms.heightMap.value = texture;
+		
+		self.heightLoaded = true;
+		self.nodeReady();
+	}).catch(function(err)
+	{
+		console.error("GeoThree: Failed to load height node data.", err);
+		self.heightLoaded = true;
+		self.nodeReady();
+	});
+};
+
+export {MapHeightNodeShader};
+</code></pre>
         </article>
     </section>
 

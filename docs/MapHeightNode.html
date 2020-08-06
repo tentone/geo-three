@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>MapHeightNode<span class="signature">()</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>MapHeightNode<span class="signature">(parentNode, mapView, location, level, x, y, material, geometry)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="MapHeightNode"><span class="type-signature"></span>new MapHeightNode<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="MapHeightNode"><span class="type-signature"></span>new MapHeightNode<span class="signature">(parentNode, mapView, location, level, x, y, material, geometry)</span><span class="type-signature"></span></h4>
     
 
     
@@ -62,6 +62,216 @@ The height node is designed to use MapBox elevation tile encoded data as describ
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>parentNode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MapHeightNode.html">MapHeightNode</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The parent node of this node.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>mapView</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="MapView.html">MapView</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Map view object where this node is placed.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>location</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Position in the node tree relative to the parent.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Zoom level in the tile tree of the node.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">X position of the node in the tile tree.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Y position of the node in the tile tree.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>material</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Material</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Material used to render this height node.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>geometry</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Geometry</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Geometry used to render this height node.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -201,7 +411,7 @@ The height node is designed to use MapBox elevation tile encoded data as describ
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line123">line 123</a>
+        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line93">line 93</a>
     </li></ul></dd>
     
 
@@ -219,7 +429,7 @@ The height node is designed to use MapBox elevation tile encoded data as describ
 
         
             
-<h4 class="name" id=".GEOMETRY_SIZE"><span class="type-signature">(static) </span>GEOMETRY_SIZE<span class="type-signature"> :Number</span></h4>
+<h4 class="name" id=".GEOMETRY_SIZE"><span class="type-signature">(static) </span>GEOMETRY_SIZE<span class="type-signature"> :number</span></h4>
 
 
 
@@ -234,7 +444,7 @@ The height node is designed to use MapBox elevation tile encoded data as describ
     <ul>
         <li>
             
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
         </li>
@@ -273,7 +483,7 @@ The height node is designed to use MapBox elevation tile encoded data as describ
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line114">line 114</a>
+        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line84">line 84</a>
     </li></ul></dd>
     
 
@@ -291,155 +501,7 @@ The height node is designed to use MapBox elevation tile encoded data as describ
 
         
             
-<h4 class="name" id=".HEIGHT_DAMPENING"><span class="type-signature">(static) </span>HEIGHT_DAMPENING<span class="type-signature"> :Number</span></h4>
-
-
-
-
-<div class="description">
-    Dampening factor applied to the height retrieved from the server.
-
-Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line96">line 96</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".MAX_HEIGHT"><span class="type-signature">(static) </span>MAX_HEIGHT<span class="type-signature"> :Number</span></h4>
-
-
-
-
-<div class="description">
-    Max world height allowed.
-
-Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line85">line 85</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".TILE_SIZE"><span class="type-signature">(static) </span>TILE_SIZE<span class="type-signature"> :Number</span></h4>
+<h4 class="name" id=".TILE_SIZE"><span class="type-signature">(static) </span>TILE_SIZE<span class="type-signature"> :number</span></h4>
 
 
 
@@ -454,7 +516,7 @@ Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
     <ul>
         <li>
             
-<span class="param-type">Number</span>
+<span class="param-type">number</span>
 
 
         </li>
@@ -493,79 +555,7 @@ Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line105">line 105</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id=".USE_DISPLACEMENT"><span class="type-signature">(static) </span>USE_DISPLACEMENT<span class="type-signature"> :Boolean</span></h4>
-
-
-
-
-<div class="description">
-    If true a displacement map is used for surface deformation.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Boolean</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line74">line 74</a>
+        <a href="nodes_MapHeightNode.js.html">nodes/MapHeightNode.js</a>, <a href="nodes_MapHeightNode.js.html#line75">line 75</a>
     </li></ul></dd>
     
 
@@ -599,13 +589,13 @@ Applied when USE_DISPLACEMENT set to true to concatenate value to 8 bit range.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightDisplacement">loadHeightDisplacement</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Sat Aug 01 2020 11:44:18 GMT+0100 (Western European Summer Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Thu Aug 06 2020 19:08:44 GMT+0100 (Western European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
