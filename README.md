@@ -10,7 +10,7 @@
   - Providers should have a tile based map system to be supported by the library.
  - You can test the [live demo of the library running](https://tentone.github.io/geo-three/examples/index.html) from the GitHub page.
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_a.png" width="330"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_b.png" width="348">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_a.png" width="345"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_b.png" width="360">
 
 
 
@@ -44,8 +44,6 @@ scene.add(map);
 
 
 
-
-
 ### Data Providers
 
 - The library as support for multiple data providers that have to be configured beforehand. Most of these data providers rely on external API that differ from service to service.
@@ -54,6 +52,21 @@ scene.add(map);
 - The `DebugProvider` provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
 
 <img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="270">
+
+
+
+### Tiles Representation
+
+- The library has support for both planar and spherical representation of tiles. Most providers only have planar tiles available.
+  - It is required that the tiles for spherical mode are previously adjusted, since planar tiles get more stretched as closer you get to the poles.
+
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/planar.png" width="350"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/spherical.png" width="350">
+
+- There are available formats for GPU shader generated geometry using height data directly from the providers. 
+  - GPU generated geometry is more dense, more detailed and a lot faster. But the final geometry used is not accessible for raycasting, so interaction with these geometries is limited.
+- On the left the geometry was generated in CPU and on the right the geometry was displaced directly in the vertex shader.
+
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/shader.jpg" width="600">
 
 
 
