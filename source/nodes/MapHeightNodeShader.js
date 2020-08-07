@@ -1,6 +1,7 @@
-import {Texture, LinearFilter, RGBFormat, ShaderMaterial} from "three";
+import {Texture, LinearFilter, RGBFormat, ShaderMaterial, Mesh, NearestFilter} from "three";
 import {MapHeightNode} from "./MapHeightNode.js";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry.js";
+import {MapPlaneNode} from "./MapPlaneNode.js";
 /** 
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
  * 
@@ -59,16 +60,23 @@ MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
 
 MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
+/**
+ * Empty texture used as a placeholder for missing textures.
+ * 
+ * @static
+ * @attribute EMPTY_TEXTURE
+ * @type {Texture}
+ */
 MapHeightNodeShader.EMPTY_TEXTURE = new Texture();
 
 /**
  * Size of the grid of the geometry displayed on the scene for each tile.
- *
+ * 
  * @static
  * @attribute GEOMETRY_SIZE
  * @type {number}
  */
-MapHeightNodeShader.GEOMETRY_SIZE = 128;
+MapHeightNodeShader.GEOMETRY_SIZE = 256;
 
 /**
  * Map node plane geometry.
@@ -120,8 +128,8 @@ MapHeightNodeShader.prototype.loadHeightGeometry = function()
 		var texture = new Texture(image);
 		texture.generateMipmaps = false;
 		texture.format = RGBFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
+		texture.magFilter = NearestFilter;
+		texture.minFilter = NearestFilter;
 		texture.needsUpdate = true;
 
 		self.material.uniforms.heightMap.value = texture;
@@ -134,6 +142,29 @@ MapHeightNodeShader.prototype.loadHeightGeometry = function()
 		self.heightLoaded = true;
 		self.nodeReady();
 	});
+};
+
+/**
+ * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+ * 
+ * Switches the geometry for a simpler one for faster raycasting.
+ * 
+ * @method raycast
+ */
+MapHeightNodeShader.prototype.raycast = function(raycaster, intersects)
+{
+	if(this.isMesh === true)
+	{
+		this.geometry = MapPlaneNode.GEOMETRY;
+
+		var result =  Mesh.prototype.raycast.call(this, raycaster, intersects);
+
+		this.geometry = MapHeightNodeShader.GEOMETRY;
+
+		return result;
+	}
+
+	return false;
 };
 
 export {MapHeightNodeShader};

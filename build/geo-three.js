@@ -1215,16 +1215,23 @@
 
 	MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
+	/**
+	 * Empty texture used as a placeholder for missing textures.
+	 * 
+	 * @static
+	 * @attribute EMPTY_TEXTURE
+	 * @type {Texture}
+	 */
 	MapHeightNodeShader.EMPTY_TEXTURE = new three.Texture();
 
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
-	 *
+	 * 
 	 * @static
 	 * @attribute GEOMETRY_SIZE
 	 * @type {number}
 	 */
-	MapHeightNodeShader.GEOMETRY_SIZE = 128;
+	MapHeightNodeShader.GEOMETRY_SIZE = 256;
 
 	/**
 	 * Map node plane geometry.
@@ -1276,8 +1283,8 @@
 			var texture = new three.Texture(image);
 			texture.generateMipmaps = false;
 			texture.format = three.RGBFormat;
-			texture.magFilter = three.LinearFilter;
-			texture.minFilter = three.LinearFilter;
+			texture.magFilter = three.NearestFilter;
+			texture.minFilter = three.NearestFilter;
 			texture.needsUpdate = true;
 
 			self.material.uniforms.heightMap.value = texture;
@@ -1290,6 +1297,29 @@
 			self.heightLoaded = true;
 			self.nodeReady();
 		});
+	};
+
+	/**
+	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * 
+	 * Switches the geometry for a simpler one for faster raycasting.
+	 * 
+	 * @method raycast
+	 */
+	MapHeightNodeShader.prototype.raycast = function(raycaster, intersects)
+	{
+		if(this.isMesh === true)
+		{
+			this.geometry = MapPlaneNode.GEOMETRY;
+
+			var result =  three.Mesh.prototype.raycast.call(this, raycaster, intersects);
+
+			this.geometry = MapHeightNodeShader.GEOMETRY;
+
+			return result;
+		}
+
+		return false;
 	};
 
 	/**

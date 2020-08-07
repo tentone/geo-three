@@ -110,7 +110,7 @@
 			providerHeight.appendChild(option);
 		}
 
-		mode.selectedIndex = 1;
+		mode.selectedIndex = 2;
 		providerColor.selectedIndex = 9;
 		providerHeight.selectedIndex = 15;
 
@@ -121,7 +121,7 @@
 		var camera = new THREE.PerspectiveCamera(80, 1, 1e2, 1e12);
 
 		var controls = new THREE.MapControls(camera, canvas);
-		controls.minDistance = 1e3;
+		controls.minDistance = 1e1;
 		controls.zoomSpeed = 2.0;
 
 		controls.target.set(-903962.8060267984, -4.814428263109778e-12, -5133753.346552399);
