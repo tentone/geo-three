@@ -19,3 +19,5 @@ export {MapNode} from "./nodes/MapNode.js";
 export {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 export {MapSphereNode} from "./nodes/MapSphereNode.js";
 export {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
+
+export {UnitsUtils} from "./utils/UnitsUtils.js";

@@ -30,6 +30,18 @@ scene.add(map);
 
 
 
+### Coordinates
+
+- The project uses internally a XY [EPSG:900913](https://epsg.io/900913) coordinate format to be compatible with the XYZ coordinates used in three.js
+- Use the UnitsUtils class to access the unit conversion methods for example to convert a latitude, longiture [WGS84](https://epsg.io/4326) pair value to to XY coordinates you can use the code bellow
+
+```javascript
+var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
+controls.target.set(coords.x, 0, -coords.y);
+```
+
+
+
 ### Tile Loading
 
 - Tiles are fetched from the service API configured, each on of the services requires specific configuration using the specific `MapProvider` object.

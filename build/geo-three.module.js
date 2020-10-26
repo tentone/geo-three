@@ -2614,4 +2614,4 @@ class HeightDebugProvider extends MapProvider
 	}
 }
 
-export { BingMapsProvider, DebugProvider, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider };
+export { BingMapsProvider, DebugProvider, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, UnitsUtils };

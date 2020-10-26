@@ -2636,6 +2636,7 @@
 	exports.MapView = MapView;
 	exports.OpenMapTilesProvider = OpenMapTilesProvider;
 	exports.OpenStreetMapsProvider = OpenStreetMapsProvider;
+	exports.UnitsUtils = UnitsUtils;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 

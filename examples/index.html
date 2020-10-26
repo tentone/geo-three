@@ -123,10 +123,9 @@
 		var controls = new THREE.MapControls(camera, canvas);
 		controls.minDistance = 1e1;
 		controls.zoomSpeed = 2.0;
-
-		controls.target.set(-903962.8060267984, -4.814428263109778e-12, -5133753.346552399);
-		camera.position.set(-904365.4101032199, 1334.1534013962676, -5130994.46642316);
-		camera.quaternion.set(-0.22072872069139535, -0.07059530917508659, -0.01602065586665935, 0.9726450908579224);
+		
+		var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
+		controls.target.set(coords.x, 1, -coords.y);
 
 		scene.add(new THREE.AmbientLight(0x777777));
 
