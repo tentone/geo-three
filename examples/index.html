@@ -125,7 +125,8 @@
 		controls.zoomSpeed = 2.0;
 		
 		var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
-		controls.target.set(coords.x, 1, -coords.y);
+		controls.target.set(coords.x, 0, -coords.y);
+		camera.position.set(0, 1000, 0);
 
 		scene.add(new THREE.AmbientLight(0x777777));
 
