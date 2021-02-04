@@ -92,14 +92,14 @@ export class GoogleMapsProvider extends MapProvider
 
 		const address = "https://www.googleapis.com/tile/v1/createSession?key=" + this.apiToken;
 		const data = JSON.stringify(
-		{
-			"mapType": this.mapType,
-			"language": "en-EN",
-			"region": "en",
-			"layerTypes": ["layerRoadmap", "layerStreetview"],
-			"overlay":  this.overlay,
-			"scale": "scaleFactor1x"
-		});
+			{
+				"mapType": this.mapType,
+				"language": "en-EN",
+				"region": "en",
+				"layerTypes": ["layerRoadmap", "layerStreetview"],
+				"overlay": this.overlay,
+				"scale": "scaleFactor1x"
+			});
 
 		XHRUtils.request(address, "GET", {"Content-Type": "text/json"}, data, function(response, xhr)
 		{
@@ -117,8 +117,8 @@ export class GoogleMapsProvider extends MapProvider
 		return new Promise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
-			image.onload = function(){resolve(image);};
-			image.onerror = function(){reject();};
+			image.onload = function() {resolve(image);};
+			image.onerror = function() {reject();};
 			image.crossOrigin = "Anonymous";
 			image.src = "https://www.googleapis.com/tile/v1/tiles/" + zoom + "/" + x + "/" + y + "?session=" + this.sessionToken + "&orientation=" + this.orientation + "&key=" + this.apiToken;
 		});

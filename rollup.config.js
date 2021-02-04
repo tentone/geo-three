@@ -4,11 +4,11 @@ export default {
 	input: "source/Main.js",
 	plugins: [
 		strip(
-		{
-			functions: ["assert.*", "debug", "alert"],
-			debugger: false,
-			sourceMap: false
-		}),
+			{
+				functions: ["assert.*", "debug", "alert"],
+				debugger: false,
+				sourceMap: false
+			})
 	],
 	
 	output: [

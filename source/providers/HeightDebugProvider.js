@@ -54,14 +54,14 @@ export class HeightDebugProvider extends MapProvider
 		
 				var imageData = context.getImageData(0, 0, resolution, resolution);
 				var data = imageData.data;
-				for(var i = 0; i < data.length; i += 4)
+				for (var i = 0; i < data.length; i += 4)
 				{
 					var r = data[i];
 					var g = data[i + 1];
 					var b = data[i + 2];
 		
-					//The value will be composed of the bits RGB
-					var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+					// The value will be composed of the bits RGB
+					var value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
 					
 					// (16777216 * 0.1) - 1e4
 					var max = 1667721.6;

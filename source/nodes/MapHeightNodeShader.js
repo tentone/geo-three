@@ -116,7 +116,7 @@ MapHeightNodeShader.prototype.loadTexture = function()
 
 MapHeightNodeShader.prototype.loadHeightGeometry = function()
 {
-	if(this.mapView.heightProvider === null)
+	if (this.mapView.heightProvider === null)
 	{
 		throw new Error("GeoThree: MapView.heightProvider provider is null.");
 	}
@@ -153,11 +153,11 @@ MapHeightNodeShader.prototype.loadHeightGeometry = function()
  */
 MapHeightNodeShader.prototype.raycast = function(raycaster, intersects)
 {
-	if(this.isMesh === true)
+	if (this.isMesh === true)
 	{
 		this.geometry = MapPlaneNode.GEOMETRY;
 
-		var result =  Mesh.prototype.raycast.call(this, raycaster, intersects);
+		var result = Mesh.prototype.raycast.call(this, raycaster, intersects);
 
 		this.geometry = MapHeightNodeShader.GEOMETRY;
 

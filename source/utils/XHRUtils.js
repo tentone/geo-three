@@ -4,7 +4,8 @@
  * @static
  * @class Service
  */
-export class XHRUtils {
+export class XHRUtils 
+{
 	/**
 	 * Get file data from URL as text, using a XHR call.
 	 * 
@@ -20,7 +21,7 @@ export class XHRUtils {
 		file.overrideMimeType("text/plain");
 		file.open("GET", fname, true);
 
-		if(onLoad !== undefined)
+		if (onLoad !== undefined)
 		{
 			file.onload = function()
 			{
@@ -28,7 +29,7 @@ export class XHRUtils {
 			};
 		}
 
-		if(onError !== undefined)
+		if (onError !== undefined)
 		{
 			file.onerror = onError;
 		}
@@ -57,7 +58,7 @@ export class XHRUtils {
 			{
 				return JSON.parse(response);
 			}
-			catch(e)
+			catch (e)
 			{
 				return response;
 			}
@@ -67,16 +68,16 @@ export class XHRUtils {
 		xhr.overrideMimeType("text/plain");
 		xhr.open(type, url, true);
 
-		//Fill header data from Object
-		if(header !== null && header !== undefined)
+		// Fill header data from Object
+		if (header !== null && header !== undefined)
 		{
-			for(var i in header)
+			for (var i in header)
 			{
 				xhr.setRequestHeader(i, header[i]);
 			}
 		}
 
-		if(onLoad !== undefined)
+		if (onLoad !== undefined)
 		{
 			xhr.onload = function(event)
 			{
@@ -84,17 +85,17 @@ export class XHRUtils {
 			};
 		}
 
-		if(onError !== undefined)
+		if (onError !== undefined)
 		{
 			xhr.onerror = onError;
 		}
 
-		if(onProgress !== undefined)
+		if (onProgress !== undefined)
 		{
 			xhr.onprogress = onProgress;
 		}
 
-		if(body !== undefined)
+		if (body !== undefined)
 		{
 			xhr.send(body);
 		}

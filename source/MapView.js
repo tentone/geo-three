@@ -29,7 +29,7 @@ export class MapView extends Mesh
 
 		var geometry;
 
-		if(mode === MapView.SPHERICAL)
+		if (mode === MapView.SPHERICAL)
 		{
 			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 		}
@@ -38,7 +38,7 @@ export class MapView extends Mesh
 			geometry = MapPlaneNode.GEOMETRY;
 		}
 
-		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		super(geometry, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 		
 		/**
 		 * Define the type of map view in use.
@@ -112,24 +112,24 @@ export class MapView extends Mesh
 		 */
 		this.root = null;
 
-		if(this.mode === MapView.PLANAR)
+		if (this.mode === MapView.PLANAR)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 		}
-		else if(this.mode === MapView.HEIGHT)
+		else if (this.mode === MapView.HEIGHT)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 0.5;
 			this.thresholdDown = 0.1;
 		}
-		else if(this.mode === MapView.HEIGHT_SHADER)
+		else if (this.mode === MapView.HEIGHT_SHADER)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 		}
-		else if(this.mode === MapView.SPHERICAL)
+		else if (this.mode === MapView.SPHERICAL)
 		{
 			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 7e7;
@@ -152,7 +152,7 @@ export class MapView extends Mesh
 	 */
 	setProvider(provider)
 	{
-		if(provider !== this.provider)
+		if (provider !== this.provider)
 		{
 			this.provider = provider;
 			this.clear();
@@ -168,7 +168,7 @@ export class MapView extends Mesh
 	 */
 	setHeightProvider(heightProvider)
 	{
-		if(heightProvider !== this.heightProvider)
+		if (heightProvider !== this.heightProvider)
 		{
 			this.heightProvider = heightProvider;
 			this.clear();
@@ -186,12 +186,12 @@ export class MapView extends Mesh
 	{
 		this.traverse(function(children)
 		{
-			if(children.childrenCache !== undefined && children.childrenCache !== null)
+			if (children.childrenCache !== undefined && children.childrenCache !== null)
 			{
 				children.childrenCache = null;
 			}
 
-			if(children.loadTexture !== undefined)
+			if (children.loadTexture !== undefined)
 			{
 				children.loadTexture();
 			}
@@ -209,31 +209,31 @@ export class MapView extends Mesh
 	{
 		const intersects = [];
 
-		for(let t = 0; t < this.subdivisionRays; t++)
+		for (let t = 0; t < this.subdivisionRays; t++)
 		{
-			//Raycast from random point
+			// Raycast from random point
 			this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
 			
-			//Check intersection
+			// Check intersection
 			this._raycaster.setFromCamera(this._mouse, camera);
 			this._raycaster.intersectObjects(this.children, true, intersects);
 		}
 
-		if(this.mode === MapView.SPHERICAL)
+		if (this.mode === MapView.SPHERICAL)
 		{
-			for(var i = 0; i < intersects.length; i++)
+			for (var i = 0; i < intersects.length; i++)
 			{
 				var node = intersects[i].object;
-				const distance = intersects[i].distance * 2 ** node.level;
+				const distance = Math.pow(intersects[i].distance * 2, node.level);
 
-				if(distance < this.thresholdUp)
+				if (distance < this.thresholdUp)
 				{
 					node.subdivide();
 					return;
 				}
-				else if(distance > this.thresholdDown)
+				else if (distance > this.thresholdDown)
 				{
-					if(node.parentNode !== null)
+					if (node.parentNode !== null)
 					{
 						node.parentNode.simplify();
 						return;
@@ -243,21 +243,21 @@ export class MapView extends Mesh
 		}
 		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
 		{
-			for(var i = 0; i < intersects.length; i++)
+			for (var i = 0; i < intersects.length; i++)
 			{
 				var node = intersects[i].object;
 				const matrix = node.matrixWorld.elements;
 				const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
 				const value = scaleX / intersects[i].distance;
 
-				if(value > this.thresholdUp)
+				if (value > this.thresholdUp)
 				{
 					node.subdivide();
 					return;
 				}
-				else if(value < this.thresholdDown)
+				else if (value < this.thresholdDown)
 				{
-					if(node.parentNode !== null)
+					if (node.parentNode !== null)
 					{
 						node.parentNode.simplify();
 						return;
@@ -266,10 +266,13 @@ export class MapView extends Mesh
 			}
 		}
 
-		this.traverse(function(children)
+		if (this.cleanupDistance > 0)
 		{
-			
-		});
+			this.traverse(function(children)
+			{
+				console.log(children);
+			});
+		}
 	}
 
 	/**

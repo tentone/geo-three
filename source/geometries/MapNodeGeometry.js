@@ -27,39 +27,39 @@ export class MapNodeGeometry extends BufferGeometry
 		const segmentWidth = width / widthSegments;
 		const segmentHeight = height / heightSegments;
 
-		//Buffers
+		// Buffers
 		const indices = [];
 		const vertices = [];
 		const normals = [];
 		const uvs = [];
 
-		//Generate vertices, normals and uvs
-		for(var iz = 0; iz < gridZ; iz++)
+		// Generate vertices, normals and uvs
+		for (var iz = 0; iz < gridZ; iz++)
 		{
 			const z = iz * segmentHeight - heightHalf;
 
-			for(var ix = 0; ix < gridX; ix++)
+			for (var ix = 0; ix < gridX; ix++)
 			{
 				const x = ix * segmentWidth - widthHalf;
 
 				vertices.push(x, 0, z);
 				normals.push(0, 1, 0);
 				uvs.push(ix / widthSegments);
-				uvs.push(1 - (iz / heightSegments));
+				uvs.push(1 - iz / heightSegments);
 			}
 		}
 
-		//Indices
-		for(var iz = 0; iz < heightSegments; iz++)
+		// Indices
+		for (var iz = 0; iz < heightSegments; iz++)
 		{
-			for(var ix = 0; ix < widthSegments; ix++)
+			for (var ix = 0; ix < widthSegments; ix++)
 			{
 				const a = ix + gridX * iz;
 				const b = ix + gridX * (iz + 1);
-				const c = (ix + 1) + gridX * (iz + 1);
-				const d = (ix + 1) + gridX * iz;
+				const c = ix + 1 + gridX * (iz + 1);
+				const d = ix + 1 + gridX * iz;
 
-				//faces
+				// faces
 				indices.push(a, b, d);
 				indices.push(b, c, d);
 			}

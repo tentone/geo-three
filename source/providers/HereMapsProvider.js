@@ -124,7 +124,7 @@ export class HereMapsProvider extends MapProvider
 	 */
 	nextServer()
 	{
-		this.server = (this.server % 4 === 0 ? 1 : this.server + 1);
+		this.server = this.server % 4 === 0 ? 1 : this.server + 1;
 	}
 
 	getMetaData() {}
@@ -136,8 +136,8 @@ export class HereMapsProvider extends MapProvider
 		return new Promise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
-			image.onload = function(){resolve(image);};
-			image.onerror = function(){reject();};
+			image.onload = function() {resolve(image);};
+			image.onerror = function() {reject();};
 			image.crossOrigin = "Anonymous";
 			image.src = "https://" + this.server + "." + this.style + ".maps.api.here.com/maptile/2.1/maptile/" + this.version + "/" + this.scheme + "/" + zoom + "/" + x + "/" + y + "/" + this.size + "/" + this.format + "?app_id=" + this.appId + "&app_code=" + this.appCode;
 		});

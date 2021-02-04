@@ -12,7 +12,7 @@ import {UnitsUtils} from "../utils/UnitsUtils.js";
  */
 function MapSphereNode(parentNode, mapView, location, level, x, y)
 {
-	Mesh.call(this, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe:false}));
+	Mesh.call(this, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}));
 	MapNode.call(this, parentNode, mapView, location, level, x, y);
 
 	this.applyScaleNode();
@@ -52,12 +52,12 @@ MapSphereNode.createGeometry = function(zoom, x, y)
 	var max = 40;
 	var segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
 
-	//X
-	var phiLength = (1 / range) * 2 * Math.PI;
+	// X
+	var phiLength = 1 / range * 2 * Math.PI;
 	var phiStart = x * phiLength;
 
-	//Y
-	var thetaLength = (1 / range) * Math.PI;
+	// Y
+	var thetaLength = 1 / range * Math.PI;
 	var thetaStart = y * thetaLength;
 
 	return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
@@ -93,7 +93,7 @@ MapSphereNode.prototype.updateMatrix = function()
 
 MapSphereNode.prototype.updateMatrixWorld = function(force)
 {
-	if(this.matrixWorldNeedsUpdate || force)
+	if (this.matrixWorldNeedsUpdate || force)
 	{
 		this.matrixWorld.copy(this.matrix);
 		this.matrixWorldNeedsUpdate = false;
@@ -135,7 +135,7 @@ MapSphereNode.prototype.createChildNodes = function()
  */
 MapSphereNode.prototype.raycast = function(raycaster, intersects)
 {
-	if(this.isMesh === true)
+	if (this.isMesh === true)
 	{
 		return Mesh.prototype.raycast.call(this, raycaster, intersects);
 	}

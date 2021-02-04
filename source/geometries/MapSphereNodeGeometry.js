@@ -10,7 +10,8 @@ import {Float32BufferAttribute, BufferGeometry, Vector3} from "three";
  * @param {number} widthSegments Number of subdivisions along the width.
  * @param {number} heightSegments Number of subdivisions along the height.
  */
-export class MapSphereNodeGeometry extends BufferGeometry {
+export class MapSphereNodeGeometry extends BufferGeometry 
+{
 	constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
 	{
 		super();
@@ -21,34 +22,34 @@ export class MapSphereNodeGeometry extends BufferGeometry {
 		const vertex = new Vector3();
 		const normal = new Vector3();
 
-		//Buffers
+		// Buffers
 		const indices = [];
 		const vertices = [];
 		const normals = [];
 		const uvs = [];
 
-		//Generate vertices, normals and uvs
-		for(var iy = 0; iy <= heightSegments; iy++)
+		// Generate vertices, normals and uvs
+		for (var iy = 0; iy <= heightSegments; iy++)
 		{
 			const verticesRow = [];
 			const v = iy / heightSegments;
 
-			for(var ix = 0; ix <= widthSegments; ix++)
+			for (var ix = 0; ix <= widthSegments; ix++)
 			{
 				const u = ix / widthSegments;
 
-				//Vertex
+				// Vertex
 				vertex.x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
 				vertex.y = radius * Math.cos(thetaStart + v * thetaLength);
 				vertex.z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
 
 				vertices.push(vertex.x, vertex.y, vertex.z);
 
-				//Normal
+				// Normal
 				normal.set(vertex.x, vertex.y, vertex.z).normalize();
 				normals.push(normal.x, normal.y, normal.z);
 
-				//UV
+				// UV
 				uvs.push(u, 1 - v);
 				verticesRow.push(index++);
 			}
@@ -56,22 +57,22 @@ export class MapSphereNodeGeometry extends BufferGeometry {
 			grid.push(verticesRow);
 		}
 
-		//Indices
-		for(var iy = 0; iy < heightSegments; iy++)
+		// Indices
+		for (var iy = 0; iy < heightSegments; iy++)
 		{
-			for(var ix = 0; ix < widthSegments; ix++)
+			for (var ix = 0; ix < widthSegments; ix++)
 			{
 				const a = grid[iy][ix + 1];
 				const b = grid[iy][ix];
 				const c = grid[iy + 1][ix];
 				const d = grid[iy + 1][ix + 1];
 
-				if(iy !== 0 || thetaStart > 0)
+				if (iy !== 0 || thetaStart > 0)
 				{
 					indices.push(a, b, d);
 				}
 
-				if(iy !== heightSegments - 1 || thetaEnd < Math.PI)
+				if (iy !== heightSegments - 1 || thetaEnd < Math.PI)
 				{
 					indices.push(b, c, d);
 				}

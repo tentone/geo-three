@@ -18,6 +18,6 @@ export default {
 			name: "Geo",
 			file: "build/geo-three.js",
 			indent: "\t"
-		},
+		}
 	]
 };

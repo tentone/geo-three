@@ -81,7 +81,7 @@ export class BingMapsProvider extends MapProvider
 		{
 			const meta = JSON.parse(data);
 
-			//TODO <FILL METADATA>
+			// TODO <FILL METADATA>
 		});
 	}
 
@@ -97,17 +97,17 @@ export class BingMapsProvider extends MapProvider
 	{
 		let quad = "";
 
-		for(let i = zoom; i > 0; i--)
+		for (let i = zoom; i > 0; i--)
 		{
-			const mask = 1 << (i - 1);
+			const mask = 1 << i - 1;
 			let cell = 0;
 			
-			if((x & mask) != 0)
+			if ((x & mask) !== 0)
 			{
 				cell++;	
 			}
 			
-			if((y & mask) != 0)
+			if ((y & mask) !== 0)
 			{
 				cell += 2;
 			}
@@ -123,8 +123,8 @@ export class BingMapsProvider extends MapProvider
 		return new Promise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
-			image.onload = function(){resolve(image);};
-			image.onerror = function(){reject();};
+			image.onload = function() {resolve(image);};
+			image.onerror = function() {reject();};
 			image.crossOrigin = "Anonymous";
 			image.src = "http://ecn." + this.subdomain + ".tiles.virtualearth.net/tiles/" + this.type + BingMapsProvider.quadKey(zoom, x, y) + ".jpeg?g=1173";
 		});

@@ -21,16 +21,16 @@ import {MapNode} from "./MapNode.js";
  */
 function MapHeightNode(parentNode, mapView, location, level, x, y, material, geometry)
 {
-	if(material === undefined)
+	if (material === undefined)
 	{
 		material = new MeshPhongMaterial(
-		{
-			color: 0x000000,
-			specular: 0x000000,
-			shininess: 0,
-			wireframe: false,
-			emissive: 0xFFFFFF
-		});
+			{
+				color: 0x000000,
+				specular: 0x000000,
+				shininess: 0,
+				wireframe: false,
+				emissive: 0xFFFFFF
+			});
 	}
 
 	Mesh.call(this, geometry === undefined ? MapHeightNode.GEOMETRY: geometry, material);
@@ -123,7 +123,7 @@ MapHeightNode.prototype.loadTexture = function()
 
 MapHeightNode.prototype.nodeReady = function()
 {
-	if(!this.heightLoaded || !this.textureLoaded)
+	if (!this.heightLoaded || !this.textureLoaded)
 	{
 		return;
 	}
@@ -140,28 +140,28 @@ MapHeightNode.prototype.createChildNodes = function()
 	var x = this.x * 2;
 	var y = this.y * 2;
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	var node = new this.constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	var node = new this.constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	var node = new this.constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, 0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	var node = new this.constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, 0.25);
 	this.add(node);
@@ -177,7 +177,7 @@ MapHeightNode.prototype.createChildNodes = function()
  */
 MapHeightNode.prototype.loadHeightGeometry = function()
 {
-	if(this.mapView.heightProvider === null)
+	if (this.mapView.heightProvider === null)
 	{
 		throw new Error("GeoThree: MapView.heightProvider provider is null.");
 	}
@@ -197,14 +197,14 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 		
 		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 		var data = imageData.data;
-		for(var i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
+		for (var i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3)
 		{
 			var r = data[i];
 			var g = data[i + 1];
 			var b = data[i + 2];
 
-			//The value will be composed of the bits RGB
-			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+			// The value will be composed of the bits RGB
+			var value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
 
 			vertices[j + 1] = value;
 		}
@@ -227,7 +227,7 @@ MapHeightNode.prototype.loadHeightGeometry = function()
  */
 MapHeightNode.prototype.raycast = function(raycaster, intersects)
 {
-	if(this.isMesh === true)
+	if (this.isMesh === true)
 	{
 		return Mesh.prototype.raycast.call(this, raycaster, intersects);
 	}

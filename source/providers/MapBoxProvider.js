@@ -121,11 +121,11 @@ export class MapBoxProvider extends MapProvider
 		return new Promise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
-			image.onload = function(){resolve(image);};
-			image.onerror = function(){reject();};
+			image.onload = function() {resolve(image);};
+			image.onerror = function() {reject();};
 			image.crossOrigin = "Anonymous";
 
-			if(this.mode === MapBoxProvider.STYLE)
+			if (this.mode === MapBoxProvider.STYLE)
 			{
 				image.src = MapBoxProvider.ADDRESS + "styles/v1/" + this.style + "/tiles/" + zoom + "/" + x + "/" + y + (this.useHDPI ? "@2x?access_token=" : "?access_token=") + this.apiToken;
 			}

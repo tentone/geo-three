@@ -165,7 +165,7 @@ MapNode.BOTTOM_RIGHT = 3;
  *
  * @method createChildNodes 
  */
-MapNode.prototype.createChildNodes = function(){};
+MapNode.prototype.createChildNodes = function() {};
 
 /**
  * Subdivide node,check the maximum depth allowed for the tile provider.
@@ -174,16 +174,16 @@ MapNode.prototype.createChildNodes = function(){};
  * 
  * @method subdivide
  */
-MapNode.prototype.subdivide =  function()
+MapNode.prototype.subdivide = function()
 {
-	if(this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom || (this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS))
+	if (this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)
 	{
 		return;
 	}
 
 	this.subdivided = true;
 
-	if(this.childrenCache !== null)
+	if (this.childrenCache !== null)
 	{
 		this.isMesh = false;
 		this.children = this.childrenCache;
@@ -205,7 +205,7 @@ MapNode.prototype.subdivide =  function()
  */
 MapNode.prototype.simplify = function()
 {
-	if(this.children.length > 0)
+	if (this.children.length > 0)
 	{
 		this.childrenCache = this.children;
 	}
@@ -263,25 +263,25 @@ MapNode.prototype.loadTexture = function(onLoad)
  */
 MapNode.prototype.nodeReady = function()
 {
-	//Update parent nodes loaded
-	if(this.parentNode !== null)
+	// Update parent nodes loaded
+	if (this.parentNode !== null)
 	{
 		this.parentNode.nodesLoaded++;
 
-		if(this.parentNode.nodesLoaded >= MapNode.CHILDRENS)
+		if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS)
 		{
-			if(this.parentNode.subdivided === true)
+			if (this.parentNode.subdivided === true)
 			{
 				this.parentNode.isMesh = false;
 			}
 
-			for(var i = 0; i < this.parentNode.children.length; i++)
+			for (var i = 0; i < this.parentNode.children.length; i++)
 			{
 				this.parentNode.children[i].visible = true;
 			}
 		}
 	}
-	//If its the root object just set visible
+	// If its the root object just set visible
 	else
 	{
 		this.visible = true;
@@ -297,7 +297,7 @@ MapNode.prototype.nodeReady = function()
  */
 MapNode.prototype.getNeighborsDirection = function(direction)
 {
-	//TODO <ADD CODE HERE>
+	// TODO <ADD CODE HERE>
 
 	return null;
 };
@@ -312,7 +312,7 @@ MapNode.prototype.getNeighbors = function()
 {
 	var neighbors = [];
 
-	//TODO <ADD CODE HERE>
+	// TODO <ADD CODE HERE>
 
 	return neighbors;
 };

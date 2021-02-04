@@ -6,7 +6,8 @@
  * @static
  * @class UnitsUtils
  */
-export class UnitsUtils {
+export class UnitsUtils 
+{
 	/**
 	 * Get the current geolocation from the browser using the location API.
 	 * 
@@ -37,7 +38,7 @@ export class UnitsUtils {
 
 		y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
 
-		return {x:x, y:y};
+		return {x: x, y: y};
 	}
 
 	/**
@@ -49,12 +50,12 @@ export class UnitsUtils {
 	 */
 	static sphericalToDatums(x, y)
 	{
-		var longitude = (x / UnitsUtils.EARTH_ORIGIN) * 180.0;
-		var latitude = (y / UnitsUtils.EARTH_ORIGIN) * 180.0;
+		var longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
+		var latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
 
-		latitude = (180.0 / Math.PI) * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
+		latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
 
-		return {latitude:latitude, longitude:longitude};
+		return {latitude: latitude, longitude: longitude};
 	}
 
 	/**
@@ -72,7 +73,7 @@ export class UnitsUtils {
 		var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
 		var latitude = 180.0 * (latitudeRad / Math.PI);
 
-		return {latitude:latitude, longitude:longitude};
+		return {latitude: latitude, longitude: longitude};
 	}
 }
 

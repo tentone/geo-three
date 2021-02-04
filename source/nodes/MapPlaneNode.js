@@ -76,7 +76,7 @@ MapPlaneNode.prototype.createChildNodes = function()
  */
 MapPlaneNode.prototype.raycast = function(raycaster, intersects)
 {
-	if(this.isMesh === true)
+	if (this.isMesh === true)
 	{
 		return Mesh.prototype.raycast.call(this, raycaster, intersects);
 	}
