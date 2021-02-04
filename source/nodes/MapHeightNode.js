@@ -1,4 +1,4 @@
-import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader, CanvasTexture} from "three";
+import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter} from "three";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
 import {MapNode} from "./MapNode.js";
 

@@ -1,4 +1,4 @@
-import {Texture, ImageLoader, RGBFormat, LinearFilter} from "three";
+import {Texture, RGBFormat, LinearFilter} from "three";
 
 /** 
  * Represents a map tile node inside of the tiles quad-tree

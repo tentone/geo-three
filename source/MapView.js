@@ -97,6 +97,14 @@ export class MapView extends Mesh
 		this.thresholdDown = 0.2;
 		
 		/**
+		 * Minimum ditance to discard far away nodes that are subdivided.
+		 *
+		 * @attribute cleanupDistance
+		 * @type {number}
+		 */
+		this.cleanupDistance = 1e3;
+
+		/**
 		 * Root map node.
 		 *
 		 * @attribute root
@@ -257,6 +265,11 @@ export class MapView extends Mesh
 				}
 			}
 		}
+
+		this.traverse(function(children)
+		{
+			
+		});
 	}
 
 	/**
