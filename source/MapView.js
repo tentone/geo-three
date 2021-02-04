@@ -9,6 +9,22 @@ import {UnitsUtils} from "./utils/UnitsUtils.js";
 import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
 
 /**
+ * Contains the methods that are available to control level of detail of the tiles.
+ * 
+ * @static
+ * @class LODMethod
+ */
+export const LODMethod =
+{
+	/**
+	 * Use random raycasting to randomly pick n objects to be tested.
+	 * 
+	 * Overall the fastest solution but does not include out of screen objects.
+	 */
+	RAYCAST: 0
+};
+
+/**
  * Map viewer is used to read and display map tiles from a server.
  * 
  * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
@@ -97,7 +113,7 @@ export class MapView extends Mesh
 		this.thresholdDown = 0.2;
 		
 		/**
-		 * Minimum ditance to discard far away nodes that are subdivided.
+		 * Minimum ditance to simplify far away nodes that are subdivided.
 		 *
 		 * @attribute cleanupDistance
 		 * @type {number}
@@ -266,13 +282,18 @@ export class MapView extends Mesh
 			}
 		}
 
+		// TODO <ADD CODE HERE>
+		/*
 		if (this.cleanupDistance > 0)
 		{
+			console.log(intersects);
+			
 			this.traverse(function(children)
 			{
-				console.log(children);
+				// console.log(children);
 			});
 		}
+		*/
 	}
 
 	/**
