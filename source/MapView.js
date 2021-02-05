@@ -17,7 +17,7 @@ import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
 export const LODMethod =
 {
 	/**
-	 * Use random raycasting to randomly pick n objects to be tested.
+	 * Use random raycasting to randomly pick n objects to be tested on screen space.
 	 * 
 	 * Overall the fastest solution but does not include out of screen objects.
 	 */
@@ -65,6 +65,11 @@ export class MapView extends Mesh
 		 * @type {number}
 		 */
 		this.mode = mode;
+
+		/**
+		 * Method to controll the LOD of the map.
+		 */
+		this.lod = LODMethod.RAYCAST;
 
 		/**
 		 * Map tile color layer provider.
@@ -223,64 +228,68 @@ export class MapView extends Mesh
 	 */
 	onBeforeRender(renderer, scene, camera, geometry, material, group)
 	{
-		const intersects = [];
-
-		for (let t = 0; t < this.subdivisionRays; t++)
+		if (this.lod === LODMethod.RAYCAST)
 		{
-			// Raycast from random point
-			this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
-			
-			// Check intersection
-			this._raycaster.setFromCamera(this._mouse, camera);
-			this._raycaster.intersectObjects(this.children, true, intersects);
-		}
+			const intersects = [];
 
-		if (this.mode === MapView.SPHERICAL)
-		{
-			for (var i = 0; i < intersects.length; i++)
+			for (let t = 0; t < this.subdivisionRays; t++)
 			{
-				var node = intersects[i].object;
-				const distance = Math.pow(intersects[i].distance * 2, node.level);
-
-				if (distance < this.thresholdUp)
+				// Raycast from random point
+				this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+				
+				// Check intersection
+				this._raycaster.setFromCamera(this._mouse, camera);
+				this._raycaster.intersectObjects(this.children, true, intersects);
+			}
+	
+			if (this.mode === MapView.SPHERICAL)
+			{
+				for (var i = 0; i < intersects.length; i++)
 				{
-					node.subdivide();
-					return;
-				}
-				else if (distance > this.thresholdDown)
-				{
-					if (node.parentNode !== null)
+					var node = intersects[i].object;
+					const distance = Math.pow(intersects[i].distance * 2, node.level);
+	
+					if (distance < this.thresholdUp)
 					{
-						node.parentNode.simplify();
+						node.subdivide();
 						return;
+					}
+					else if (distance > this.thresholdDown)
+					{
+						if (node.parentNode !== null)
+						{
+							node.parentNode.simplify();
+							return;
+						}
+					}
+				}
+			}
+			else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+			{
+				for (var i = 0; i < intersects.length; i++)
+				{
+					var node = intersects[i].object;
+					const matrix = node.matrixWorld.elements;
+					const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
+					const value = scaleX / intersects[i].distance;
+	
+					if (value > this.thresholdUp)
+					{
+						node.subdivide();
+						return;
+					}
+					else if (value < this.thresholdDown)
+					{
+						if (node.parentNode !== null)
+						{
+							node.parentNode.simplify();
+							return;
+						}
 					}
 				}
 			}
 		}
-		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-		{
-			for (var i = 0; i < intersects.length; i++)
-			{
-				var node = intersects[i].object;
-				const matrix = node.matrixWorld.elements;
-				const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
-				const value = scaleX / intersects[i].distance;
 
-				if (value > this.thresholdUp)
-				{
-					node.subdivide();
-					return;
-				}
-				else if (value < this.thresholdDown)
-				{
-					if (node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
-				}
-			}
-		}
 
 		// TODO <ADD CODE HERE>
 		/*
