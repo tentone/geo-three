@@ -37,6 +37,29 @@ import {UnitsUtils} from "./utils/UnitsUtils.js";
 import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
 
 /**
+ * Contains the methods that are available to control level of detail of the tiles.
+ * 
+ * @static
+ * @class LODMethod
+ */
+export const LODMethod =
+{
+	/**
+	 * Use random raycasting to randomly pick n objects to be tested on screen space.
+	 * 
+	 * Overall the fastest solution but does not include out of screen objects.
+	 */
+	RAYCAST: 0,
+
+	/**
+	 * Check the planar distance between the nodes center and the view position.
+	 * 
+	 * Distance is adjusted with the node level, more consistent results since every node is considered.
+	 */
+	RADIAL: 1
+};
+
+/**
  * Map viewer is used to read and display map tiles from a server.
  * 
  * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
@@ -57,7 +80,7 @@ export class MapView extends Mesh
 
 		var geometry;
 
-		if(mode === MapView.SPHERICAL)
+		if (mode === MapView.SPHERICAL)
 		{
 			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 		}
@@ -66,7 +89,7 @@ export class MapView extends Mesh
 			geometry = MapPlaneNode.GEOMETRY;
 		}
 
-		super(geometry, new MeshBasicMaterial({transparent:true, opacity:0.0}));
+		super(geometry, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 		
 		/**
 		 * Define the type of map view in use.
@@ -77,6 +100,11 @@ export class MapView extends Mesh
 		 * @type {number}
 		 */
 		this.mode = mode;
+
+		/**
+		 * Method to controll the LOD of the map.
+		 */
+		this.lod = LODMethod.RAYCAST;
 
 		/**
 		 * Map tile color layer provider.
@@ -125,6 +153,22 @@ export class MapView extends Mesh
 		this.thresholdDown = 0.2;
 		
 		/**
+		 * Minimum ditance to subdivide nodes.
+		 *
+		 * @attribute subdivideDistance
+		 * @type {number}
+		 */
+		this.subdivideDistance = 8e1;
+
+		/**
+		 * Minimum ditance to simplify far away nodes that are subdivided.
+		 *
+		 * @attribute simplifyDistance
+		 * @type {number}
+		 */
+		this.simplifyDistance = 4e2;
+
+		/**
 		 * Root map node.
 		 *
 		 * @attribute root
@@ -132,24 +176,24 @@ export class MapView extends Mesh
 		 */
 		this.root = null;
 
-		if(this.mode === MapView.PLANAR)
+		if (this.mode === MapView.PLANAR)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 		}
-		else if(this.mode === MapView.HEIGHT)
+		else if (this.mode === MapView.HEIGHT)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 0.5;
 			this.thresholdDown = 0.1;
 		}
-		else if(this.mode === MapView.HEIGHT_SHADER)
+		else if (this.mode === MapView.HEIGHT_SHADER)
 		{
 			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 		}
-		else if(this.mode === MapView.SPHERICAL)
+		else if (this.mode === MapView.SPHERICAL)
 		{
 			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
 			this.thresholdUp = 7e7;
@@ -172,7 +216,7 @@ export class MapView extends Mesh
 	 */
 	setProvider(provider)
 	{
-		if(provider !== this.provider)
+		if (provider !== this.provider)
 		{
 			this.provider = provider;
 			this.clear();
@@ -188,7 +232,7 @@ export class MapView extends Mesh
 	 */
 	setHeightProvider(heightProvider)
 	{
-		if(heightProvider !== this.heightProvider)
+		if (heightProvider !== this.heightProvider)
 		{
 			this.heightProvider = heightProvider;
 			this.clear();
@@ -206,12 +250,12 @@ export class MapView extends Mesh
 	{
 		this.traverse(function(children)
 		{
-			if(children.childrenCache !== undefined &amp;&amp; children.childrenCache !== null)
+			if (children.childrenCache !== undefined &amp;&amp; children.childrenCache !== null)
 			{
 				children.childrenCache = null;
 			}
 
-			if(children.loadTexture !== undefined)
+			if (children.loadTexture !== undefined)
 			{
 				children.loadTexture();
 			}
@@ -227,63 +271,91 @@ export class MapView extends Mesh
 	 */
 	onBeforeRender(renderer, scene, camera, geometry, material, group)
 	{
-		const intersects = [];
-
-		for(let t = 0; t &lt; this.subdivisionRays; t++)
+		if (this.lod === LODMethod.RAYCAST)
 		{
-			//Raycast from random point
-			this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+			const intersects = [];
+
+			for (let t = 0; t &lt; this.subdivisionRays; t++)
+			{
+				// Raycast from random point
+				this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+				
+				// Check intersection
+				this._raycaster.setFromCamera(this._mouse, camera);
+				this._raycaster.intersectObjects(this.children, true, intersects);
+			}
+	
+			if (this.mode === MapView.SPHERICAL)
+			{
+				for (var i = 0; i &lt; intersects.length; i++)
+				{
+					var node = intersects[i].object;
+					const distance = Math.pow(intersects[i].distance * 2, node.level);
+	
+					if (distance &lt; this.thresholdUp)
+					{
+						node.subdivide();
+						return;
+					}
+					else if (distance > this.thresholdDown)
+					{
+						if (node.parentNode !== null)
+						{
+							node.parentNode.simplify();
+							return;
+						}
+					}
+				}
+			}
+			else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+			{
+				for (var i = 0; i &lt; intersects.length; i++)
+				{
+					var node = intersects[i].object;
+					const matrix = node.matrixWorld.elements;
+					const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
+					const value = scaleX / intersects[i].distance;
+	
+					if (value > this.thresholdUp)
+					{
+						node.subdivide();
+						return;
+					}
+					else if (value &lt; this.thresholdDown)
+					{
+						if (node.parentNode !== null)
+						{
+							node.parentNode.simplify();
+							return;
+						}
+					}
+				}
+			}
+		}
+		else if (this.lod === LODMethod.RADIAL)
+		{
+			var view = new Vector3();
+			view = camera.getWorldPosition(view);
 			
-			//Check intersection
-			this._raycaster.setFromCamera(this._mouse, camera);
-			this._raycaster.intersectObjects(this.children, true, intersects);
-		}
+			var position = new Vector3();
+			var self = this;
 
-		if(this.mode === MapView.SPHERICAL)
-		{
-			for(var i = 0; i &lt; intersects.length; i++)
+			this.children[0].traverse(function(node)
 			{
-				var node = intersects[i].object;
-				const distance = intersects[i].distance * 2 ** node.level;
+				position = node.getWorldPosition(position);
 
-				if(distance &lt; this.thresholdUp)
+				var distance = view.distanceTo(position);
+				distance /= Math.pow(2, self.provider.maxZoom - node.level);
+
+				if (distance &lt; self.subdivideDistance)
 				{
 					node.subdivide();
-					return;
 				}
-				else if(distance > this.thresholdDown)
+				else if (distance > self.simplifyDistance &amp;&amp; node.parentNode)
 				{
-					if(node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
+					node.parentNode.simplify();
 				}
-			}
-		}
-		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-		{
-			for(var i = 0; i &lt; intersects.length; i++)
-			{
-				var node = intersects[i].object;
-				const matrix = node.matrixWorld.elements;
-				const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
-				const value = scaleX / intersects[i].distance;
-
-				if(value > this.thresholdUp)
-				{
-					node.subdivide();
-					return;
-				}
-				else if(value &lt; this.thresholdDown)
-				{
-					if(node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
-				}
-			}
+			});
 		}
 	}
 
@@ -361,13 +433,13 @@ MapView.HEIGHT_SHADER = 203;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="LODMethod.html">LODMethod</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Mon Oct 26 2020 17:02:58 GMT+0000 (Western European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sat Feb 06 2021 18:33:35 GMT+0000 (Western European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

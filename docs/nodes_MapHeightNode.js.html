@@ -26,7 +26,7 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, ImageLoader, CanvasTexture} from "three";
+            <pre class="prettyprint source linenums"><code>import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter} from "three";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
 import {MapNode} from "./MapNode.js";
 
@@ -49,16 +49,16 @@ import {MapNode} from "./MapNode.js";
  */
 function MapHeightNode(parentNode, mapView, location, level, x, y, material, geometry)
 {
-	if(material === undefined)
+	if (material === undefined)
 	{
 		material = new MeshPhongMaterial(
-		{
-			color: 0x000000,
-			specular: 0x000000,
-			shininess: 0,
-			wireframe: false,
-			emissive: 0xFFFFFF
-		});
+			{
+				color: 0x000000,
+				specular: 0x000000,
+				shininess: 0,
+				wireframe: false,
+				emissive: 0xFFFFFF
+			});
 	}
 
 	Mesh.call(this, geometry === undefined ? MapHeightNode.GEOMETRY: geometry, material);
@@ -151,7 +151,7 @@ MapHeightNode.prototype.loadTexture = function()
 
 MapHeightNode.prototype.nodeReady = function()
 {
-	if(!this.heightLoaded || !this.textureLoaded)
+	if (!this.heightLoaded || !this.textureLoaded)
 	{
 		return;
 	}
@@ -168,28 +168,28 @@ MapHeightNode.prototype.createChildNodes = function()
 	var x = this.x * 2;
 	var y = this.y * 2;
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	var node = new this.constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	var node = new this.constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, -0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	var node = new this.constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(-0.25, 0, 0.25);
 	this.add(node);
 	node.updateMatrix();
 	node.updateMatrixWorld(true);
 
-	var node = new (this.constructor)(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	var node = new this.constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 	node.scale.set(0.5, 1, 0.5);
 	node.position.set(0.25, 0, 0.25);
 	this.add(node);
@@ -205,7 +205,7 @@ MapHeightNode.prototype.createChildNodes = function()
  */
 MapHeightNode.prototype.loadHeightGeometry = function()
 {
-	if(this.mapView.heightProvider === null)
+	if (this.mapView.heightProvider === null)
 	{
 		throw new Error("GeoThree: MapView.heightProvider provider is null.");
 	}
@@ -225,14 +225,14 @@ MapHeightNode.prototype.loadHeightGeometry = function()
 		
 		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 		var data = imageData.data;
-		for(var i = 0, j = 0; i &lt; data.length &amp;&amp; j &lt; vertices.length; i += 4, j += 3)
+		for (var i = 0, j = 0; i &lt; data.length &amp;&amp; j &lt; vertices.length; i += 4, j += 3)
 		{
 			var r = data[i];
 			var g = data[i + 1];
 			var b = data[i + 2];
 
-			//The value will be composed of the bits RGB
-			var value = (((r * 65536 + g * 256 + b) * 0.1) - 1e4);
+			// The value will be composed of the bits RGB
+			var value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
 
 			vertices[j + 1] = value;
 		}
@@ -255,7 +255,7 @@ MapHeightNode.prototype.loadHeightGeometry = function()
  */
 MapHeightNode.prototype.raycast = function(raycaster, intersects)
 {
-	if(this.isMesh === true)
+	if (this.isMesh === true)
 	{
 		return Mesh.prototype.raycast.call(this, raycaster, intersects);
 	}
@@ -274,13 +274,13 @@ export {MapHeightNode};
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="LODMethod.html">LODMethod</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.4</a> on Mon Oct 26 2020 17:02:58 GMT+0000 (Western European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sat Feb 06 2021 18:33:35 GMT+0000 (Western European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
