@@ -1341,7 +1341,7 @@
 		/**
 		 * Check the planar distance between the nodes center and the view position.
 		 * 
-		 * Updates all nodes in the world every time.
+		 * Distance is adjusted with the node level, more consistent results since every node is considered.
 		 */
 		RADIAL: 1
 	};
@@ -1391,7 +1391,7 @@
 			/**
 			 * Method to controll the LOD of the map.
 			 */
-			this.lod = LODMethod.RADIAL;
+			this.lod = LODMethod.RAYCAST;
 
 			/**
 			 * Map tile color layer provider.
@@ -2697,6 +2697,7 @@
 	exports.GoogleMapsProvider = GoogleMapsProvider;
 	exports.HeightDebugProvider = HeightDebugProvider;
 	exports.HereMapsProvider = HereMapsProvider;
+	exports.LODMethod = LODMethod;
 	exports.MapBoxProvider = MapBoxProvider;
 	exports.MapHeightNode = MapHeightNode;
 	exports.MapHeightNodeShader = MapHeightNodeShader;

@@ -1,4 +1,4 @@
-export {MapView} from "./MapView.js";
+export {MapView, LODMethod} from "./MapView.js";
 
 export {BingMapsProvider} from "./providers/BingMapsProvider.js";
 export {GoogleMapsProvider} from "./providers/GoogleMapsProvider.js";

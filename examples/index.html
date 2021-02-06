@@ -9,6 +9,7 @@
 	<select id="mode" style="position: absolute; top: 20px; right: 20px; width: 200px; height: 25px;"></select>
 	<select id="providerColor" style="position: absolute; top: 50px; right: 20px; width: 200px; height: 25px;"></select>
 	<select id="providerHeight" style="position: absolute; top: 80px; right: 20px; width: 200px; height: 25px;"></select>
+	<select id="lod" style="position: absolute; top: 110px; right: 20px; width: 200px; height: 25px;"></select>
 
 	<!-- Code -->
 	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
@@ -60,6 +61,28 @@
 			["Height Shader", Geo.MapView.HEIGHT_SHADER],
 			["Spherical", Geo.MapView.SPHERICAL]
 		];
+
+
+		var lods = [
+			["Raycast", Geo.LODMethod.RAYCAST],
+			["Radial", Geo.LODMethod.RADIAL]
+		];
+
+
+		var lod = document.getElementById("lod");
+		lod.onchange = function(event)
+		{
+			if(map !== undefined)
+			{
+				map.lod = lods[lod.selectedIndex][1];
+			}
+		};
+		for(var i = 0; i < lods.length; i++)
+		{
+			var option = document.createElement("option");
+			option.innerHTML = lods[i][0];
+			lod.appendChild(option);
+		}
 
 		var mode = document.getElementById("mode");
 		mode.onchange = function(event)
