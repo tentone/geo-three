@@ -57,7 +57,6 @@ function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 }
 
 MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
-
 MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
 /**

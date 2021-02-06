@@ -21,7 +21,14 @@ export const LODMethod =
 	 * 
 	 * Overall the fastest solution but does not include out of screen objects.
 	 */
-	RAYCAST: 0
+	RAYCAST: 0,
+
+	/**
+	 * Check the planar distance between the nodes center and the view position.
+	 * 
+	 * Distance is adjusted with the node level, more consistent results since every node is considered.
+	 */
+	RADIAL: 1
 };
 
 /**
@@ -118,12 +125,20 @@ export class MapView extends Mesh
 		this.thresholdDown = 0.2;
 		
 		/**
-		 * Minimum ditance to simplify far away nodes that are subdivided.
+		 * Minimum ditance to subdivide nodes.
 		 *
-		 * @attribute cleanupDistance
+		 * @attribute subdivideDistance
 		 * @type {number}
 		 */
-		this.cleanupDistance = 1e3;
+		this.subdivideDistance = 8e1;
+
+		/**
+		 * Minimum ditance to simplify far away nodes that are subdivided.
+		 *
+		 * @attribute simplifyDistance
+		 * @type {number}
+		 */
+		this.simplifyDistance = 4e2;
 
 		/**
 		 * Root map node.
@@ -289,20 +304,31 @@ export class MapView extends Mesh
 				}
 			}
 		}
-
-
-		// TODO <ADD CODE HERE>
-		/*
-		if (this.cleanupDistance > 0)
+		else if (this.lod === LODMethod.RADIAL)
 		{
-			console.log(intersects);
+			var view = new Vector3();
+			view = camera.getWorldPosition(view);
 			
-			this.traverse(function(children)
+			var position = new Vector3();
+			var self = this;
+
+			this.children[0].traverse(function(node)
 			{
-				// console.log(children);
+				position = node.getWorldPosition(position);
+
+				var distance = view.distanceTo(position);
+				distance /= Math.pow(2, self.provider.maxZoom - node.level);
+
+				if (distance < self.subdivideDistance)
+				{
+					node.subdivide();
+				}
+				else if (distance > self.simplifyDistance && node.parentNode)
+				{
+					node.parentNode.simplify();
+				}
 			});
 		}
-		*/
 	}
 
 	/**

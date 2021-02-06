@@ -67,6 +67,14 @@ controls.target.set(coords.x, 0, -coords.y);
 
 
 
+### LOD Control
+
+- The library includes two methods for LOD control, that define how tiles are subdivided or simplified.
+  - Raycast: uses raycasting determine the distance of the nodes to the camera view, it only considers the node inside of the view frustum it is faster but leaves node out of view subdivided unnecessarily.
+  - Radial: Calculates the distance from the camera to each one of the nodes, the nodes closer are subdivided and nodes far away are simplified a simple and effective method that considers all nodes, and provides a more consistent result.
+
+
+
 ### Tiles Representation
 
 - The library has support for both planar and spherical representation of tiles. Most providers only have planar tiles available.

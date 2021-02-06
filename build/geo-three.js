@@ -1214,7 +1214,6 @@
 	}
 
 	MapHeightNodeShader.prototype = Object.create(MapHeightNode.prototype);
-
 	MapHeightNodeShader.prototype.constructor = MapHeightNodeShader;
 
 	/**
@@ -1325,6 +1324,29 @@
 	};
 
 	/**
+	 * Contains the methods that are available to control level of detail of the tiles.
+	 * 
+	 * @static
+	 * @class LODMethod
+	 */
+	const LODMethod =
+	{
+		/**
+		 * Use random raycasting to randomly pick n objects to be tested on screen space.
+		 * 
+		 * Overall the fastest solution but does not include out of screen objects.
+		 */
+		RAYCAST: 0,
+
+		/**
+		 * Check the planar distance between the nodes center and the view position.
+		 * 
+		 * Updates all nodes in the world every time.
+		 */
+		RADIAL: 1
+	};
+
+	/**
 	 * Map viewer is used to read and display map tiles from a server.
 	 * 
 	 * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
@@ -1365,6 +1387,11 @@
 			 * @type {number}
 			 */
 			this.mode = mode;
+
+			/**
+			 * Method to controll the LOD of the map.
+			 */
+			this.lod = LODMethod.RADIAL;
 
 			/**
 			 * Map tile color layer provider.
@@ -1413,12 +1440,20 @@
 			this.thresholdDown = 0.2;
 			
 			/**
-			 * Minimum ditance to discard far away nodes that are subdivided.
+			 * Minimum ditance to subdivide nodes.
 			 *
-			 * @attribute cleanupDistance
+			 * @attribute subdivideDistance
 			 * @type {number}
 			 */
-			this.cleanupDistance = 1e3;
+			this.subdivideDistance = 8e1;
+
+			/**
+			 * Minimum ditance to simplify far away nodes that are subdivided.
+			 *
+			 * @attribute simplifyDistance
+			 * @type {number}
+			 */
+			this.simplifyDistance = 4e2;
 
 			/**
 			 * Root map node.
@@ -1523,73 +1558,90 @@
 		 */
 		onBeforeRender(renderer, scene, camera, geometry, material, group)
 		{
-			const intersects = [];
-
-			for (let t = 0; t < this.subdivisionRays; t++)
+			if (this.lod === LODMethod.RAYCAST)
 			{
-				// Raycast from random point
-				this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
-				
-				// Check intersection
-				this._raycaster.setFromCamera(this._mouse, camera);
-				this._raycaster.intersectObjects(this.children, true, intersects);
-			}
+				const intersects = [];
 
-			if (this.mode === MapView.SPHERICAL)
-			{
-				for (var i = 0; i < intersects.length; i++)
+				for (let t = 0; t < this.subdivisionRays; t++)
 				{
-					var node = intersects[i].object;
-					const distance = Math.pow(intersects[i].distance * 2, node.level);
-
-					if (distance < this.thresholdUp)
+					// Raycast from random point
+					this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+					
+					// Check intersection
+					this._raycaster.setFromCamera(this._mouse, camera);
+					this._raycaster.intersectObjects(this.children, true, intersects);
+				}
+		
+				if (this.mode === MapView.SPHERICAL)
+				{
+					for (var i = 0; i < intersects.length; i++)
 					{
-						node.subdivide();
-						return;
-					}
-					else if (distance > this.thresholdDown)
-					{
-						if (node.parentNode !== null)
+						var node = intersects[i].object;
+						const distance = Math.pow(intersects[i].distance * 2, node.level);
+		
+						if (distance < this.thresholdUp)
 						{
-							node.parentNode.simplify();
+							node.subdivide();
 							return;
+						}
+						else if (distance > this.thresholdDown)
+						{
+							if (node.parentNode !== null)
+							{
+								node.parentNode.simplify();
+								return;
+							}
+						}
+					}
+				}
+				else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+				{
+					for (var i = 0; i < intersects.length; i++)
+					{
+						var node = intersects[i].object;
+						const matrix = node.matrixWorld.elements;
+						const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
+						const value = scaleX / intersects[i].distance;
+		
+						if (value > this.thresholdUp)
+						{
+							node.subdivide();
+							return;
+						}
+						else if (value < this.thresholdDown)
+						{
+							if (node.parentNode !== null)
+							{
+								node.parentNode.simplify();
+								return;
+							}
 						}
 					}
 				}
 			}
-			else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+			else if (this.lod === LODMethod.RADIAL)
 			{
-				for (var i = 0; i < intersects.length; i++)
-				{
-					var node = intersects[i].object;
-					const matrix = node.matrixWorld.elements;
-					const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
-					const value = scaleX / intersects[i].distance;
+				var view = new three.Vector3();
+				view = camera.getWorldPosition(view);
+				
+				var position = new three.Vector3();
+				var self = this;
 
-					if (value > this.thresholdUp)
+				this.children[0].traverse(function(node)
+				{
+					position = node.getWorldPosition(position);
+
+					var distance = view.distanceTo(position);
+					distance /= Math.pow(2, self.provider.maxZoom - node.level);
+
+					if (distance < self.subdivideDistance)
 					{
 						node.subdivide();
-						return;
 					}
-					else if (value < this.thresholdDown)
+					else if (distance > self.simplifyDistance && node.parentNode)
 					{
-						if (node.parentNode !== null)
-						{
-							node.parentNode.simplify();
-							return;
-						}
+						node.parentNode.simplify();
 					}
-				}
-			}
-
-
-			if (this.cleanupDistance > 0)
-			{
-				console.log(intersects);
-				
-				this.traverse(function(children)
-				{
-					// console.log(children);
 				});
 			}
 		}
