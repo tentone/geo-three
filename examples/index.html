@@ -64,8 +64,8 @@
 
 
 		var lods = [
-			["Raycast", Geo.LODMethod.RAYCAST],
-			["Radial", Geo.LODMethod.RADIAL]
+			["Raycast", Geo.LODRaycast],
+			["Radial", Geo.LODRadial]
 		];
 
 
@@ -74,7 +74,7 @@
 		{
 			if(map !== undefined)
 			{
-				map.lod = lods[lod.selectedIndex][1];
+				map.lod = new lods[lod.selectedIndex][1]();
 			}
 		};
 		for(var i = 0; i < lods.length; i++)

@@ -1323,27 +1323,121 @@
 		return false;
 	};
 
+	function LODControl() {}
+
+	LODControl.prototype.updateLOD = function(view, camera, renderer, scene) {};
+
 	/**
-	 * Contains the methods that are available to control level of detail of the tiles.
+	 * Use random raycasting to randomly pick n objects to be tested on screen space.
 	 * 
-	 * @static
-	 * @class LODMethod
+	 * Overall the fastest solution but does not include out of screen objects.
+	 * 
+	 * @class LODRaycast
+	 * @extends {LODControl}
 	 */
-	const LODMethod =
+	function LODRaycast()
 	{
-		/**
-		 * Use random raycasting to randomly pick n objects to be tested on screen space.
-		 * 
-		 * Overall the fastest solution but does not include out of screen objects.
-		 */
-		RAYCAST: 0,
+		LODControl.call(this);
 
 		/**
-		 * Check the planar distance between the nodes center and the view position.
-		 * 
-		 * Distance is adjusted with the node level, more consistent results since every node is considered.
+		 * Number of rays used to test nodes and subdivide the map.
+		 *
+		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
+		 *
+		 * @attribute subdivisionRays
+		 * @type {boolean}
 		 */
-		RADIAL: 1
+		this.subdivisionRays = 1;
+
+		/**
+		 * Threshold to subdivide the map tiles.
+		 * 
+		 * Lower value will subdivide earlier (less zoom required to subdivide).
+		 * 
+		 * @attribute thresholdUp
+		 * @type {number}
+		 */
+		this.thresholdUp = 0.6;
+
+		/**
+		 * Threshold to simplify the map tiles.
+		 * 
+		 * Higher value will simplify earlier.
+		 *
+		 * @attribute thresholdDown
+		 * @type {number}
+		 */
+		this.thresholdDown = 0.15;
+
+		this.raycaster = new Raycaster();
+
+		this.mouse = new Vector2();
+
+		this.vector = new Vector3();
+	}
+
+	LODRaycast.prototype = Object.create(LODControl.prototype);
+
+	LODRaycast.prototype.updateLOD = function(view, camera, renderer, scene)
+	{
+		var intersects = [];
+
+		for (var t = 0; t < this.subdivisionRays; t++)
+		{
+			// Raycast from random point
+			this.mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+			
+			// Check intersection
+			this.raycaster.setFromCamera(this.mouse, camera);
+			this.raycaster.intersectObjects(view.children, true, intersects);
+		}
+
+		if (view.mode === MapView.SPHERICAL)
+		{
+			for (var i = 0; i < intersects.length; i++)
+			{
+				var node = intersects[i].object;
+				const distance = Math.pow(intersects[i].distance * 2, node.level);
+
+				if (distance < this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if (distance > this.thresholdDown)
+				{
+					if (node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
+			}
+		}
+		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+		{
+			for (var i = 0; i < intersects.length; i++)
+			{
+				var node = intersects[i].object;
+				var matrix = node.matrixWorld.elements;
+				var scaleX = this.vector.set(matrix[0], matrix[1], matrix[2]).length();
+				var value = scaleX / intersects[i].distance;
+
+				if (value > this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if (value < this.thresholdDown)
+				{
+					if (node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
+			}
+		}
 	};
 
 	/**
@@ -1359,15 +1453,15 @@
 	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
-	class MapView extends three.Mesh
+	class MapView$1 extends three.Mesh
 	{
 		constructor(mode, provider, heightProvider)
 		{
-			mode = mode !== undefined ? mode : MapView.PLANAR;
+			mode = mode !== undefined ? mode : MapView$1.PLANAR;
 
 			var geometry;
 
-			if (mode === MapView.SPHERICAL)
+			if (mode === MapView$1.SPHERICAL)
 			{
 				geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 			}
@@ -1389,9 +1483,12 @@
 			this.mode = mode;
 
 			/**
-			 * Method to controll the LOD of the map.
+			 * LOD control object used to defined how tiles are loaded in and out of memory.
+			 * 
+			 * @attribute lod
+			 * @type {LODControl}
 			 */
-			this.lod = LODMethod.RAYCAST;
+			this.lod = new LODRaycast();
 
 			/**
 			 * Map tile color layer provider.
@@ -1410,52 +1507,6 @@
 			this.heightProvider = heightProvider !== undefined ? heightProvider : null;
 
 			/**
-			 * Number of rays used to test nodes and subdivide the map.
-			 *
-			 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
-			 *
-			 * @attribute subdivisionRays
-			 * @type {boolean}
-			 */
-			this.subdivisionRays = 1;
-
-			/**
-			 * Threshold to subdivide the map tiles.
-			 * 
-			 * Lower value will subdivide earlier (less zoom required to subdivide).
-			 * 
-			 * @attribute thresholdUp
-			 * @type {number}
-			 */
-			this.thresholdUp = 0.8;
-
-			/**
-			 * Threshold to simplify the map tiles.
-			 * 
-			 * Higher value will simplify earlier.
-			 *
-			 * @attribute thresholdDown
-			 * @type {number}
-			 */
-			this.thresholdDown = 0.2;
-			
-			/**
-			 * Minimum ditance to subdivide nodes.
-			 *
-			 * @attribute subdivideDistance
-			 * @type {number}
-			 */
-			this.subdivideDistance = 8e1;
-
-			/**
-			 * Minimum ditance to simplify far away nodes that are subdivided.
-			 *
-			 * @attribute simplifyDistance
-			 * @type {number}
-			 */
-			this.simplifyDistance = 4e2;
-
-			/**
 			 * Root map node.
 			 *
 			 * @attribute root
@@ -1463,35 +1514,27 @@
 			 */
 			this.root = null;
 
-			if (this.mode === MapView.PLANAR)
+			if (this.mode === MapView$1.PLANAR)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 			}
-			else if (this.mode === MapView.HEIGHT)
+			else if (this.mode === MapView$1.HEIGHT)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-				this.thresholdUp = 0.5;
-				this.thresholdDown = 0.1;
 			}
-			else if (this.mode === MapView.HEIGHT_SHADER)
+			else if (this.mode === MapView$1.HEIGHT_SHADER)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 			}
-			else if (this.mode === MapView.SPHERICAL)
+			else if (this.mode === MapView$1.SPHERICAL)
 			{
 				this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
-				this.thresholdUp = 7e7;
-				this.thresholdDown = 2e8;
 			}
 			
 			this.add(this.root);
-
-			this._raycaster = new three.Raycaster();
-			this._mouse = new three.Vector2();
-			this._vector = new three.Vector3();
 		}
 
 		/**
@@ -1558,92 +1601,7 @@
 		 */
 		onBeforeRender(renderer, scene, camera, geometry, material, group)
 		{
-			if (this.lod === LODMethod.RAYCAST)
-			{
-				const intersects = [];
-
-				for (let t = 0; t < this.subdivisionRays; t++)
-				{
-					// Raycast from random point
-					this._mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
-					
-					// Check intersection
-					this._raycaster.setFromCamera(this._mouse, camera);
-					this._raycaster.intersectObjects(this.children, true, intersects);
-				}
-		
-				if (this.mode === MapView.SPHERICAL)
-				{
-					for (var i = 0; i < intersects.length; i++)
-					{
-						var node = intersects[i].object;
-						const distance = Math.pow(intersects[i].distance * 2, node.level);
-		
-						if (distance < this.thresholdUp)
-						{
-							node.subdivide();
-							return;
-						}
-						else if (distance > this.thresholdDown)
-						{
-							if (node.parentNode !== null)
-							{
-								node.parentNode.simplify();
-								return;
-							}
-						}
-					}
-				}
-				else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-				{
-					for (var i = 0; i < intersects.length; i++)
-					{
-						var node = intersects[i].object;
-						const matrix = node.matrixWorld.elements;
-						const scaleX = this._vector.set(matrix[0], matrix[1], matrix[2]).length();
-						const value = scaleX / intersects[i].distance;
-		
-						if (value > this.thresholdUp)
-						{
-							node.subdivide();
-							return;
-						}
-						else if (value < this.thresholdDown)
-						{
-							if (node.parentNode !== null)
-							{
-								node.parentNode.simplify();
-								return;
-							}
-						}
-					}
-				}
-			}
-			else if (this.lod === LODMethod.RADIAL)
-			{
-				var view = new three.Vector3();
-				view = camera.getWorldPosition(view);
-				
-				var position = new three.Vector3();
-				var self = this;
-
-				this.children[0].traverse(function(node)
-				{
-					position = node.getWorldPosition(position);
-
-					var distance = view.distanceTo(position);
-					distance /= Math.pow(2, self.provider.maxZoom - node.level);
-
-					if (distance < self.subdivideDistance)
-					{
-						node.subdivide();
-					}
-					else if (distance > self.simplifyDistance && node.parentNode)
-					{
-						node.parentNode.simplify();
-					}
-				});
-			}
+			this.lod.updateLOD(this, camera, renderer, scene);
 		}
 
 		/**
@@ -1682,7 +1640,7 @@
 	 * @attribute PLANAR
 	 * @type {number}
 	 */
-	MapView.PLANAR = 200;
+	MapView$1.PLANAR = 200;
 
 	/**
 	 * Spherical map projection.
@@ -1691,7 +1649,7 @@
 	 * @attribute SPHERICAL
 	 * @type {number}
 	 */
-	MapView.SPHERICAL = 201;
+	MapView$1.SPHERICAL = 201;
 
 	/**
 	 * Planar map projection with height deformation.
@@ -1700,7 +1658,7 @@
 	 * @attribute HEIGHT
 	 * @type {number}
 	 */
-	MapView.HEIGHT = 202;
+	MapView$1.HEIGHT = 202;
 
 	/**
 	 * Planar map projection with height deformation using the GPU for height generation.
@@ -1709,7 +1667,64 @@
 	 * @attribute HEIGHT_DISPLACEMENT
 	 * @type {number}
 	 */
-	MapView.HEIGHT_SHADER = 203;
+	MapView$1.HEIGHT_SHADER = 203;
+
+	/**
+	 * Check the planar distance between the nodes center and the view position.
+	 * 
+	 * Distance is adjusted with the node level, more consistent results since every node is considered.
+	 *
+	 * @class LODRadial
+	 * @extends {LODControl}
+	 */
+	function LODRadial()
+	{
+		LODControl.call(this);
+		
+		/**
+		 * Minimum ditance to subdivide nodes.
+		 *
+		 * @attribute subdivideDistance
+		 * @type {number}
+		 */
+		this.subdivideDistance = 8e1;
+
+		/**
+		 * Minimum ditance to simplify far away nodes that are subdivided.
+		 *
+		 * @attribute simplifyDistance
+		 * @type {number}
+		 */
+		this.simplifyDistance = 4e2;
+	}
+
+	LODRadial.prototype = Object.create(LODControl.prototype);
+
+	LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
+	{
+		var view = new Vector3();
+		camera.getWorldPosition(view);
+		
+		var position = new Vector3();
+		var self = this;
+
+		view.children[0].traverse(function(node)
+		{
+			node.getWorldPosition(position);
+
+			var distance = view.distanceTo(position);
+			distance /= Math.pow(2, self.provider.maxZoom - node.level);
+
+			if (distance < self.subdivideDistance)
+			{
+				node.subdivide();
+			}
+			else if (distance > self.simplifyDistance && node.parentNode)
+			{
+				node.parentNode.simplify();
+			}
+		});
+	};
 
 	/**
 	 * XHR utils contains static methods to allow easy access to services via XHR.
@@ -2697,7 +2712,9 @@
 	exports.GoogleMapsProvider = GoogleMapsProvider;
 	exports.HeightDebugProvider = HeightDebugProvider;
 	exports.HereMapsProvider = HereMapsProvider;
-	exports.LODMethod = LODMethod;
+	exports.LODControl = LODControl;
+	exports.LODRadial = LODRadial;
+	exports.LODRaycast = LODRaycast;
 	exports.MapBoxProvider = MapBoxProvider;
 	exports.MapHeightNode = MapHeightNode;
 	exports.MapHeightNodeShader = MapHeightNodeShader;
@@ -2708,7 +2725,7 @@
 	exports.MapSphereNode = MapSphereNode;
 	exports.MapSphereNodeGeometry = MapSphereNodeGeometry;
 	exports.MapTilerProvider = MapTilerProvider;
-	exports.MapView = MapView;
+	exports.MapView = MapView$1;
 	exports.OpenMapTilesProvider = OpenMapTilesProvider;
 	exports.OpenStreetMapsProvider = OpenStreetMapsProvider;
 	exports.UnitsUtils = UnitsUtils;

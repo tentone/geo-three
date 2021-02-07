@@ -1,4 +1,8 @@
-export {MapView, LODMethod} from "./MapView.js";
+export {MapView} from "./MapView.js";
+
+export {LODControl} from "./lod/LODControl.js";
+export {LODRadial} from "./lod/LODRadial.js";
+export {LODRaycast} from "./lod/LODRaycast.js";
 
 export {BingMapsProvider} from "./providers/BingMapsProvider.js";
 export {GoogleMapsProvider} from "./providers/GoogleMapsProvider.js";
