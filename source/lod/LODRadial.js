@@ -1,5 +1,5 @@
 import {LODControl} from "./LODControl";
-import {Vector3} from "threejs";
+import {Vector3} from "three";
 
 /**
  * Check the planar distance between the nodes center and the view position.
@@ -19,7 +19,7 @@ function LODRadial()
 	 * @attribute subdivideDistance
 	 * @type {number}
 	 */
-	this.subdivideDistance = 8e1;
+	this.subdivideDistance = 50;
 
 	/**
 	 * Minimum ditance to simplify far away nodes that are subdivided.
@@ -27,15 +27,23 @@ function LODRadial()
 	 * @attribute simplifyDistance
 	 * @type {number}
 	 */
-	this.simplifyDistance = 4e2;
+	this.simplifyDistance = 400;
+
+	/**
+	 * If true only the nodes in frustum will be subidivided.
+	 * 
+	 * @attribute limitToFrustum
+	 * @type {boolean}
+	 */
+	this.limitToFrustum = true;
 }
 
 LODRadial.prototype = Object.create(LODControl.prototype);
 
 LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
 {
-	var view = new Vector3();
-	camera.getWorldPosition(view);
+	var pov = new Vector3();
+	camera.getWorldPosition(pov);
 	
 	var position = new Vector3();
 	var self = this;
@@ -44,8 +52,8 @@ LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
 	{
 		node.getWorldPosition(position);
 
-		var distance = view.distanceTo(position);
-		distance /= Math.pow(2, self.provider.maxZoom - node.level);
+		var distance = pov.distanceTo(position);
+		distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
 		if (distance < self.subdivideDistance)
 		{

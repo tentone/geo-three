@@ -1369,11 +1369,11 @@
 		 */
 		this.thresholdDown = 0.15;
 
-		this.raycaster = new Raycaster();
+		this.raycaster = new three.Raycaster();
 
-		this.mouse = new Vector2();
+		this.mouse = new three.Vector2();
 
-		this.vector = new Vector3();
+		this.vector = new three.Vector3();
 	}
 
 	LODRaycast.prototype = Object.create(LODControl.prototype);
@@ -1453,15 +1453,15 @@
 	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
-	class MapView$1 extends three.Mesh
+	class MapView extends three.Mesh
 	{
 		constructor(mode, provider, heightProvider)
 		{
-			mode = mode !== undefined ? mode : MapView$1.PLANAR;
+			mode = mode !== undefined ? mode : MapView.PLANAR;
 
 			var geometry;
 
-			if (mode === MapView$1.SPHERICAL)
+			if (mode === MapView.SPHERICAL)
 			{
 				geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 			}
@@ -1514,22 +1514,22 @@
 			 */
 			this.root = null;
 
-			if (this.mode === MapView$1.PLANAR)
+			if (this.mode === MapView.PLANAR)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
 			}
-			else if (this.mode === MapView$1.HEIGHT)
+			else if (this.mode === MapView.HEIGHT)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
 			}
-			else if (this.mode === MapView$1.HEIGHT_SHADER)
+			else if (this.mode === MapView.HEIGHT_SHADER)
 			{
 				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
 				this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
 			}
-			else if (this.mode === MapView$1.SPHERICAL)
+			else if (this.mode === MapView.SPHERICAL)
 			{
 				this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
 			}
@@ -1640,7 +1640,7 @@
 	 * @attribute PLANAR
 	 * @type {number}
 	 */
-	MapView$1.PLANAR = 200;
+	MapView.PLANAR = 200;
 
 	/**
 	 * Spherical map projection.
@@ -1649,7 +1649,7 @@
 	 * @attribute SPHERICAL
 	 * @type {number}
 	 */
-	MapView$1.SPHERICAL = 201;
+	MapView.SPHERICAL = 201;
 
 	/**
 	 * Planar map projection with height deformation.
@@ -1658,7 +1658,7 @@
 	 * @attribute HEIGHT
 	 * @type {number}
 	 */
-	MapView$1.HEIGHT = 202;
+	MapView.HEIGHT = 202;
 
 	/**
 	 * Planar map projection with height deformation using the GPU for height generation.
@@ -1667,7 +1667,7 @@
 	 * @attribute HEIGHT_DISPLACEMENT
 	 * @type {number}
 	 */
-	MapView$1.HEIGHT_SHADER = 203;
+	MapView.HEIGHT_SHADER = 203;
 
 	/**
 	 * Check the planar distance between the nodes center and the view position.
@@ -1702,18 +1702,18 @@
 
 	LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
 	{
-		var view = new Vector3();
-		camera.getWorldPosition(view);
+		var pov = new three.Vector3();
+		camera.getWorldPosition(pov);
 		
-		var position = new Vector3();
+		var position = new three.Vector3();
 		var self = this;
 
 		view.children[0].traverse(function(node)
 		{
 			node.getWorldPosition(position);
 
-			var distance = view.distanceTo(position);
-			distance /= Math.pow(2, self.provider.maxZoom - node.level);
+			var distance = pov.distanceTo(position);
+			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
 			if (distance < self.subdivideDistance)
 			{
@@ -2725,7 +2725,7 @@
 	exports.MapSphereNode = MapSphereNode;
 	exports.MapSphereNodeGeometry = MapSphereNodeGeometry;
 	exports.MapTilerProvider = MapTilerProvider;
-	exports.MapView = MapView$1;
+	exports.MapView = MapView;
 	exports.OpenMapTilesProvider = OpenMapTilesProvider;
 	exports.OpenStreetMapsProvider = OpenStreetMapsProvider;
 	exports.UnitsUtils = UnitsUtils;
