@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/XHRUtils.js</title>
+    <title>JSDoc: Source: lod/LODRaycast.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/XHRUtils.js</h1>
+    <h1 class="page-title">Source: lod/LODRaycast.js</h1>
 
     
 
@@ -26,113 +26,124 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * XHR utils contains static methods to allow easy access to services via XHR.
- *
- * @static
- * @class Service
+            <pre class="prettyprint source linenums"><code>import {LODControl} from "./LODControl";
+import {Vector3, Vector2, Raycaster} from "three";
+import {MapView} from "../MapView";
+
+/**
+ * Use random raycasting to randomly pick n objects to be tested on screen space.
+ * 
+ * Overall the fastest solution but does not include out of screen objects.
+ * 
+ * @class LODRaycast
+ * @extends {LODControl}
  */
-export class XHRUtils 
+function LODRaycast()
 {
-	/**
-	 * Get file data from URL as text, using a XHR call.
-	 * 
-	 * @method readFile
-	 * @param {string} fname File URL.
-	 * @param {boolean} sync If set to true or undefined the file is read syncronosly.
-	 * @param {Function} onLoad On load callback.
-	 * @param {Function} onError On progress callback.
-	 */
-	static get(fname, onLoad, onError)
-	{
-		var file = new XMLHttpRequest();
-		file.overrideMimeType("text/plain");
-		file.open("GET", fname, true);
-
-		if (onLoad !== undefined)
-		{
-			file.onload = function()
-			{
-				onLoad(file.response);
-			};
-		}
-
-		if (onError !== undefined)
-		{
-			file.onerror = onError;
-		}
-
-		file.send(null);
-	}
+	LODControl.call(this);
 
 	/**
-	 * Perform a request with the specified configuration.
-	 * 
-	 * Syncronous request should be avoided unless they are strictly necessary.
-	 * 
-	 * @method request
-	 * @param {string} url Target for the request.
-	 * @param {string} type Resquest type (POST, GET, ...)
-	 * @param {string} header Object with data to be added to the request header.
-	 * @param {string} body Data to be sent in the resquest.
-	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
-	 * @param {Function} onError XHR onError callback.
+	 * Number of rays used to test nodes and subdivide the map.
+	 *
+	 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
+	 *
+	 * @attribute subdivisionRays
+	 * @type {boolean}
 	 */
-	static request(url, type, header, body, onLoad, onError)
-	{
-		function parseResponse(response)
-		{
-			try
-			{
-				return JSON.parse(response);
-			}
-			catch (e)
-			{
-				return response;
-			}
-		}
+	this.subdivisionRays = 1;
 
-		var xhr = new XMLHttpRequest();
-		xhr.overrideMimeType("text/plain");
-		xhr.open(type, url, true);
+	/**
+	 * Threshold to subdivide the map tiles.
+	 * 
+	 * Lower value will subdivide earlier (less zoom required to subdivide).
+	 * 
+	 * @attribute thresholdUp
+	 * @type {number}
+	 */
+	this.thresholdUp = 0.6;
 
-		// Fill header data from Object
-		if (header !== null &amp;&amp; header !== undefined)
-		{
-			for (var i in header)
-			{
-				xhr.setRequestHeader(i, header[i]);
-			}
-		}
+	/**
+	 * Threshold to simplify the map tiles.
+	 * 
+	 * Higher value will simplify earlier.
+	 *
+	 * @attribute thresholdDown
+	 * @type {number}
+	 */
+	this.thresholdDown = 0.15;
 
-		if (onLoad !== undefined)
-		{
-			xhr.onload = function(event)
-			{
-				onLoad(parseResponse(xhr.response), xhr);
-			};
-		}
+	this.raycaster = new Raycaster();
 
-		if (onError !== undefined)
-		{
-			xhr.onerror = onError;
-		}
+	this.mouse = new Vector2();
 
-		if (onProgress !== undefined)
-		{
-			xhr.onprogress = onProgress;
-		}
-
-		if (body !== undefined)
-		{
-			xhr.send(body);
-		}
-		else
-		{
-			xhr.send(null);
-		}
-	}
+	this.vector = new Vector3();
 }
+
+LODRaycast.prototype = Object.create(LODControl.prototype);
+
+LODRaycast.prototype.updateLOD = function(view, camera, renderer, scene)
+{
+	var intersects = [];
+
+	for (var t = 0; t &lt; this.subdivisionRays; t++)
+	{
+		// Raycast from random point
+		this.mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+		
+		// Check intersection
+		this.raycaster.setFromCamera(this.mouse, camera);
+		this.raycaster.intersectObjects(view.children, true, intersects);
+	}
+
+	if (view.mode === MapView.SPHERICAL)
+	{
+		for (var i = 0; i &lt; intersects.length; i++)
+		{
+			var node = intersects[i].object;
+			const distance = Math.pow(intersects[i].distance * 2, node.level);
+
+			if (distance &lt; this.thresholdUp)
+			{
+				node.subdivide();
+				return;
+			}
+			else if (distance > this.thresholdDown)
+			{
+				if (node.parentNode !== null)
+				{
+					node.parentNode.simplify();
+					return;
+				}
+			}
+		}
+	}
+	else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+	{
+		for (var i = 0; i &lt; intersects.length; i++)
+		{
+			var node = intersects[i].object;
+			var matrix = node.matrixWorld.elements;
+			var scaleX = this.vector.set(matrix[0], matrix[1], matrix[2]).length();
+			var value = scaleX / intersects[i].distance;
+
+			if (value > this.thresholdUp)
+			{
+				node.subdivide();
+				return;
+			}
+			else if (value &lt; this.thresholdDown)
+			{
+				if (node.parentNode !== null)
+				{
+					node.parentNode.simplify();
+					return;
+				}
+			}
+		}
+	}
+};
+
+export {LODRaycast};
 </code></pre>
         </article>
     </section>

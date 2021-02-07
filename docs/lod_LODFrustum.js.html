@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/XHRUtils.js</title>
+    <title>JSDoc: Source: lod/LODFrustum.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/XHRUtils.js</h1>
+    <h1 class="page-title">Source: lod/LODFrustum.js</h1>
 
     
 
@@ -26,113 +26,72 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * XHR utils contains static methods to allow easy access to services via XHR.
+            <pre class="prettyprint source linenums"><code>import {LODRadial} from "./LODRadial";
+import {Vector3, Frustum, Matrix4} from "three";
+
+/**
+ * Check the planar distance between the nodes center and the view position.
+ * 
+ * Only subdivides elements inside of the camera frustum.
  *
- * @static
- * @class Service
+ * @class LODFrustum
+ * @extends {LODRadial}
  */
-export class XHRUtils 
+function LODFrustum()
 {
-	/**
-	 * Get file data from URL as text, using a XHR call.
-	 * 
-	 * @method readFile
-	 * @param {string} fname File URL.
-	 * @param {boolean} sync If set to true or undefined the file is read syncronosly.
-	 * @param {Function} onLoad On load callback.
-	 * @param {Function} onError On progress callback.
-	 */
-	static get(fname, onLoad, onError)
-	{
-		var file = new XMLHttpRequest();
-		file.overrideMimeType("text/plain");
-		file.open("GET", fname, true);
+	LODRadial.call(this);
 
-		if (onLoad !== undefined)
-		{
-			file.onload = function()
-			{
-				onLoad(file.response);
-			};
-		}
+	this.subdivideDistance = 120;
 
-		if (onError !== undefined)
-		{
-			file.onerror = onError;
-		}
-
-		file.send(null);
-	}
+	this.simplifyDistance = 400;
 
 	/**
-	 * Perform a request with the specified configuration.
+	 * If true only the central point of the plane geometry will be used
 	 * 
-	 * Syncronous request should be avoided unless they are strictly necessary.
+	 * Otherwise the object bouding sphere will be tested, providing better results for nodes on frustum edge but will lower performance.
 	 * 
-	 * @method request
-	 * @param {string} url Target for the request.
-	 * @param {string} type Resquest type (POST, GET, ...)
-	 * @param {string} header Object with data to be added to the request header.
-	 * @param {string} body Data to be sent in the resquest.
-	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
-	 * @param {Function} onError XHR onError callback.
+	 * @attribute testCenter
+	 * @type {boolean}
 	 */
-	static request(url, type, header, body, onLoad, onError)
-	{
-		function parseResponse(response)
-		{
-			try
-			{
-				return JSON.parse(response);
-			}
-			catch (e)
-			{
-				return response;
-			}
-		}
-
-		var xhr = new XMLHttpRequest();
-		xhr.overrideMimeType("text/plain");
-		xhr.open(type, url, true);
-
-		// Fill header data from Object
-		if (header !== null &amp;&amp; header !== undefined)
-		{
-			for (var i in header)
-			{
-				xhr.setRequestHeader(i, header[i]);
-			}
-		}
-
-		if (onLoad !== undefined)
-		{
-			xhr.onload = function(event)
-			{
-				onLoad(parseResponse(xhr.response), xhr);
-			};
-		}
-
-		if (onError !== undefined)
-		{
-			xhr.onerror = onError;
-		}
-
-		if (onProgress !== undefined)
-		{
-			xhr.onprogress = onProgress;
-		}
-
-		if (body !== undefined)
-		{
-			xhr.send(body);
-		}
-		else
-		{
-			xhr.send(null);
-		}
-	}
+	this.testCenter = true;
 }
+
+LODFrustum.prototype = Object.create(LODRadial.prototype);
+
+var projection = new Matrix4();
+var pov = new Vector3();
+var frustum = new Frustum();
+var position = new Vector3();
+
+LODFrustum.prototype.updateLOD = function(view, camera, renderer, scene)
+{
+	projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+	frustum.setFromProjectionMatrix(projection);
+	camera.getWorldPosition(pov);
+	
+	var self = this;
+
+	view.children[0].traverse(function(node)
+	{
+		node.getWorldPosition(position);
+
+		var distance = pov.distanceTo(position);
+		distance /= Math.pow(2, view.provider.maxZoom - node.level);
+
+		var inFrustum = self.pointOnly ? frustum.containsPoint(position) : frustum.intersectsObject(node);
+
+		if (distance &lt; self.subdivideDistance &amp;&amp; inFrustum)
+		{
+			node.subdivide();
+		}
+		else if (distance > self.simplifyDistance &amp;&amp; node.parentNode)
+		{
+			node.parentNode.simplify();
+		}
+	});
+};
+
+export {LODFrustum};
 </code></pre>
         </article>
     </section>

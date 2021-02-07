@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: utils/XHRUtils.js</title>
+    <title>JSDoc: Class: LODFrustum</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,125 +17,148 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: utils/XHRUtils.js</h1>
+    <h1 class="page-title">Class: LODFrustum</h1>
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * XHR utils contains static methods to allow easy access to services via XHR.
- *
- * @static
- * @class Service
- */
-export class XHRUtils 
-{
-	/**
-	 * Get file data from URL as text, using a XHR call.
-	 * 
-	 * @method readFile
-	 * @param {string} fname File URL.
-	 * @param {boolean} sync If set to true or undefined the file is read syncronosly.
-	 * @param {Function} onLoad On load callback.
-	 * @param {Function} onError On progress callback.
-	 */
-	static get(fname, onLoad, onError)
-	{
-		var file = new XMLHttpRequest();
-		file.overrideMimeType("text/plain");
-		file.open("GET", fname, true);
+        <h2><span class="attribs"><span class="type-signature"></span></span>LODFrustum<span class="signature">()</span><span class="type-signature"></span></h2>
+        
+    
+</header>
 
-		if (onLoad !== undefined)
-		{
-			file.onload = function()
-			{
-				onLoad(file.response);
-			};
-		}
+<article>
+    <div class="container-overview">
+    
+        
 
-		if (onError !== undefined)
-		{
-			file.onerror = onError;
-		}
+    
 
-		file.send(null);
-	}
+    
+    <h4 class="name" id="LODFrustum"><span class="type-signature"></span>new LODFrustum<span class="signature">()</span><span class="type-signature"></span></h4>
+    
 
-	/**
-	 * Perform a request with the specified configuration.
-	 * 
-	 * Syncronous request should be avoided unless they are strictly necessary.
-	 * 
-	 * @method request
-	 * @param {string} url Target for the request.
-	 * @param {string} type Resquest type (POST, GET, ...)
-	 * @param {string} header Object with data to be added to the request header.
-	 * @param {string} body Data to be sent in the resquest.
-	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
-	 * @param {Function} onError XHR onError callback.
-	 */
-	static request(url, type, header, body, onLoad, onError)
-	{
-		function parseResponse(response)
-		{
-			try
-			{
-				return JSON.parse(response);
-			}
-			catch (e)
-			{
-				return response;
-			}
-		}
+    
 
-		var xhr = new XMLHttpRequest();
-		xhr.overrideMimeType("text/plain");
-		xhr.open(type, url, true);
 
-		// Fill header data from Object
-		if (header !== null &amp;&amp; header !== undefined)
-		{
-			for (var i in header)
-			{
-				xhr.setRequestHeader(i, header[i]);
-			}
-		}
 
-		if (onLoad !== undefined)
-		{
-			xhr.onload = function(event)
-			{
-				onLoad(parseResponse(xhr.response), xhr);
-			};
-		}
+<div class="description">
+    Check the planar distance between the nodes center and the view position.Only subdivides elements inside of the camera frustum.
+</div>
 
-		if (onError !== undefined)
-		{
-			xhr.onerror = onError;
-		}
 
-		if (onProgress !== undefined)
-		{
-			xhr.onprogress = onProgress;
-		}
 
-		if (body !== undefined)
-		{
-			xhr.send(body);
-		}
-		else
-		{
-			xhr.send(null);
-		}
-	}
-}
-</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lod_LODFrustum.js.html">lod/LODFrustum.js</a>, <a href="lod_LODFrustum.js.html#line4">line 4</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="LODRadial.html">LODRadial</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
