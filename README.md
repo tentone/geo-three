@@ -10,7 +10,7 @@
   - Providers should have a tile based map system to be supported by the library.
  - You can test the [live demo of the library running](https://tentone.github.io/geo-three/examples/index.html) from the GitHub page.
 
-<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_a.png" width="345"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/terrain_b.png" width="360">
+<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/b.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/c.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/e.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/d.png" width="380">
 
 
 
@@ -75,6 +75,47 @@ controls.target.set(coords.x, 0, -coords.y);
   - Frustum: Similar to the radial mode but only nodes inside of the view frustum are considered for subdivision.
 - Custom `LODControl` can be implemented by extending the `LODControl` object and implementing the `updateLOD(view, camera, renderer, scene)` method.
 
+```javascript
+export class DistanceLOD extends LODControl
+{
+	constructor() {super();}
+
+	updateLOD(view, camera, renderer, scene)
+	{
+        // Get world position of the camera.
+        var pov = new Vector3();
+        camera.getWorldPosition(pov);
+
+        view.traverse(function(node)
+        {
+            // Check if child in a MapNode
+            if(node instanceof MapNode)
+            {
+                var position = new Vector3();
+                node.getWorldPosition(position);
+				
+                // Distance between camera and tile
+                var distance = pov.distanceTo(position);
+                
+                // Normalize distance based on tile level
+                distance /= Math.pow(2, 20 - node.level);
+                
+                // If closer than X subdivide
+                if (distance < 50)
+                {
+                    node.subdivide();
+                }
+                // If far away, simplify parent
+                else if (distance > 200 node.parentNode)
+                {
+                    node.parentNode.simplify();
+                }
+            }
+        });
+	}
+}
+```
+
 
 
 ### Tiles Representation
@@ -85,7 +126,7 @@ controls.target.set(coords.x, 0, -coords.y);
 <img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/planar.png" width="350"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/spherical.png" width="350">
 
 - There are available formats for GPU shader generated geometry using height data directly from the providers. 
-  - GPU generated geometry is more dense, more detailed and a lot faster. But the final geometry used is not accessible for raycasting, so interaction with these geometries is limited.
+  - GPU generated geometry is more dense, more detailed and a lot faster. But the final geometry used is not accessible for ray casting, so interaction with these geometries is limited.
 - On the left the geometry was generated in CPU and on the right the geometry was displaced directly in the vertex shader.
 
 <img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/shader.jpg" width="600">
