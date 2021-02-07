@@ -27,7 +27,7 @@ function LODRadial()
 	 * @attribute simplifyDistance
 	 * @type {number}
 	 */
-	this.simplifyDistance = 400;
+	this.simplifyDistance = 300;
 }
 
 LODRadial.prototype = Object.create(LODControl.prototype);

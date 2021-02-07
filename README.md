@@ -69,9 +69,11 @@ controls.target.set(coords.x, 0, -coords.y);
 
 ### LOD Control
 
-- The library includes two methods for LOD control, that define how tiles are subdivided or simplified.
-  - Raycast: uses raycasting determine the distance of the nodes to the camera view, it only considers the node inside of the view frustum it is faster but leaves node out of view subdivided unnecessarily.
+- The library includes multiple methods for LOD control, that define how tiles are subdivided or simplified.
+  - Raycast: uses ray casting determine the distance of the nodes to the camera view, it only considers the nodes inside of the view frustum. Is uses random sampling and takes some time to pick all nodes to be subdivided but is overall faster.
   - Radial: Calculates the distance from the camera to each one of the nodes, the nodes closer are subdivided and nodes far away are simplified a simple and effective method that considers all nodes, and provides a more consistent result.
+  - Frustum: Similar to the radial mode but only nodes inside of the view frustum are considered for subdivision.
+- Custom `LODControl` can be implemented by extending the `LODControl` object and implementing the `updateLOD(view, camera, renderer, scene)` method.
 
 
 

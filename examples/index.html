@@ -14,6 +14,7 @@
 	<!-- Code -->
 	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
 	<script type="text/javascript" src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+	<script type="text/javascript" src="https://threejs.org/examples/js/objects/Sky.js"></script>
 	<script type="text/javascript" src="../build/geo-three.js"></script>
 	<script type="text/javascript">
 		var canvas = document.getElementById("canvas");
@@ -25,6 +26,9 @@
 
 		var scene = new THREE.Scene();
 		scene.background = new THREE.Color(0.4, 0.4, 0.4);
+
+		var sky = createSky();
+		scene.add(sky);
 
 		var DEV_MAPBOX_API_KEY = "pk.eyJ1IjoidGVudG9uZSIsImEiOiJjazBwNHU4eDQwZzE4M2VzOGhibWY5NXo5In0.8xpF1DEcT6Y4000vNhjj1g";
 		var DEV_HEREMAPS_APP_ID = "HqSchC7XT2PA9qCfxzFq";
@@ -62,13 +66,11 @@
 			["Spherical", Geo.MapView.SPHERICAL]
 		];
 
-
 		var lods = [
+			["Frustum", Geo.LODFrustum],
 			["Raycast", Geo.LODRaycast],
-			["Radial", Geo.LODRadial],
-			["Frustum", Geo.LODFrustum]
+			["Radial", Geo.LODRadial]
 		];
-
 
 		var lod = document.getElementById("lod");
 		lod.onchange = function(event)
@@ -175,6 +177,42 @@
 			renderer.render(scene, camera);
 		}
 		animate();
+
+		function createSky()
+		{
+			// Add Sky
+			var sky = new THREE.Sky();
+			sky.scale.setScalar(1e8);
+
+			// GUI
+			var effectController = {
+				turbidity: 0,
+				rayleigh: 0.5,
+				mieCoefficient: 0.005,
+				mieDirectionalG: 0.7,
+				inclination: 0.48,
+				azimuth: 0.25,
+				exposure: 0.5
+			};
+
+			const uniforms = sky.material.uniforms;
+			uniforms["turbidity"].value = effectController.turbidity;
+			uniforms["rayleigh"].value = effectController.rayleigh;
+			uniforms["mieCoefficient"].value = effectController.mieCoefficient;
+			uniforms["mieDirectionalG"].value = effectController.mieDirectionalG;
+
+			var theta = Math.PI * (effectController.inclination - 0.5);
+			var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
+
+			var sun = new THREE.Vector3();
+			sun.x = Math.cos(phi);
+			sun.y = Math.sin(phi) * Math.sin(theta);
+			sun.z = Math.sin(phi) * Math.cos(theta);
+			uniforms["sunPosition"].value.copy(sun);
+
+			return sky;
+		}
+
 	</script>
 </body>
 </html>

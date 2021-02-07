@@ -1,4 +1,4 @@
-import {Mesh, MeshBasicMaterial, Vector2, Vector3, Raycaster} from "three";
+import {Mesh, MeshBasicMaterial} from "three";
 import {MapSphereNodeGeometry} from "./geometries/MapSphereNodeGeometry.js";
 import {OpenStreetMapsProvider} from "./providers/OpenStreetMapsProvider.js";
 import {MapNode} from "./nodes/MapNode.js";
@@ -7,8 +7,7 @@ import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 import {MapSphereNode} from "./nodes/MapSphereNode.js";
 import {UnitsUtils} from "./utils/UnitsUtils.js";
 import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
-import {LODControl} from "./lod/LODControl.js";
-import {LODRaycast} from "./lod/LODRaycast.js";
+import {LODFrustum} from "./lod/LODFrustum.js";
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -58,7 +57,7 @@ export class MapView extends Mesh
 		 * @attribute lod
 		 * @type {LODControl}
 		 */
-		this.lod = new LODRaycast();
+		this.lod = new LODFrustum();
 
 		/**
 		 * Map tile color layer provider.

@@ -13,7 +13,9 @@ function LODFrustum()
 {
 	LODRadial.call(this);
 
-	this.subdivideDistance = 100;
+	this.subdivideDistance = 120;
+
+	this.simplifyDistance = 400;
 
 	/**
 	 * If true only the central point of the plane geometry will be used
@@ -23,7 +25,7 @@ function LODFrustum()
 	 * @attribute testCenter
 	 * @type {boolean}
 	 */
-	this.testCenter = false;
+	this.testCenter = true;
 }
 
 LODFrustum.prototype = Object.create(LODRadial.prototype);

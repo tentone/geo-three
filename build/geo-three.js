@@ -1328,116 +1328,123 @@
 	LODControl.prototype.updateLOD = function(view, camera, renderer, scene) {};
 
 	/**
-	 * Use random raycasting to randomly pick n objects to be tested on screen space.
+	 * Check the planar distance between the nodes center and the view position.
 	 * 
-	 * Overall the fastest solution but does not include out of screen objects.
-	 * 
-	 * @class LODRaycast
+	 * Distance is adjusted with the node level, more consistent results since every node is considered.
+	 *
+	 * @class LODRadial
 	 * @extends {LODControl}
 	 */
-	function LODRaycast()
+	function LODRadial()
 	{
 		LODControl.call(this);
-
+		
 		/**
-		 * Number of rays used to test nodes and subdivide the map.
+		 * Minimum ditance to subdivide nodes.
 		 *
-		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
-		 *
-		 * @attribute subdivisionRays
-		 * @type {boolean}
-		 */
-		this.subdivisionRays = 1;
-
-		/**
-		 * Threshold to subdivide the map tiles.
-		 * 
-		 * Lower value will subdivide earlier (less zoom required to subdivide).
-		 * 
-		 * @attribute thresholdUp
+		 * @attribute subdivideDistance
 		 * @type {number}
 		 */
-		this.thresholdUp = 0.6;
+		this.subdivideDistance = 50;
 
 		/**
-		 * Threshold to simplify the map tiles.
-		 * 
-		 * Higher value will simplify earlier.
+		 * Minimum ditance to simplify far away nodes that are subdivided.
 		 *
-		 * @attribute thresholdDown
+		 * @attribute simplifyDistance
 		 * @type {number}
 		 */
-		this.thresholdDown = 0.15;
-
-		this.raycaster = new three.Raycaster();
-
-		this.mouse = new three.Vector2();
-
-		this.vector = new three.Vector3();
+		this.simplifyDistance = 300;
 	}
 
-	LODRaycast.prototype = Object.create(LODControl.prototype);
+	LODRadial.prototype = Object.create(LODControl.prototype);
 
-	LODRaycast.prototype.updateLOD = function(view, camera, renderer, scene)
+	var pov = new three.Vector3();
+	var position = new three.Vector3();
+
+	LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
 	{
-		var intersects = [];
+		var self = this;
 
-		for (var t = 0; t < this.subdivisionRays; t++)
-		{
-			// Raycast from random point
-			this.mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
-			
-			// Check intersection
-			this.raycaster.setFromCamera(this.mouse, camera);
-			this.raycaster.intersectObjects(view.children, true, intersects);
-		}
+		camera.getWorldPosition(pov);
 
-		if (view.mode === MapView.SPHERICAL)
+		view.children[0].traverse(function(node)
 		{
-			for (var i = 0; i < intersects.length; i++)
+			node.getWorldPosition(position);
+
+			var distance = pov.distanceTo(position);
+			distance /= Math.pow(2, view.provider.maxZoom - node.level);
+
+			if (distance < self.subdivideDistance)
 			{
-				var node = intersects[i].object;
-				const distance = Math.pow(intersects[i].distance * 2, node.level);
-
-				if (distance < this.thresholdUp)
-				{
-					node.subdivide();
-					return;
-				}
-				else if (distance > this.thresholdDown)
-				{
-					if (node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
-				}
+				node.subdivide();
 			}
-		}
-		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-		{
-			for (var i = 0; i < intersects.length; i++)
+			else if (distance > self.simplifyDistance && node.parentNode)
 			{
-				var node = intersects[i].object;
-				var matrix = node.matrixWorld.elements;
-				var scaleX = this.vector.set(matrix[0], matrix[1], matrix[2]).length();
-				var value = scaleX / intersects[i].distance;
-
-				if (value > this.thresholdUp)
-				{
-					node.subdivide();
-					return;
-				}
-				else if (value < this.thresholdDown)
-				{
-					if (node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
-				}
+				node.parentNode.simplify();
 			}
-		}
+		});
+	};
+
+	/**
+	 * Check the planar distance between the nodes center and the view position.
+	 * 
+	 * Only subdivides elements inside of the camera frustum.
+	 *
+	 * @class LODFrustum
+	 * @extends {LODRadial}
+	 */
+	function LODFrustum()
+	{
+		LODRadial.call(this);
+
+		this.subdivideDistance = 120;
+
+		this.simplifyDistance = 400;
+
+		/**
+		 * If true only the central point of the plane geometry will be used
+		 * 
+		 * Otherwise the object bouding sphere will be tested, providing better results for nodes on frustum edge but will lower performance.
+		 * 
+		 * @attribute testCenter
+		 * @type {boolean}
+		 */
+		this.testCenter = true;
+	}
+
+	LODFrustum.prototype = Object.create(LODRadial.prototype);
+
+	var projection = new three.Matrix4();
+	var pov$1 = new three.Vector3();
+	var frustum = new three.Frustum();
+	var position$1 = new three.Vector3();
+
+	LODFrustum.prototype.updateLOD = function(view, camera, renderer, scene)
+	{
+		projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+		frustum.setFromProjectionMatrix(projection);
+		camera.getWorldPosition(pov$1);
+		
+		var self = this;
+
+		view.children[0].traverse(function(node)
+		{
+			node.getWorldPosition(position$1);
+
+			var distance = pov$1.distanceTo(position$1);
+			distance /= Math.pow(2, view.provider.maxZoom - node.level);
+
+			var inFrustum = self.pointOnly ? frustum.containsPoint(position$1) : frustum.intersectsObject(node);
+
+			if (distance < self.subdivideDistance && inFrustum)
+			{
+				node.subdivide();
+			}
+			else if (distance > self.simplifyDistance && node.parentNode)
+			{
+				node.parentNode.simplify();
+			}
+		});
 	};
 
 	/**
@@ -1488,7 +1495,7 @@
 			 * @attribute lod
 			 * @type {LODControl}
 			 */
-			this.lod = new LODRaycast();
+			this.lod = new LODFrustum();
 
 			/**
 			 * Map tile color layer provider.
@@ -1670,121 +1677,116 @@
 	MapView.HEIGHT_SHADER = 203;
 
 	/**
-	 * Check the planar distance between the nodes center and the view position.
+	 * Use random raycasting to randomly pick n objects to be tested on screen space.
 	 * 
-	 * Distance is adjusted with the node level, more consistent results since every node is considered.
-	 *
-	 * @class LODRadial
+	 * Overall the fastest solution but does not include out of screen objects.
+	 * 
+	 * @class LODRaycast
 	 * @extends {LODControl}
 	 */
-	function LODRadial()
+	function LODRaycast()
 	{
 		LODControl.call(this);
-		
+
 		/**
-		 * Minimum ditance to subdivide nodes.
+		 * Number of rays used to test nodes and subdivide the map.
 		 *
-		 * @attribute subdivideDistance
-		 * @type {number}
-		 */
-		this.subdivideDistance = 50;
-
-		/**
-		 * Minimum ditance to simplify far away nodes that are subdivided.
+		 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 		 *
-		 * @attribute simplifyDistance
-		 * @type {number}
-		 */
-		this.simplifyDistance = 400;
-	}
-
-	LODRadial.prototype = Object.create(LODControl.prototype);
-
-	var pov = new three.Vector3();
-	var position = new three.Vector3();
-
-	LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
-	{
-		var self = this;
-
-		camera.getWorldPosition(pov);
-
-		view.children[0].traverse(function(node)
-		{
-			node.getWorldPosition(position);
-
-			var distance = pov.distanceTo(position);
-			distance /= Math.pow(2, view.provider.maxZoom - node.level);
-
-			if (distance < self.subdivideDistance)
-			{
-				node.subdivide();
-			}
-			else if (distance > self.simplifyDistance && node.parentNode)
-			{
-				node.parentNode.simplify();
-			}
-		});
-	};
-
-	/**
-	 * Check the planar distance between the nodes center and the view position.
-	 * 
-	 * Only subdivides elements inside of the camera frustum.
-	 *
-	 * @class LODFrustum
-	 * @extends {LODRadial}
-	 */
-	function LODFrustum()
-	{
-		LODRadial.call(this);
-
-		this.subdivideDistance = 100;
-
-		/**
-		 * If true only the central point of the plane geometry will be used
-		 * 
-		 * Otherwise the object bouding sphere will be tested, providing better results for nodes on frustum edge but will lower performance.
-		 * 
-		 * @attribute testCenter
+		 * @attribute subdivisionRays
 		 * @type {boolean}
 		 */
-		this.testCenter = false;
+		this.subdivisionRays = 1;
+
+		/**
+		 * Threshold to subdivide the map tiles.
+		 * 
+		 * Lower value will subdivide earlier (less zoom required to subdivide).
+		 * 
+		 * @attribute thresholdUp
+		 * @type {number}
+		 */
+		this.thresholdUp = 0.6;
+
+		/**
+		 * Threshold to simplify the map tiles.
+		 * 
+		 * Higher value will simplify earlier.
+		 *
+		 * @attribute thresholdDown
+		 * @type {number}
+		 */
+		this.thresholdDown = 0.15;
+
+		this.raycaster = new three.Raycaster();
+
+		this.mouse = new three.Vector2();
+
+		this.vector = new three.Vector3();
 	}
 
-	LODFrustum.prototype = Object.create(LODRadial.prototype);
+	LODRaycast.prototype = Object.create(LODControl.prototype);
 
-	var projection = new three.Matrix4();
-	var pov$1 = new three.Vector3();
-	var frustum = new three.Frustum();
-	var position$1 = new three.Vector3();
-
-	LODFrustum.prototype.updateLOD = function(view, camera, renderer, scene)
+	LODRaycast.prototype.updateLOD = function(view, camera, renderer, scene)
 	{
-		projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-		frustum.setFromProjectionMatrix(projection);
-		camera.getWorldPosition(pov$1);
-		
-		var self = this;
+		var intersects = [];
 
-		view.children[0].traverse(function(node)
+		for (var t = 0; t < this.subdivisionRays; t++)
 		{
-			node.getWorldPosition(position$1);
+			// Raycast from random point
+			this.mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
+			
+			// Check intersection
+			this.raycaster.setFromCamera(this.mouse, camera);
+			this.raycaster.intersectObjects(view.children, true, intersects);
+		}
 
-			var distance = pov$1.distanceTo(position$1);
-			distance /= Math.pow(2, view.provider.maxZoom - node.level);
-
-			var inFrustum = self.pointOnly ? frustum.containsPoint(position$1) : frustum.intersectsObject(node);
-
-			if (distance < self.subdivideDistance && inFrustum)
+		if (view.mode === MapView.SPHERICAL)
+		{
+			for (var i = 0; i < intersects.length; i++)
 			{
-				node.subdivide();
+				var node = intersects[i].object;
+				const distance = Math.pow(intersects[i].distance * 2, node.level);
+
+				if (distance < this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if (distance > this.thresholdDown)
+				{
+					if (node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
 			}
-			else if (distance > self.simplifyDistance && node.parentNode)
+		}
+		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
+		{
+			for (var i = 0; i < intersects.length; i++)
 			{
-				node.parentNode.simplify();
+				var node = intersects[i].object;
+				var matrix = node.matrixWorld.elements;
+				var scaleX = this.vector.set(matrix[0], matrix[1], matrix[2]).length();
+				var value = scaleX / intersects[i].distance;
+
+				if (value > this.thresholdUp)
+				{
+					node.subdivide();
+					return;
+				}
+				else if (value < this.thresholdDown)
+				{
+					if (node.parentNode !== null)
+					{
+						node.parentNode.simplify();
+						return;
+					}
+				}
 			}
-		});
+		}
 	};
 
 	/**
