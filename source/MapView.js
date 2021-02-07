@@ -7,7 +7,7 @@ import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 import {MapSphereNode} from "./nodes/MapSphereNode.js";
 import {UnitsUtils} from "./utils/UnitsUtils.js";
 import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
-import {LODFrustum} from "./lod/LODFrustum.js";
+import {LODRaycast} from "./lod/LODRaycast.js";
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -57,7 +57,7 @@ export class MapView extends Mesh
 		 * @attribute lod
 		 * @type {LODControl}
 		 */
-		this.lod = new LODFrustum();
+		this.lod = new LODRaycast();
 
 		/**
 		 * Map tile color layer provider.
