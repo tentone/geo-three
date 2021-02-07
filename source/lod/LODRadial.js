@@ -28,25 +28,18 @@ function LODRadial()
 	 * @type {number}
 	 */
 	this.simplifyDistance = 400;
-
-	/**
-	 * If true only the nodes in frustum will be subidivided.
-	 * 
-	 * @attribute limitToFrustum
-	 * @type {boolean}
-	 */
-	this.limitToFrustum = true;
 }
 
 LODRadial.prototype = Object.create(LODControl.prototype);
 
+var pov = new Vector3();
+var position = new Vector3();
+
 LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
 {
-	var pov = new Vector3();
-	camera.getWorldPosition(pov);
-	
-	var position = new Vector3();
 	var self = this;
+
+	camera.getWorldPosition(pov);
 
 	view.children[0].traverse(function(node)
 	{

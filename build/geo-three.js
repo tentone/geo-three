@@ -1687,7 +1687,7 @@
 		 * @attribute subdivideDistance
 		 * @type {number}
 		 */
-		this.subdivideDistance = 8e1;
+		this.subdivideDistance = 50;
 
 		/**
 		 * Minimum ditance to simplify far away nodes that are subdivided.
@@ -1695,18 +1695,19 @@
 		 * @attribute simplifyDistance
 		 * @type {number}
 		 */
-		this.simplifyDistance = 4e2;
+		this.simplifyDistance = 400;
 	}
 
 	LODRadial.prototype = Object.create(LODControl.prototype);
 
+	var pov = new three.Vector3();
+	var position = new three.Vector3();
+
 	LODRadial.prototype.updateLOD = function(view, camera, renderer, scene)
 	{
-		var pov = new three.Vector3();
-		camera.getWorldPosition(pov);
-		
-		var position = new three.Vector3();
 		var self = this;
+
+		camera.getWorldPosition(pov);
 
 		view.children[0].traverse(function(node)
 		{
@@ -1716,6 +1717,66 @@
 			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
 			if (distance < self.subdivideDistance)
+			{
+				node.subdivide();
+			}
+			else if (distance > self.simplifyDistance && node.parentNode)
+			{
+				node.parentNode.simplify();
+			}
+		});
+	};
+
+	/**
+	 * Check the planar distance between the nodes center and the view position.
+	 * 
+	 * Only subdivides elements inside of the camera frustum.
+	 *
+	 * @class LODFrustum
+	 * @extends {LODRadial}
+	 */
+	function LODFrustum()
+	{
+		LODRadial.call(this);
+
+		this.subdivideDistance = 100;
+
+		/**
+		 * If true only the central point of the plane geometry will be used
+		 * 
+		 * Otherwise the object bouding sphere will be tested, providing better results for nodes on frustum edge but will lower performance.
+		 * 
+		 * @attribute testCenter
+		 * @type {boolean}
+		 */
+		this.testCenter = false;
+	}
+
+	LODFrustum.prototype = Object.create(LODRadial.prototype);
+
+	var projection = new three.Matrix4();
+	var pov$1 = new three.Vector3();
+	var frustum = new three.Frustum();
+	var position$1 = new three.Vector3();
+
+	LODFrustum.prototype.updateLOD = function(view, camera, renderer, scene)
+	{
+		projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+		frustum.setFromProjectionMatrix(projection);
+		camera.getWorldPosition(pov$1);
+		
+		var self = this;
+
+		view.children[0].traverse(function(node)
+		{
+			node.getWorldPosition(position$1);
+
+			var distance = pov$1.distanceTo(position$1);
+			distance /= Math.pow(2, view.provider.maxZoom - node.level);
+
+			var inFrustum = self.pointOnly ? frustum.containsPoint(position$1) : frustum.intersectsObject(node);
+
+			if (distance < self.subdivideDistance && inFrustum)
 			{
 				node.subdivide();
 			}
@@ -2713,6 +2774,7 @@
 	exports.HeightDebugProvider = HeightDebugProvider;
 	exports.HereMapsProvider = HereMapsProvider;
 	exports.LODControl = LODControl;
+	exports.LODFrustum = LODFrustum;
 	exports.LODRadial = LODRadial;
 	exports.LODRaycast = LODRaycast;
 	exports.MapBoxProvider = MapBoxProvider;
