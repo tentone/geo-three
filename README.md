@@ -33,7 +33,7 @@ scene.add(map);
 ### Coordinates
 
 - The project uses internally a XY [EPSG:900913](https://epsg.io/900913) coordinate format to be compatible with the XYZ coordinates used in three.js
-- Use the UnitsUtils class to access the unit conversion methods for example to convert a latitude, longiture [WGS84](https://epsg.io/4326) pair value to to XY coordinates you can use the code bellow
+- Use the UnitsUtils class to access the unit conversion methods for example to convert a latitude, longitude [WGS84](https://epsg.io/4326) pair value to XY coordinates you can use the code bellow:
 
 ```javascript
 var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
@@ -44,7 +44,7 @@ controls.target.set(coords.x, 0, -coords.y);
 
 ### Tile Loading
 
-- Tiles are fetched from the service API configured, each on of the services requires specific configuration using the specific `MapProvider` object.
+- Tiles are fetched from the service API configured, each one of the services requires specific configuration using the specific `MapProvider` object.
 
 - Base tiles are always loaded at the beginning of the process, then each frame a couple of rays are casted into the tile tree. The number of rays can be configured using the `MapView` `subdivisionRays` attribute.
 
@@ -58,7 +58,7 @@ controls.target.set(coords.x, 0, -coords.y);
 
 ### Data Providers
 
-- The library as support for multiple data providers that have to be configured beforehand. Most of these data providers rely on external API that differ from service to service.
+- The library has support for multiple data providers that must be configured beforehand. Most of these data providers rely on external API that differ from service to service.
 - Each one of them has its own provider object implementation of the `MapProvider` interface.
 
 - The `DebugProvider` provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.
@@ -70,7 +70,7 @@ controls.target.set(coords.x, 0, -coords.y);
 ### LOD Control
 
 - The library includes multiple methods for LOD control, that define how tiles are subdivided or simplified.
-  - Raycast: uses ray casting determine the distance of the nodes to the camera view, it only considers the nodes inside of the view frustum. Is uses random sampling and takes some time to pick all nodes to be subdivided but is overall faster.
+  - Raycast: uses ray casting determine the distance of the nodes to the camera view, it only considers the nodes inside of the view frustum. It uses random sampling and takes some time to pick all nodes to be subdivided but is overall faster.
   - Radial: Calculates the distance from the camera to each one of the nodes, the nodes closer are subdivided and nodes far away are simplified a simple and effective method that considers all nodes, and provides a more consistent result.
   - Frustum: Similar to the radial mode but only nodes inside of the view frustum are considered for subdivision.
 - Custom `LODControl` can be implemented by extending the `LODControl` object and implementing the `updateLOD(view, camera, renderer, scene)` method.
