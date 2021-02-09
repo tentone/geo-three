@@ -86,6 +86,45 @@ MapHeightNodeShader.GEOMETRY_SIZE = 256;
  */
 MapHeightNodeShader.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
+/**
+ * Prepare the threejs material to be used in the map tile.
+ * 
+ * @param {Material} material Material to be transformed. 
+ */
+MapHeightNodeShader.prepareMaterial = function(material)
+{
+	material.userData = {heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}};
+
+	material.onBeforeCompile = (shader) =>
+	{
+		// Pass uniforms from userData to the
+		for (let i in material.userData)
+		{
+			shader.uniforms[i] = material.userData[i];
+		}
+
+		// Vertex variables
+		shader.vertexShader = `
+		uniform sampler2D heightMap;
+		` + shader.vertexShader;
+
+		// Vertex depth logic
+		shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", `
+		#include <fog_vertex>
+
+		// Calculate height of the title
+		vec4 theight = texture2D(heightMap, vUv);
+		float height = ((theight.r * 255.0 * 65536.0 + theight.g * 255.0 * 256.0 + theight.b * 255.0) * 0.1) - 10000.0;
+		vec3 transformed = position + height * normal;
+
+		// Vertex position based on height
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+		`);
+	};
+
+	return material;
+};
+
 MapHeightNodeShader.prototype.loadTexture = function()
 {
 	var self = this;
