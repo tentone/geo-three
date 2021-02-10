@@ -1174,39 +1174,8 @@
 	 */
 	function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 	{
-		var vertexShader = `
-	varying vec2 vUv;
-	
-	uniform sampler2D heightMap;
-
-	void main() 
-	{
-		vUv = uv;
-		
-		vec4 theight = texture2D(heightMap, vUv);
-		float height = ((theight.r * 255.0 * 65536.0 + theight.g * 255.0 * 256.0 + theight.b * 255.0) * 0.1) - 10000.0;
-		vec3 transformed = position + height * normal;
-
-		gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
-	}`;
-
-		var fragmentShader = `
-	varying vec2 vUv;
-
-	uniform sampler2D colorMap;
-
-	void main() {
-		gl_FragColor = vec4(texture2D(colorMap, vUv).rgb, 1.0);
-	}`;
-
-		var material = new three.ShaderMaterial({
-			uniforms: {
-				colorMap: {value: MapHeightNodeShader.EMPTY_TEXTURE},
-				heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}
-			},
-			vertexShader: vertexShader,
-			fragmentShader: fragmentShader
-		});
+		var material = new three.MeshBasicMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
+		material = MapHeightNodeShader.prepareMaterial(material);
 
 		MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
 
@@ -1243,6 +1212,45 @@
 	 */
 	MapHeightNodeShader.GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
+	/**
+	 * Prepare the threejs material to be used in the map tile.
+	 * 
+	 * @param {Material} material Material to be transformed. 
+	 */
+	MapHeightNodeShader.prepareMaterial = function(material)
+	{
+		material.userData = {heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}};
+
+		material.onBeforeCompile = (shader) =>
+		{
+			// Pass uniforms from userData to the
+			for (let i in material.userData)
+			{
+				shader.uniforms[i] = material.userData[i];
+			}
+
+			// Vertex variables
+			shader.vertexShader = `
+		uniform sampler2D heightMap;
+		` + shader.vertexShader;
+
+			// Vertex depth logic
+			shader.vertexShader = shader.vertexShader.replace("#include <fog_vertex>", `
+		#include <fog_vertex>
+
+		// Calculate height of the title
+		vec4 _theight = texture2D(heightMap, vUv);
+		float _height = ((_theight.r * 255.0 * 65536.0 + _theight.g * 255.0 * 256.0 + _theight.b * 255.0) * 0.1) - 10000.0;
+		vec3 _transformed = position + _height * normal;
+
+		// Vertex position based on height
+		gl_Position = projectionMatrix * modelViewMatrix * vec4(_transformed, 1.0);
+		`);
+		};
+
+		return material;
+	};
+
 	MapHeightNodeShader.prototype.loadTexture = function()
 	{
 		var self = this;
@@ -1256,7 +1264,7 @@
 			texture.minFilter = three.LinearFilter;
 			texture.needsUpdate = true;
 
-			self.material.uniforms.colorMap.value = texture;
+			self.material.map = texture;
 
 			self.textureLoaded = true;
 			self.nodeReady();
@@ -1288,7 +1296,7 @@
 			texture.minFilter = three.NearestFilter;
 			texture.needsUpdate = true;
 
-			self.material.uniforms.heightMap.value = texture;
+			self.material.userData.heightMap.value = texture;
 			
 			self.heightLoaded = true;
 			self.nodeReady();
