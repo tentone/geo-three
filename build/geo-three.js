@@ -1174,7 +1174,7 @@
 	 */
 	function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 	{
-		var material = new three.MeshBasicMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
+		var material = new three.MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 		material = MapHeightNodeShader.prepareMaterial(material);
 
 		MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);

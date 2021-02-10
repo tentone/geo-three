@@ -1,4 +1,4 @@
-import {Texture, LinearFilter, RGBFormat, ShaderMaterial, MeshBasicMaterial, Mesh, NearestFilter} from "three";
+import {Texture, LinearFilter, RGBFormat, MeshBasicMaterial, MeshPhongMaterial, Mesh, NearestFilter} from "three";
 import {MapHeightNode} from "./MapHeightNode.js";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry.js";
 import {MapPlaneNode} from "./MapPlaneNode.js";
@@ -17,7 +17,7 @@ import {MapPlaneNode} from "./MapPlaneNode.js";
  */
 function MapHeightNodeShader(parentNode, mapView, location, level, x, y)
 {
-	var material = new MeshBasicMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
+	var material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 	material = MapHeightNodeShader.prepareMaterial(material);
 
 	MapHeightNode.call(this, parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
