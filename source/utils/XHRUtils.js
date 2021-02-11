@@ -103,5 +103,7 @@ export class XHRUtils
 		{
 			xhr.send(null);
 		}
+
+		return xhr;
 	}
 }

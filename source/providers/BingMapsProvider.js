@@ -64,6 +64,51 @@ export class BingMapsProvider extends MapProvider
 		this.subdomain = "t1";
 	}
 
+	/**
+	 * Display an aerial view of the map.
+	 *
+	 * @static
+	 * @attribute AERIAL
+	 * @type {string}
+	 */
+	static AERIAL = "a";
+
+	/**
+	 * Display a road view of the map.
+	 *
+	 * @static
+	 * @attribute AERIAL
+	 * @type {string}
+	 */
+	static ROAD = "r";
+
+	/**
+	 * Display an aerial view of the map with labels.
+	 *
+	 * @static
+	 * @attribute AERIAL_LABELS
+	 * @type {string}
+	 */
+	static AERIAL_LABELS = "h";
+
+	/**
+	 * Use this value to display a bird's eye (oblique) view of the map.
+	 *
+	 * @static
+	 * @attribute AERIAL
+	 * @type {string}
+	 */
+	static OBLIQUE = "o";
+
+	/**
+	 * Display a bird's eye (oblique) with labels view of the map.
+	 *
+	 * @static
+	 * @attribute AERIAL
+	 * @type {string}
+	 */
+	static OBLIQUE_LABELS = "b";
+
 	/** 
 	 * Get the base URL for the map configuration requested.
 	 *
@@ -131,47 +176,3 @@ export class BingMapsProvider extends MapProvider
 	}
 }
 
-/**
- * Display an aerial view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.AERIAL = "a";
-
-/**
- * Display a road view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.ROAD = "r";
-
-/**
- * Display an aerial view of the map with labels.
- *
- * @static
- * @attribute AERIAL_LABELS
- * @type {string}
- */
-BingMapsProvider.AERIAL_LABELS = "h";
-
-/**
- * Use this value to display a bird's eye (oblique) view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.OBLIQUE = "o";
-
-/**
- * Display a bird's eye (oblique) with labels view of the map.
- *
- * @static
- * @attribute AERIAL
- * @type {string}
- */
-BingMapsProvider.OBLIQUE_LABELS = "b";

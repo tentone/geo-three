@@ -16,6 +16,27 @@ import {XHRUtils} from "../utils/XHRUtils.js";
  */
 export class MapBoxProvider extends MapProvider
 {
+	static ADDRESS = "https://api.mapbox.com/";
+
+	/**
+	 * Access the map data using a map style.
+	 *
+	 * @static
+	 * @attribute STYLE
+	 * @type {number}
+	 */
+	static STYLE = 100;
+
+	/**
+	 * Access the map data using a map id.
+	 *
+	 * @static
+	 * @attribute MAP_ID
+	 * @type {number}
+	 */
+	static MAP_ID = 101;
+
+
 	constructor(apiToken, id, mode, format, useHDPI)
 	{
 		super();
@@ -136,23 +157,3 @@ export class MapBoxProvider extends MapProvider
 		});
 	}
 }
-
-MapBoxProvider.ADDRESS = "https://api.mapbox.com/";
-
-/**
- * Access the map data using a map style.
- *
- * @static
- * @attribute STYLE
- * @type {number}
- */
-MapBoxProvider.STYLE = 100;
-
-/**
- * Access the map data using a map id.
- *
- * @static
- * @attribute MAP_ID
- * @type {number}
- */
-MapBoxProvider.MAP_ID = 101;

@@ -16,6 +16,8 @@ import {MapProvider} from "./MapProvider.js";
  */
 export class HereMapsProvider extends MapProvider
 {
+	static PATH = "/maptile/2.1/";
+	
 	constructor(appId, appCode, style, scheme, format, size)
 	{
 		super();
@@ -144,4 +146,3 @@ export class HereMapsProvider extends MapProvider
 	}
 }
 
-HereMapsProvider.PATH = "/maptile/2.1/";
