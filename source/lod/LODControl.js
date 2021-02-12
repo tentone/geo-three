@@ -1,5 +1,4 @@
-function LODControl() {}
-
-LODControl.prototype.updateLOD = function(view, camera, renderer, scene) {};
-
-export {LODControl};
+export class LODControl
+{
+	updateLOD(view, camera, renderer, scene) {}
+}
