@@ -9,6 +9,31 @@
 export class UnitsUtils 
 {
 	/**
+	 * Aproximated radius of earth in meters.
+	 *
+	 * @static
+	 * @attribute EARTH_RADIUS
+	 */
+	static EARTH_RADIUS = 6378137;
+
+	/**
+	 * Earth equator perimeter in meters.
+	 *
+	 * @static
+	 * @attribute EARTH_RADIUS
+	 */
+	static EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
+
+	/**
+	 * Earth equator perimeter in meters.
+	 *
+	 * @static
+	 * @attribute EARTH_ORIGIN
+	 */
+	static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
+
+
+	/**
 	 * Get the current geolocation from the browser using the location API.
 	 * 
 	 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
@@ -76,27 +101,3 @@ export class UnitsUtils
 		return {latitude: latitude, longitude: longitude};
 	}
 }
-
-/**
- * Aproximated radius of earth in meters.
- *
- * @static
- * @attribute EARTH_RADIUS
- */
-UnitsUtils.EARTH_RADIUS = 6378137;
-
-/**
- * Earth equator perimeter in meters.
- *
- * @static
- * @attribute EARTH_RADIUS
- */
-UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
-
-/**
- * Earth equator perimeter in meters.
- *
- * @static
- * @attribute EARTH_ORIGIN
- */
-UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;

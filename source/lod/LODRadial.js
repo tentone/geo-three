@@ -4,7 +4,6 @@ import {Vector3} from "three";
 var pov = new Vector3();
 var position = new Vector3();
 
-
 /**
  * Check the planar distance between the nodes center and the view position.
  * 
