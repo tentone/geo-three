@@ -32,7 +32,6 @@ export class UnitsUtils
 	 */
 	static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 
-
 	/**
 	 * Get the current geolocation from the browser using the location API.
 	 * 
