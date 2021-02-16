@@ -950,7 +950,6 @@
 		 */
 		static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 
-
 		/**
 		 * Get the current geolocation from the browser using the location API.
 		 * 
@@ -2217,17 +2216,25 @@
 	 *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
 	 *
 	 * @class HereMapsProvider
-	 * @param {string} appId HERE maps app id.
-	 * @param {string} appCode HERE maps app code.
-	 * @param {string} style Map style.
-	 * @param {number} scheme Map scheme.
-	 * @param {string} format Image format.
-	 * @param {number} size Tile size.
 	 */
 	class HereMapsProvider extends MapProvider
 	{
+		/**
+		 * Path to map tile API.
+		 * 
+		 * Version of the api is fixed 2.1.
+		 */
 		static PATH = "/maptile/2.1/";
 		
+		/**
+		 * 
+		 * @param {string} appId HERE maps app id.
+		 * @param {string} appCode HERE maps app code.
+		 * @param {string} style Map style.
+		 * @param {number} scheme Map scheme.
+		 * @param {string} format Image format.
+		 * @param {number} size Tile size.
+		 */
 		constructor(appId, appCode, style, scheme, format, size)
 		{
 			super();
