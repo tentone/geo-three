@@ -1,5 +1,6 @@
 import {MapProvider} from "./MapProvider.js";
 import {Color} from "three";
+import {CancelablePromise} from "../utils/CancelablePromise.js";
 
 /**
  * Height debug provider takes a RGB encoded height map from another provider and converts it to a gradient for preview.
@@ -41,7 +42,7 @@ export class HeightDebugProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		return new Promise((resolve, reject) =>
+		return new CancelablePromise((resolve, reject) =>
 		{
 			this.provider.fetchTile(zoom, x, y).then((image) =>
 			{

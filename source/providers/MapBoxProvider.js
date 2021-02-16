@@ -1,5 +1,6 @@
 import {MapProvider} from "./MapProvider.js";
 import {XHRUtils} from "../utils/XHRUtils.js";
+import {CancelablePromise} from "../utils/CancelablePromise.js";
 
 /**
  * Map box service tile provider. Map tiles can be fetched from style or from a map id.
@@ -139,7 +140,7 @@ export class MapBoxProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		return new Promise((resolve, reject) =>
+		return new CancelablePromise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
 			image.onload = function() {resolve(image);};

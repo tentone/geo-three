@@ -1,4 +1,5 @@
 import {MapProvider} from "./MapProvider.js";
+import {CancelablePromise} from "../utils/CancelablePromise.js";
 
 /**
  * Here maps tile server.
@@ -143,7 +144,7 @@ export class HereMapsProvider extends MapProvider
 	{
 		this.nextServer();
 
-		return new Promise((resolve, reject) =>
+		return new CancelablePromise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
 			image.onload = function() {resolve(image);};

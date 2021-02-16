@@ -1,4 +1,5 @@
 import {MapProvider} from "./MapProvider.js";
+import {CancelablePromise} from "../utils/CancelablePromise.js";
 
 /**
  * Open street maps tile server.
@@ -34,7 +35,7 @@ export class OpenStreetMapsProvider extends MapProvider
 
 	fetchTile(zoom, x, y)
 	{
-		return new Promise((resolve, reject) =>
+		return new CancelablePromise((resolve, reject) =>
 		{
 			var image = document.createElement("img");
 			image.onload = function() {resolve(image);};

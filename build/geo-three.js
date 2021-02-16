@@ -168,6 +168,124 @@
 	}
 
 	/**
+	 * Cancelable promises extend base promises and provide a cancel functionality than can be used to cancel the execution or task of the promise.
+	 * 
+	 * These type of promises can be used to prevent additional processing when the data is not longer required (e.g. HTTP request for data that is not longer necessary)
+	 * 
+	 * @class CancelablePromise
+	 * @extends {Promise}
+	 */
+	function CancelablePromise(executor) 
+	{
+		let onResolve;
+		let onReject;
+		let fulfilled = false;
+		let rejected = false;
+		let called = false;
+		let value;
+
+		function resolve(v) 
+		{
+			fulfilled = true;
+			value = v;
+
+			if (typeof onResolve === "function") 
+			{
+				onResolve(value);
+				called = true;
+			}
+		}
+
+		function reject(reason) 
+		{
+			rejected = true;
+			value = reason;
+
+			if (typeof onReject === "function") 
+			{
+				onReject(value);
+				called = true;
+			}
+		}
+
+		this.then = function(callback) 
+		{
+			onResolve = callback;
+
+			if (fulfilled && !called) 
+			{
+				called = true;
+				onResolve(value);
+			}
+			return this;
+		};
+
+		this.catch = function(callback) 
+		{
+			onReject = callback;
+
+			if (rejected && !called) 
+			{
+				called = true;
+				onReject(value);
+			}
+			return this;
+		};
+
+		try 
+		{
+			executor(resolve, reject);
+		}
+		catch (error) 
+		{
+			reject(error);
+		}
+	}
+	  
+	CancelablePromise.resolve = (val) => 
+	{
+		return new CancelablePromise(function executor(resolve, _reject) 
+		{
+			resolve(val);
+		});
+	};
+	  
+	CancelablePromise.reject = (reason) => 
+	{
+		return new CancelablePromise(function executor(resolve, reject) 
+		{
+			reject(reason);
+		});
+	};
+	  
+	CancelablePromise.all = (promises) => 
+	{
+		let fulfilledPromises = [];
+		let result = [];
+
+		function executor(resolve, reject) 
+		{
+			promises.forEach((promise, index) => 
+			{
+				return promise
+					.then((val) => 
+					{
+						fulfilledPromises.push(true);
+						result[index] = val;
+
+						if (fulfilledPromises.length === promises.length) 
+						{
+							return resolve(result);
+						}
+					})
+					.catch((error) => {return reject(error);});
+			}
+			);
+		}
+		return new CancelablePromise(executor);
+	};
+
+	/**
 	 * Open street maps tile server.
 	 *
 	 * Works with any service that uses a address/zoom/x/y.format URL for tile access.
@@ -201,7 +319,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2074,7 +2192,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2198,7 +2316,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2352,7 +2470,7 @@
 		{
 			this.nextServer();
 
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2501,7 +2619,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2580,7 +2698,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2656,7 +2774,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				var image = document.createElement("img");
 				image.onload = function() {resolve(image);};
@@ -2751,7 +2869,7 @@
 
 		fetchTile(zoom, x, y)
 		{
-			return new Promise((resolve, reject) =>
+			return new CancelablePromise((resolve, reject) =>
 			{
 				this.provider.fetchTile(zoom, x, y).then((image) =>
 				{
