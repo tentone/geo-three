@@ -173,12 +173,12 @@
 	 * These type of promises can be used to prevent additional processing when the data is not longer required (e.g. HTTP request for data that is not longer necessary)
 	 * 
 	 * @class CancelablePromise
-	 * @extends {Promise}
 	 */
 	function CancelablePromise(executor) 
 	{
 		let onResolve;
 		let onReject;
+
 		let fulfilled = false;
 		let rejected = false;
 		let called = false;
@@ -208,6 +208,22 @@
 			}
 		}
 
+		/**
+		 * Request to cancel the promise execution.
+		 * 
+		 * @returns {boolean} True if the promise is canceled successfully, false otherwise.
+		 */
+		this.cancel = function()
+		{
+			// TODO <ADD CODE HERE>
+			return false;
+		};
+
+		/**
+		 * Executed after the promise is fulfilled.
+		 * 
+		 * @param {*} callback 
+		 */
 		this.then = function(callback) 
 		{
 			onResolve = callback;
@@ -220,6 +236,11 @@
 			return this;
 		};
 
+		/**
+		 * Catch any error that occurs in the promise.
+		 * 
+		 * @param {*} callback 
+		 */
 		this.catch = function(callback) 
 		{
 			onReject = callback;
@@ -241,7 +262,13 @@
 			reject(error);
 		}
 	}
-	  
+
+	/**
+	 * Create a resolved promise.
+	 * 
+	 * @param {*} val Value to pass.
+	 * @returns {CancelablePromise} Promise created with resolve value.
+	 */
 	CancelablePromise.resolve = (val) => 
 	{
 		return new CancelablePromise(function executor(resolve, _reject) 
@@ -249,7 +276,13 @@
 			resolve(val);
 		});
 	};
-	  
+
+	/**
+	 * Create a rejected promise.
+	 * 
+	 * @param {*} reason 
+	 * @returns {CancelablePromise} Promise created with rejection reason.
+	 */
 	CancelablePromise.reject = (reason) => 
 	{
 		return new CancelablePromise(function executor(resolve, reject) 
@@ -258,7 +291,15 @@
 		});
 	};
 	  
-	CancelablePromise.all = (promises) => 
+	/**
+	 * Wait for a set of promises to finish, creates a promise that waits for all running promises.
+	 * 
+	 * If any of the promises fail it will reject altough some of them may have been completed with success.
+	 * 
+	 * @param {*} promises 
+	 * @returns {CancelablePromise} Promise that will resolve when all of the running promises are fullfilled.
+	 */
+	CancelablePromise.all = function(promises) 
 	{
 		let fulfilledPromises = [];
 		let result = [];

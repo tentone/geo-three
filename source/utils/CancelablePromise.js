@@ -87,7 +87,7 @@ function CancelablePromise(executor)
 
 	try 
 	{
-		executor(resolve, reject, cancel);
+		executor(resolve, reject);
 	}
 	catch (error) 
 	{
