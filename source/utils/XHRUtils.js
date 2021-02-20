@@ -2,7 +2,7 @@
  * XHR utils contains static methods to allow easy access to services via XHR.
  *
  * @static
- * @class Service
+ * @class XHRUtils
  */
 export class XHRUtils 
 {
@@ -10,31 +10,32 @@ export class XHRUtils
 	 * Get file data from URL as text, using a XHR call.
 	 * 
 	 * @method readFile
-	 * @param {string} fname File URL.
-	 * @param {boolean} sync If set to true or undefined the file is read syncronosly.
+	 * @param {string} url Target for the request.
 	 * @param {Function} onLoad On load callback.
 	 * @param {Function} onError On progress callback.
 	 */
-	static get(fname, onLoad, onError)
+	static get(url, onLoad, onError)
 	{
-		var file = new XMLHttpRequest();
-		file.overrideMimeType("text/plain");
-		file.open("GET", fname, true);
+		var xhr = new XMLHttpRequest();
+		xhr.overrideMimeType("text/plain");
+		xhr.open("GET", url, true);
 
 		if (onLoad !== undefined)
 		{
-			file.onload = function()
+			xhr.onload = function()
 			{
-				onLoad(file.response);
+				onLoad(xhr.response);
 			};
 		}
 
 		if (onError !== undefined)
 		{
-			file.onerror = onError;
+			xhr.onerror = onError;
 		}
 
-		file.send(null);
+		xhr.send(null);
+
+		return xhr;
 	}
 
 	/**
