@@ -3,20 +3,21 @@ import {MapHeightNode} from "./MapHeightNode.js";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry.js";
 import {MapPlaneNode} from "./MapPlaneNode.js";
 
-export class MapHeightNode extends MapHeightNode {
-	/** 
-	 * Map height node that uses GPU height calculation to generate the deformed plane mesh.
-	 * 
-	 * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
-	 *
-	 * @class MapHeightNodeShader
-	 * @param parentNode {MapHeightNode} The parent node of this node.
-	 * @param mapView {MapView} Map view object where this node is placed.
-	 * @param location {number} Position in the node tree relative to the parent.
-	 * @param level {number} Zoom level in the tile tree of the node.
-	 * @param x {number} X position of the node in the tile tree.
-	 * @param y {number} Y position of the node in the tile tree.
-	 */
+/**
+ * Map height node that uses GPU height calculation to generate the deformed plane mesh.
+ * 
+ * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
+ *
+ * @class MapHeightNodeShader
+ * @param parentNode {MapHeightNode} The parent node of this node.
+ * @param mapView {MapView} Map view object where this node is placed.
+ * @param location {number} Position in the node tree relative to the parent.
+ * @param level {number} Zoom level in the tile tree of the node.
+ * @param x {number} X position of the node in the tile tree.
+ * @param y {number} Y position of the node in the tile tree.
+ */
+export class MapHeightNode extends MapHeightNode
+{
 	constructor(parentNode, mapView, location, level, x, y)
 	{
 		var material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});

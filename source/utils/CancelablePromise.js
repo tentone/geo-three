@@ -5,157 +5,160 @@
  * 
  * @class CancelablePromise
  */
-function CancelablePromise(executor) 
+export class CancelablePromise
 {
-	let onResolve;
-	let onReject;
-	let onCancel;
-
-	let fulfilled = false;
-	let rejected = false;
-	let called = false;
-	let value;
-
-	function resolve(v) 
+	constructor(executor) 
 	{
-		fulfilled = true;
-		value = v;
-
-		if (typeof onResolve === "function") 
+		let onResolve;
+		let onReject;
+		let onCancel;
+	
+		let fulfilled = false;
+		let rejected = false;
+		let called = false;
+		let value;
+	
+		function resolve(v) 
 		{
-			onResolve(value);
-			called = true;
+			fulfilled = true;
+			value = v;
+	
+			if (typeof onResolve === "function") 
+			{
+				onResolve(value);
+				called = true;
+			}
 		}
-	}
-
-	function reject(reason) 
-	{
-		rejected = true;
-		value = reason;
-
-		if (typeof onReject === "function") 
+	
+		function reject(reason) 
 		{
-			onReject(value);
-			called = true;
+			rejected = true;
+			value = reason;
+	
+			if (typeof onReject === "function") 
+			{
+				onReject(value);
+				called = true;
+			}
+		}
+	
+		/**
+		 * Request to cancel the promise execution.
+		 * 
+		 * @returns {boolean} True if the promise is canceled successfully, false otherwise.
+		 */
+		this.cancel = function()
+		{
+			// TODO <ADD CODE HERE>
+			return false;
+		};
+	
+		/**
+		 * Executed after the promise is fulfilled.
+		 * 
+		 * @param {*} callback 
+		 */
+		this.then = function(callback) 
+		{
+			onResolve = callback;
+	
+			if (fulfilled && !called) 
+			{
+				called = true;
+				onResolve(value);
+			}
+			return this;
+		};
+	
+		/**
+		 * Catch any error that occurs in the promise.
+		 * 
+		 * @param {*} callback 
+		 */
+		this.catch = function(callback) 
+		{
+			onReject = callback;
+	
+			if (rejected && !called) 
+			{
+				called = true;
+				onReject(value);
+			}
+			return this;
+		};
+	
+		try 
+		{
+			executor(resolve, reject);
+		}
+		catch (error) 
+		{
+			reject(error);
 		}
 	}
 
 	/**
-	 * Request to cancel the promise execution.
+	 * Create a resolved promise.
 	 * 
-	 * @returns {boolean} True if the promise is canceled successfully, false otherwise.
+	 * @param {*} val Value to pass.
+	 * @returns {CancelablePromise} Promise created with resolve value.
 	 */
-	this.cancel = function()
+	static resolve(val)
 	{
-		// TODO <ADD CODE HERE>
-		return false;
-	};
-
-	/**
-	 * Executed after the promise is fulfilled.
-	 * 
-	 * @param {*} callback 
-	 */
-	this.then = function(callback) 
-	{
-		onResolve = callback;
-
-		if (fulfilled && !called) 
+		return new CancelablePromise(function executor(resolve, _reject) 
 		{
-			called = true;
-			onResolve(value);
-		}
-		return this;
-	};
-
-	/**
-	 * Catch any error that occurs in the promise.
-	 * 
-	 * @param {*} callback 
-	 */
-	this.catch = function(callback) 
-	{
-		onReject = callback;
-
-		if (rejected && !called) 
-		{
-			called = true;
-			onReject(value);
-		}
-		return this;
-	};
-
-	try 
-	{
-		executor(resolve, reject);
+			resolve(val);
+		});
 	}
-	catch (error) 
+
+	/**
+	 * Create a rejected promise.
+	 * 
+	 * @param {*} reason 
+	 * @returns {CancelablePromise} Promise created with rejection reason.
+	 */
+	static reject(reason)
 	{
-		reject(error);
+		return new CancelablePromise(function executor(resolve, reject) 
+		{
+			reject(reason);
+		});
+	}
+	
+	/**
+	 * Wait for a set of promises to finish, creates a promise that waits for all running promises.
+	 * 
+	 * If any of the promises fail it will reject altough some of them may have been completed with success.
+	 * 
+	 * @param {*} promises 
+	 * @returns {CancelablePromise} Promise that will resolve when all of the running promises are fullfilled.
+	 */
+	static all(promises) 
+	{
+		let fulfilledPromises = [];
+		let result = [];
+
+		function executor(resolve, reject) 
+		{
+			promises.forEach((promise, index) => 
+			{
+				return promise
+					.then((val) => 
+					{
+						fulfilledPromises.push(true);
+						result[index] = val;
+
+						if (fulfilledPromises.length === promises.length) 
+						{
+							return resolve(result);
+						}
+					})
+					.catch((error) => {return reject(error);});
+			}
+			);
+		}
+
+		return new CancelablePromise(executor);
 	}
 }
 
-/**
- * Create a resolved promise.
- * 
- * @param {*} val Value to pass.
- * @returns {CancelablePromise} Promise created with resolve value.
- */
-CancelablePromise.resolve = (val) => 
-{
-	return new CancelablePromise(function executor(resolve, _reject) 
-	{
-		resolve(val);
-	});
-};
-
-/**
- * Create a rejected promise.
- * 
- * @param {*} reason 
- * @returns {CancelablePromise} Promise created with rejection reason.
- */
-CancelablePromise.reject = (reason) => 
-{
-	return new CancelablePromise(function executor(resolve, reject) 
-	{
-		reject(reason);
-	});
-};
-  
-/**
- * Wait for a set of promises to finish, creates a promise that waits for all running promises.
- * 
- * If any of the promises fail it will reject altough some of them may have been completed with success.
- * 
- * @param {*} promises 
- * @returns {CancelablePromise} Promise that will resolve when all of the running promises are fullfilled.
- */
-CancelablePromise.all = function(promises) 
-{
-	let fulfilledPromises = [];
-	let result = [];
-
-	function executor(resolve, reject) 
-	{
-		promises.forEach((promise, index) => 
-		{
-			return promise
-				.then((val) => 
-				{
-					fulfilledPromises.push(true);
-					result[index] = val;
-
-					if (fulfilledPromises.length === promises.length) 
-					{
-						return resolve(result);
-					}
-				})
-				.catch((error) => {return reject(error);});
-		}
-		);
-	}
-	return new CancelablePromise(executor);
-};
-
-export {CancelablePromise};
