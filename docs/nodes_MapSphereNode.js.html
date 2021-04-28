@@ -38,140 +38,135 @@ import {UnitsUtils} from "../utils/UnitsUtils.js";
  * 
  * @class MapSphereNode
  */
-function MapSphereNode(parentNode, mapView, location, level, x, y)
+export class MapSphereNode extends MapNode
 {
-	Mesh.call(this, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}));
-	MapNode.call(this, parentNode, mapView, location, level, x, y);
-
-	this.applyScaleNode();
-
-	this.matrixAutoUpdate = false;
-	this.isMesh = true;
-	this.visible = false;
-
-	this.loadTexture();
+	constructor(parentNode, mapView, location, level, x, y)
+	{
+		super(MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
+	
+		this.applyScaleNode();
+	
+		this.matrixAutoUpdate = false;
+		this.isMesh = true;
+		this.visible = false;
+	
+		this.loadTexture();
+	}
+	
+	/**
+	 * Number of segments per node geometry.
+	 *
+	 * @STATIC
+	 * @static SEGMENTS
+	 * @type {number}
+	 */
+	static SEGMENTS = 80;
+	
+	/**
+	 * Create a geometry for a sphere map node.
+	 *
+	 * @method createGeometry
+	 * @param {number} zoom
+	 * @param {number} x
+	 * @param {number} y
+	 */
+	static createGeometry(zoom, x, y)
+	{
+		var range = Math.pow(2, zoom);
+		var max = 40;
+		var segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
+	
+		// X
+		var phiLength = 1 / range * 2 * Math.PI;
+		var phiStart = x * phiLength;
+	
+		// Y
+		var thetaLength = 1 / range * Math.PI;
+		var thetaStart = y * thetaLength;
+	
+		return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
+	}
+	
+	/** 
+	 * Apply scale and offset position to the sphere node geometry.
+	 *
+	 * @method applyScaleNode
+	 */
+	applyScaleNode()
+	{
+		this.geometry.computeBoundingBox();
+	
+		var box = this.geometry.boundingBox.clone();
+		var center = box.getCenter(new Vector3());
+	
+		var matrix = new Matrix4();
+		matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS));
+		this.geometry.applyMatrix4(matrix);
+	
+		this.position.copy(center);
+	
+		this.updateMatrix();
+		this.updateMatrixWorld();
+	}
+	
+	updateMatrix()
+	{
+		this.matrix.setPosition(this.position);
+		this.matrixWorldNeedsUpdate = true;
+	}
+	
+	updateMatrixWorld(force)
+	{
+		if (this.matrixWorldNeedsUpdate || force)
+		{
+			this.matrixWorld.copy(this.matrix);
+			this.matrixWorldNeedsUpdate = false;
+		}
+	}
+	
+	createChildNodes()
+	{
+		var level = this.level + 1;
+	
+		var x = this.x * 2;
+		var y = this.y * 2;
+	
+		var node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	
+		var node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	
+		var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	
+		var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		this.add(node);
+		node.updateMatrix();
+		node.updateMatrixWorld(true);
+	}
+	
+	/**
+	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+	 * 
+	 * @method raycast
+	 */
+	raycast(raycaster, intersects)
+	{
+		if (this.isMesh === true)
+		{
+			return Mesh.prototype.raycast.call(this, raycaster, intersects);
+		}
+	
+		return false;
+	}
 }
-
-MapSphereNode.prototype = Object.create(Mesh.prototype);
-Object.assign(MapSphereNode.prototype, MapNode.prototype);
-
-MapSphereNode.prototype.constructor = MapSphereNode;
-
-/**
- * Number of segments per node geometry.
- *
- * @STATIC
- * @static SEGMENTS
- * @type {number}
- */
-MapSphereNode.SEGMENTS = 80;
-
-/**
- * Create a geometry for a sphere map node.
- *
- * @method createGeometry
- * @param {number} zoom
- * @param {number} x
- * @param {number} y
- */
-MapSphereNode.createGeometry = function(zoom, x, y)
-{
-	var range = Math.pow(2, zoom);
-	var max = 40;
-	var segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
-
-	// X
-	var phiLength = 1 / range * 2 * Math.PI;
-	var phiStart = x * phiLength;
-
-	// Y
-	var thetaLength = 1 / range * Math.PI;
-	var thetaStart = y * thetaLength;
-
-	return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
-};
-
-/** 
- * Apply scale and offset position to the sphere node geometry.
- *
- * @method applyScaleNode
- */
-MapSphereNode.prototype.applyScaleNode = function()
-{
-	this.geometry.computeBoundingBox();
-
-	var box = this.geometry.boundingBox.clone();
-	var center = box.getCenter(new Vector3());
-
-	var matrix = new Matrix4();
-	matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS));
-	this.geometry.applyMatrix(matrix);
-
-	this.position.copy(center);
-
-	this.updateMatrix();
-	this.updateMatrixWorld();
-};
-
-MapSphereNode.prototype.updateMatrix = function()
-{
-	this.matrix.setPosition(this.position);
-	this.matrixWorldNeedsUpdate = true;
-};
-
-MapSphereNode.prototype.updateMatrixWorld = function(force)
-{
-	if (this.matrixWorldNeedsUpdate || force)
-	{
-		this.matrixWorld.copy(this.matrix);
-		this.matrixWorldNeedsUpdate = false;
-	}
-};
-
-MapSphereNode.prototype.createChildNodes = function()
-{
-	var level = this.level + 1;
-
-	var x = this.x * 2;
-	var y = this.y * 2;
-
-	var node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-
-	var node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-
-	var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-
-	var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
-	this.add(node);
-	node.updateMatrix();
-	node.updateMatrixWorld(true);
-};
-
-/**
- * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
- * 
- * @method raycast
- */
-MapSphereNode.prototype.raycast = function(raycaster, intersects)
-{
-	if (this.isMesh === true)
-	{
-		return Mesh.prototype.raycast.call(this, raycaster, intersects);
-	}
-
-	return false;
-};
-
-export {MapSphereNode};
 </code></pre>
         </article>
     </section>
@@ -182,13 +177,13 @@ export {MapSphereNode};
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="LODFrustum.html">LODFrustum</a></li><li><a href="LODRadial.html">LODRadial</a></li><li><a href="LODRaycast.html">LODRaycast</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#simplifyDistance">simplifyDistance</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#subdivideDistance">subdivideDistance</a></li><li><a href="global.html#subdivisionRays">subdivisionRays</a></li><li><a href="global.html#testCenter">testCenter</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#thresholdDown">thresholdDown</a></li><li><a href="global.html#thresholdUp">thresholdUp</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="CancelablePromise.html">CancelablePromise</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="HereMapsProvider_HereMapsProvider.html">HereMapsProvider</a></li><li><a href="LODFrustum.html">LODFrustum</a></li><li><a href="LODRadial.html">LODRadial</a></li><li><a href="LODRaycast.html">LODRaycast</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li><li><a href="XHRUtils.html">XHRUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Feb 07 2021 14:59:04 GMT+0000 (Western European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Apr 28 2021 14:17:11 GMT+0100 (Western European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -147,7 +147,7 @@ It is intended to be used as a base class for other map node implementations.
 
         
             
-<h4 class="name" id=".BOTTOM_LEFT"><span class="type-signature">(static) </span>BOTTOM_LEFT<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="BOTTOM_LEFT"><span class="type-signature"></span>BOTTOM_LEFT<span class="type-signature"> :number</span></h4>
 
 
 
@@ -203,7 +203,7 @@ Can be used to navigate the children array looking for neighbors.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line148">line 148</a>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line150">line 150</a>
     </li></ul></dd>
     
 
@@ -221,7 +221,7 @@ Can be used to navigate the children array looking for neighbors.
 
         
             
-<h4 class="name" id=".BOTTOM_RIGHT"><span class="type-signature">(static) </span>BOTTOM_RIGHT<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="BOTTOM_RIGHT"><span class="type-signature"></span>BOTTOM_RIGHT<span class="type-signature"> :number</span></h4>
 
 
 
@@ -277,7 +277,7 @@ Can be used to navigate the children array looking for neighbors.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line159">line 159</a>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -295,7 +295,83 @@ Can be used to navigate the children array looking for neighbors.
 
         
             
-<h4 class="name" id=".CHILDRENS"><span class="type-signature">(static) </span>CHILDRENS<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="childrenCache"><span class="type-signature"></span>childrenCache<span class="type-signature"> :Array</span></h4>
+
+
+
+
+<div class="description">
+    Cache with the children objects created from subdivision.
+
+Used to avoid recreate object after simplification and subdivision.
+
+The default value is null.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Array</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line96">line 96</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="CHILDRENS"><span class="type-signature"></span>CHILDRENS<span class="type-signature"> :number</span></h4>
 
 
 
@@ -351,7 +427,7 @@ For a quad-tree this value is 4.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line106">line 106</a>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line108">line 108</a>
     </li></ul></dd>
     
 
@@ -369,7 +445,369 @@ For a quad-tree this value is 4.
 
         
             
-<h4 class="name" id=".ROOT"><span class="type-signature">(static) </span>ROOT<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="level"><span class="type-signature"></span>level<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Tile level of this node.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line50">line 50</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="location"><span class="type-signature"></span>location<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Index of the map node in the quad-tree parent node.
+
+Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line42">line 42</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="mapView"><span class="type-signature"></span>mapView<span class="type-signature"> :<a href="MapView.html">MapView</a></span></h4>
+
+
+
+
+<div class="description">
+    The map view.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="MapView.html">MapView</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line24">line 24</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="nodesLoaded"><span class="type-signature"></span>nodesLoaded<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Indicates how many children nodes where loaded.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line74">line 74</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="parentNode"><span class="type-signature"></span>parentNode<span class="type-signature"> :<a href="MapPlaneNode.html">MapPlaneNode</a></span></h4>
+
+
+
+
+<div class="description">
+    Parent node (from an upper tile level).
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="MapPlaneNode.html">MapPlaneNode</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line32">line 32</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="ROOT"><span class="type-signature"></span>ROOT<span class="type-signature"> :number</span></h4>
 
 
 
@@ -423,7 +861,7 @@ For a quad-tree this value is 4.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line115">line 115</a>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line117">line 117</a>
     </li></ul></dd>
     
 
@@ -441,7 +879,81 @@ For a quad-tree this value is 4.
 
         
             
-<h4 class="name" id=".TOP_LEFT"><span class="type-signature">(static) </span>TOP_LEFT<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="subdivided"><span class="type-signature"></span>subdivided<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    Variable to check if the node is subdivided.
+
+To avoid bad visibility changes on node load.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line84">line 84</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="TOP_LEFT"><span class="type-signature"></span>TOP_LEFT<span class="type-signature"> :number</span></h4>
 
 
 
@@ -497,7 +1009,7 @@ Can be used to navigate the children array looking for neighbors.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line126">line 126</a>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line128">line 128</a>
     </li></ul></dd>
     
 
@@ -515,7 +1027,7 @@ Can be used to navigate the children array looking for neighbors.
 
         
             
-<h4 class="name" id=".TOP_RIGHT"><span class="type-signature">(static) </span>TOP_RIGHT<span class="type-signature"> :number</span></h4>
+<h4 class="name" id="TOP_RIGHT"><span class="type-signature"></span>TOP_RIGHT<span class="type-signature"> :number</span></h4>
 
 
 
@@ -571,7 +1083,151 @@ Can be used to navigate the children array looking for neighbors.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line137">line 137</a>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line139">line 139</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="x"><span class="type-signature"></span>x<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Tile x position.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="y"><span class="type-signature"></span>y<span class="type-signature"> :number</span></h4>
+
+
+
+
+<div class="description">
+    Tile y position.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="nodes_MapNode.js.html">nodes/MapNode.js</a>, <a href="nodes_MapNode.js.html#line66">line 66</a>
     </li></ul></dd>
     
 
@@ -605,13 +1261,13 @@ Can be used to navigate the children array looking for neighbors.
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="LODFrustum.html">LODFrustum</a></li><li><a href="LODRadial.html">LODRadial</a></li><li><a href="LODRaycast.html">LODRaycast</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="Service.html">Service</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#childrenCache">childrenCache</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#heightLoaded">heightLoaded</a></li><li><a href="global.html#level">level</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#location">location</a></li><li><a href="global.html#mapView">mapView</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#nodesLoaded">nodesLoaded</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#parentNode">parentNode</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#simplifyDistance">simplifyDistance</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li><li><a href="global.html#subdivided">subdivided</a></li><li><a href="global.html#subdivideDistance">subdivideDistance</a></li><li><a href="global.html#subdivisionRays">subdivisionRays</a></li><li><a href="global.html#testCenter">testCenter</a></li><li><a href="global.html#textureLoaded">textureLoaded</a></li><li><a href="global.html#thresholdDown">thresholdDown</a></li><li><a href="global.html#thresholdUp">thresholdUp</a></li><li><a href="global.html#x">x</a></li><li><a href="global.html#y">y</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="BingMapsProvider.html">BingMapsProvider</a></li><li><a href="CancelablePromise.html">CancelablePromise</a></li><li><a href="DebugProvider.html">DebugProvider</a></li><li><a href="GoogleMapsProvider.html">GoogleMapsProvider</a></li><li><a href="HeightDebugProvider.html">HeightDebugProvider</a></li><li><a href="HereMapsProvider.html">HereMapsProvider</a></li><li><a href="HereMapsProvider_HereMapsProvider.html">HereMapsProvider</a></li><li><a href="LODFrustum.html">LODFrustum</a></li><li><a href="LODRadial.html">LODRadial</a></li><li><a href="LODRaycast.html">LODRaycast</a></li><li><a href="MapBoxProvider.html">MapBoxProvider</a></li><li><a href="MapHeightNode.html">MapHeightNode</a></li><li><a href="MapHeightNodeShader.html">MapHeightNodeShader</a></li><li><a href="MapNode.html">MapNode</a></li><li><a href="MapNodeGeometry.html">MapNodeGeometry</a></li><li><a href="MapPlaneNode.html">MapPlaneNode</a></li><li><a href="MapProvider.html">MapProvider</a></li><li><a href="MapSphereNode.html">MapSphereNode</a></li><li><a href="MapSphereNodeGeometry.html">MapSphereNodeGeometry</a></li><li><a href="MapTilerProvider.html">MapTilerProvider</a></li><li><a href="MapView.html">MapView</a></li><li><a href="OpenMapTilesProvider.html">OpenMapTilesProvider</a></li><li><a href="OpenStreetMapsProvider.html">OpenStreetMapsProvider</a></li><li><a href="UnitsUtils.html">UnitsUtils</a></li><li><a href="XHRUtils.html">XHRUtils</a></li></ul><h3>Global</h3><ul><li><a href="global.html#applyScaleNode">applyScaleNode</a></li><li><a href="global.html#clear">clear</a></li><li><a href="global.html#createChildNodes">createChildNodes</a></li><li><a href="global.html#createGeometry">createGeometry</a></li><li><a href="global.html#createSession">createSession</a></li><li><a href="global.html#datumsToSpherical">datumsToSpherical</a></li><li><a href="global.html#fetchTile">fetchTile</a></li><li><a href="global.html#get">get</a></li><li><a href="global.html#getMetaData">getMetaData</a></li><li><a href="global.html#getNeighbors">getNeighbors</a></li><li><a href="global.html#getNeighborsDirection">getNeighborsDirection</a></li><li><a href="global.html#loadHeightGeometry">loadHeightGeometry</a></li><li><a href="global.html#loadTexture">loadTexture</a></li><li><a href="global.html#nextServer">nextServer</a></li><li><a href="global.html#nodeReady">nodeReady</a></li><li><a href="global.html#onBeforeRender">onBeforeRender</a></li><li><a href="global.html#quadKey">quadKey</a></li><li><a href="global.html#quadtreeToDatums">quadtreeToDatums</a></li><li><a href="global.html#raycast">raycast</a></li><li><a href="global.html#readFile">readFile</a></li><li><a href="global.html#request">request</a></li><li><a href="global.html#setHeightProvider">setHeightProvider</a></li><li><a href="global.html#setProvider">setProvider</a></li><li><a href="global.html#simplify">simplify</a></li><li><a href="global.html#sphericalToDatums">sphericalToDatums</a></li><li><a href="global.html#subdivide">subdivide</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Sun Feb 07 2021 14:59:04 GMT+0000 (Western European Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Apr 28 2021 14:17:12 GMT+0100 (Western European Summer Time)
 </footer>
 
 <script> prettyPrint(); </script>
