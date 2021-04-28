@@ -19,7 +19,7 @@ import {MapNode} from "./MapNode.js";
  * @param material {Material} Material used to render this height node.
  * @param geometry {Geometry} Geometry used to render this height node.
  */
-export class MapHeightNode extends Mesh
+export class MapHeightNode extends MapNode
 {
 	constructor(parentNode, mapView, location, level, x, y, material, geometry)
 	{
@@ -35,9 +35,7 @@ export class MapHeightNode extends Mesh
 				});
 		}
 	
-		super(geometry === undefined ? MapHeightNode.GEOMETRY: geometry, material);
-		
-		// MapNode.call(this, parentNode, mapView, location, level, x, y);
+		super(geometry === undefined ? MapHeightNode.GEOMETRY: geometry, material, parentNode, mapView, location, level, x, y);
 	
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;

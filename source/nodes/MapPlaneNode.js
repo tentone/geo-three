@@ -7,12 +7,11 @@ import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
  * 
  * @class MapPlaneNode
  */
-export class MapPlaneNode
+export class MapPlaneNode extends MapNode
 {
 	constructor(parentNode, mapView, location, level, x, y)
 	{
-		Mesh.call(this, MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}));
-		MapNode.call(this, parentNode, mapView, location, level, x, y);
+		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 	
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;

@@ -10,12 +10,11 @@ import {UnitsUtils} from "../utils/UnitsUtils.js";
  * 
  * @class MapSphereNode
  */
-export class MapSphereNode
+export class MapSphereNode extends MapNode
 {
 	constructor(parentNode, mapView, location, level, x, y)
 	{
-		Mesh.call(this, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}));
-		MapNode.call(this, parentNode, mapView, location, level, x, y);
+		super(MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 	
 		this.applyScaleNode();
 	
@@ -43,7 +42,7 @@ export class MapSphereNode
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static createGeometry = function(zoom, x, y)
+	static createGeometry(zoom, x, y)
 	{
 		var range = Math.pow(2, zoom);
 		var max = 40;
@@ -65,7 +64,7 @@ export class MapSphereNode
 	 *
 	 * @method applyScaleNode
 	 */
-	applyScaleNode = function()
+	applyScaleNode()
 	{
 		this.geometry.computeBoundingBox();
 	
@@ -74,7 +73,7 @@ export class MapSphereNode
 	
 		var matrix = new Matrix4();
 		matrix.compose(new Vector3(-center.x, -center.y, -center.z), new Quaternion(), new Vector3(UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS, UnitsUtils.EARTH_RADIUS));
-		this.geometry.applyMatrix(matrix);
+		this.geometry.applyMatrix4(matrix);
 	
 		this.position.copy(center);
 	
@@ -82,13 +81,13 @@ export class MapSphereNode
 		this.updateMatrixWorld();
 	}
 	
-	updateMatrix = function()
+	updateMatrix()
 	{
 		this.matrix.setPosition(this.position);
 		this.matrixWorldNeedsUpdate = true;
 	}
 	
-	updateMatrixWorld = function(force)
+	updateMatrixWorld(force)
 	{
 		if (this.matrixWorldNeedsUpdate || force)
 		{
@@ -97,7 +96,7 @@ export class MapSphereNode
 		}
 	}
 	
-	createChildNodes = function()
+	createChildNodes()
 	{
 		var level = this.level + 1;
 	
@@ -130,7 +129,7 @@ export class MapSphereNode
 	 * 
 	 * @method raycast
 	 */
-	raycast = function(raycaster, intersects)
+	raycast(raycaster, intersects)
 	{
 		if (this.isMesh === true)
 		{

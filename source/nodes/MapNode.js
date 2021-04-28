@@ -1,4 +1,4 @@
-import {Texture, RGBFormat, LinearFilter} from "three";
+import {Texture, RGBFormat, LinearFilter, Mesh} from "three";
 
 /** 
  * Represents a map tile node inside of the tiles quad-tree
@@ -9,9 +9,12 @@ import {Texture, RGBFormat, LinearFilter} from "three";
  * 
  * @class MapNode
  */
-export class MapNode {
-	constructor(parentNode, mapView, location, level, x, y)
+export class MapNode extends Mesh
+{
+	constructor(geometry, material, parentNode, mapView, location, level, x, y)
 	{
+		super(geometry, material);
+
 		/**
 		 * The map view.
 		 *

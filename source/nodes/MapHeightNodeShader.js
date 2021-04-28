@@ -16,7 +16,7 @@ import {MapPlaneNode} from "./MapPlaneNode.js";
  * @param x {number} X position of the node in the tile tree.
  * @param y {number} Y position of the node in the tile tree.
  */
-export class MapHeightNode extends MapHeightNode
+export class MapHeightNodeShader extends MapHeightNode
 {
 	constructor(parentNode, mapView, location, level, x, y)
 	{
