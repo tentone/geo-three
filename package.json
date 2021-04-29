@@ -9,6 +9,7 @@
 	},
 	"scripts": {
 		"start": "rollup -c rollup.dev.js",
+		"watch": "rollup -c rollup.dev.js --watch",
 		"build": "rollup -c",
 		"docs": "jsdoc -d docs -r source",
 		"uglify": "uglifyjs --compress --mangle --output build/geo-three.min.js -- build/geo-three.js",
@@ -35,10 +36,11 @@
 		"three": "~0.125.0",
 		"jsdoc": "~3.6.4",
 		"uglify-js": "~3.9.2",
-		"rollup": "~2.9.1",
-		"@rollup/plugin-strip": "~1.3.3",
+		"rollup": "~2.46.0",
+		"@rollup/plugin-strip": "~2.0.0",
+		"rollup-plugin-livereload": "~2.0.0",
 		"rollup-plugin-uglify": "~6.0.4",
-		"rollup-plugin-serve": "~2.0.0-beta.0",
 		"eslint": "~7.18.0"
+		"rollup-plugin-serve": "~1.1.0",
 	}
 }
