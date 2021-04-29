@@ -42,13 +42,13 @@ export class LODFrustum extends LODRadial
 		camera.getWorldPosition(pov);
 		
 		var self = this;
-	
+		const maxZoom = Math.min (view.provider.maxZoom, view.heightProvider.maxZoom);
+		
 		view.children[0].traverse(function(node)
 		{
 			node.getWorldPosition(position);
-	
 			var distance = pov.distanceTo(position);
-			distance /= Math.pow(2, view.provider.maxZoom - node.level);
+			distance /= Math.pow(2, maxZoom - node.level);
 	
 			var inFrustum = self.pointOnly ? frustum.containsPoint(position) : frustum.intersectsObject(node);
 	
