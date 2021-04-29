@@ -41,13 +41,12 @@ export class LODRadial extends LODControl
 	
 		camera.getWorldPosition(pov);
 	
-		const maxZoom = Math.min (view.provider.maxZoom, view.heightProvider.maxZoom);
 		view.children[0].traverse(function(node)
 		{
 			node.getWorldPosition(position);
 	
 			var distance = pov.distanceTo(position);
-			distance /= Math.pow(2, maxZoom - node.level);
+			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 	
 			if (distance < self.subdivideDistance)
 			{
