@@ -5,7 +5,7 @@ module.exports = {
 	parserOptions: {
 		sourceType: "module",
 		babelOptions: {configFile: './.babelrc'},
-		ecmaVersion: 2018, // needed to support spread in objects
+		ecmaVersion: 2018,
 		ecmaFeatures: {modules: true}
 	},
 	rules: {

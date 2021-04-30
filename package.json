@@ -33,7 +33,7 @@
 		"three": ">0.80.0"
 	},
 	"devDependencies": {
-    "@babel/core":"7.13.16",
+	"@babel/core":"7.13.16",
 		"@babel/eslint-parser":"7.13.14",
 		"@babel/plugin-syntax-class-properties":"7.12.13",
 		"@babel/preset-env":"7.13.15",
@@ -44,7 +44,7 @@
 		"@rollup/plugin-strip": "~2.0.0",
 		"rollup-plugin-uglify": "~6.0.4",
 		"rollup-plugin-serve": "~1.1.0",
-    "rollup-plugin-livereload": "~2.0.0",
+		"rollup-plugin-livereload": "~2.0.0",
 		"eslint": "~7.25.0"
 	}
 }
