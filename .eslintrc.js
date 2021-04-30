@@ -1,9 +1,11 @@
 // eslint-disable-next-line no-undef
 module.exports = {
 	root: true,
+	parser: "@babel/eslint-parser",
 	parserOptions: {
 		sourceType: "module",
-		ecmaVersion: 2015,
+		babelOptions: {configFile: './.babelrc'},
+		ecmaVersion: 2018, // needed to support spread in objects
 		ecmaFeatures: {modules: true}
 	},
 	rules: {
