@@ -33,7 +33,7 @@ scene.add(map);
 ### Coordinates
 
 - The project uses internally a XY [EPSG:900913](https://epsg.io/900913) coordinate format to be compatible with the XYZ coordinates used in three.js
-- Use the UnitsUtils class to access the unit conversion methods for example to convert a latitude, longitude [WGS84](https://epsg.io/4326) pair value to XY coordinates you can use the code bellow:
+- Use the `UnitsUtils` class to access the unit conversion methods for example to convert a latitude, longitude [WGS84](https://epsg.io/4326) pair value to XY coordinates you can use the code bellow:
 
 ```javascript
 var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
@@ -118,8 +118,9 @@ export class DistanceLOD extends LODControl
 
 
 
-### Tiles Representation
+### Tiles Map Nodes
 
+- `MapNode` objects are used to define how the tiles should be represented in the space. `MapNode` are organized hierarchically, every node implements the MapNode class that is based on the THREE.Mesh class (every map node has a visual representation as a mesh).
 - The library has support for both planar and spherical representation of tiles. Most providers only have planar tiles available.
   - It is required that the tiles for spherical mode are previously adjusted, since planar tiles get more stretched as closer you get to the poles.
 
