@@ -24,6 +24,42 @@ import {LODRaycast} from "./lod/LODRaycast.js";
  */
 export class MapView extends Mesh
 {
+	/**
+	 * Planar map projection.
+	 *
+	 * @static
+	 * @attribute PLANAR
+	 * @type {number}
+	 */
+	static PLANAR = 200;
+
+	/**
+	 * Spherical map projection.
+	 *
+	 * @static
+	 * @attribute SPHERICAL
+	 * @type {number}
+	 */
+	static SPHERICAL = 201;
+
+	/**
+	 * Planar map projection with height deformation.
+	 *
+	 * @static
+	 * @attribute HEIGHT
+	 * @type {number}
+	 */
+	static HEIGHT = 202;
+
+	/**
+	 * Planar map projection with height deformation using the GPU for height generation.
+	 *
+	 * @static
+	 * @attribute HEIGHT_DISPLACEMENT
+	 * @type {number}
+	 */
+	static HEIGHT_SHADER = 203;
+
 	constructor(mode, provider, heightProvider)
 	{
 		mode = mode !== undefined ? mode : MapView.PLANAR;
@@ -102,8 +138,10 @@ export class MapView extends Mesh
 		{
 			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
 		}
-		
-		this.add(this.root);
+		if (this.root)
+		{
+			this.add(this.root);
+		}
 	}
 
 	/**
@@ -201,39 +239,3 @@ export class MapView extends Mesh
 		return false;
 	}
 }
-
-/**
- * Planar map projection.
- *
- * @static
- * @attribute PLANAR
- * @type {number}
- */
-MapView.PLANAR = 200;
-
-/**
- * Spherical map projection.
- *
- * @static
- * @attribute SPHERICAL
- * @type {number}
- */
-MapView.SPHERICAL = 201;
-
-/**
- * Planar map projection with height deformation.
- *
- * @static
- * @attribute HEIGHT
- * @type {number}
- */
-MapView.HEIGHT = 202;
-
-/**
- * Planar map projection with height deformation using the GPU for height generation.
- *
- * @static
- * @attribute HEIGHT_DISPLACEMENT
- * @type {number}
- */
-MapView.HEIGHT_SHADER = 203;

@@ -1,4 +1,5 @@
 import serve from "rollup-plugin-serve";
+import livereload from 'rollup-plugin-livereload';
 
 export default {
 	input: "source/Main.js",
@@ -8,8 +9,9 @@ export default {
 			contentBase: '.',
 			openPage: '/examples',
 			host: 'localhost',
-			port: 8080
-		})
+			port: 8083
+		}),
+		livereload({watch: '.'})
 	],
 	output: [
 		{
