@@ -33,10 +33,10 @@
 		"three": ">0.80.0"
 	},
 	"devDependencies": {
-	"@babel/core":"7.13.16",
-		"@babel/eslint-parser":"7.13.14",
-		"@babel/plugin-syntax-class-properties":"7.12.13",
-		"@babel/preset-env":"7.13.15",
+		"@babel/core": "7.13.16",
+		"@babel/eslint-parser": "7.13.14",
+		"@babel/plugin-syntax-class-properties": "7.12.13",
+		"@babel/preset-env": "7.13.15",
 		"three": "^0.128.0",
 		"jsdoc": "~3.6.6",
 		"uglify-js": "~3.13.5",
