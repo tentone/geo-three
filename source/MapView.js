@@ -138,7 +138,8 @@ export class MapView extends Mesh
 		{
 			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
 		}
-		if (this.root)
+
+		if (this.root !== null)
 		{
 			this.add(this.root);
 		}
