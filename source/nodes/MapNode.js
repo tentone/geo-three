@@ -97,6 +97,26 @@ export class MapNode extends Mesh
 	}
 	
 	/**
+	 * Base geometry is attached to the map viewer object.
+	 * 
+	 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
+	 * 
+	 * @static
+	 * @attribute baseGeometry
+	 * @type {THREE.Geometry}
+	 */
+	static baseGeometry = null;
+
+	/**
+	 * Base scale applied to the map viewer object.
+	 * 
+	 * @static
+	 * @attribute baseScale
+	 * @type {THREE.Vector3}
+	 */
+	static baseScale = null;
+
+	/**
 	 * How many children each branch of the tree has.
 	 *
 	 * For a quad-tree this value is 4.

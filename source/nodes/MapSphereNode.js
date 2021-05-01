@@ -25,8 +25,14 @@ export class MapSphereNode extends MapNode
 		this.loadTexture();
 	}
 	
+	static baseGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+
+	static baseScale = new Vector3(1, 1, 1);
+
 	/**
 	 * Number of segments per node geometry.
+	 * 
+	 * Can be configured globally and is applied to all nodes.
 	 *
 	 * @STATIC
 	 * @static SEGMENTS

@@ -1,7 +1,8 @@
-import {Texture, LinearFilter, RGBFormat, MeshPhongMaterial, Mesh, NearestFilter} from "three";
+import {Texture, LinearFilter, RGBFormat, MeshPhongMaterial, Mesh, NearestFilter, Vector3} from "three";
 import {MapHeightNode} from "./MapHeightNode.js";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry.js";
 import {MapPlaneNode} from "./MapPlaneNode.js";
+import {UnitsUtils} from "../utils/UnitsUtils";
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
@@ -55,6 +56,10 @@ export class MapHeightNodeShader extends MapHeightNode
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 	
+	static baseGeometry = MapPlaneNode.GEOMETRY;
+
+	static baseScale = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
 	/**
 	 * Prepare the threejs material to be used in the map tile.
 	 * 

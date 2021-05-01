@@ -474,6 +474,26 @@
 		}
 		
 		/**
+		 * Base geometry is attached to the map viewer object.
+		 * 
+		 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
+		 * 
+		 * @static
+		 * @attribute baseGeometry
+		 * @type {THREE.Geometry}
+		 */
+		static baseGeometry = null;
+
+		/**
+		 * Base scale applied to the map viewer object.
+		 * 
+		 * @static
+		 * @attribute baseScale
+		 * @type {THREE.Vector3}
+		 */
+		static baseScale = null;
+
+		/**
 		 * How many children each branch of the tree has.
 		 *
 		 * For a quad-tree this value is 4.
@@ -770,6 +790,192 @@
 		}
 	}
 
+	/**
+	 * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
+	 *
+	 * Devices with a GPS, for example, can take a minute or more to get a GPS fix, so less accurate data (IP location or wifi) may be returned.
+	 *
+	 * @static
+	 * @class UnitsUtils
+	 */
+	class UnitsUtils 
+	{
+		/**
+		 * Aproximated radius of earth in meters.
+		 *
+		 * @static
+		 * @attribute EARTH_RADIUS
+		 */
+		static EARTH_RADIUS = 6378137;
+
+		/**
+		 * Earth equator perimeter in meters.
+		 *
+		 * @static
+		 * @attribute EARTH_RADIUS
+		 */
+		static EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
+
+		/**
+		 * Earth equator perimeter in meters.
+		 *
+		 * @static
+		 * @attribute EARTH_ORIGIN
+		 */
+		static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
+
+		/**
+		 * Get the current geolocation from the browser using the location API.
+		 * 
+		 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
+		 *
+		 * @method get
+		 * @param {Function} onResult Callback function onResult(coords, timestamp).
+		 */
+		static get(onResult, onError)
+		{
+			navigator.geolocation.getCurrentPosition(function(result)
+			{
+				onResult(result.coords, result.timestamp);
+			}, onError);
+		}
+
+		/**
+		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
+		 *
+		 * @method datumsToSpherical
+		 * @param {number} latitude
+		 * @param {number} longitude
+		 */
+		static datumsToSpherical(latitude, longitude)
+		{
+			var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
+			var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
+
+			y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
+
+			return {x: x, y: y};
+		}
+
+		/**
+		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
+		 *
+		 * @method sphericalToDatums
+		 * @param {number} x
+		 * @param {number} y
+		 */
+		static sphericalToDatums(x, y)
+		{
+			var longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
+			var latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
+
+			latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
+
+			return {latitude: latitude, longitude: longitude};
+		}
+
+		/**
+		 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
+		 *
+		 * @method quadtreeToDatums
+		 * @param {number} zoom
+		 * @param {number} x
+		 * @param {number} y
+		 */
+		static quadtreeToDatums(zoom, x, y)
+		{
+			var n = Math.pow(2.0, zoom);
+			var longitude = x / n * 360.0 - 180.0;
+			var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
+			var latitude = 180.0 * (latitudeRad / Math.PI);
+
+			return {latitude: latitude, longitude: longitude};
+		}
+	}
+
+	/** 
+	 * Represents a basic plane tile node.
+	 * 
+	 * @class MapPlaneNode
+	 */
+	class MapPlaneNode extends MapNode
+	{
+		constructor(parentNode, mapView, location, level, x, y)
+		{
+			super(MapPlaneNode.GEOMETRY, new three.MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
+		
+			this.matrixAutoUpdate = false;
+			this.isMesh = true;
+			this.visible = false;
+			
+			this.loadTexture();
+		}
+		
+		/**
+		 * Map node plane geometry.
+		 *
+		 * @static
+		 * @attribute GEOMETRY
+		 * @type {PlaneBufferGeometry}
+		 */
+		static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
+		
+		static baseGeometry = MapPlaneNode.GEOMETRY;
+
+		static baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
+		createChildNodes()
+		{
+			var level = this.level + 1;
+		
+			var x = this.x * 2;
+			var y = this.y * 2;
+		
+			var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+			node.scale.set(0.5, 1, 0.5);
+			node.position.set(-0.25, 0, -0.25);
+			this.add(node);
+			node.updateMatrix();
+			node.updateMatrixWorld(true);
+		
+			var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+			node.scale.set(0.5, 1, 0.5);
+			node.position.set(0.25, 0, -0.25);
+			this.add(node);
+			node.updateMatrix();
+			node.updateMatrixWorld(true);
+		
+			var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+			node.scale.set(0.5, 1, 0.5);
+			node.position.set(-0.25, 0, 0.25);
+			this.add(node);
+			node.updateMatrix();
+			node.updateMatrixWorld(true);
+		
+			var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+			node.scale.set(0.5, 1, 0.5);
+			node.position.set(0.25, 0, 0.25);
+			this.add(node);
+			node.updateMatrix();
+			node.updateMatrixWorld(true);
+		}
+		
+		/**
+		 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
+		 * 
+		 * @method raycast
+		 */
+		raycast(raycaster, intersects)
+		{
+			if (this.isMesh === true)
+			{
+				return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
+			}
+		
+			return false;
+		}
+	}
+
 	/** 
 	 * Represents a height map tile node that can be subdivided into other height nodes.
 	 * 
@@ -845,7 +1051,7 @@
 		 * @attribute GEOMETRY_SIZE
 		 * @type {number}
 		 */
-		 static GEOMETRY_SIZE = 16;
+		static GEOMETRY_SIZE = 16;
 		
 		/**
 		 * Map node plane geometry.
@@ -854,8 +1060,12 @@
 		 * @attribute GEOMETRY
 		 * @type {PlaneBufferGeometry}
 		 */
-		 static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+		static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 		
+		static baseGeometry = MapPlaneNode.GEOMETRY;
+
+		static baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
 		/**
 		 * Load tile texture from the server.
 		 * 
@@ -1001,188 +1211,6 @@
 	}
 
 	/** 
-	 * Represents a basic plane tile node.
-	 * 
-	 * @class MapPlaneNode
-	 */
-	class MapPlaneNode extends MapNode
-	{
-		constructor(parentNode, mapView, location, level, x, y)
-		{
-			super(MapPlaneNode.GEOMETRY, new three.MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
-		
-			this.matrixAutoUpdate = false;
-			this.isMesh = true;
-			this.visible = false;
-			
-			this.loadTexture();
-		}
-		
-		/**
-		 * Map node plane geometry.
-		 *
-		 * @static
-		 * @attribute GEOMETRY
-		 * @type {PlaneBufferGeometry}
-		 */
-		static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
-		
-		createChildNodes()
-		{
-			var level = this.level + 1;
-		
-			var x = this.x * 2;
-			var y = this.y * 2;
-		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(-0.25, 0, -0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(0.25, 0, -0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(-0.25, 0, 0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
-			node.scale.set(0.5, 1, 0.5);
-			node.position.set(0.25, 0, 0.25);
-			this.add(node);
-			node.updateMatrix();
-			node.updateMatrixWorld(true);
-		}
-		
-		/**
-		 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
-		 * 
-		 * @method raycast
-		 */
-		raycast(raycaster, intersects)
-		{
-			if (this.isMesh === true)
-			{
-				return three.Mesh.prototype.raycast.call(this, raycaster, intersects);
-			}
-		
-			return false;
-		}
-	}
-
-	/**
-	 * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
-	 *
-	 * Devices with a GPS, for example, can take a minute or more to get a GPS fix, so less accurate data (IP location or wifi) may be returned.
-	 *
-	 * @static
-	 * @class UnitsUtils
-	 */
-	class UnitsUtils 
-	{
-		/**
-		 * Aproximated radius of earth in meters.
-		 *
-		 * @static
-		 * @attribute EARTH_RADIUS
-		 */
-		static EARTH_RADIUS = 6378137;
-
-		/**
-		 * Earth equator perimeter in meters.
-		 *
-		 * @static
-		 * @attribute EARTH_RADIUS
-		 */
-		static EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
-
-		/**
-		 * Earth equator perimeter in meters.
-		 *
-		 * @static
-		 * @attribute EARTH_ORIGIN
-		 */
-		static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
-
-		/**
-		 * Get the current geolocation from the browser using the location API.
-		 * 
-		 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
-		 *
-		 * @method get
-		 * @param {Function} onResult Callback function onResult(coords, timestamp).
-		 */
-		static get(onResult, onError)
-		{
-			navigator.geolocation.getCurrentPosition(function(result)
-			{
-				onResult(result.coords, result.timestamp);
-			}, onError);
-		}
-
-		/**
-		 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
-		 *
-		 * @method datumsToSpherical
-		 * @param {number} latitude
-		 * @param {number} longitude
-		 */
-		static datumsToSpherical(latitude, longitude)
-		{
-			var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
-			var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
-
-			y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
-
-			return {x: x, y: y};
-		}
-
-		/**
-		 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
-		 *
-		 * @method sphericalToDatums
-		 * @param {number} x
-		 * @param {number} y
-		 */
-		static sphericalToDatums(x, y)
-		{
-			var longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
-			var latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
-
-			latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
-
-			return {latitude: latitude, longitude: longitude};
-		}
-
-		/**
-		 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
-		 *
-		 * @method quadtreeToDatums
-		 * @param {number} zoom
-		 * @param {number} x
-		 * @param {number} y
-		 */
-		static quadtreeToDatums(zoom, x, y)
-		{
-			var n = Math.pow(2.0, zoom);
-			var longitude = x / n * 360.0 - 180.0;
-			var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
-			var latitude = 180.0 * (latitudeRad / Math.PI);
-
-			return {latitude: latitude, longitude: longitude};
-		}
-	}
-
-	/** 
 	 * Represents a map tile node.
 	 * 
 	 * A map node can be subdivided into other nodes (Quadtree).
@@ -1204,8 +1232,14 @@
 			this.loadTexture();
 		}
 		
+		static baseGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+
+		static baseScale = new three.Vector3(1, 1, 1);
+
 		/**
 		 * Number of segments per node geometry.
+		 * 
+		 * Can be configured globally and is applied to all nodes.
 		 *
 		 * @STATIC
 		 * @static SEGMENTS
@@ -1371,6 +1405,10 @@
 		 */
 		static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 		
+		static baseGeometry = MapPlaneNode.GEOMETRY;
+
+		static baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
 		/**
 		 * Prepare the threejs material to be used in the map tile.
 		 * 
@@ -1619,9 +1657,6 @@
 	 *
 	 * @class MapView
 	 * @extends {Mesh}
-	 * @param {string} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
-	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
-	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
 	class MapView extends three.Mesh
 	{
@@ -1661,33 +1696,46 @@
 		 */
 		static HEIGHT_SHADER = 203;
 
-		constructor(mode, provider, heightProvider)
+		/**
+		 * Map of the map node types available.
+		 * 
+		 * @static
+		 * @attribute mapModes
+		 * @type {Map}
+		 */
+		static mapModes = new Map([
+			[MapView.PLANAR, MapPlaneNode],
+			[MapView.SPHERICAL, MapSphereNode],
+			[MapView.HEIGHT, MapHeightNode],
+			[MapView.HEIGHT_SHADER, MapHeightNodeShader],
+		]);
+
+		/**
+		 * Constructor for the map view objects.
+		 * 
+		 * @param {string | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
+		 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+		 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
+		 */
+		constructor(root, provider, heightProvider)
 		{
-			mode = mode !== undefined ? mode : MapView.PLANAR;
-
-			var geometry;
-
-			if (mode === MapView.SPHERICAL)
-			{
-				geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-			}
-			else // if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
-			{
-				geometry = MapPlaneNode.GEOMETRY;
-			}
-
-			super(geometry, new three.MeshBasicMaterial({transparent: true, opacity: 0.0}));
+			root = root !== undefined ? root : MapView.PLANAR;
 			
-			/**
-			 * Define the type of map view in use.
-			 *
-			 * This value can only be set on creation
-			 *
-			 * @attribute mode
-			 * @type {number}
-			 */
-			this.mode = mode;
+			if (typeof root === "number")
+			{
+				if(!MapView.mapModes.has(root))
+				{
+					throw new Error("Map mode " + root + " does is not registered.");
+				}
 
+				var rootConstructor = MapView.mapModes.get(root);
+				root = new rootConstructor(null, null, MapNode.ROOT, 0, 0, 0);
+			}
+
+			super(root.constructor.baseGeometry, new three.MeshBasicMaterial({transparent: true, opacity: 0.0}));
+			
+			this.scale.copy(root.constructor.baseScale);
+			
 			/**
 			 * LOD control object used to defined how tiles are loaded in and out of memory.
 			 * 
@@ -1713,37 +1761,16 @@
 			this.heightProvider = heightProvider !== undefined ? heightProvider : null;
 
 			/**
-			 * Root map node.
+			 * Define the type of map node in use, defined how the map is presented.
 			 *
+			 * Should only be set on creationg.
+			 * 
 			 * @attribute root
-			 * @type {MapPlaneNode}
+			 * @type {MapNode}
 			 */
-			this.root = null;
-
-			if (this.mode === MapView.PLANAR)
-			{
-				this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
-				this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
-			}
-			else if (this.mode === MapView.HEIGHT)
-			{
-				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
-				this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-			}
-			else if (this.mode === MapView.HEIGHT_SHADER)
-			{
-				this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
-				this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
-			}
-			else if (this.mode === MapView.SPHERICAL)
-			{
-				this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
-			}
-
-			if (this.root !== null)
-			{
-				this.add(this.root);
-			}
+			this.root = root;
+			this.root.mapView = this;
+			this.add(this.root);
 		}
 
 		/**

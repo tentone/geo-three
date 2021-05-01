@@ -18,9 +18,6 @@ import {LODRaycast} from "./lod/LODRaycast.js";
  *
  * @class MapView
  * @extends {Mesh}
- * @param {string} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
- * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
- * @param {number} heightProvider Map height tile provider, by default no height provider is used.
  */
 export class MapView extends Mesh
 {
@@ -60,33 +57,46 @@ export class MapView extends Mesh
 	 */
 	static HEIGHT_SHADER = 203;
 
-	constructor(mode, provider, heightProvider)
+	/**
+	 * Map of the map node types available.
+	 * 
+	 * @static
+	 * @attribute mapModes
+	 * @type {Map}
+	 */
+	static mapModes = new Map([
+		[MapView.PLANAR, MapPlaneNode],
+		[MapView.SPHERICAL, MapSphereNode],
+		[MapView.HEIGHT, MapHeightNode],
+		[MapView.HEIGHT_SHADER, MapHeightNodeShader],
+	]);
+
+	/**
+	 * Constructor for the map view objects.
+	 * 
+	 * @param {string | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
+	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
+	 */
+	constructor(root, provider, heightProvider)
 	{
-		mode = mode !== undefined ? mode : MapView.PLANAR;
-
-		var geometry;
-
-		if (mode === MapView.SPHERICAL)
-		{
-			geometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-		}
-		else // if(mode === MapView.PLANAR || mode === MapView.HEIGHT)
-		{
-			geometry = MapPlaneNode.GEOMETRY;
-		}
-
-		super(geometry, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
+		root = root !== undefined ? root : MapView.PLANAR;
 		
-		/**
-		 * Define the type of map view in use.
-		 *
-		 * This value can only be set on creation
-		 *
-		 * @attribute mode
-		 * @type {number}
-		 */
-		this.mode = mode;
+		if (typeof root === "number")
+		{
+			if(!MapView.mapModes.has(root))
+			{
+				throw new Error("Map mode " + root + " does is not registered.");
+			}
 
+			var rootConstructor = MapView.mapModes.get(root);
+			root = new rootConstructor(null, null, MapNode.ROOT, 0, 0, 0);
+		}
+
+		super(root.constructor.baseGeometry, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
+		
+		this.scale.copy(root.constructor.baseScale);
+		
 		/**
 		 * LOD control object used to defined how tiles are loaded in and out of memory.
 		 * 
@@ -112,37 +122,16 @@ export class MapView extends Mesh
 		this.heightProvider = heightProvider !== undefined ? heightProvider : null;
 
 		/**
-		 * Root map node.
+		 * Define the type of map node in use, defined how the map is presented.
 		 *
+		 * Should only be set on creationg.
+		 * 
 		 * @attribute root
-		 * @type {MapPlaneNode}
+		 * @type {MapNode}
 		 */
-		this.root = null;
-
-		if (this.mode === MapView.PLANAR)
-		{
-			this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
-			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
-		}
-		else if (this.mode === MapView.HEIGHT)
-		{
-			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
-			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
-		}
-		else if (this.mode === MapView.HEIGHT_SHADER)
-		{
-			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
-			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
-		}
-		else if (this.mode === MapView.SPHERICAL)
-		{
-			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
-		}
-
-		if (this.root !== null)
-		{
-			this.add(this.root);
-		}
+		this.root = root;
+		this.root.mapView = this;
+		this.add(this.root);
 	}
 
 	/**

@@ -1,6 +1,8 @@
-import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter} from "three";
+import {Mesh, MeshPhongMaterial, Texture, RGBFormat, LinearFilter, Vector3} from "three";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
 import {MapNode} from "./MapNode.js";
+import {MapPlaneNode} from "./MapPlaneNode.js";
+import {UnitsUtils} from "../utils/UnitsUtils";
 
 /** 
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -77,7 +79,7 @@ export class MapHeightNode extends MapNode
 	 * @attribute GEOMETRY_SIZE
 	 * @type {number}
 	 */
-	 static GEOMETRY_SIZE = 16;
+	static GEOMETRY_SIZE = 16;
 	
 	/**
 	 * Map node plane geometry.
@@ -86,8 +88,12 @@ export class MapHeightNode extends MapNode
 	 * @attribute GEOMETRY
 	 * @type {PlaneBufferGeometry}
 	 */
-	 static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 	
+	static baseGeometry = MapPlaneNode.GEOMETRY;
+
+	static baseScale = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
 	/**
 	 * Load tile texture from the server.
 	 * 

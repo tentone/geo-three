@@ -1,7 +1,7 @@
-import {Mesh, MeshBasicMaterial} from "three";
+import {Mesh, MeshBasicMaterial, Vector3} from "three";
 import {MapNode} from "./MapNode.js";
 import {MapNodeGeometry} from "../geometries/MapNodeGeometry";
-
+import {UnitsUtils} from "../utils/UnitsUtils";
 /** 
  * Represents a basic plane tile node.
  * 
@@ -29,6 +29,10 @@ export class MapPlaneNode extends MapNode
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
 	
+	static baseGeometry = MapPlaneNode.GEOMETRY;
+
+	static baseScale = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
 	createChildNodes()
 	{
 		var level = this.level + 1;
