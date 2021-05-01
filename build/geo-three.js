@@ -1,7 +1,9 @@
+
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
-	(global = global || self, factory(global.Geo = {}, global.THREE));
+	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.Geo = {}, global.THREE));
 }(this, (function (exports, three) { 'use strict';
 
 	/**
@@ -553,7 +555,8 @@
 		 */
 		subdivide()
 		{
-			if (this.children.length > 0 || this.level + 1 > this.mapView.provider.maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)
+			const maxZoom = Math.min (this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
+			if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)
 			{
 				return;
 			}
@@ -1622,6 +1625,42 @@
 	 */
 	class MapView extends three.Mesh
 	{
+		/**
+		 * Planar map projection.
+		 *
+		 * @static
+		 * @attribute PLANAR
+		 * @type {number}
+		 */
+		static PLANAR = 200;
+
+		/**
+		 * Spherical map projection.
+		 *
+		 * @static
+		 * @attribute SPHERICAL
+		 * @type {number}
+		 */
+		static SPHERICAL = 201;
+
+		/**
+		 * Planar map projection with height deformation.
+		 *
+		 * @static
+		 * @attribute HEIGHT
+		 * @type {number}
+		 */
+		static HEIGHT = 202;
+
+		/**
+		 * Planar map projection with height deformation using the GPU for height generation.
+		 *
+		 * @static
+		 * @attribute HEIGHT_DISPLACEMENT
+		 * @type {number}
+		 */
+		static HEIGHT_SHADER = 203;
+
 		constructor(mode, provider, heightProvider)
 		{
 			mode = mode !== undefined ? mode : MapView.PLANAR;
@@ -1700,8 +1739,10 @@
 			{
 				this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
 			}
-			
-			this.add(this.root);
+			if (this.root)
+			{
+				this.add(this.root);
+			}
 		}
 
 		/**
@@ -1800,44 +1841,8 @@
 		}
 	}
 
-	/**
-	 * Planar map projection.
-	 *
-	 * @static
-	 * @attribute PLANAR
-	 * @type {number}
-	 */
-	MapView.PLANAR = 200;
-
-	/**
-	 * Spherical map projection.
-	 *
-	 * @static
-	 * @attribute SPHERICAL
-	 * @type {number}
-	 */
-	MapView.SPHERICAL = 201;
-
-	/**
-	 * Planar map projection with height deformation.
-	 *
-	 * @static
-	 * @attribute HEIGHT
-	 * @type {number}
-	 */
-	MapView.HEIGHT = 202;
-
-	/**
-	 * Planar map projection with height deformation using the GPU for height generation.
-	 *
-	 * @static
-	 * @attribute HEIGHT_DISPLACEMENT
-	 * @type {number}
-	 */
-	MapView.HEIGHT_SHADER = 203;
-
-	var pov = new three.Vector3();
-	var position = new three.Vector3();
+	var pov$1 = new three.Vector3();
+	var position$1 = new three.Vector3();
 
 	/**
 	 * Check the planar distance between the nodes center and the view position.
@@ -1874,13 +1879,13 @@
 		{
 			var self = this;
 		
-			camera.getWorldPosition(pov);
+			camera.getWorldPosition(pov$1);
 		
 			view.children[0].traverse(function(node)
 			{
-				node.getWorldPosition(position);
+				node.getWorldPosition(position$1);
 		
-				var distance = pov.distanceTo(position);
+				var distance = pov$1.distanceTo(position$1);
 				distance /= Math.pow(2, view.provider.maxZoom - node.level);
 		
 				if (distance < self.subdivideDistance)
@@ -1896,9 +1901,9 @@
 	}
 
 	var projection = new three.Matrix4();
-	var pov$1 = new three.Vector3();
+	var pov = new three.Vector3();
 	var frustum = new three.Frustum();
-	var position$1 = new three.Vector3();
+	var position = new three.Vector3();
 
 	/**
 	 * Check the planar distance between the nodes center and the view position.
@@ -1933,18 +1938,16 @@
 		{
 			projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 			frustum.setFromProjectionMatrix(projection);
-			camera.getWorldPosition(pov$1);
+			camera.getWorldPosition(pov);
 			
 			var self = this;
-		
 			view.children[0].traverse(function(node)
 			{
-				node.getWorldPosition(position$1);
-		
-				var distance = pov$1.distanceTo(position$1);
+				node.getWorldPosition(position);
+				var distance = pov.distanceTo(position);
 				distance /= Math.pow(2, view.provider.maxZoom - node.level);
 		
-				var inFrustum = self.pointOnly ? frustum.containsPoint(position$1) : frustum.intersectsObject(node);
+				var inFrustum = self.pointOnly ? frustum.containsPoint(position) : frustum.intersectsObject(node);
 		
 				if (distance < self.subdivideDistance && inFrustum)
 				{
@@ -2191,7 +2194,7 @@
 			
 			XHRUtils.get(address, function(data)
 			{
-				const meta = JSON.parse(data);
+				JSON.parse(data);
 
 				// TODO <FILL METADATA>
 			});
@@ -2952,6 +2955,7 @@
 	}
 
 	exports.BingMapsProvider = BingMapsProvider;
+	exports.CancelablePromise = CancelablePromise;
 	exports.DebugProvider = DebugProvider;
 	exports.GoogleMapsProvider = GoogleMapsProvider;
 	exports.HeightDebugProvider = HeightDebugProvider;

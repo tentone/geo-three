@@ -8,8 +8,7 @@
 		"url": "https://github.com/tentone/geothree.git"
 	},
 	"scripts": {
-		"start": "rollup -c rollup.dev.js",
-		"watch": "rollup -c rollup.dev.js --watch",
+		"start": "rollup -c rollup.dev.js --watch",
 		"build": "rollup -c",
 		"docs": "jsdoc -d docs -r source",
 		"uglify": "uglifyjs --compress --mangle --output build/geo-three.min.js -- build/geo-three.js",

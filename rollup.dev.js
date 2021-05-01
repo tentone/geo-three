@@ -7,9 +7,10 @@ export default {
 		serve({
 			open: true,
 			contentBase: '.',
-			openPage: '/examples',
+			verbose: true,
+			openPage: '/',
 			host: 'localhost',
-			port: 8083
+			port: 8080
 		}),
 		livereload({watch: '.'})
 	],
