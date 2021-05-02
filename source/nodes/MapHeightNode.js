@@ -12,18 +12,22 @@ import {UnitsUtils} from "../utils/UnitsUtils";
  * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
  *
  * @class MapHeightNode
- * @param parentNode {MapHeightNode} The parent node of this node.
- * @param mapView {MapView} Map view object where this node is placed.
- * @param location {number} Position in the node tree relative to the parent.
- * @param level {number} Zoom level in the tile tree of the node.
- * @param x {number} X position of the node in the tile tree.
- * @param y {number} Y position of the node in the tile tree.
- * @param material {Material} Material used to render this height node.
- * @param geometry {Geometry} Geometry used to render this height node.
  */
 export class MapHeightNode extends MapNode
 {
-	constructor(parentNode, mapView, location, level, x, y, material, geometry)
+	/**
+	 * Map height node constructor.
+	 *  
+	 * @param parentNode {MapHeightNode} The parent node of this node.
+	 * @param mapView {MapView} Map view object where this node is placed.
+	 * @param location {number} Position in the node tree relative to the parent.
+	 * @param level {number} Zoom level in the tile tree of the node.
+	 * @param x {number} X position of the node in the tile tree.
+	 * @param y {number} Y position of the node in the tile tree.
+	 * @param material {Material} Material used to render this height node.
+	 * @param geometry {Geometry} Geometry used to render this height node.
+	 */
+	constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material, geometry)
 	{
 		if (material === undefined)
 		{
@@ -90,9 +94,9 @@ export class MapHeightNode extends MapNode
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 	
-	static baseGeometry = MapPlaneNode.GEOMETRY;
+	static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-	static baseScale = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
 	 * Load tile texture from the server.

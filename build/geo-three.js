@@ -300,14 +300,14 @@
 	 * 
 	 * @class MapNode
 	 */
-	class MapNode extends three.Mesh
+	class MapNode$1 extends three.Mesh
 	{
 		constructor(geometry, material, parentNode, mapView, location, level, x, y)
 		{
 			super(geometry, material);
 
 			/**
-			 * The map view.
+			 * The map view object where the node is placed.
 			 *
 			 * @attribute mapView
 			 * @type {MapView}
@@ -393,19 +393,19 @@
 		 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
 		 * 
 		 * @static
-		 * @attribute baseGeometry
+		 * @attribute BASE_GEOMETRY
 		 * @type {THREE.Geometry}
 		 */
-		static baseGeometry = null;
+		static BASE_GEOMETRY = null;
 
 		/**
 		 * Base scale applied to the map viewer object.
 		 * 
 		 * @static
-		 * @attribute baseScale
+		 * @attribute BASE_SCALE
 		 * @type {THREE.Vector3}
 		 */
-		static baseScale = null;
+		static BASE_SCALE = null;
 
 		/**
 		 * How many children each branch of the tree has.
@@ -490,7 +490,7 @@
 		subdivide()
 		{
 			const maxZoom = Math.min (this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-			if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)
+			if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode$1.CHILDRENS)
 			{
 				return;
 			}
@@ -582,7 +582,7 @@
 			{
 				this.parentNode.nodesLoaded++;
 		
-				if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS)
+				if (this.parentNode.nodesLoaded >= MapNode$1.CHILDRENS)
 				{
 					if (this.parentNode.subdivided === true)
 					{
@@ -812,9 +812,9 @@
 	 * 
 	 * @class MapPlaneNode
 	 */
-	class MapPlaneNode extends MapNode
+	class MapPlaneNode extends MapNode$1
 	{
-		constructor(parentNode, mapView, location, level, x, y)
+		constructor(parentNode, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
 		{
 			super(MapPlaneNode.GEOMETRY, new three.MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 		
@@ -834,9 +834,9 @@
 		 */
 		static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
 		
-		static baseGeometry = MapPlaneNode.GEOMETRY;
+		static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-		static baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+		static BASE_SCALE = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 		createChildNodes()
 		{
@@ -845,28 +845,28 @@
 			var x = this.x * 2;
 			var y = this.y * 2;
 		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+			var node = new MapPlaneNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(-0.25, 0, -0.25);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+			var node = new MapPlaneNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(0.25, 0, -0.25);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+			var node = new MapPlaneNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(-0.25, 0, 0.25);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new MapPlaneNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+			var node = new MapPlaneNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(0.25, 0, 0.25);
 			this.add(node);
@@ -898,18 +898,22 @@
 	 * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
 	 *
 	 * @class MapHeightNode
-	 * @param parentNode {MapHeightNode} The parent node of this node.
-	 * @param mapView {MapView} Map view object where this node is placed.
-	 * @param location {number} Position in the node tree relative to the parent.
-	 * @param level {number} Zoom level in the tile tree of the node.
-	 * @param x {number} X position of the node in the tile tree.
-	 * @param y {number} Y position of the node in the tile tree.
-	 * @param material {Material} Material used to render this height node.
-	 * @param geometry {Geometry} Geometry used to render this height node.
 	 */
-	class MapHeightNode extends MapNode
+	class MapHeightNode extends MapNode$1
 	{
-		constructor(parentNode, mapView, location, level, x, y, material, geometry)
+		/**
+		 * Map height node constructor.
+		 *  
+		 * @param parentNode {MapHeightNode} The parent node of this node.
+		 * @param mapView {MapView} Map view object where this node is placed.
+		 * @param location {number} Position in the node tree relative to the parent.
+		 * @param level {number} Zoom level in the tile tree of the node.
+		 * @param x {number} X position of the node in the tile tree.
+		 * @param y {number} Y position of the node in the tile tree.
+		 * @param material {Material} Material used to render this height node.
+		 * @param geometry {Geometry} Geometry used to render this height node.
+		 */
+		constructor(parentNode, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0, material, geometry)
 		{
 			if (material === undefined)
 			{
@@ -976,9 +980,9 @@
 		 */
 		static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 		
-		static baseGeometry = MapPlaneNode.GEOMETRY;
+		static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-		static baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+		static BASE_SCALE = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 		/**
 		 * Load tile texture from the server.
@@ -1018,7 +1022,7 @@
 		
 			this.visible = true;
 		
-			MapNode.prototype.nodeReady.call(this);
+			MapNode$1.prototype.nodeReady.call(this);
 		};
 		
 		createChildNodes()
@@ -1028,28 +1032,28 @@
 			var x = this.x * 2;
 			var y = this.y * 2;
 		
-			var node = new this.constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+			var node = new this.constructor(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(-0.25, 0, -0.25);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new this.constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+			var node = new this.constructor(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(0.25, 0, -0.25);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new this.constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+			var node = new this.constructor(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(-0.25, 0, 0.25);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new this.constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+			var node = new this.constructor(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
 			node.scale.set(0.5, 1, 0.5);
 			node.position.set(0.25, 0, 0.25);
 			this.add(node);
@@ -1217,9 +1221,9 @@
 	 * 
 	 * @class MapSphereNode
 	 */
-	class MapSphereNode extends MapNode
+	class MapSphereNode extends MapNode$1
 	{
-		constructor(parentNode, mapView, location, level, x, y)
+		constructor(parentNode, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
 		{
 			super(MapSphereNode.createGeometry(level, x, y), new three.MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 		
@@ -1232,9 +1236,9 @@
 			this.loadTexture();
 		}
 		
-		static baseGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+		static BASE_GEOMETRY = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 
-		static baseScale = new three.Vector3(1, 1, 1);
+		static BASE_SCALE = new three.Vector3(1, 1, 1);
 
 		/**
 		 * Number of segments per node geometry.
@@ -1316,22 +1320,22 @@
 			var x = this.x * 2;
 			var y = this.y * 2;
 		
-			var node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+			var node = new MapSphereNode(this, this.mapView, MapNode$1.TOP_LEFT, level, x, y);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+			var node = new MapSphereNode(this, this.mapView, MapNode$1.TOP_RIGHT, level, x + 1, y);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+			var node = new MapSphereNode(this, this.mapView, MapNode$1.BOTTOM_LEFT, level, x, y + 1);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
 		
-			var node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+			var node = new MapSphereNode(this, this.mapView, MapNode$1.BOTTOM_RIGHT, level, x + 1, y + 1);
 			this.add(node);
 			node.updateMatrix();
 			node.updateMatrixWorld(true);
@@ -1368,7 +1372,7 @@
 	 */
 	class MapHeightNodeShader extends MapHeightNode
 	{
-		constructor(parentNode, mapView, location, level, x, y)
+		constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 		{
 			var material = new three.MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 			material = MapHeightNodeShader.prepareMaterial(material);
@@ -1405,9 +1409,9 @@
 		 */
 		static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 		
-		static baseGeometry = MapPlaneNode.GEOMETRY;
+		static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-		static baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+		static BASE_SCALE = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 		/**
 		 * Prepare the threejs material to be used in the map tile.
@@ -1776,7 +1780,7 @@
 				}
 
 				var rootConstructor = MapView.mapModes.get(root);
-				root = new rootConstructor(null, this, MapNode.ROOT, 0, 0, 0);
+				root = new rootConstructor(null, this, MapNode$1.ROOT, 0, 0, 0);
 			}
 
 			if (this.root !== null) {
@@ -1786,8 +1790,8 @@
 
 			this.root = root;
 			
-			this.geometry = this.root.constructor.baseGeometry;
-			this.scale.copy(this.root.constructor.baseScale);
+			this.geometry = this.root.constructor.BASE_GEOMETRY;
+			this.scale.copy(this.root.constructor.BASE_SCALE);
 
 			this.root.mapView = this;
 			this.add(this.root);
@@ -3015,7 +3019,7 @@
 	exports.MapBoxProvider = MapBoxProvider;
 	exports.MapHeightNode = MapHeightNode;
 	exports.MapHeightNodeShader = MapHeightNodeShader;
-	exports.MapNode = MapNode;
+	exports.MapNode = MapNode$1;
 	exports.MapNodeGeometry = MapNodeGeometry;
 	exports.MapPlaneNode = MapPlaneNode;
 	exports.MapProvider = MapProvider;

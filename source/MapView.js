@@ -145,8 +145,8 @@ export class MapView extends Mesh
 
 		this.root = root;
 		
-		this.geometry = this.root.constructor.baseGeometry;
-		this.scale.copy(this.root.constructor.baseScale);
+		this.geometry = this.root.constructor.BASE_GEOMETRY;
+		this.scale.copy(this.root.constructor.BASE_SCALE);
 
 		this.root.mapView = this;
 		this.add(this.root);

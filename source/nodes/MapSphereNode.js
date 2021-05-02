@@ -12,7 +12,7 @@ import {UnitsUtils} from "../utils/UnitsUtils.js";
  */
 export class MapSphereNode extends MapNode
 {
-	constructor(parentNode, mapView, location, level, x, y)
+	constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 	{
 		super(MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 	
@@ -25,9 +25,9 @@ export class MapSphereNode extends MapNode
 		this.loadTexture();
 	}
 	
-	static baseGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+	static BASE_GEOMETRY = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 
-	static baseScale = new Vector3(1, 1, 1);
+	static BASE_SCALE = new Vector3(1, 1, 1);
 
 	/**
 	 * Number of segments per node geometry.

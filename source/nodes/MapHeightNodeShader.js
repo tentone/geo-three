@@ -19,7 +19,7 @@ import {UnitsUtils} from "../utils/UnitsUtils";
  */
 export class MapHeightNodeShader extends MapHeightNode
 {
-	constructor(parentNode, mapView, location, level, x, y)
+	constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 	{
 		var material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 		material = MapHeightNodeShader.prepareMaterial(material);
@@ -56,9 +56,9 @@ export class MapHeightNodeShader extends MapHeightNode
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 	
-	static baseGeometry = MapPlaneNode.GEOMETRY;
+	static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-	static baseScale = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
 	 * Prepare the threejs material to be used in the map tile.

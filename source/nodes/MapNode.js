@@ -16,7 +16,7 @@ export class MapNode extends Mesh
 		super(geometry, material);
 
 		/**
-		 * The map view.
+		 * The map view object where the node is placed.
 		 *
 		 * @attribute mapView
 		 * @type {MapView}
@@ -102,19 +102,19 @@ export class MapNode extends Mesh
 	 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
 	 * 
 	 * @static
-	 * @attribute baseGeometry
+	 * @attribute BASE_GEOMETRY
 	 * @type {THREE.Geometry}
 	 */
-	static baseGeometry = null;
+	static BASE_GEOMETRY = null;
 
 	/**
 	 * Base scale applied to the map viewer object.
 	 * 
 	 * @static
-	 * @attribute baseScale
+	 * @attribute BASE_SCALE
 	 * @type {THREE.Vector3}
 	 */
-	static baseScale = null;
+	static BASE_SCALE = null;
 
 	/**
 	 * How many children each branch of the tree has.
