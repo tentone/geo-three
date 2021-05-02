@@ -385,6 +385,7 @@
 			 * @type {MapView}
 			 */
 			this.mapView = mapView;
+
 			this.initialize();
 		}
 		
@@ -475,7 +476,7 @@
 		/**
 		 * Initialize resources that require access to data from the MapView.
 		 * 
-		 * Called automatically by the constructor but can also be called by the MapView when a node is attached to it.
+		 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
 		 * 
 		 * @method initialize
 		 */
