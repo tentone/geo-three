@@ -7,92 +7,6 @@
 }(this, (function (exports, three) { 'use strict';
 
 	/**
-	 * Map node geometry is a geometry used to represent the spherical map nodes.
-	 *
-	 * @class MapSphereNodeGeometry
-	 * @extends {BufferGeometry}
-	 * @param {number} width Width of the node.
-	 * @param {number} height Height of the node.
-	 * @param {number} widthSegments Number of subdivisions along the width.
-	 * @param {number} heightSegments Number of subdivisions along the height.
-	 */
-	class MapSphereNodeGeometry extends three.BufferGeometry 
-	{
-		constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
-		{
-			super();
-
-			const thetaEnd = thetaStart + thetaLength;
-			let index = 0;
-			const grid = [];
-			const vertex = new three.Vector3();
-			const normal = new three.Vector3();
-
-			// Buffers
-			const indices = [];
-			const vertices = [];
-			const normals = [];
-			const uvs = [];
-
-			// Generate vertices, normals and uvs
-			for (var iy = 0; iy <= heightSegments; iy++)
-			{
-				const verticesRow = [];
-				const v = iy / heightSegments;
-
-				for (var ix = 0; ix <= widthSegments; ix++)
-				{
-					const u = ix / widthSegments;
-
-					// Vertex
-					vertex.x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
-					vertex.y = radius * Math.cos(thetaStart + v * thetaLength);
-					vertex.z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
-
-					vertices.push(vertex.x, vertex.y, vertex.z);
-
-					// Normal
-					normal.set(vertex.x, vertex.y, vertex.z).normalize();
-					normals.push(normal.x, normal.y, normal.z);
-
-					// UV
-					uvs.push(u, 1 - v);
-					verticesRow.push(index++);
-				}
-
-				grid.push(verticesRow);
-			}
-
-			// Indices
-			for (var iy = 0; iy < heightSegments; iy++)
-			{
-				for (var ix = 0; ix < widthSegments; ix++)
-				{
-					const a = grid[iy][ix + 1];
-					const b = grid[iy][ix];
-					const c = grid[iy + 1][ix];
-					const d = grid[iy + 1][ix + 1];
-
-					if (iy !== 0 || thetaStart > 0)
-					{
-						indices.push(a, b, d);
-					}
-
-					if (iy !== heightSegments - 1 || thetaEnd < Math.PI)
-					{
-						indices.push(b, c, d);
-					}
-				}
-			}
-
-			this.setIndex(indices);
-			this.setAttribute("position", new three.Float32BufferAttribute(vertices, 3));
-			this.setAttribute("normal", new three.Float32BufferAttribute(normals, 3));
-			this.setAttribute("uv", new three.Float32BufferAttribute(uvs, 2));
-		}
-	}
-
-	/**
 	 * A map provider is a object that handles the access to map tiles of a specific service.
 	 *
 	 * They contain the access configuration and are responsible for handling the map theme size etc.
@@ -1210,6 +1124,92 @@
 		};
 	}
 
+	/**
+	 * Map node geometry is a geometry used to represent the spherical map nodes.
+	 *
+	 * @class MapSphereNodeGeometry
+	 * @extends {BufferGeometry}
+	 * @param {number} width Width of the node.
+	 * @param {number} height Height of the node.
+	 * @param {number} widthSegments Number of subdivisions along the width.
+	 * @param {number} heightSegments Number of subdivisions along the height.
+	 */
+	class MapSphereNodeGeometry extends three.BufferGeometry 
+	{
+		constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+		{
+			super();
+
+			const thetaEnd = thetaStart + thetaLength;
+			let index = 0;
+			const grid = [];
+			const vertex = new three.Vector3();
+			const normal = new three.Vector3();
+
+			// Buffers
+			const indices = [];
+			const vertices = [];
+			const normals = [];
+			const uvs = [];
+
+			// Generate vertices, normals and uvs
+			for (var iy = 0; iy <= heightSegments; iy++)
+			{
+				const verticesRow = [];
+				const v = iy / heightSegments;
+
+				for (var ix = 0; ix <= widthSegments; ix++)
+				{
+					const u = ix / widthSegments;
+
+					// Vertex
+					vertex.x = -radius * Math.cos(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
+					vertex.y = radius * Math.cos(thetaStart + v * thetaLength);
+					vertex.z = radius * Math.sin(phiStart + u * phiLength) * Math.sin(thetaStart + v * thetaLength);
+
+					vertices.push(vertex.x, vertex.y, vertex.z);
+
+					// Normal
+					normal.set(vertex.x, vertex.y, vertex.z).normalize();
+					normals.push(normal.x, normal.y, normal.z);
+
+					// UV
+					uvs.push(u, 1 - v);
+					verticesRow.push(index++);
+				}
+
+				grid.push(verticesRow);
+			}
+
+			// Indices
+			for (var iy = 0; iy < heightSegments; iy++)
+			{
+				for (var ix = 0; ix < widthSegments; ix++)
+				{
+					const a = grid[iy][ix + 1];
+					const b = grid[iy][ix];
+					const c = grid[iy + 1][ix];
+					const d = grid[iy + 1][ix + 1];
+
+					if (iy !== 0 || thetaStart > 0)
+					{
+						indices.push(a, b, d);
+					}
+
+					if (iy !== heightSegments - 1 || thetaEnd < Math.PI)
+					{
+						indices.push(b, c, d);
+					}
+				}
+			}
+
+			this.setIndex(indices);
+			this.setAttribute("position", new three.Float32BufferAttribute(vertices, 3));
+			this.setAttribute("normal", new three.Float32BufferAttribute(normals, 3));
+			this.setAttribute("uv", new three.Float32BufferAttribute(uvs, 2));
+		}
+	}
+
 	/** 
 	 * Represents a map tile node.
 	 * 
@@ -1713,7 +1713,7 @@
 		/**
 		 * Constructor for the map view objects.
 		 * 
-		 * @param {string | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
+		 * @param {number | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
 		 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 		 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 		 */
@@ -1721,21 +1721,8 @@
 		{
 			root = root !== undefined ? root : MapView.PLANAR;
 			
-			if (typeof root === "number")
-			{
-				if(!MapView.mapModes.has(root))
-				{
-					throw new Error("Map mode " + root + " does is not registered.");
-				}
-
-				var rootConstructor = MapView.mapModes.get(root);
-				root = new rootConstructor(null, null, MapNode.ROOT, 0, 0, 0);
-			}
-
-			super(root.constructor.baseGeometry, new three.MeshBasicMaterial({transparent: true, opacity: 0.0}));
-			
-			this.scale.copy(root.constructor.baseScale);
-			
+			super(undefined, new three.MeshBasicMaterial({transparent: true, opacity: 0.0}));
+				
 			/**
 			 * LOD control object used to defined how tiles are loaded in and out of memory.
 			 * 
@@ -1768,7 +1755,40 @@
 			 * @attribute root
 			 * @type {MapNode}
 			 */
+			this.root = null;
+			this.setRoot(root);
+		}
+
+		/**
+		 * Set the root of the map view.
+		 * 
+		 * Is set by the constructor by default, can be changed in runtime.
+		 * 
+		 * @method setRoot
+		 * @param {MapNode} root Map node to be used as root. 
+		 */
+		setRoot(root) {
+			if (typeof root === "number")
+			{
+				if(!MapView.mapModes.has(root))
+				{
+					throw new Error("Map mode " + root + " does is not registered.");
+				}
+
+				var rootConstructor = MapView.mapModes.get(root);
+				root = new rootConstructor(null, this, MapNode.ROOT, 0, 0, 0);
+			}
+
+			if (this.root !== null) {
+				this.remove(this.root);
+				this.root = null;
+			}
+
 			this.root = root;
+			
+			this.geometry = this.root.constructor.baseGeometry;
+			this.scale.copy(this.root.constructor.baseScale);
+
 			this.root.mapView = this;
 			this.add(this.root);
 		}

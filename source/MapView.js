@@ -1,11 +1,9 @@
 import {Mesh, MeshBasicMaterial} from "three";
-import {MapSphereNodeGeometry} from "./geometries/MapSphereNodeGeometry.js";
 import {OpenStreetMapsProvider} from "./providers/OpenStreetMapsProvider.js";
 import {MapNode} from "./nodes/MapNode.js";
 import {MapHeightNode} from "./nodes/MapHeightNode.js";
 import {MapPlaneNode} from "./nodes/MapPlaneNode.js";
 import {MapSphereNode} from "./nodes/MapSphereNode.js";
-import {UnitsUtils} from "./utils/UnitsUtils.js";
 import {MapHeightNodeShader} from "./nodes/MapHeightNodeShader.js";
 import {LODRaycast} from "./lod/LODRaycast.js";
 
@@ -74,7 +72,7 @@ export class MapView extends Mesh
 	/**
 	 * Constructor for the map view objects.
 	 * 
-	 * @param {string | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
+	 * @param {number | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
 	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
@@ -82,21 +80,8 @@ export class MapView extends Mesh
 	{
 		root = root !== undefined ? root : MapView.PLANAR;
 		
-		if (typeof root === "number")
-		{
-			if(!MapView.mapModes.has(root))
-			{
-				throw new Error("Map mode " + root + " does is not registered.");
-			}
-
-			var rootConstructor = MapView.mapModes.get(root);
-			root = new rootConstructor(null, null, MapNode.ROOT, 0, 0, 0);
-		}
-
-		super(root.constructor.baseGeometry, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
-		
-		this.scale.copy(root.constructor.baseScale);
-		
+		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
+			
 		/**
 		 * LOD control object used to defined how tiles are loaded in and out of memory.
 		 * 
@@ -129,7 +114,40 @@ export class MapView extends Mesh
 		 * @attribute root
 		 * @type {MapNode}
 		 */
+		this.root = null;
+		this.setRoot(root);
+	}
+
+	/**
+	 * Set the root of the map view.
+	 * 
+	 * Is set by the constructor by default, can be changed in runtime.
+	 * 
+	 * @method setRoot
+	 * @param {MapNode} root Map node to be used as root. 
+	 */
+	setRoot(root) {
+		if (typeof root === "number")
+		{
+			if(!MapView.mapModes.has(root))
+			{
+				throw new Error("Map mode " + root + " does is not registered.");
+			}
+
+			var rootConstructor = MapView.mapModes.get(root);
+			root = new rootConstructor(null, this, MapNode.ROOT, 0, 0, 0);
+		}
+
+		if (this.root !== null) {
+			this.remove(this.root);
+			this.root = null;
+		}
+
 		this.root = root;
+		
+		this.geometry = this.root.constructor.baseGeometry;
+		this.scale.copy(this.root.constructor.baseScale);
+
 		this.root.mapView = this;
 		this.add(this.root);
 	}
