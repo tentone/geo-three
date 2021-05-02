@@ -291,7 +291,7 @@
 		}
 	}
 
-	/** 
+	/**
 	 * Represents a map tile node inside of the tiles quad-tree
 	 * 
 	 * Each map node can be subdivided into other nodes.
@@ -302,17 +302,9 @@
 	 */
 	class MapNode$1 extends three.Mesh
 	{
-		constructor(geometry, material, parentNode, mapView, location, level, x, y)
+		constructor(geometry = null, material = null, parentNode = null, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
 		{
 			super(geometry, material);
-
-			/**
-			 * The map view object where the node is placed.
-			 *
-			 * @attribute mapView
-			 * @type {MapView}
-			 */
-			this.mapView = mapView;
 		
 			/**
 			 * Parent node (from an upper tile level).
@@ -385,6 +377,15 @@
 			 * @type {Array}
 			 */
 			this.childrenCache = null;
+
+			/**
+			 * The map view object where the node is placed.
+			 *
+			 * @attribute mapView
+			 * @type {MapView}
+			 */
+			this.mapView = mapView;
+			this.initialize();
 		}
 		
 		/**
@@ -472,6 +473,15 @@
 		static BOTTOM_RIGHT = 3;
 		
 		/**
+		 * Initialize resources that require access to data from the MapView.
+		 * 
+		 * Called automatically by the constructor but can also be called by the MapView when a node is attached to it.
+		 * 
+		 * @method initialize
+		 */
+		initialize() {}
+
+		/**
 		 * Create the child nodes to represent the next tree level.
 		 *
 		 * These nodes should be added to the object, and their transformations matrix should be updated.
@@ -479,7 +489,7 @@
 		 * @method createChildNodes 
 		 */
 		createChildNodes() {}
-		
+
 		/**
 		 * Subdivide node,check the maximum depth allowed for the tile provider.
 		 *
@@ -537,11 +547,11 @@
 		 * @method loadTexture
 		 * @param {Function} onLoad 
 		 */
-		loadTexture(onLoad)
+		loadTexture()
 		{
 			var self = this;
 			
-			this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+			this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
 			{
 				var texture = new three.Texture(image);
 				texture.generateMipmaps = false;
@@ -814,15 +824,13 @@
 	 */
 	class MapPlaneNode extends MapNode$1
 	{
-		constructor(parentNode, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
+		constructor(parentNode = null, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
 		{
 			super(MapPlaneNode.GEOMETRY, new three.MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 		
 			this.matrixAutoUpdate = false;
 			this.isMesh = true;
-			this.visible = false;
-			
-			this.loadTexture();
+			this.visible = false;	
 		}
 		
 		/**
@@ -837,6 +845,10 @@
 		static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
 		static BASE_SCALE = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
+		initialize() {
+			this.loadTexture();
+		}
 
 		createChildNodes()
 		{
@@ -913,7 +925,7 @@
 		 * @param material {Material} Material used to render this height node.
 		 * @param geometry {Geometry} Geometry used to render this height node.
 		 */
-		constructor(parentNode, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0, material, geometry)
+		constructor(parentNode = null, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0, material, geometry)
 		{
 			if (material === undefined)
 			{
@@ -949,8 +961,6 @@
 			 * @type {boolean}
 			 */
 			this.heightLoaded = false;
-		
-			this.loadTexture();
 		}
 		
 		/**
@@ -984,6 +994,11 @@
 
 		static BASE_SCALE = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
+		initialize() {
+			this.loadTexture();
+			this.loadHeightGeometry();
+		}
+
 		/**
 		 * Load tile texture from the server.
 		 * 
@@ -995,7 +1010,7 @@
 		{
 			var self = this;
 		
-			this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+			this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
 			{
 				var texture = new three.Texture(image);
 				texture.generateMipmaps = false;
@@ -1010,7 +1025,7 @@
 				self.nodeReady();
 			});
 		
-			this.loadHeightGeometry();
+			
 		};
 		
 		nodeReady()
@@ -1223,7 +1238,7 @@
 	 */
 	class MapSphereNode extends MapNode$1
 	{
-		constructor(parentNode, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
+		constructor(parentNode = null, mapView = null, location = MapNode$1.ROOT, level = 0, x = 0, y = 0)
 		{
 			super(MapSphereNode.createGeometry(level, x, y), new three.MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 		
@@ -1232,8 +1247,6 @@
 			this.matrixAutoUpdate = false;
 			this.isMesh = true;
 			this.visible = false;
-		
-			this.loadTexture();
 		}
 		
 		static BASE_GEOMETRY = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
@@ -1251,6 +1264,10 @@
 		 */
 		static SEGMENTS = 80;
 		
+		initialize() {
+			this.loadTexture();
+		}
+
 		/**
 		 * Create a geometry for a sphere map node.
 		 *
@@ -1372,7 +1389,7 @@
 	 */
 	class MapHeightNodeShader extends MapHeightNode
 	{
-		constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
+		constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 		{
 			var material = new three.MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 			material = MapHeightNodeShader.prepareMaterial(material);
@@ -1456,7 +1473,7 @@
 		{
 			var self = this;
 		
-			this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+			this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
 			{
 				var texture = new three.Texture(image);
 				texture.generateMipmaps = false;
@@ -1872,19 +1889,6 @@
 		getMetaData()
 		{
 			this.provider.getMetaData();
-		}
-
-		/**
-		 * Fetch tile image URL using its quadtree position and zoom level.
-		 * 
-		 * @method fetchTile
-		 * @param {number} zoom Zoom level.
-		 * @param {number} x Tile x.
-		 * @param {number} y Tile y.
-		 */
-		fetchTile(zoom, x, y)
-		{
-			return this.provider.fetchTile(zoom, x, y);
 		}
 
 		raycast(raycaster, intersects)

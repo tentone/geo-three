@@ -27,7 +27,7 @@ export class MapHeightNode extends MapNode
 	 * @param material {Material} Material used to render this height node.
 	 * @param geometry {Geometry} Geometry used to render this height node.
 	 */
-	constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material, geometry)
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material, geometry)
 	{
 		if (material === undefined)
 		{
@@ -63,8 +63,6 @@ export class MapHeightNode extends MapNode
 		 * @type {boolean}
 		 */
 		this.heightLoaded = false;
-	
-		this.loadTexture();
 	}
 	
 	/**
@@ -98,6 +96,11 @@ export class MapHeightNode extends MapNode
 
 	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
+	initialize() {
+		this.loadTexture();
+		this.loadHeightGeometry();
+	}
+
 	/**
 	 * Load tile texture from the server.
 	 * 
@@ -109,7 +112,7 @@ export class MapHeightNode extends MapNode
 	{
 		var self = this;
 	
-		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			var texture = new Texture(image);
 			texture.generateMipmaps = false;
@@ -124,7 +127,7 @@ export class MapHeightNode extends MapNode
 			self.nodeReady();
 		});
 	
-		this.loadHeightGeometry();
+		
 	};
 	
 	nodeReady()

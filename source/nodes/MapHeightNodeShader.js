@@ -19,7 +19,7 @@ import {UnitsUtils} from "../utils/UnitsUtils";
  */
 export class MapHeightNodeShader extends MapHeightNode
 {
-	constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 	{
 		var material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 		material = MapHeightNodeShader.prepareMaterial(material);
@@ -103,7 +103,7 @@ export class MapHeightNodeShader extends MapHeightNode
 	{
 		var self = this;
 	
-		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			var texture = new Texture(image);
 			texture.generateMipmaps = false;

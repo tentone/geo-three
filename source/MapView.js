@@ -229,19 +229,6 @@ export class MapView extends Mesh
 		this.provider.getMetaData();
 	}
 
-	/**
-	 * Fetch tile image URL using its quadtree position and zoom level.
-	 * 
-	 * @method fetchTile
-	 * @param {number} zoom Zoom level.
-	 * @param {number} x Tile x.
-	 * @param {number} y Tile y.
-	 */
-	fetchTile(zoom, x, y)
-	{
-		return this.provider.fetchTile(zoom, x, y);
-	}
-
 	raycast(raycaster, intersects)
 	{
 		return false;

@@ -9,15 +9,13 @@ import {UnitsUtils} from "../utils/UnitsUtils";
  */
 export class MapPlaneNode extends MapNode
 {
-	constructor(parentNode, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 	{
 		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 	
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;
-		this.visible = false;
-		
-		this.loadTexture();
+		this.visible = false;	
 	}
 	
 	/**
@@ -32,6 +30,10 @@ export class MapPlaneNode extends MapNode
 	static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
 	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
+	initialize() {
+		this.loadTexture();
+	}
 
 	createChildNodes()
 	{

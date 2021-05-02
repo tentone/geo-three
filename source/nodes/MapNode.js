@@ -1,6 +1,6 @@
 import {Texture, RGBFormat, LinearFilter, Mesh} from "three";
 
-/** 
+/**
  * Represents a map tile node inside of the tiles quad-tree
  * 
  * Each map node can be subdivided into other nodes.
@@ -11,17 +11,9 @@ import {Texture, RGBFormat, LinearFilter, Mesh} from "three";
  */
 export class MapNode extends Mesh
 {
-	constructor(geometry, material, parentNode, mapView, location, level, x, y)
+	constructor(geometry = null, material = null, parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
 	{
 		super(geometry, material);
-
-		/**
-		 * The map view object where the node is placed.
-		 *
-		 * @attribute mapView
-		 * @type {MapView}
-		 */
-		this.mapView = mapView;
 	
 		/**
 		 * Parent node (from an upper tile level).
@@ -94,6 +86,15 @@ export class MapNode extends Mesh
 		 * @type {Array}
 		 */
 		this.childrenCache = null;
+
+		/**
+		 * The map view object where the node is placed.
+		 *
+		 * @attribute mapView
+		 * @type {MapView}
+		 */
+		this.mapView = mapView;
+		this.initialize();
 	}
 	
 	/**
@@ -181,6 +182,15 @@ export class MapNode extends Mesh
 	static BOTTOM_RIGHT = 3;
 	
 	/**
+	 * Initialize resources that require access to data from the MapView.
+	 * 
+	 * Called automatically by the constructor but can also be called by the MapView when a node is attached to it.
+	 * 
+	 * @method initialize
+	 */
+	initialize() {}
+
+	/**
 	 * Create the child nodes to represent the next tree level.
 	 *
 	 * These nodes should be added to the object, and their transformations matrix should be updated.
@@ -188,7 +198,7 @@ export class MapNode extends Mesh
 	 * @method createChildNodes 
 	 */
 	createChildNodes() {}
-	
+
 	/**
 	 * Subdivide node,check the maximum depth allowed for the tile provider.
 	 *
@@ -246,11 +256,11 @@ export class MapNode extends Mesh
 	 * @method loadTexture
 	 * @param {Function} onLoad 
 	 */
-	loadTexture(onLoad)
+	loadTexture()
 	{
 		var self = this;
 		
-		this.mapView.fetchTile(this.level, this.x, this.y).then(function(image)
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
 		{
 			var texture = new Texture(image);
 			texture.generateMipmaps = false;
