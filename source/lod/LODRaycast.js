@@ -46,11 +46,37 @@ export class LODRaycast extends LODControl
 		 */
 		this.thresholdDown = 0.15;
 
+		/**
+		 * Raycaster object used to cast rays into the world and check for hits.
+		 * 
+		 * @attribute raycaster
+		 * @type {Raycaster}
+		 */
 		this.raycaster = new Raycaster();
 
+		/**
+		 * Normalized mouse coordinates.
+		 * 
+		 * @attribute mouse
+		 * @type {Vector2}
+		 */
 		this.mouse = new Vector2();
 
-		this.vector = new Vector3();
+		/**
+		 * Consider the distance powered to level of the node.
+		 * 
+		 * @attribute powerDistance
+		 * @type {boolean}
+		 */
+		this.powerDistance = false;
+
+		/**
+		 * Consider the scale of the node when calculating the distance.
+		 * 
+		 * @attribute scaleDistance
+		 * @type {boolean}
+		 */
+		this.scaleDistance = true;
 	}
 
 	updateLOD(view, camera, renderer, scene)
@@ -67,49 +93,34 @@ export class LODRaycast extends LODControl
 			this.raycaster.intersectObjects(view.children, true, intersects);
 		}
 	
-		if (view.mode === MapView.SPHERICAL)
+		for (var i = 0; i < intersects.length; i++)
 		{
-			for (var i = 0; i < intersects.length; i++)
+			var node = intersects[i].object;
+			var distance = intersects[i].distance;
+
+			if (this.powerDistance)
 			{
-				var node = intersects[i].object;
-				const distance = Math.pow(intersects[i].distance * 2, node.level);
-	
-				if (distance < this.thresholdUp)
-				{
-					node.subdivide();
-					return;
-				}
-				else if (distance > this.thresholdDown)
-				{
-					if (node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
-				}
+				distance = Math.pow(distance * 2, node.level);
 			}
-		}
-		else // if(this.mode === MapView.PLANAR || this.mode === MapView.HEIGHT)
-		{
-			for (var i = 0; i < intersects.length; i++)
+
+			if (this.scaleDistance) 
 			{
-				var node = intersects[i].object;
 				var matrix = node.matrixWorld.elements;
-				var scaleX = this.vector.set(matrix[0], matrix[1], matrix[2]).length();
-				var value = scaleX / intersects[i].distance;
-	
-				if (value > this.thresholdUp)
+				var vector = new Vector3(matrix[0], matrix[1], matrix[2]);
+				distance = vector.length() / distance;
+			}
+
+			if (distance > this.thresholdUp)
+			{
+				node.subdivide();
+				return;
+			}
+			else if (distance < this.thresholdDown)
+			{
+				if (node.parentNode !== null)
 				{
-					node.subdivide();
+					node.parentNode.simplify();
 					return;
-				}
-				else if (value < this.thresholdDown)
-				{
-					if (node.parentNode !== null)
-					{
-						node.parentNode.simplify();
-						return;
-					}
 				}
 			}
 		}
