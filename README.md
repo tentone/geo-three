@@ -192,6 +192,45 @@ export class BlueToRedProvider extends MapProvider
 
 
 
+### Custom Map Nodes
+
+- To implement a custom `MapNode` we can create a new class that extends the base implementation.
+- The objects created from the class should then be passed as argument to the `MapView` object that is responsible for managing its life cycle.
+- All map nodes are based on three.js `Mesh` object and have attached a Geometry and Material used to render them into the scene.
+- These materials and geometries can be customized and are not required to be of any specific type. It is recommended to reuse them as much as possible to save memory.
+
+```javascript
+// The MapNode inherits from three Mesh object and requires a geometry and material
+export class CustomMapNode extends MapNode
+{
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
+	{
+		super(CustomMapNode.GEOMETRY, CustomMapNode.MATERIAL, parentNode, mapView, location, level, x, y);
+	}
+	
+	static GEOMETRY = new THREE.SphereGeometry(0.5, 32, 32); 
+	
+	static MATERIAL = new MeshBasicMaterial();
+	
+	// Base geometry applied to the map view.
+	static BASE_GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
+	
+	// Base scale is applied to the map view
+	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
+	initialize() {
+		// Method to initialize data of the node (e.g fetch assets)
+	}
+
+	createChildNodes()
+	{
+		// Method called on subdivision to craete child nodes
+	}
+}
+```
+
+
+
 ### License
 
 - Project uses a MIT license that allow for commercial usage of the platform without any cost.
