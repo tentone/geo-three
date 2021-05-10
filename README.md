@@ -200,6 +200,8 @@ export class BlueToRedProvider extends MapProvider
 - These materials and geometries can be customized and are not required to be of any specific type. It is recommended to reuse them as much as possible to save memory.
 
 ```javascript
+import {SphereGeometry, MeshBasicMaterial, Vector3} from "three";
+
 // The MapNode inherits from three Mesh object and requires a geometry and material
 export class CustomMapNode extends MapNode
 {
@@ -208,7 +210,7 @@ export class CustomMapNode extends MapNode
 		super(CustomMapNode.GEOMETRY, CustomMapNode.MATERIAL, parentNode, mapView, location, level, x, y);
 	}
 	
-	static GEOMETRY = new THREE.SphereGeometry(0.5, 32, 32); 
+	static GEOMETRY = new SphereGeometry(0.5, 32, 32); 
 	
 	static MATERIAL = new MeshBasicMaterial();
 	
