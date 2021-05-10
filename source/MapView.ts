@@ -1,18 +1,18 @@
 import { Mesh, MeshBasicMaterial } from 'three';
-import { MapSphereNodeGeometry } from './geometries/MapSphereNodeGeometry;
-import { OpenStreetMapsProvider } from './providers/OpenStreetMapsProvider;
-import { MapNode } from './nodes/MapNode;
-import { MapHeightNode } from './nodes/MapHeightNode;
-import { MapPlaneNode } from './nodes/MapPlaneNode;
-import { MapSphereNode } from './nodes/MapSphereNode;
-import { UnitsUtils } from './utils/UnitsUtils;
-import { MapHeightNodeShader } from './nodes/MapHeightNodeShader;
-import { LODRaycast } from './lod/LODRaycast;
-import { MapProvider } from './providers/MapProvider;
+import { MapSphereNodeGeometry } from './geometries/MapSphereNodeGeometry';
+import { OpenStreetMapsProvider } from './providers/OpenStreetMapsProvider';
+import { MapNode } from './nodes/MapNode';
+import { MapHeightNode } from './nodes/MapHeightNode';
+import { MapPlaneNode } from './nodes/MapPlaneNode';
+import { MapSphereNode } from './nodes/MapSphereNode';
+import { UnitsUtils } from './utils/UnitsUtils';
+import { MapHeightNodeShader } from './nodes/MapHeightNodeShader';
+import { LODRaycast } from './lod/LODRaycast';
+import { MapProvider } from './providers/MapProvider';
 
 /**
  * Map viewer is used to read and display map tiles from a server.
- * 
+ *
  * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
  *
  * The map is drawn in plane map nodes using a quad tree that is subdivided as necessary to guaratee good map quality.
@@ -20,8 +20,7 @@ import { MapProvider } from './providers/MapProvider;
  * @class MapView
  * @extends {Mesh}
  */
-export class MapView extends Mesh
-{
+export class MapView extends Mesh {
 	/**
 	 * Planar map projection.
 	 *
@@ -60,7 +59,7 @@ export class MapView extends Mesh
 
 	/**
 	 * Map of the map node types available.
-	 * 
+	 *
 	 * @static
 	 * @attribute mapModes
 	 * @type {Map}
@@ -69,91 +68,49 @@ export class MapView extends Mesh
 		[MapView.PLANAR, MapPlaneNode],
 		[MapView.SPHERICAL, MapSphereNode],
 		[MapView.HEIGHT, MapHeightNode],
-		[MapView.HEIGHT_SHADER, MapHeightNodeShader],
-	]);
-
+		[MapView.HEIGHT_SHADER, MapHeightNodeShader]
+	] as any);
 	/**
-	 * Constructor for the map view objects.
-	 * 
-	 * @param {number | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
-	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
-	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
-	 */
-export class MapView extends Mesh {
-	/**
-	 * Planar map projection.
+	 * LOD control object used to defined how tiles are loaded in and out of memory.
 	 *
-	 * @static
-	 * @attribute PLANAR
-	 * @type {number}
+	 * @attribute lod
+	 * @type {LODControl}
 	 */
-	static PLANAR = 200;
-
-	/**
-	 * Spherical map projection.
-	 *
-	 * @static
-	 * @attribute SPHERICAL
-	 * @type {number}
-	 */
-	static SPHERICAL = 201;
-
-	/**
-	 * Planar map projection with height deformation.
-	 *
-	 * @static
-	 * @attribute HEIGHT
-	 * @type {number}
-	 */
-	static HEIGHT = 202;
-
-	/**
-	 * Planar map projection with height deformation using the GPU for height generation.
-	 *
-	 * @static
-	 * @attribute HEIGHT_DISPLACEMENT
-	 * @type {number}
-	 */
-	static HEIGHT_SHADER = 203;
-			
-		/**
-		 * LOD control object used to defined how tiles are loaded in and out of memory.
-		 * 
-		 * @attribute lod
-		 * @type {LODControl}
-		 */
 	lod: LODRaycast;
 
-		/**
-		 * Map tile color layer provider.
-		 *
-		 * @attribute provider
-		 * @type {MapProvider}
-		 */
+	/**
+	 * Map tile color layer provider.
+	 *
+	 * @attribute provider
+	 * @type {MapProvider}
+	 */
 	provider: MapProvider;
 
-		/**
-		 * Map height (terrain elevation) layer provider.
-		 *
-		 * @attribute heightProvider
-		 * @type {MapProvider}
-		 */
+	/**
+	 * Map height (terrain elevation) layer provider.
+	 *
+	 * @attribute heightProvider
+	 * @type {MapProvider}
+	 */
 	heightProvider: MapProvider;
 
 	/**
 	 * Root map node.
 	 *
 	 * @attribute root
-	 * @type {MapPlaneNode}
+	 * @type {MapNode}
 	 */
-	root: MapPlaneNode;
+	root: MapNode;
 
+	/**
+	 * Constructor for the map view objects.
+	 *
+	 * @param {number | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
+	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
+	 */
 	constructor(root, provider, heightProvider) {
-		super(
-			undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0})
-		);
-
-		this.mode = mode;
+		super(undefined, new MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
 
 		this.lod = new LODRaycast();
 
@@ -165,32 +122,30 @@ export class MapView extends Mesh {
 		 * Define the type of map node in use, defined how the map is presented.
 		 *
 		 * Should only be set on creationg.
-		 * 
+		 *
 		 * @attribute root
 		 * @type {MapNode}
 		 */
-		this.root =  root !== undefined ? root : MapView.PLANAR;
+		this.root = root !== undefined ? root : MapView.PLANAR;
 		this.setRoot(root);
 	}
 
 	/**
 	 * Set the root of the map view.
-	 * 
+	 *
 	 * Is set by the constructor by default, can be changed in runtime.
-	 * 
+	 *
 	 * @method setRoot
-	 * @param {MapNode} root Map node to be used as root. 
+	 * @param {MapNode} root Map node to be used as root.
 	 */
 	setRoot(root) {
-		if (typeof root === "number")
-		{
-			if(!MapView.mapModes.has(root))
-			{
-				throw new Error("Map mode " + root + " does is not registered.");
+		if (typeof root === 'number') {
+			if (!MapView.mapModes.has(root)) {
+				throw new Error('Map mode ' + root + ' does is not registered.');
 			}
 
-			var rootConstructor = MapView.mapModes.get(root);
-			root = new rootConstructor(null, this, MapNode.ROOT, 0, 0, 0);
+			const rootConstructor = MapView.mapModes.get(root) as typeof MapNode;
+			root = new rootConstructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
 		}
 
 		if (this.root !== null) {
@@ -199,9 +154,9 @@ export class MapView extends Mesh {
 		}
 
 		this.root = root;
-		
-		this.geometry = this.root.constructor.BASE_GEOMETRY;
-		this.scale.copy(this.root.constructor.BASE_SCALE);
+
+		this.geometry = (this.root.constructor as typeof MapNode).BASE_GEOMETRY;
+		this.scale.copy((this.root.constructor as typeof MapNode).BASE_SCALE);
 
 		this.root.mapView = this;
 		this.add(this.root);
@@ -237,9 +192,9 @@ export class MapView extends Mesh {
 
 	/**
 	 * Clears all tiles from memory and reloads data. Used when changing the provider.
-	 * 
+	 *
 	 * Should be called manually if any changed to the provider are made without setting the provider.
-	 * 
+	 *
 	 * @method clear
 	 */
 	clear() {
@@ -258,7 +213,7 @@ export class MapView extends Mesh {
 	/**
 	 * Ajust node configuration depending on the camera distance.
 	 *
-	 * Called everytime before render. 
+	 * Called everytime before render.
 	 *
 	 * @method onBeforeRender
 	 */
@@ -268,15 +223,14 @@ export class MapView extends Mesh {
 
 	/**
 	 * Get map meta data from server if supported.
-	 * 
+	 *
 	 * @method getMetaData
 	 */
 	getMetaData() {
 		this.provider.getMetaData();
 	}
 
-	raycast(raycaster, intersects)
-	{
+	raycast(raycaster, intersects) {
 		return false;
 	}
 }

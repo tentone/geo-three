@@ -3,15 +3,15 @@ import { MapView } from '../MapView';
 
 /**
  * Represents a map tile node inside of the tiles quad-tree
- * 
+ *
  * Each map node can be subdivided into other nodes.
- * 
+ *
  * It is intended to be used as a base class for other map node implementations.
- * 
+ *
  * @class MapNode
  */
 export class MapNode extends Mesh {
-		/**
+	/**
 	 * The map view.
 	 *
 	 * @attribute mapView
@@ -20,63 +20,63 @@ export class MapNode extends Mesh {
 	mapView: MapView;
 
 	/**
-		 * Parent node (from an upper tile level).
-		 * 
-		 * @attribute parentNode
+	 * Parent node (from an upper tile level).
+	 *
+	 * @attribute parentNode
 	 * @type {MapNode}
-		 */
+	 */
 	parentNode: MapNode;
-		
-		/**
-		 * Index of the map node in the quad-tree parent node.
-		 *
-		 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
-		 *
-		 * @attribute location
-		 * @type {number}
-		 */
+
+	/**
+	 * Index of the map node in the quad-tree parent node.
+	 *
+	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
+	 *
+	 * @attribute location
+	 * @type {number}
+	 */
 	location: number;
-	
-		/**
-		 * Tile level of this node.
-		 * 
-		 * @attribute level
-		 * @type {number}
-		 */
+
+	/**
+	 * Tile level of this node.
+	 *
+	 * @attribute level
+	 * @type {number}
+	 */
 	level: number;
-	
-		/**
-		 * Tile x position.
-		 * 
-		 * @attribute x
-		 * @type {number}
-		 */
+
+	/**
+	 * Tile x position.
+	 *
+	 * @attribute x
+	 * @type {number}
+	 */
 	x: number;
-	
-		/**
-		 * Tile y position.
-		 * 
-		 * @attribute y
-		 * @type {number}
-		 */
+
+	/**
+	 * Tile y position.
+	 *
+	 * @attribute y
+	 * @type {number}
+	 */
 	y: number;
-	
-		/**
-		 * Indicates how many children nodes where loaded.
-		 *
-		 * @attribute nodesLoaded
-		 * @type {number}
-		 */
+
+	/**
+	 * Indicates how many children nodes where loaded.
+	 *
+	 * @attribute nodesLoaded
+	 * @type {number}
+	 */
 	nodesLoaded = 0;
-	
-		/** 
-		 * Variable to check if the node is subdivided.
-		 *
-		 * To avoid bad visibility changes on node load.
-		 *
-		 * @attribute subdivided
-		 * @type {boolean}
-		 */
+
+	/**
+	 * Variable to check if the node is subdivided.
+	 *
+	 * To avoid bad visibility changes on node load.
+	 *
+	 * @attribute subdivided
+	 * @type {boolean}
+	 */
 	subdivided = false;
 
 	/**
@@ -88,17 +88,17 @@ export class MapNode extends Mesh {
 	 * @type {boolean}
 	 */
 	isMesh;
-		
-		/**
-		 * Cache with the children objects created from subdivision.
-		 * 
-		 * Used to avoid recreate object after simplification and subdivision.
-		 * 
-		 * The default value is null.
-		 *
-		 * @attribute childrenCache
-		 * @type {Array}
-		 */
+
+	/**
+	 * Cache with the children objects created from subdivision.
+	 *
+	 * Used to avoid recreate object after simplification and subdivision.
+	 *
+	 * The default value is null.
+	 *
+	 * @attribute childrenCache
+	 * @type {Array}
+	 */
 	childrenCache = null;
 
 	material: Material;
@@ -126,12 +126,12 @@ export class MapNode extends Mesh {
 
 		this.initialize();
 	}
-	
+
 	/**
 	 * Base geometry is attached to the map viewer object.
-	 * 
+	 *
 	 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
-	 * 
+	 *
 	 * @static
 	 * @attribute BASE_GEOMETRY
 	 * @type {THREE.Geometry}
@@ -140,7 +140,7 @@ export class MapNode extends Mesh {
 
 	/**
 	 * Base scale applied to the map viewer object.
-	 * 
+	 *
 	 * @static
 	 * @attribute BASE_SCALE
 	 * @type {THREE.Vector3}
@@ -157,7 +157,7 @@ export class MapNode extends Mesh {
 	 * @type {number}
 	 */
 	static CHILDRENS = 4;
-	
+
 	/**
 	 * Root node has no location.
 	 *
@@ -166,7 +166,7 @@ export class MapNode extends Mesh {
 	 * @type {number}
 	 */
 	static ROOT = -1;
-	
+
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
@@ -177,7 +177,7 @@ export class MapNode extends Mesh {
 	 * @type {number}
 	 */
 	static TOP_LEFT = 0;
-	
+
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
@@ -188,7 +188,7 @@ export class MapNode extends Mesh {
 	 * @type {number}
 	 */
 	static TOP_RIGHT = 1;
-	
+
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
@@ -199,7 +199,7 @@ export class MapNode extends Mesh {
 	 * @type {number}
 	 */
 	static BOTTOM_LEFT = 2;
-	
+
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
@@ -210,12 +210,12 @@ export class MapNode extends Mesh {
 	 * @type {number}
 	 */
 	static BOTTOM_RIGHT = 3;
-	
+
 	/**
 	 * Initialize resources that require access to data from the MapView.
-	 * 
+	 *
 	 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
-	 * 
+	 *
 	 * @method initialize
 	 */
 	initialize() {}
@@ -225,7 +225,7 @@ export class MapNode extends Mesh {
 	 *
 	 * These nodes should be added to the object, and their transformations matrix should be updated.
 	 *
-	 * @method createChildNodes 
+	 * @method createChildNodes
 	 */
 	createChildNodes() {}
 
@@ -233,19 +233,17 @@ export class MapNode extends Mesh {
 	 * Subdivide node,check the maximum depth allowed for the tile provider.
 	 *
 	 * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
-	 * 
+	 *
 	 * @method subdivide
 	 */
-	subdivide()
-	{
-		const maxZoom = Math.min (this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)
-		{
+	subdivide() {
+		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
+		if (this.children.length > 0 || this.level + 1 > maxZoom || (this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)) {
 			return;
 		}
-	
+
 		this.subdivided = true;
-	
+
 		if (this.childrenCache !== null) {
 			this.isMesh = false;
 			this.children = this.childrenCache;
@@ -253,7 +251,7 @@ export class MapNode extends Mesh {
 			this.createChildNodes();
 		}
 	}
-	
+
 	/**
 	 * Simplify node, remove all children from node, store them in cache.
 	 *
@@ -267,52 +265,52 @@ export class MapNode extends Mesh {
 		if (this.children.length > 0) {
 			this.childrenCache = this.children;
 		}
-	
+
 		this.subdivided = false;
 		this.isMesh = true;
 		this.children = [];
 	}
-	
+
 	/**
 	 * Load tile texture from the server.
-	 * 
+	 *
 	 * This base method assumes the existence of a material attribute with a map texture.
 	 *
 	 * @method loadTexture
-	 * @param {Function} onLoad 
+	 * @param {Function} onLoad
 	 */
-	loadTexture()
-	{
+	loadTexture() {
 		const self = this;
-		
-		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image)
-		{
-			var texture = new Texture(image as any);
-			texture.generateMipmaps = false;
-			texture.format = RGBFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
-	
+
+		this.mapView.provider
+			.fetchTile(this.level, this.x, this.y)
+			.then(function (image) {
+				const texture = new Texture(image as any);
+				texture.generateMipmaps = false;
+				texture.format = RGBFormat;
+				texture.magFilter = LinearFilter;
+				texture.minFilter = LinearFilter;
+				texture.needsUpdate = true;
+
 				(self.material as MeshPhongMaterial).map = texture;
-			self.nodeReady();
+				self.nodeReady();
 			})
 			.catch(function () {
 				const canvas = new OffscreenCanvas(1, 1);
 				const context = canvas.getContext('2d');
 				context.fillStyle = '#FF0000';
-			context.fillRect(0, 0, 1, 1);
-	
+				context.fillRect(0, 0, 1, 1);
+
 				const texture = new Texture(canvas as any);
-			texture.generateMipmaps = false;
-			texture.needsUpdate = true;
-	
+				texture.generateMipmaps = false;
+				texture.needsUpdate = true;
+
 				(self.material as MeshPhongMaterial).map = texture;
-			self.nodeReady();
-		});
+				self.nodeReady();
+			});
 	}
-	
-	/** 
+
+	/**
 	 * Increment the child loaded counter.
 	 *
 	 * Should be called after a map node is ready for display.
@@ -323,12 +321,12 @@ export class MapNode extends Mesh {
 		// Update parent nodes loaded
 		if (this.parentNode !== null) {
 			this.parentNode.nodesLoaded++;
-	
+
 			if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS) {
 				if (this.parentNode.subdivided === true) {
 					this.parentNode.isMesh = false;
 				}
-	
+
 				for (let i = 0; i < this.parentNode.children.length; i++) {
 					this.parentNode.children[i].visible = true;
 				}
@@ -339,7 +337,7 @@ export class MapNode extends Mesh {
 			this.visible = true;
 		}
 	}
-	
+
 	/**
 	 * Get all the neighbors in a specific direction (left, right, up down).
 	 *
@@ -349,10 +347,10 @@ export class MapNode extends Mesh {
 	 */
 	getNeighborsDirection(direction) {
 		// TODO <ADD CODE HERE>
-	
+
 		return null;
 	}
-	
+
 	/**
 	 * Get all the quad tree nodes neighbors. Are considered neighbors all the nodes directly in contact with a edge of this node.
 	 *
@@ -361,9 +359,9 @@ export class MapNode extends Mesh {
 	 */
 	getNeighbors() {
 		const neighbors = [];
-	
+
 		// TODO <ADD CODE HERE>
-	
+
 		return neighbors;
 	}
 }
