@@ -1,0 +1,52 @@
+name: 
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install depedencies from NPM
+        run: npm install
+
+      - name: Build Project
+        run: npm run build-dev
+
+  eslint:
+    name: ES Lint
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install depedencies from NPM
+        run: npm install
+
+      - name: ESLint
+        run: npm run lint

@@ -33,7 +33,7 @@ scene.add(map);
 ### Coordinates
 
 - The project uses internally a XY [EPSG:900913](https://epsg.io/900913) coordinate format to be compatible with the XYZ coordinates used in three.js
-- Use the UnitsUtils class to access the unit conversion methods for example to convert a latitude, longitude [WGS84](https://epsg.io/4326) pair value to XY coordinates you can use the code bellow:
+- Use the `UnitsUtils` class to access the unit conversion methods for example to convert a latitude, longitude [WGS84](https://epsg.io/4326) pair value to XY coordinates you can use the code bellow:
 
 ```javascript
 var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
@@ -118,8 +118,9 @@ export class DistanceLOD extends LODControl
 
 
 
-### Tiles Representation
+### Tiles Map Nodes
 
+- `MapNode` objects are used to define how the tiles should be represented in the space. `MapNode` are organized hierarchically, every node implements the MapNode class that is based on the THREE.Mesh class (every map node has a visual representation as a mesh).
 - The library has support for both planar and spherical representation of tiles. Most providers only have planar tiles available.
   - It is required that the tiles for spherical mode are previously adjusted, since planar tiles get more stretched as closer you get to the poles.
 
@@ -185,6 +186,47 @@ export class BlueToRedProvider extends MapProvider
 		context.fillStyle = color.getStyle();
 		context.fillRect(0, 0, 16, 16);
 		return Promise.resolve(canvas);
+	}
+}
+```
+
+
+
+### Custom Map Nodes
+
+- To implement a custom `MapNode` we can create a new class that extends the base implementation.
+- The objects created from the class should then be passed as argument to the `MapView` object that is responsible for managing its life cycle.
+- All map nodes are based on three.js `Mesh` object and have attached a Geometry and Material used to render them into the scene.
+- These materials and geometries can be customized and are not required to be of any specific type. It is recommended to reuse them as much as possible to save memory.
+
+```javascript
+import {SphereGeometry, MeshBasicMaterial, Vector3} from "three";
+
+// The MapNode inherits from three Mesh object and requires a geometry and material
+export class CustomMapNode extends MapNode
+{
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0)
+	{
+		super(CustomMapNode.GEOMETRY, CustomMapNode.MATERIAL, parentNode, mapView, location, level, x, y);
+	}
+	
+	static GEOMETRY = new SphereGeometry(0.5, 32, 32); 
+	
+	static MATERIAL = new MeshBasicMaterial();
+	
+	// Base geometry applied to the map view.
+	static BASE_GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
+	
+	// Base scale is applied to the map view
+	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+
+	initialize() {
+		// Method to initialize data of the node (e.g fetch assets)
+	}
+
+	createChildNodes()
+	{
+		// Method called on subdivision to craete child nodes
 	}
 }
 ```

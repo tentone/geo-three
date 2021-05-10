@@ -1,5 +1,6 @@
 import serve from 'rollup-plugin-serve';
 import typescript from '@rollup/plugin-typescript';
+import livereload from 'rollup-plugin-livereload';
 
 export default {
 	input: 'source/Main.ts',
@@ -8,10 +9,12 @@ export default {
 		serve({
 			open: true,
 			contentBase: '.',
-			openPage: '/examples',
+			verbose: true,
+			openPage: '/',
 			host: 'localhost',
 			port: 8080
-		})
+		}),
+		livereload({watch: '.'})
 	],
 	output: [
 		{
