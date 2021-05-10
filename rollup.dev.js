@@ -1,8 +1,10 @@
-import serve from "rollup-plugin-serve";
+import serve from 'rollup-plugin-serve';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
-	input: "source/Main.js",
+	input: 'source/Main.ts',
 	plugins: [
+		typescript(),
 		serve({
 			open: true,
 			contentBase: '.',
@@ -13,11 +15,11 @@ export default {
 	],
 	output: [
 		{
-			globals: {"three": "THREE"},
-			format: "umd",
-			name: "Geo",
-			file: "build/geo-three.js",
-			indent: "\t"
+			globals: { three: 'THREE' },
+			format: 'umd',
+			name: 'Geo',
+			file: 'build/geo-three.js',
+			indent: '\t'
 		}
 	]
 };

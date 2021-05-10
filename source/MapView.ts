@@ -1,0 +1,226 @@
+import { Mesh, MeshBasicMaterial } from 'three';
+import { MapSphereNodeGeometry } from './geometries/MapSphereNodeGeometry;
+import { OpenStreetMapsProvider } from './providers/OpenStreetMapsProvider;
+import { MapNode } from './nodes/MapNode;
+import { MapHeightNode } from './nodes/MapHeightNode;
+import { MapPlaneNode } from './nodes/MapPlaneNode;
+import { MapSphereNode } from './nodes/MapSphereNode;
+import { UnitsUtils } from './utils/UnitsUtils;
+import { MapHeightNodeShader } from './nodes/MapHeightNodeShader;
+import { LODRaycast } from './lod/LODRaycast;
+import { MapProvider } from './providers/MapProvider;
+
+/**
+ * Map viewer is used to read and display map tiles from a server.
+ *
+ * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
+ *
+ * The map is drawn in plane map nodes using a quad tree that is subdivided as necessary to guaratee good map quality.
+ *
+ * @class MapView
+ * @extends {Mesh}
+ * @param {string} mode Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default.
+ * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
+ * @param {number} heightProvider Map height tile provider, by default no height provider is used.
+ */
+export class MapView extends Mesh {
+	/**
+	 * Planar map projection.
+	 *
+	 * @static
+	 * @attribute PLANAR
+	 * @type {number}
+	 */
+	static PLANAR = 200;
+
+	/**
+	 * Spherical map projection.
+	 *
+	 * @static
+	 * @attribute SPHERICAL
+	 * @type {number}
+	 */
+	static SPHERICAL = 201;
+
+	/**
+	 * Planar map projection with height deformation.
+	 *
+	 * @static
+	 * @attribute HEIGHT
+	 * @type {number}
+	 */
+	static HEIGHT = 202;
+
+	/**
+	 * Planar map projection with height deformation using the GPU for height generation.
+	 *
+	 * @static
+	 * @attribute HEIGHT_DISPLACEMENT
+	 * @type {number}
+	 */
+	static HEIGHT_SHADER = 203;
+
+	/**
+	 * Define the type of map view in use.
+	 *
+	 * This value can only be set on creation
+	 *
+	 * @attribute mode
+	 * @type {number}
+	 */
+	mode: number;
+
+	/**
+	 * LOD control object used to defined how tiles are loaded in and out of memory.
+	 *
+	 * @attribute lod
+	 * @type {LODControl}
+	 */
+	lod: LODRaycast;
+
+	/**
+	 * Map tile color layer provider.
+	 *
+	 * @attribute provider
+	 * @type {MapProvider}
+	 */
+	provider: MapProvider;
+
+	/**
+	 * Map height (terrain elevation) layer provider.
+	 *
+	 * @attribute heightProvider
+	 * @type {MapProvider}
+	 */
+	heightProvider: MapProvider;
+
+	/**
+	 * Root map node.
+	 *
+	 * @attribute root
+	 * @type {MapPlaneNode}
+	 */
+	root: MapPlaneNode;
+
+	constructor(mode = MapView.PLANAR, provider, heightProvider) {
+		super(
+			mode === MapView.SPHERICAL ? new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI) : MapPlaneNode.GEOMETRY,
+			new MeshBasicMaterial({ transparent: true, opacity: 0.0 })
+		);
+
+		this.mode = mode;
+
+		this.lod = new LODRaycast();
+
+		this.provider = provider !== undefined ? provider : new OpenStreetMapsProvider();
+
+		this.heightProvider = heightProvider !== undefined ? heightProvider : null;
+
+		/**
+		 * Root map node.
+		 *
+		 * @attribute root
+		 * @type {MapPlaneNode}
+		 */
+		this.root = null;
+
+		if (this.mode === MapView.PLANAR) {
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapPlaneNode(null, this, MapNode.ROOT, 0, 0, 0);
+		} else if (this.mode === MapView.HEIGHT) {
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNode(null, this, MapNode.ROOT, 0, 0, 0);
+		} else if (this.mode === MapView.HEIGHT_SHADER) {
+			this.scale.set(UnitsUtils.EARTH_PERIMETER, MapHeightNode.USE_DISPLACEMENT ? MapHeightNode.MAX_HEIGHT : 1, UnitsUtils.EARTH_PERIMETER);
+			this.root = new MapHeightNodeShader(null, this, MapNode.ROOT, 0, 0, 0);
+		} else if (this.mode === MapView.SPHERICAL) {
+			this.root = new MapSphereNode(null, this, MapNode.ROOT, 0, 0, 0);
+		}
+
+		this.add(this.root);
+	}
+
+	/**
+	 * Change the map provider of this map view.
+	 *
+	 * Will discard all the tiles already loaded using the old provider.
+	 *
+	 * @method setProvider
+	 */
+	setProvider(provider) {
+		if (provider !== this.provider) {
+			this.provider = provider;
+			this.clear();
+		}
+	}
+
+	/**
+	 * Change the map height provider of this map view.
+	 *
+	 * Will discard all the tiles already loaded using the old provider.
+	 *
+	 * @method setHeightProvider
+	 */
+	setHeightProvider(heightProvider) {
+		if (heightProvider !== this.heightProvider) {
+			this.heightProvider = heightProvider;
+			this.clear();
+		}
+	}
+
+	/**
+	 * Clears all tiles from memory and reloads data. Used when changing the provider.
+	 *
+	 * Should be called manually if any changed to the provider are made without setting the provider.
+	 *
+	 * @method clear
+	 */
+	clear() {
+		this.traverse(function (children: MapNode) {
+			if (children.childrenCache !== undefined && children.childrenCache !== null) {
+				children.childrenCache = null;
+			}
+
+			if (children.loadTexture !== undefined) {
+				children.loadTexture();
+			}
+		});
+		return this;
+	}
+
+	/**
+	 * Ajust node configuration depending on the camera distance.
+	 *
+	 * Called everytime before render.
+	 *
+	 * @method onBeforeRender
+	 */
+	onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+		this.lod.updateLOD(this, camera, renderer, scene);
+	};
+
+	/**
+	 * Get map meta data from server if supported.
+	 *
+	 * @method getMetaData
+	 */
+	getMetaData() {
+		this.provider.getMetaData();
+	}
+
+	/**
+	 * Fetch tile image URL using its quadtree position and zoom level.
+	 *
+	 * @method fetchTile
+	 * @param {number} zoom Zoom level.
+	 * @param {number} x Tile x.
+	 * @param {number} y Tile y.
+	 */
+	fetchTile(zoom, x, y) {
+		return this.provider.fetchTile(zoom, x, y);
+	}
+
+	raycast(raycaster, intersects) {
+		return false;
+	}
+}
