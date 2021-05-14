@@ -130,7 +130,6 @@ export class HereMapsProvider extends MapProvider
 	 *
 	 * There are 4 server (1 to 4).
 	 *
-	 * @method nextServer
 	 */
 	nextServer() 
 	{

@@ -12,26 +12,25 @@ export class UnitsUtils
 	 * Aproximated radius of earth in meters.
 	 *
 	 */
-	static EARTH_RADIUS = 6378137;
+	static EARTH_RADIUS: number = 6378137;
 
 	/**
 	 * Earth equator perimeter in meters.
 	 *
 	 */
-	static EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
+	static EARTH_PERIMETER: number = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 
 	/**
 	 * Earth equator perimeter in meters.
 	 *
 	 */
-	static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
+	static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 	/**
 	 * Get the current geolocation from the browser using the location API.
 	 *
 	 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
 	 *
-	 * @method get
 	 * @param {Function} onResult Callback function onResult(coords, timestamp).
 	 */
 	static get(onResult, onError) 
@@ -45,7 +44,6 @@ export class UnitsUtils
 	/**
 	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 	 *
-	 * @method datumsToSpherical
 	 * @param {number} latitude
 	 * @param {number} longitude
 	 */
@@ -62,7 +60,6 @@ export class UnitsUtils
 	/**
 	 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
 	 *
-	 * @method sphericalToDatums
 	 * @param {number} x
 	 * @param {number} y
 	 */
@@ -79,7 +76,6 @@ export class UnitsUtils
 	/**
 	 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
 	 *
-	 * @method quadtreeToDatums
 	 * @param {number} zoom
 	 * @param {number} x
 	 * @param {number} y

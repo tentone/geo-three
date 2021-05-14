@@ -5,19 +5,19 @@
  */
 export class CancelablePromise<T> 
 {
-	onResolve;
+	public onResolve: (value: any)=> void;
 
-	onReject;
+	public onReject: (error: any)=> void;
 
-	onCancel;
+	public onCancel: ()=> void;
 
-	fulfilled = false;
+	public fulfilled: boolean = false;
 
-	rejected = false;
+	public rejected: boolean = false;
 
-	called = false;
+	public called: boolean = false;
 
-	value: T;
+	public value: T;
 
 	public constructor(executor) 
 	{
@@ -58,9 +58,9 @@ export class CancelablePromise<T>
 	/**
 	 * Request to cancel the promise execution.
 	 *
-	 * @returns {boolean} True if the promise is canceled successfully, false otherwise.
+	 * @returns True if the promise is canceled successfully, false otherwise.
 	 */
-	cancel() 
+	public cancel(): boolean
 	{
 		// TODO <ADD CODE HERE>
 		return false;
@@ -69,9 +69,10 @@ export class CancelablePromise<T>
 	/**
 	 * Executed after the promise is fulfilled.
 	 *
-	 * @param {*} callback
+	 * @param callback - Callback to receive the value.
+	 * @returns Promise for chainning.
 	 */
-	then(callback) 
+	public then(callback: (value: any)=> void): CancelablePromise<T>
 	{
 		this.onResolve = callback;
 
@@ -80,15 +81,17 @@ export class CancelablePromise<T>
 			this.called = true;
 			this.onResolve(this.value);
 		}
+
 		return this;
 	}
 
 	/**
 	 * Catch any error that occurs in the promise.
 	 *
-	 * @param {*} callback
+	 * @param callback - Method to catch errors.
+	 * @returns Promise for chainning.
 	 */
-	catch(callback) 
+	public catch(callback: (error: any)=> void): CancelablePromise<T>
 	{
 		this.onReject = callback;
 
@@ -101,25 +104,24 @@ export class CancelablePromise<T>
 	}
 
 	/**
-	 * finally.
+	 * Finally callback
 	 *
-	 * @param {*} callback
+	 * @param callback - Method to be called.
+	 * @returns Promise for chainning.
 	 */
-	finally(callback) 
+	public finally(callback: Function): CancelablePromise<T>
 	{
 		// TODO: not implemented
 		return this;
 	}
 
-	[Symbol.toStringTag] = 'CancelablePromise';
-
 	/**
 	 * Create a resolved promise.
 	 *
-	 * @param {*} val Value to pass.
-	 * @returns {CancelablePromise} Promise created with resolve value.
+	 * @param val - Value to pass.
+	 * @returns Promise created with resolve value.
 	 */
-	static resolve<T>(val) 
+	public static resolve<T>(val: T): CancelablePromise<T>
 	{
 		return new CancelablePromise<T>(function executor(resolve, _reject) 
 		{
@@ -130,10 +132,10 @@ export class CancelablePromise<T>
 	/**
 	 * Create a rejected promise.
 	 *
-	 * @param {*} reason
-	 * @returns {CancelablePromise} Promise created with rejection reason.
+	 * @param reason - Reason to reject the promise.
+	 * @returns Promise created with rejection reason.
 	 */
-	static reject(reason) 
+	public static reject(reason: any): CancelablePromise<any>
 	{
 		return new CancelablePromise(function executor(resolve, reject) 
 		{
@@ -146,10 +148,10 @@ export class CancelablePromise<T>
 	 *
 	 * If any of the promises fail it will reject altough some of them may have been completed with success.
 	 *
-	 * @param {*} promises
-	 * @returns {CancelablePromise} Promise that will resolve when all of the running promises are fullfilled.
+	 * @param promises - List of promisses to syncronize.
+	 * @returns Promise that will resolve when all of the running promises are fullfilled.
 	 */
-	static all(promises) 
+	public static all(promises: CancelablePromise<any>[]): CancelablePromise<any>
 	{
 		const fulfilledPromises = [];
 		const result = [];

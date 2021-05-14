@@ -121,7 +121,6 @@ export class MapView extends Mesh
 	 *
 	 * Is set by the constructor by default, can be changed in runtime.
 	 *
-	 * @method setRoot
 	 * @param {MapNode} root Map node to be used as root.
 	 */
 	setRoot(root) 
@@ -157,7 +156,6 @@ export class MapView extends Mesh
 	 *
 	 * Will discard all the tiles already loaded using the old provider.
 	 *
-	 * @method setProvider
 	 */
 	setProvider(provider) 
 	{
@@ -173,7 +171,6 @@ export class MapView extends Mesh
 	 *
 	 * Will discard all the tiles already loaded using the old provider.
 	 *
-	 * @method setHeightProvider
 	 */
 	setHeightProvider(heightProvider) 
 	{
@@ -189,7 +186,6 @@ export class MapView extends Mesh
 	 *
 	 * Should be called manually if any changed to the provider are made without setting the provider.
 	 *
-	 * @method clear
 	 */
 	clear() 
 	{
@@ -213,7 +209,6 @@ export class MapView extends Mesh
 	 *
 	 * Called everytime before render.
 	 *
-	 * @method onBeforeRender
 	 */
 	onBeforeRender = (renderer, scene, camera, geometry, material, group) => 
 	{
@@ -223,7 +218,6 @@ export class MapView extends Mesh
 	/**
 	 * Get map meta data from server if supported.
 	 *
-	 * @method getMetaData
 	 */
 	getMetaData() 
 	{

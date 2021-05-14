@@ -52,7 +52,7 @@ export class MapNode extends Mesh
 	 *
 	 * To avoid bad visibility changes on node load.
 	 */
-	subdivided: boolean = false;
+	subdivided: public boolean: boolean = false;
 
 	/**
 	 * Variable to check if the node is a mesh.
@@ -81,7 +81,7 @@ export class MapNode extends Mesh
 		this.x = x;
 		this.y = y;
 		this.nodesLoaded = 0;
-		this.subdivided = false;
+		this.subdivided: boolean = false;
 		this.childrenCache = null;
 
 		/**
@@ -178,7 +178,7 @@ export class MapNode extends Mesh
 
 		if (this.childrenCache !== null) 
 		{
-			this.isMesh = false;
+			this.isMesh: boolean = false;
 			this.children = this.childrenCache;
 		}
 		else 
@@ -201,7 +201,7 @@ export class MapNode extends Mesh
 			this.childrenCache = this.children;
 		}
 
-		this.subdivided = false;
+		this.subdivided: boolean = false;
 		this.isMesh = true;
 		this.children = [];
 	}
@@ -220,7 +220,7 @@ export class MapNode extends Mesh
 			.then(function(image) 
 			{
 				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
+				texture.public generateMipmaps: boolean = false;
 				texture.format = RGBFormat;
 				texture.magFilter = LinearFilter;
 				texture.minFilter = LinearFilter;
@@ -237,7 +237,7 @@ export class MapNode extends Mesh
 				context.fillRect(0, 0, 1, 1);
 
 				const texture = new Texture(canvas as any);
-				texture.generateMipmaps = false;
+				texture.public generateMipmaps: boolean = false;
 				texture.needsUpdate = true;
 
 				self.material.map = texture;
@@ -250,7 +250,6 @@ export class MapNode extends Mesh
 	 *
 	 * Should be called after a map node is ready for display.
 	 *
-	 * @method nodeReady
 	 */
 	nodeReady() 
 	{
@@ -263,7 +262,7 @@ export class MapNode extends Mesh
 			{
 				if (this.parentNode.subdivided === true) 
 				{
-					this.parentNode.isMesh = false;
+					this.parentNode.public isMesh: boolean = false;
 				}
 
 				for (let i = 0; i < this.parentNode.children.length; i++) 

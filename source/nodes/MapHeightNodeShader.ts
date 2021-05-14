@@ -27,7 +27,7 @@ export class MapHeightNodeShader extends MapHeightNode
 
 		super(parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
 
-		this.frustumCulled = false;
+		this.frustumCulled: boolean = false;
 	}
 
 	/**
@@ -107,7 +107,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			.then(function(image) 
 {
 				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
+				texture.public generateMipmaps: boolean = false;
 				texture.format = RGBFormat;
 				texture.magFilter = LinearFilter;
 				texture.minFilter = LinearFilter;
@@ -142,7 +142,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			.then(function(image) 
 {
 				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
+				texture.public generateMipmaps: boolean = false;
 				texture.format = RGBFormat;
 				texture.magFilter = NearestFilter;
 				texture.minFilter = NearestFilter;
@@ -166,7 +166,6 @@ export class MapHeightNodeShader extends MapHeightNode
 	 *
 	 * Switches the geometry for a simpler one for faster raycasting.
 	 *
-	 * @method raycast
 	 */
 	raycast(raycaster, intersects) 
 {

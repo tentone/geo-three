@@ -45,7 +45,6 @@ export class MapSphereNode extends MapNode
 	/**
 	 * Create a geometry for a sphere map node.
 	 *
-	 * @method createGeometry
 	 * @param {number} zoom
 	 * @param {number} x
 	 * @param {number} y
@@ -70,7 +69,6 @@ export class MapSphereNode extends MapNode
 	/** 
 	 * Apply scale and offset position to the sphere node geometry.
 	 *
-	 * @method applyScaleNode
 	 */
 	applyScaleNode() 
 	{

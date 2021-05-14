@@ -104,7 +104,6 @@ export class BingMapsProvider extends MapProvider
 	 * Uses the follwing format
 	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
 	 *
-	 * @method getMetaData
 	 */
 	getMetaData() 
 	{
@@ -124,7 +123,6 @@ export class BingMapsProvider extends MapProvider
 	 *
 	 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
 	 *
-	 * @method quadKey
 	 * @param {number} x
 	 */
 	static quadKey(zoom, x, y) 

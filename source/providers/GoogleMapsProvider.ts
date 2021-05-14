@@ -63,7 +63,7 @@ export class GoogleMapsProvider extends MapProvider
 	 *
 	 * @type {boolean}
 	 */
-	overlay = false;
+	public overlay: boolean = false;
 
 	public constructor(apiToken) 
 	{
@@ -79,7 +79,6 @@ export class GoogleMapsProvider extends MapProvider
 	 *
 	 * This method needs to be called before using the provider
 	 *
-	 * @method createSession
 	 */
 	createSession() 
 	{

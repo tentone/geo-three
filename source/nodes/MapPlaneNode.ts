@@ -11,9 +11,9 @@ export class MapPlaneNode extends MapNode
 	{
 		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 
-		this.matrixAutoUpdate = false;
+		this.matrixAutoUpdate: boolean = false;
 		this.isMesh = true;
-		this.visible = false;
+		this.visible: boolean = false;
 	}
 
 	/**
@@ -71,7 +71,6 @@ export class MapPlaneNode extends MapNode
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
 	 *
-	 * @method raycast
 	 */
 	raycast(raycaster, intersects) 
 	{
