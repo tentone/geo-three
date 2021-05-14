@@ -1,4 +1,4 @@
-import {Float32BufferAttribute, BufferGeometry} from "three";
+import { BufferGeometry, Float32BufferAttribute } from 'three';
 
 /**
  * Map node geometry is a geometry used to represent the map nodes.
@@ -12,10 +12,8 @@ import {Float32BufferAttribute, BufferGeometry} from "three";
  * @param {number} widthSegments Number of subdivisions along the width.
  * @param {number} heightSegments Number of subdivisions along the height.
  */
-export class MapNodeGeometry extends BufferGeometry
-{
-	constructor(width, height, widthSegments, heightSegments)
-	{
+export class MapNodeGeometry extends BufferGeometry {
+	constructor(width, height, widthSegments, heightSegments) {
 		super();
 
 		const widthHalf = width / 2;
@@ -34,12 +32,10 @@ export class MapNodeGeometry extends BufferGeometry
 		const uvs = [];
 
 		// Generate vertices, normals and uvs
-		for (var iz = 0; iz < gridZ; iz++)
-		{
+		for (let iz = 0; iz < gridZ; iz++) {
 			const z = iz * segmentHeight - heightHalf;
 
-			for (var ix = 0; ix < gridX; ix++)
-			{
+			for (let ix = 0; ix < gridX; ix++) {
 				const x = ix * segmentWidth - widthHalf;
 
 				vertices.push(x, 0, z);
@@ -50,10 +46,8 @@ export class MapNodeGeometry extends BufferGeometry
 		}
 
 		// Indices
-		for (var iz = 0; iz < heightSegments; iz++)
-		{
-			for (var ix = 0; ix < widthSegments; ix++)
-			{
+		for (let iz = 0; iz < heightSegments; iz++) {
+			for (let ix = 0; ix < widthSegments; ix++) {
 				const a = ix + gridX * iz;
 				const b = ix + gridX * (iz + 1);
 				const c = ix + 1 + gridX * (iz + 1);
@@ -66,8 +60,8 @@ export class MapNodeGeometry extends BufferGeometry
 		}
 
 		this.setIndex(indices);
-		this.setAttribute("position", new Float32BufferAttribute(vertices, 3));
-		this.setAttribute("normal", new Float32BufferAttribute(normals, 3));
-		this.setAttribute("uv", new Float32BufferAttribute(uvs, 2));
+		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 	}
 }

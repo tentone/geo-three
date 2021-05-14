@@ -6,8 +6,7 @@
  * @static
  * @class UnitsUtils
  */
-export class UnitsUtils 
-{
+export class UnitsUtils {
 	/**
 	 * Aproximated radius of earth in meters.
 	 *
@@ -34,16 +33,14 @@ export class UnitsUtils
 
 	/**
 	 * Get the current geolocation from the browser using the location API.
-	 * 
+	 *
 	 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
 	 *
 	 * @method get
 	 * @param {Function} onResult Callback function onResult(coords, timestamp).
 	 */
-	static get(onResult, onError)
-	{
-		navigator.geolocation.getCurrentPosition(function(result)
-		{
+	static get(onResult, onError) {
+		navigator.geolocation.getCurrentPosition(function (result) {
 			onResult(result.coords, result.timestamp);
 		}, onError);
 	}
@@ -55,14 +52,13 @@ export class UnitsUtils
 	 * @param {number} latitude
 	 * @param {number} longitude
 	 */
-	static datumsToSpherical(latitude, longitude)
-	{
-		var x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
-		var y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
+	static datumsToSpherical(latitude, longitude) {
+		const x = (longitude * UnitsUtils.EARTH_ORIGIN) / 180.0;
+		let y = Math.log(Math.tan(((90 + latitude) * Math.PI) / 360.0)) / (Math.PI / 180.0);
 
-		y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
+		y = (y * UnitsUtils.EARTH_ORIGIN) / 180.0;
 
-		return {x: x, y: y};
+		return { x, y };
 	}
 
 	/**
@@ -72,14 +68,13 @@ export class UnitsUtils
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static sphericalToDatums(x, y)
-	{
-		var longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
-		var latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
+	static sphericalToDatums(x, y) {
+		const longitude = (x / UnitsUtils.EARTH_ORIGIN) * 180.0;
+		let latitude = (y / UnitsUtils.EARTH_ORIGIN) * 180.0;
 
-		latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
+		latitude = (180.0 / Math.PI) * (2 * Math.atan(Math.exp((latitude * Math.PI) / 180.0)) - Math.PI / 2.0);
 
-		return {latitude: latitude, longitude: longitude};
+		return { latitude, longitude };
 	}
 
 	/**
@@ -90,13 +85,12 @@ export class UnitsUtils
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static quadtreeToDatums(zoom, x, y)
-	{
-		var n = Math.pow(2.0, zoom);
-		var longitude = x / n * 360.0 - 180.0;
-		var latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
-		var latitude = 180.0 * (latitudeRad / Math.PI);
+	static quadtreeToDatums(zoom, x, y) {
+		const n = Math.pow(2.0, zoom);
+		const longitude = (x / n) * 360.0 - 180.0;
+		const latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - (2.0 * y) / n)));
+		const latitude = 180.0 * (latitudeRad / Math.PI);
 
-		return {latitude: latitude, longitude: longitude};
+		return { latitude, longitude };
 	}
 }
