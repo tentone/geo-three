@@ -1,8 +1,8 @@
-import { LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3 } from 'three';
-import { MapNodeGeometry } from '../geometries/MapNodeGeometry';
-import { MapNode } from './MapNode';
-import { MapPlaneNode } from './MapPlaneNode';
-import { UnitsUtils } from '../utils/UnitsUtils';
+import {LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3} from 'three';
+import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
+import {MapNode} from './MapNode';
+import {MapPlaneNode} from './MapPlaneNode';
+import {UnitsUtils} from '../utils/UnitsUtils';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -13,11 +13,14 @@ import { UnitsUtils } from '../utils/UnitsUtils';
  *
  * @class MapHeightNode
  */
-export class MapHeightNode extends MapNode {
+export class MapHeightNode extends MapNode 
+{
 	static USE_DISPLACEMENT = false;
+
 	static MAX_HEIGHT = 0;
 
 	heightLoaded = false;
+
 	textureLoaded = false;
 
 	/**
@@ -32,7 +35,8 @@ export class MapHeightNode extends MapNode {
 	 * @param material {Material} Material used to render this height node.
 	 * @param geometry {Geometry} Geometry used to render this height node.
 	 */
-	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material?: Material, geometry?) {
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material?: Material, geometry?) 
+{
 		super(
 			geometry === undefined ? MapHeightNode.GEOMETRY : geometry,
 			material ||
@@ -104,7 +108,8 @@ export class MapHeightNode extends MapNode {
 
 	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
-	initialize() {
+	initialize() 
+{
 		this.loadTexture();
 		this.loadHeightGeometry();
 	}
@@ -116,10 +121,12 @@ export class MapHeightNode extends MapNode {
 	 *
 	 * @method loadTexture
 	 */
-	loadTexture() {
+	loadTexture() 
+{
 		const self = this;
 
-		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function (image) {
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image) 
+{
 			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
 			texture.format = RGBFormat;
@@ -127,15 +134,17 @@ export class MapHeightNode extends MapNode {
 			texture.minFilter = LinearFilter;
 			texture.needsUpdate = true;
 
-			(self.material as MeshPhongMaterial).emissiveMap = texture;
+			self.material as MeshPhongMaterial.emissiveMap = texture;
 
 			self.textureLoaded = true;
 			self.nodeReady();
 		});
 	}
 
-	nodeReady() {
-		if (!this.heightLoaded || !this.textureLoaded) {
+	nodeReady() 
+{
+		if (!this.heightLoaded || !this.textureLoaded) 
+{
 			return;
 		}
 
@@ -144,34 +153,35 @@ export class MapHeightNode extends MapNode {
 		MapNode.prototype.nodeReady.call(this);
 	}
 
-	createChildNodes() {
+	createChildNodes() 
+{
 		const level = this.level + 1;
 
 		const x = this.x * 2;
 		const y = this.y * 2;
 
-		let node = new (this.constructor as typeof MapHeightNode)(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		let node = new this.constructor as typeof MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(-0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new (this.constructor as typeof MapHeightNode)(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node = new this.constructor as typeof MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new (this.constructor as typeof MapHeightNode)(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node = new this.constructor as typeof MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(-0.25, 0, 0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new (this.constructor as typeof MapHeightNode)(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node = new this.constructor as typeof MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(0.25, 0, 0.25);
 		this.add(node);
@@ -185,8 +195,10 @@ export class MapHeightNode extends MapNode {
 	 * @method loadHeightGeometry
 	 * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished.
 	 */
-	loadHeightGeometry() {
-		if (this.mapView.heightProvider === null) {
+	loadHeightGeometry() 
+{
+		if (this.mapView.heightProvider === null) 
+{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
@@ -194,7 +206,8 @@ export class MapHeightNode extends MapNode {
 
 		this.mapView.heightProvider
 			.fetchTile(this.level, this.x, this.y)
-			.then(function (image) {
+			.then(function(image) 
+{
 				const geometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 				const vertices = geometry.attributes.position.array as number[];
 
@@ -206,7 +219,8 @@ export class MapHeightNode extends MapNode {
 
 				const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 				const data = imageData.data;
-				for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) {
+				for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) 
+{
 					const r = data[i];
 					const g = data[i + 1];
 					const b = data[i + 2];
@@ -221,7 +235,8 @@ export class MapHeightNode extends MapNode {
 				self.heightLoaded = true;
 				self.nodeReady();
 			})
-			.catch(function () {
+			.catch(function() 
+{
 				console.error('GeoThree: Failed to load height node data.', this);
 				self.heightLoaded = true;
 				self.nodeReady();
@@ -233,8 +248,10 @@ export class MapHeightNode extends MapNode {
 	 *
 	 * @method raycast
 	 */
-	raycast(raycaster, intersects) {
-		if (this.isMesh === true) {
+	raycast(raycaster, intersects) 
+{
+		if (this.isMesh === true) 
+{
 			return Mesh.prototype.raycast.call(this, raycaster, intersects);
 		}
 

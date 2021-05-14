@@ -1,7 +1,7 @@
-import { Matrix4, Mesh, MeshBasicMaterial, Quaternion, Vector3 } from 'three';
-import { MapNode } from './MapNode';
-import { MapSphereNodeGeometry } from '../geometries/MapSphereNodeGeometry';
-import { UnitsUtils } from '../utils/UnitsUtils';
+import {Matrix4, Mesh, MeshBasicMaterial, Quaternion, Vector3} from 'three';
+import {MapNode} from './MapNode';
+import {MapSphereNodeGeometry} from '../geometries/MapSphereNodeGeometry';
+import {UnitsUtils} from '../utils/UnitsUtils';
 
 /** 
  * Represents a map tile node.
@@ -10,8 +10,10 @@ import { UnitsUtils } from '../utils/UnitsUtils';
  * 
  * @class MapSphereNode
  */
-export class MapSphereNode extends MapNode {
-	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) {
+export class MapSphereNode extends MapNode 
+{
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	{
 		super(MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 	
 		this.applyScaleNode();
@@ -36,7 +38,8 @@ export class MapSphereNode extends MapNode {
 	 */
 	static SEGMENTS = 80;
 	
-	initialize() {
+	initialize() 
+	{
 		this.loadTexture();
 	}
 
@@ -48,17 +51,18 @@ export class MapSphereNode extends MapNode {
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static createGeometry(zoom, x, y) {
+	static createGeometry(zoom, x, y) 
+	{
 		const range = Math.pow(2, zoom);
 		const max = 40;
-		const segments = Math.floor((MapSphereNode.SEGMENTS * (max / (zoom + 1))) / max);
+		const segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
 	
 		// X
-		const phiLength = (1 / range) * 2 * Math.PI;
+		const phiLength = 1 / range * 2 * Math.PI;
 		const phiStart = x * phiLength;
 	
 		// Y
-		const thetaLength = (1 / range) * Math.PI;
+		const thetaLength = 1 / range * Math.PI;
 		const thetaStart = y * thetaLength;
 	
 		return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
@@ -69,7 +73,8 @@ export class MapSphereNode extends MapNode {
 	 *
 	 * @method applyScaleNode
 	 */
-	applyScaleNode() {
+	applyScaleNode() 
+	{
 		this.geometry.computeBoundingBox();
 	
 		const box = this.geometry.boundingBox.clone();
@@ -85,19 +90,23 @@ export class MapSphereNode extends MapNode {
 		this.updateMatrixWorld();
 	}
 	
-	updateMatrix() {
+	updateMatrix() 
+	{
 		this.matrix.setPosition(this.position);
 		this.matrixWorldNeedsUpdate = true;
 	}
 	
-	updateMatrixWorld(force = false) {
-		if (this.matrixWorldNeedsUpdate || force) {
+	updateMatrixWorld(force = false) 
+	{
+		if (this.matrixWorldNeedsUpdate || force) 
+		{
 			this.matrixWorld.copy(this.matrix);
 			this.matrixWorldNeedsUpdate = false;
 		}
 	}
 	
-	createChildNodes() {
+	createChildNodes() 
+	{
 		const level = this.level + 1;
 
 		const x = this.x * 2;
@@ -129,8 +138,10 @@ export class MapSphereNode extends MapNode {
 	 * 
 	 * @method raycast
 	 */
-	raycast(raycaster, intersects) {
-		if (this.isMesh === true) {
+	raycast(raycaster, intersects) 
+	{
+		if (this.isMesh === true) 
+		{
 			return Mesh.prototype.raycast.call(this, raycaster, intersects);
 		}
 	

@@ -1,15 +1,17 @@
-import { Mesh, MeshBasicMaterial, Vector3 } from 'three';
-import { MapNode } from './MapNode';
-import { MapNodeGeometry } from '../geometries/MapNodeGeometry';
-import { UnitsUtils } from '../utils/UnitsUtils';
+import {Mesh, MeshBasicMaterial, Vector3} from 'three';
+import {MapNode} from './MapNode';
+import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
+import {UnitsUtils} from '../utils/UnitsUtils';
 /**
  * Represents a basic plane tile node.
  *
  * @class MapPlaneNode
  */
-export class MapPlaneNode extends MapNode {
-	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) {
-		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({ wireframe: false }), parentNode, mapView, location, level, x, y);
+export class MapPlaneNode extends MapNode 
+{
+	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	{
+		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;
@@ -29,11 +31,13 @@ export class MapPlaneNode extends MapNode {
 
 	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
-	initialize() {
+	initialize() 
+	{
 		this.loadTexture();
 	}
 
-	createChildNodes() {
+	createChildNodes() 
+	{
 		const level = this.level + 1;
 
 		const x = this.x * 2;
@@ -73,8 +77,10 @@ export class MapPlaneNode extends MapNode {
 	 *
 	 * @method raycast
 	 */
-	raycast(raycaster, intersects) {
-		if (this.isMesh === true) {
+	raycast(raycaster, intersects) 
+	{
+		if (this.isMesh === true) 
+		{
 			return Mesh.prototype.raycast.call(this, raycaster, intersects);
 		}
 

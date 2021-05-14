@@ -1,6 +1,6 @@
-import { MapProvider } from './MapProvider';
-import { Color } from 'three';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {Color} from 'three';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Height debug provider takes a RGB encoded height map from another provider and converts it to a gradient for preview.
@@ -9,7 +9,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  *
  * @class HeightDebugProvider
  */
-export class HeightDebugProvider extends MapProvider {
+export class HeightDebugProvider extends MapProvider 
+{
 	/**
 	 * The provider used to retrieve the base RGB information to be debugged.
 	 *
@@ -33,17 +34,22 @@ export class HeightDebugProvider extends MapProvider {
 	 * @type {Color}
 	 */
 	toColor = new Color(0x00ff00);
-	constructor(provider) {
+
+	constructor(provider) 
+	{
 		super();
 
 		this.provider = provider;
 	}
 
-	fetchTile(zoom, x, y) {
-		return new CancelablePromise((resolve, reject) => {
+	fetchTile(zoom, x, y) 
+	{
+		return new CancelablePromise((resolve, reject) => 
+		{
 			this.provider
 				.fetchTile(zoom, x, y)
-				.then((image) => {
+				.then((image) => 
+				{
 					const resolution = 256;
 
 					const canvas = new OffscreenCanvas(resolution, resolution);
@@ -53,7 +59,8 @@ export class HeightDebugProvider extends MapProvider {
 
 					const imageData = context.getImageData(0, 0, resolution, resolution);
 					const data = imageData.data;
-					for (let i = 0; i < data.length; i += 4) {
+					for (let i = 0; i < data.length; i += 4) 
+					{
 						const r = data[i];
 						const g = data[i + 1];
 						const b = data[i + 2];

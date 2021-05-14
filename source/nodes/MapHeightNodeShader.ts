@@ -1,10 +1,10 @@
-import { LinearFilter, Mesh, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Vector3 } from 'three';
-import { MapHeightNode } from './MapHeightNode';
-import { MapNodeGeometry } from '../geometries/MapNodeGeometry';
-import { MapPlaneNode } from './MapPlaneNode';
-import { UnitsUtils } from '../utils/UnitsUtils';
-import { MapNode } from './MapNode';
-import { MapView } from '../MapView';
+import {LinearFilter, Mesh, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Vector3} from 'three';
+import {MapHeightNode} from './MapHeightNode';
+import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
+import {MapPlaneNode} from './MapPlaneNode';
+import {UnitsUtils} from '../utils/UnitsUtils';
+import {MapNode} from './MapNode';
+import {MapView} from '../MapView';
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
@@ -19,9 +19,11 @@ import { MapView } from '../MapView';
  * @param x {number} X position of the node in the tile tree.
  * @param y {number} Y position of the node in the tile tree.
  */
-export class MapHeightNodeShader extends MapHeightNode {
-	constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) {
-		let material = new MeshPhongMaterial({ map: MapHeightNodeShader.EMPTY_TEXTURE });
+export class MapHeightNodeShader extends MapHeightNode 
+{
+	constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
+{
+		let material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 		material = MapHeightNodeShader.prepareMaterial(material);
 
 		super(parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
@@ -65,12 +67,15 @@ export class MapHeightNodeShader extends MapHeightNode {
 	 *
 	 * @param {Material} material Material to be transformed.
 	 */
-	static prepareMaterial(material) {
-		material.userData = { heightMap: { value: MapHeightNodeShader.EMPTY_TEXTURE } };
+	static prepareMaterial(material) 
+{
+		material.userData = {heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}};
 
-		material.onBeforeCompile = (shader) => {
+		material.onBeforeCompile = (shader) => 
+{
 			// Pass uniforms from userData to the
-			for (const i in material.userData) {
+			for (const i in material.userData) 
+{
 				shader.uniforms[i] = material.userData[i];
 			}
 
@@ -100,12 +105,14 @@ export class MapHeightNodeShader extends MapHeightNode {
 		return material;
 	}
 
-	loadTexture() {
+	loadTexture() 
+{
 		const self = this;
 
 		this.mapView.provider
 			.fetchTile(this.level, this.x, this.y)
-			.then(function (image) {
+			.then(function(image) 
+{
 				const texture = new Texture(image as any);
 				texture.generateMipmaps = false;
 				texture.format = RGBFormat;
@@ -113,12 +120,13 @@ export class MapHeightNodeShader extends MapHeightNode {
 				texture.minFilter = LinearFilter;
 				texture.needsUpdate = true;
 
-				(self.material as MeshPhongMaterial).map = texture;
+				self.material as MeshPhongMaterial.map = texture;
 
 				self.textureLoaded = true;
 				self.nodeReady();
 			})
-			.catch(function (err) {
+			.catch(function(err) 
+{
 				console.error('GeoThree: Failed to load color node data.', err);
 				self.textureLoaded = true;
 				self.nodeReady();
@@ -127,8 +135,10 @@ export class MapHeightNodeShader extends MapHeightNode {
 		this.loadHeightGeometry();
 	}
 
-	loadHeightGeometry() {
-		if (this.mapView.heightProvider === null) {
+	loadHeightGeometry() 
+{
+		if (this.mapView.heightProvider === null) 
+{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
@@ -136,7 +146,8 @@ export class MapHeightNodeShader extends MapHeightNode {
 
 		this.mapView.heightProvider
 			.fetchTile(this.level, this.x, this.y)
-			.then(function (image) {
+			.then(function(image) 
+{
 				const texture = new Texture(image as any);
 				texture.generateMipmaps = false;
 				texture.format = RGBFormat;
@@ -149,7 +160,8 @@ export class MapHeightNodeShader extends MapHeightNode {
 				self.heightLoaded = true;
 				self.nodeReady();
 			})
-			.catch(function (err) {
+			.catch(function(err) 
+{
 				console.error('GeoThree: Failed to load height node data.', err);
 				self.heightLoaded = true;
 				self.nodeReady();
@@ -163,8 +175,10 @@ export class MapHeightNodeShader extends MapHeightNode {
 	 *
 	 * @method raycast
 	 */
-	raycast(raycaster, intersects) {
-		if (this.isMesh === true) {
+	raycast(raycaster, intersects) 
+{
+		if (this.isMesh === true) 
+{
 			this.geometry = MapPlaneNode.GEOMETRY;
 
 			const result = Mesh.prototype.raycast.call(this, raycaster, intersects);

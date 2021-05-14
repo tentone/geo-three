@@ -1,5 +1,5 @@
-import { MapProvider } from './MapProvider';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Open street maps tile server.
@@ -8,7 +8,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  *
  * @class OpenStreetMapsProvider
  */
-export class OpenStreetMapsProvider extends MapProvider {
+export class OpenStreetMapsProvider extends MapProvider 
+{
 	/**
 	 * Map server address.
 	 *
@@ -27,19 +28,24 @@ export class OpenStreetMapsProvider extends MapProvider {
 	 */
 	format: string;
 
-	constructor(address = 'https://a.tile.openstreetmap.org/') {
+	constructor(address = 'https://a.tile.openstreetmap.org/') 
+	{
 		super();
 		this.address = address;
 		this.format = 'png';
 	}
 
-	fetchTile(zoom: number, x: number, y: number) {
-		return new CancelablePromise<HTMLImageElement>((resolve, reject) => {
+	fetchTile(zoom: number, x: number, y: number) 
+	{
+		return new CancelablePromise<HTMLImageElement>((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';

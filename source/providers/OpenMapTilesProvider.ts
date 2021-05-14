@@ -1,6 +1,6 @@
-import { MapProvider } from './MapProvider';
-import { XHRUtils } from '../utils/XHRUtils';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {XHRUtils} from '../utils/XHRUtils';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Open tile map server tile provider.
@@ -10,7 +10,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  *
  * @class OpenMapTilesProvider
  */
-export class OpenMapTilesProvider extends MapProvider {
+export class OpenMapTilesProvider extends MapProvider 
+{
 	/**
 	 * Map server address.
 	 *
@@ -41,18 +42,21 @@ export class OpenMapTilesProvider extends MapProvider {
 	 */
 	theme: string;
 
-	constructor(address) {
+	constructor(address) 
+	{
 		super();
 		this.address = address;
 		this.format = 'png';
 		this.theme = 'klokantech-basic';
 	}
 
-	getMetaData() {
+	getMetaData() 
+	{
 		const self = this;
 		const address = this.address + 'styles/' + this.theme + '.json';
 
-		XHRUtils.get(address, function (data) {
+		XHRUtils.get(address, function(data) 
+		{
 			const meta = JSON.parse(data);
 
 			self.name = meta.name;
@@ -64,13 +68,17 @@ export class OpenMapTilesProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
-		return new CancelablePromise((resolve, reject) => {
+	fetchTile(zoom, x, y) 
+	{
+		return new CancelablePromise((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';

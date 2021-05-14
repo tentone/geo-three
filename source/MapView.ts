@@ -1,14 +1,14 @@
-import { Mesh, MeshBasicMaterial } from 'three';
-import { MapSphereNodeGeometry } from './geometries/MapSphereNodeGeometry';
-import { OpenStreetMapsProvider } from './providers/OpenStreetMapsProvider';
-import { MapNode } from './nodes/MapNode';
-import { MapHeightNode } from './nodes/MapHeightNode';
-import { MapPlaneNode } from './nodes/MapPlaneNode';
-import { MapSphereNode } from './nodes/MapSphereNode';
-import { UnitsUtils } from './utils/UnitsUtils';
-import { MapHeightNodeShader } from './nodes/MapHeightNodeShader';
-import { LODRaycast } from './lod/LODRaycast';
-import { MapProvider } from './providers/MapProvider';
+import {Mesh, MeshBasicMaterial} from 'three';
+import {MapSphereNodeGeometry} from './geometries/MapSphereNodeGeometry';
+import {OpenStreetMapsProvider} from './providers/OpenStreetMapsProvider';
+import {MapNode} from './nodes/MapNode';
+import {MapHeightNode} from './nodes/MapHeightNode';
+import {MapPlaneNode} from './nodes/MapPlaneNode';
+import {MapSphereNode} from './nodes/MapSphereNode';
+import {UnitsUtils} from './utils/UnitsUtils';
+import {MapHeightNodeShader} from './nodes/MapHeightNodeShader';
+import {LODRaycast} from './lod/LODRaycast';
+import {MapProvider} from './providers/MapProvider';
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -20,7 +20,8 @@ import { MapProvider } from './providers/MapProvider';
  * @class MapView
  * @extends {Mesh}
  */
-export class MapView extends Mesh {
+export class MapView extends Mesh 
+{
 	/**
 	 * Planar map projection.
 	 *
@@ -70,6 +71,7 @@ export class MapView extends Mesh {
 		[MapView.HEIGHT, MapHeightNode],
 		[MapView.HEIGHT_SHADER, MapHeightNodeShader]
 	] as any);
+
 	/**
 	 * LOD control object used to defined how tiles are loaded in and out of memory.
 	 *
@@ -109,8 +111,9 @@ export class MapView extends Mesh {
 	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
-	constructor(root, provider, heightProvider) {
-		super(undefined, new MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
+	constructor(root, provider, heightProvider) 
+	{
+		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 
 		this.lod = new LODRaycast();
 
@@ -138,9 +141,12 @@ export class MapView extends Mesh {
 	 * @method setRoot
 	 * @param {MapNode} root Map node to be used as root.
 	 */
-	setRoot(root) {
-		if (typeof root === 'number') {
-			if (!MapView.mapModes.has(root)) {
+	setRoot(root) 
+	{
+		if (typeof root === 'number') 
+		{
+			if (!MapView.mapModes.has(root)) 
+			{
 				throw new Error('Map mode ' + root + ' does is not registered.');
 			}
 
@@ -148,15 +154,16 @@ export class MapView extends Mesh {
 			root = new rootConstructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
 		}
 
-		if (this.root !== null) {
+		if (this.root !== null) 
+		{
 			this.remove(this.root);
 			this.root = null;
 		}
 
 		this.root = root;
 
-		this.geometry = (this.root.constructor as typeof MapNode).BASE_GEOMETRY;
-		this.scale.copy((this.root.constructor as typeof MapNode).BASE_SCALE);
+		this.geometry = this.root.constructor as typeof MapNode.BASE_GEOMETRY;
+		this.scale.copy(this.root.constructor as typeof MapNode.BASE_SCALE);
 
 		this.root.mapView = this;
 		this.add(this.root);
@@ -169,8 +176,10 @@ export class MapView extends Mesh {
 	 *
 	 * @method setProvider
 	 */
-	setProvider(provider) {
-		if (provider !== this.provider) {
+	setProvider(provider) 
+	{
+		if (provider !== this.provider) 
+		{
 			this.provider = provider;
 			this.clear();
 		}
@@ -183,8 +192,10 @@ export class MapView extends Mesh {
 	 *
 	 * @method setHeightProvider
 	 */
-	setHeightProvider(heightProvider) {
-		if (heightProvider !== this.heightProvider) {
+	setHeightProvider(heightProvider) 
+	{
+		if (heightProvider !== this.heightProvider) 
+		{
 			this.heightProvider = heightProvider;
 			this.clear();
 		}
@@ -197,13 +208,17 @@ export class MapView extends Mesh {
 	 *
 	 * @method clear
 	 */
-	clear() {
-		this.traverse(function (children: MapNode) {
-			if (children.childrenCache !== undefined && children.childrenCache !== null) {
+	clear() 
+	{
+		this.traverse(function(children: MapNode) 
+		{
+			if (children.childrenCache !== undefined && children.childrenCache !== null) 
+			{
 				children.childrenCache = null;
 			}
 
-			if (children.loadTexture !== undefined) {
+			if (children.loadTexture !== undefined) 
+			{
 				children.loadTexture();
 			}
 		});
@@ -217,7 +232,8 @@ export class MapView extends Mesh {
 	 *
 	 * @method onBeforeRender
 	 */
-	onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+	onBeforeRender = (renderer, scene, camera, geometry, material, group) => 
+	{
 		this.lod.updateLOD(this, camera, renderer, scene);
 	};
 
@@ -226,11 +242,13 @@ export class MapView extends Mesh {
 	 *
 	 * @method getMetaData
 	 */
-	getMetaData() {
+	getMetaData() 
+	{
 		this.provider.getMetaData();
 	}
 
-	raycast(raycaster, intersects) {
+	raycast(raycaster, intersects) 
+	{
 		return false;
 	}
 }

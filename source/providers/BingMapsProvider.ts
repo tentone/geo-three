@@ -1,6 +1,6 @@
-import { MapProvider } from './MapProvider';
-import { XHRUtils } from '../utils/XHRUtils';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {XHRUtils} from '../utils/XHRUtils';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Bing maps tile provider.
@@ -13,7 +13,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  * @class BingMapsProvider
  * @param {string} apiKey Bing API key.
  */
-export class BingMapsProvider extends MapProvider {
+export class BingMapsProvider extends MapProvider 
+{
 	maxZoom = 19;
 
 	/**
@@ -59,7 +60,8 @@ export class BingMapsProvider extends MapProvider {
 	 */
 	subdomain = 't1';
 
-	constructor(apiKey, type) {
+	constructor(apiKey, type) 
+	{
 		super();
 
 		this.apiKey = apiKey !== undefined ? apiKey : '';
@@ -120,11 +122,13 @@ export class BingMapsProvider extends MapProvider {
 	 *
 	 * @method getMetaData
 	 */
-	getMetaData() {
+	getMetaData() 
+	{
 		const self = this;
 		const address = 'http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
 
-		XHRUtils.get(address, function (data) {
+		XHRUtils.get(address, function(data) 
+		{
 			const meta = JSON.parse(data);
 
 			// TODO <FILL METADATA>
@@ -139,18 +143,22 @@ export class BingMapsProvider extends MapProvider {
 	 * @method quadKey
 	 * @param {number} x
 	 */
-	static quadKey(zoom, x, y) {
+	static quadKey(zoom, x, y) 
+	{
 		let quad = '';
 
-		for (let i = zoom; i > 0; i--) {
-			const mask = 1 << (i - 1);
+		for (let i = zoom; i > 0; i--) 
+		{
+			const mask = 1 << i - 1;
 			let cell = 0;
 
-			if ((x & mask) !== 0) {
+			if ((x & mask) !== 0) 
+			{
 				cell++;
 			}
 
-			if ((y & mask) !== 0) {
+			if ((y & mask) !== 0) 
+			{
 				cell += 2;
 			}
 
@@ -160,13 +168,17 @@ export class BingMapsProvider extends MapProvider {
 		return quad;
 	}
 
-	fetchTile(zoom, x, y) {
-		return new CancelablePromise((resolve, reject) => {
+	fetchTile(zoom, x, y) 
+	{
+		return new CancelablePromise((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';

@@ -1,5 +1,5 @@
-import { MapProvider } from './MapProvider';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Map tiler provider API.
@@ -12,7 +12,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  * @class MapTilerProvider
  * @param {string} apiKey
  */
-export class MapTilerProvider extends MapProvider {
+export class MapTilerProvider extends MapProvider 
+{
 	/**
 	 * Server API access token.
 	 *
@@ -52,7 +53,9 @@ export class MapTilerProvider extends MapProvider {
 	style: string;
 
 	resolution;
-	constructor(apiKey, category, style, format) {
+
+	constructor(apiKey, category, style, format) 
+	{
 		super();
 
 		this.apiKey = apiKey !== undefined ? apiKey : '';
@@ -66,13 +69,17 @@ export class MapTilerProvider extends MapProvider {
 		this.resolution = 512;
 	}
 
-	fetchTile(zoom, x, y) {
-		return new CancelablePromise((resolve, reject) => {
+	fetchTile(zoom, x, y) 
+	{
+		return new CancelablePromise((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';

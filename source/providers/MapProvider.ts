@@ -7,7 +7,8 @@
  *
  * @class MapProvider
  */
-export class MapProvider {
+export class MapProvider 
+{
 	/**
 	 * Name of the map provider
 	 *
@@ -59,7 +60,8 @@ export class MapProvider {
 	 * @param {number} y Tile y.
 	 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 	 */
-	async fetchTile(zoom: number, x: number, y: number): Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap> {
+	async fetchTile(zoom: number, x: number, y: number): Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap> 
+	{
 		return null;
 	}
 

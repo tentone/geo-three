@@ -5,7 +5,8 @@
  *
  * @class CancelablePromise
  */
-export class CancelablePromise<T> {
+export class CancelablePromise<T> 
+{
 	onResolve;
 
 	onReject;
@@ -20,30 +21,38 @@ export class CancelablePromise<T> {
 
 	value: T;
 
-	constructor(executor) {
-		function resolve(v) {
+	constructor(executor) 
+	{
+		function resolve(v) 
+		{
 			this.fulfilled = true;
 			this.value = v;
 
-			if (typeof this.onResolve === 'function') {
+			if (typeof this.onResolve === 'function') 
+			{
 				this.onResolve(this.value);
 				this.called = true;
 			}
 		}
 
-		function reject(reason) {
+		function reject(reason) 
+		{
 			this.rejected = true;
 			this.value = reason;
 
-			if (typeof this.onReject === 'function') {
+			if (typeof this.onReject === 'function') 
+			{
 				this.onReject(this.value);
 				this.called = true;
 			}
 		}
 
-		try {
+		try 
+		{
 			executor(resolve, reject);
-		} catch (error) {
+		}
+		catch (error) 
+		{
 			reject(error);
 		}
 	}
@@ -53,7 +62,8 @@ export class CancelablePromise<T> {
 	 *
 	 * @returns {boolean} True if the promise is canceled successfully, false otherwise.
 	 */
-	cancel() {
+	cancel() 
+	{
 		// TODO <ADD CODE HERE>
 		return false;
 	}
@@ -63,10 +73,12 @@ export class CancelablePromise<T> {
 	 *
 	 * @param {*} callback
 	 */
-	then(callback) {
+	then(callback) 
+	{
 		this.onResolve = callback;
 
-		if (this.fulfilled && !this.called) {
+		if (this.fulfilled && !this.called) 
+		{
 			this.called = true;
 			this.onResolve(this.value);
 		}
@@ -78,21 +90,25 @@ export class CancelablePromise<T> {
 	 *
 	 * @param {*} callback
 	 */
-	catch(callback) {
+	catch(callback) 
+	{
 		this.onReject = callback;
 
-		if (this.rejected && !this.called) {
+		if (this.rejected && !this.called) 
+		{
 			this.called = true;
 			this.onReject(this.value);
 		}
 		return this;
 	}
+
 	/**
 	 * finally.
 	 *
 	 * @param {*} callback
 	 */
-	finally(callback) {
+	finally(callback) 
+	{
 		// TODO: not implemented
 		return this;
 	}
@@ -105,8 +121,10 @@ export class CancelablePromise<T> {
 	 * @param {*} val Value to pass.
 	 * @returns {CancelablePromise} Promise created with resolve value.
 	 */
-	static resolve<T>(val) {
-		return new CancelablePromise<T>(function executor(resolve, _reject) {
+	static resolve<T>(val) 
+	{
+		return new CancelablePromise<T>(function executor(resolve, _reject) 
+		{
 			resolve(val);
 		});
 	}
@@ -117,8 +135,10 @@ export class CancelablePromise<T> {
 	 * @param {*} reason
 	 * @returns {CancelablePromise} Promise created with rejection reason.
 	 */
-	static reject(reason) {
-		return new CancelablePromise(function executor(resolve, reject) {
+	static reject(reason) 
+	{
+		return new CancelablePromise(function executor(resolve, reject) 
+		{
 			reject(reason);
 		});
 	}
@@ -131,22 +151,28 @@ export class CancelablePromise<T> {
 	 * @param {*} promises
 	 * @returns {CancelablePromise} Promise that will resolve when all of the running promises are fullfilled.
 	 */
-	static all(promises) {
+	static all(promises) 
+	{
 		const fulfilledPromises = [];
 		const result = [];
 
-		function executor(resolve, reject) {
+		function executor(resolve, reject) 
+		{
 			promises.forEach((promise, index) =>
-				promise
-					.then((val) => {
+			{
+				return promise
+					.then((val) => 
+					{
 						fulfilledPromises.push(true);
 						result[index] = val;
 
-						if (fulfilledPromises.length === promises.length) {
+						if (fulfilledPromises.length === promises.length) 
+						{
 							return resolve(result);
 						}
 					})
-					.catch((error) => reject(error))
+					.catch((error) => {return reject(error);});
+			}
 			);
 		}
 

@@ -5,8 +5,7 @@ module.exports = {
 	plugins: [
 		"@typescript-eslint",
 		"eslint-plugin-import",
-		"eslint-plugin-tsdoc",
-		"decorator-position"
+		"eslint-plugin-tsdoc"
 	],
 	extends: [
 		"eslint:recommended",

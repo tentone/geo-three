@@ -1,5 +1,5 @@
-import { LODRadial } from './LODRadial';
-import { Frustum, Matrix4, Vector3 } from 'three';
+import {LODRadial} from './LODRadial';
+import {Frustum, Matrix4, Vector3} from 'three';
 
 const projection = new Matrix4();
 const pov = new Vector3();
@@ -14,7 +14,8 @@ const position = new Vector3();
  * @class LODFrustum
  * @extends {LODRadial}
  */
-export class LODFrustum extends LODRadial {
+export class LODFrustum extends LODRadial 
+{
 	subdivideDistance = 120;
 
 	simplifyDistance = 400;
@@ -31,22 +32,27 @@ export class LODFrustum extends LODRadial {
 
 	pointOnly: boolean;
 
-	updateLOD(view, camera, renderer, scene) {
+	updateLOD(view, camera, renderer, scene) 
+	{
 		projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 		frustum.setFromProjectionMatrix(projection);
 		camera.getWorldPosition(pov);
 
 		const self = this;
-		view.children[0].traverse(function (node) {
+		view.children[0].traverse(function(node) 
+		{
 			node.getWorldPosition(position);
 			let distance = pov.distanceTo(position);
 			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
 			const inFrustum = self.pointOnly ? frustum.containsPoint(position) : frustum.intersectsObject(node);
 
-			if (distance < self.subdivideDistance && inFrustum) {
+			if (distance < self.subdivideDistance && inFrustum) 
+			{
 				node.subdivide();
-			} else if (distance > self.simplifyDistance && node.parentNode) {
+			}
+			else if (distance > self.simplifyDistance && node.parentNode) 
+			{
 				node.parentNode.simplify();
 			}
 		});

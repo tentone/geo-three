@@ -1,5 +1,5 @@
-import { LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3, BufferGeometry } from 'three';
-import { MapView } from '../MapView';
+import {LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3, BufferGeometry} from 'three';
+import {MapView} from '../MapView';
 
 /**
  * Represents a map tile node inside of the tiles quad-tree
@@ -10,7 +10,8 @@ import { MapView } from '../MapView';
  *
  * @class MapNode
  */
-export class MapNode extends Mesh {
+export class MapNode extends Mesh 
+{
 	/**
 	 * The map view.
 	 */
@@ -71,7 +72,8 @@ export class MapNode extends Mesh {
 	 */
 	childrenCache: any[] = null;
 
-	constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) {
+	constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	{
 		super(geometry, material);
 
 		this.mapView = mapView;
@@ -166,18 +168,23 @@ export class MapNode extends Mesh {
 	 *
 	 * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
 	 */
-	subdivide() {
+	subdivide() 
+	{
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-		if (this.children.length > 0 || this.level + 1 > maxZoom || (this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS)) {
+		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS) 
+		{
 			return;
 		}
 
 		this.subdivided = true;
 
-		if (this.childrenCache !== null) {
+		if (this.childrenCache !== null) 
+		{
 			this.isMesh = false;
 			this.children = this.childrenCache;
-		} else {
+		}
+		else 
+		{
 			this.createChildNodes();
 		}
 	}
@@ -189,8 +196,10 @@ export class MapNode extends Mesh {
 	 *
 	 * This base method assumes that the node implementation is based off Mesh and that the isMesh property is used to toggle visibility.
 	 */
-	simplify() {
-		if (this.children.length > 0) {
+	simplify() 
+	{
+		if (this.children.length > 0) 
+		{
 			this.childrenCache = this.children;
 		}
 
@@ -204,12 +213,14 @@ export class MapNode extends Mesh {
 	 *
 	 * This base method assumes the existence of a material attribute with a map texture.
 	 */
-	loadTexture() {
+	loadTexture() 
+	{
 		const self = this;
 
 		this.mapView.provider
 			.fetchTile(this.level, this.x, this.y)
-			.then(function (image) {
+			.then(function(image) 
+			{
 				const texture = new Texture(image as any);
 				texture.generateMipmaps = false;
 				texture.format = RGBFormat;
@@ -220,7 +231,8 @@ export class MapNode extends Mesh {
 				self.material.map = texture;
 				self.nodeReady();
 			})
-			.catch(function () {
+			.catch(function() 
+			{
 				const canvas = new OffscreenCanvas(1, 1);
 				const context = canvas.getContext('2d');
 				context.fillStyle = '#FF0000';
@@ -242,23 +254,29 @@ export class MapNode extends Mesh {
 	 *
 	 * @method nodeReady
 	 */
-	nodeReady() {
+	nodeReady() 
+	{
 		// Update parent nodes loaded
-		if (this.parentNode !== null) {
+		if (this.parentNode !== null) 
+		{
 			this.parentNode.nodesLoaded++;
 
-			if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS) {
-				if (this.parentNode.subdivided === true) {
+			if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS) 
+			{
+				if (this.parentNode.subdivided === true) 
+				{
 					this.parentNode.isMesh = false;
 				}
 
-				for (let i = 0; i < this.parentNode.children.length; i++) {
+				for (let i = 0; i < this.parentNode.children.length; i++) 
+				{
 					this.parentNode.children[i].visible = true;
 				}
 			}
 		}
 		// If its the root object just set visible
-		else {
+		else 
+		{
 			this.visible = true;
 		}
 	}
@@ -269,7 +287,8 @@ export class MapNode extends Mesh {
 	 * @param - direction Direction to get neighbors.
 	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
-	getNeighborsDirection(direction: number): MapNode[] {
+	getNeighborsDirection(direction: number): MapNode[] 
+	{
 		// TODO <ADD CODE HERE>
 
 		return null;
@@ -280,7 +299,8 @@ export class MapNode extends Mesh {
 	 *
 	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
-	getNeighbors(): MapNode[] {
+	getNeighbors(): MapNode[] 
+	{
 		const neighbors = [];
 
 		// TODO <ADD CODE HERE>

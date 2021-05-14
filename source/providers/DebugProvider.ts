@@ -1,13 +1,14 @@
-import { MapProvider } from './MapProvider';
-import { Color } from 'three';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {Color} from 'three';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Debug provider can be used to debug the levels of the map three based on the zoom level they change between green and red.
  *
  * @class DebugProvider
  */
-export class DebugProvider extends MapProvider {
+export class DebugProvider extends MapProvider 
+{
 	/**
 	 * Resolution in px of each tile.
 	 *
@@ -16,7 +17,8 @@ export class DebugProvider extends MapProvider {
 	 */
 	resolution = 256;
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y) 
+	{
 		const canvas = new OffscreenCanvas(this.resolution, this.resolution);
 		const context = canvas.getContext('2d');
 

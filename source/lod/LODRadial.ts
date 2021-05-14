@@ -1,5 +1,5 @@
-import { LODControl } from './LODControl';
-import { Vector3 } from 'three';
+import {LODControl} from './LODControl';
+import {Vector3} from 'three';
 
 const pov = new Vector3();
 const position = new Vector3();
@@ -12,7 +12,8 @@ const position = new Vector3();
  * @class LODRadial
  * @extends {LODControl}
  */
-export class LODRadial extends LODControl {
+export class LODRadial extends LODControl 
+{
 	/**
 	 * Minimum ditance to subdivide nodes.
 	 *
@@ -29,20 +30,25 @@ export class LODRadial extends LODControl {
 	 */
 	simplifyDistance = 300;
 
-	updateLOD(view, camera, renderer, scene) {
+	updateLOD(view, camera, renderer, scene) 
+	{
 		const self = this;
 
 		camera.getWorldPosition(pov);
 
-		view.children[0].traverse(function (node) {
+		view.children[0].traverse(function(node) 
+		{
 			node.getWorldPosition(position);
 
 			let distance = pov.distanceTo(position);
 			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
-			if (distance < self.subdivideDistance) {
+			if (distance < self.subdivideDistance) 
+			{
 				node.subdivide();
-			} else if (distance > self.simplifyDistance && node.parentNode) {
+			}
+			else if (distance > self.simplifyDistance && node.parentNode) 
+			{
 				node.parentNode.simplify();
 			}
 		});

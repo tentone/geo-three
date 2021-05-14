@@ -1,5 +1,5 @@
-import { MapProvider } from './MapProvider';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Here maps tile server.
@@ -9,7 +9,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  *
  * @class HereMapsProvider
  */
-export class HereMapsProvider extends MapProvider {
+export class HereMapsProvider extends MapProvider 
+{
 	/**
 	 * Path to map tile API.
 	 *
@@ -120,7 +121,8 @@ export class HereMapsProvider extends MapProvider {
 	 * @param {string} format Image format.
 	 * @param {number} size Tile size.
 	 */
-	constructor(appId, appCode, style, scheme, format, size) {
+	constructor(appId, appCode, style, scheme, format, size) 
+	{
 		super();
 
 		this.appId = appId !== undefined ? appId : '';
@@ -140,21 +142,26 @@ export class HereMapsProvider extends MapProvider {
 	 *
 	 * @method nextServer
 	 */
-	nextServer() {
+	nextServer() 
+	{
 		this.server = this.server % 4 === 0 ? 1 : this.server + 1;
 	}
 
 	getMetaData() {}
 
-	fetchTile(zoom, x, y) {
+	fetchTile(zoom, x, y) 
+	{
 		this.nextServer();
 
-		return new CancelablePromise((resolve, reject) => {
+		return new CancelablePromise((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';

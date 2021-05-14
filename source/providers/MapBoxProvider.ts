@@ -1,6 +1,6 @@
-import { MapProvider } from './MapProvider';
-import { XHRUtils } from '../utils/XHRUtils';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {XHRUtils} from '../utils/XHRUtils';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Map box service tile provider. Map tiles can be fetched from style or from a map id.
@@ -15,7 +15,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  * @param {string} format Image format.
  * @param {boolean} useHDPI
  */
-export class MapBoxProvider extends MapProvider {
+export class MapBoxProvider extends MapProvider 
+{
 	static ADDRESS = 'https://api.mapbox.com/';
 
 	/**
@@ -124,7 +125,8 @@ export class MapBoxProvider extends MapProvider {
 	 */
 	version: string;
 
-	constructor(apiToken, id, mode, format, useHDPI, version) {
+	constructor(apiToken, id, mode, format, useHDPI, version) 
+	{
 		super();
 
 		/**
@@ -142,11 +144,13 @@ export class MapBoxProvider extends MapProvider {
 		this.version = version !== undefined ? version : 'v4';
 	}
 
-	getMetaData() {
+	getMetaData() 
+	{
 		const self = this;
 		const address = MapBoxProvider.ADDRESS + this.version + '/' + this.mapId + '.json?access_token=' + this.apiToken;
 
-		XHRUtils.get(address, function (data) {
+		XHRUtils.get(address, function(data) 
+		{
 			const meta = JSON.parse(data);
 
 			self.name = meta.name;
@@ -157,20 +161,27 @@ export class MapBoxProvider extends MapProvider {
 		});
 	}
 
-	fetchTile(zoom, x, y) {
-		return new CancelablePromise((resolve, reject) => {
+	fetchTile(zoom, x, y) 
+	{
+		return new CancelablePromise((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';
 
-			if (this.mode === MapBoxProvider.STYLE) {
+			if (this.mode === MapBoxProvider.STYLE) 
+			{
 				image.src = MapBoxProvider.ADDRESS + 'styles/v1/' + this.style + '/tiles/' + zoom + '/' + x + '/' + y + (this.useHDPI ? '@2x?access_token=' : '?access_token=') + this.apiToken;
-			} else {
+			}
+			else 
+			{
 				image.src = MapBoxProvider.ADDRESS + 'v4/' + this.mapId + '/' + zoom + '/' + x + '/' + y + (this.useHDPI ? '@2x.' : '.') + this.format + '?access_token=' + this.apiToken;
 			}
 		});

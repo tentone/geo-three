@@ -1,6 +1,6 @@
-import { MapProvider } from './MapProvider';
-import { XHRUtils } from '../utils/XHRUtils';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapProvider} from './MapProvider';
+import {XHRUtils} from '../utils/XHRUtils';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Google maps tile server.
@@ -13,7 +13,8 @@ import { CancelablePromise } from '../utils/CancelablePromise';
  *
  * @class GoogleMapsProvider
  */
-export class GoogleMapsProvider extends MapProvider {
+export class GoogleMapsProvider extends MapProvider 
+{
 	/**
 	 * Server API access token.
 	 *
@@ -71,7 +72,9 @@ export class GoogleMapsProvider extends MapProvider {
 	 * @type {boolean}
 	 */
 	overlay = false;
-	constructor(apiToken) {
+
+	constructor(apiToken) 
+	{
 		super();
 
 		this.apiToken = apiToken !== undefined ? apiToken : '';
@@ -86,7 +89,8 @@ export class GoogleMapsProvider extends MapProvider {
 	 *
 	 * @method createSession
 	 */
-	createSession() {
+	createSession() 
+	{
 		const self = this;
 
 		const address = 'https://www.googleapis.com/tile/v1/createSession?key=' + this.apiToken;
@@ -102,25 +106,31 @@ export class GoogleMapsProvider extends MapProvider {
 		XHRUtils.request(
 			address,
 			'GET',
-			{ 'Content-Type': 'text/json' },
+			{'Content-Type': 'text/json'},
 			data,
-			function (response, xhr) {
+			function(response, xhr) 
+			{
 				console.log('Created google maps session.', response, xhr);
 				self.sessionToken = response.session;
 			},
-			function (xhr) {
+			function(xhr) 
+			{
 				console.warn('Unable to create a google maps session.', xhr);
 			}
 		);
 	}
 
-	fetchTile(zoom, x, y) {
-		return new CancelablePromise((resolve, reject) => {
+	fetchTile(zoom, x, y) 
+	{
+		return new CancelablePromise((resolve, reject) => 
+		{
 			const image = document.createElement('img');
-			image.onload = function () {
+			image.onload = function() 
+			{
 				resolve(image);
 			};
-			image.onerror = function () {
+			image.onerror = function() 
+			{
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';

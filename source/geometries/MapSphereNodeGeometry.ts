@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three';
+import {BufferGeometry, Float32BufferAttribute, Vector3} from 'three';
 
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
@@ -8,8 +8,10 @@ import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three';
  * @param {number} widthSegments Number of subdivisions along the width.
  * @param {number} heightSegments Number of subdivisions along the height.
  */
-export class MapSphereNodeGeometry extends BufferGeometry {
-	constructor(radius: number, widthSegments: number, heightSegments: number, phiStart: number, phiLength: number, thetaStart: number, thetaLength: number) {
+export class MapSphereNodeGeometry extends BufferGeometry 
+{
+	constructor(radius: number, widthSegments: number, heightSegments: number, phiStart: number, phiLength: number, thetaStart: number, thetaLength: number) 
+	{
 		super();
 
 		const thetaEnd = thetaStart + thetaLength;
@@ -25,11 +27,13 @@ export class MapSphereNodeGeometry extends BufferGeometry {
 		const uvs = [];
 
 		// Generate vertices, normals and uvs
-		for (let iy = 0; iy <= heightSegments; iy++) {
+		for (let iy = 0; iy <= heightSegments; iy++) 
+		{
 			const verticesRow = [];
 			const v = iy / heightSegments;
 
-			for (let ix = 0; ix <= widthSegments; ix++) {
+			for (let ix = 0; ix <= widthSegments; ix++) 
+			{
 				const u = ix / widthSegments;
 
 				// Vertex
@@ -52,18 +56,22 @@ export class MapSphereNodeGeometry extends BufferGeometry {
 		}
 
 		// Indices
-		for (let iy = 0; iy < heightSegments; iy++) {
-			for (let ix = 0; ix < widthSegments; ix++) {
+		for (let iy = 0; iy < heightSegments; iy++) 
+		{
+			for (let ix = 0; ix < widthSegments; ix++) 
+			{
 				const a = grid[iy][ix + 1];
 				const b = grid[iy][ix];
 				const c = grid[iy + 1][ix];
 				const d = grid[iy + 1][ix + 1];
 
-				if (iy !== 0 || thetaStart > 0) {
+				if (iy !== 0 || thetaStart > 0) 
+				{
 					indices.push(a, b, d);
 				}
 
-				if (iy !== heightSegments - 1 || thetaEnd < Math.PI) {
+				if (iy !== heightSegments - 1 || thetaEnd < Math.PI) 
+				{
 					indices.push(b, c, d);
 				}
 			}
