@@ -121,7 +121,7 @@ export class CancelablePromise<T>
 	 * @param val - Value to pass.
 	 * @returns Promise created with resolve value.
 	 */
-	public  static resolve<T>(val: T): CancelablePromise<T>
+	public static resolve<T>(val: T): CancelablePromise<T>
 	{
 		return new CancelablePromise<T>(function executor(resolve, _reject) 
 		{
@@ -135,7 +135,7 @@ export class CancelablePromise<T>
 	 * @param reason - Reason to reject the promise.
 	 * @returns Promise created with rejection reason.
 	 */
-	public  static reject(reason: any): CancelablePromise<any>
+	public static reject(reason: any): CancelablePromise<any>
 	{
 		return new CancelablePromise(function executor(resolve, reject) 
 		{
@@ -151,7 +151,7 @@ export class CancelablePromise<T>
 	 * @param promises - List of promisses to syncronize.
 	 * @returns Promise that will resolve when all of the running promises are fullfilled.
 	 */
-	public  static all(promises: CancelablePromise<any>[]): CancelablePromise<any>
+	public static all(promises: CancelablePromise<any>[]): CancelablePromise<any>
 	{
 		const fulfilledPromises = [];
 		const result = [];

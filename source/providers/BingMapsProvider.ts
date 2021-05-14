@@ -18,15 +18,11 @@ export class BingMapsProvider extends MapProvider
 
 	/**
 	 * Server API access token.
-	 *
-	 * @type {string}
 	 */
 	apiKey: string;
 
 	/**
 	 * The type of the map used.
-	 *
-	 * @type {string}
 	 */
 	type: string;
 
@@ -35,24 +31,18 @@ export class BingMapsProvider extends MapProvider
 	 *  - gif: Use GIF image format.
 	 *  - jpeg: Use JPEG image format. JPEG format is the default for Road, Aerial and AerialWithLabels imagery.
 	 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
-	 *
-	 * @type {string}
 	 */
-	format = 'jpeg';
+	format: string = 'jpeg';
 
 	/**
 	 * Size of the map tiles.
-	 *
-	 * @type {number}
 	 */
-	mapSize = 512;
+	mapSize: number = 512;
 
 	/**
 	 * Tile server subdomain.
-	 *
-	 * @type {string}
 	 */
-	subdomain = 't1';
+	subdomain: string = 't1';
 
 	public constructor(apiKey, type) 
 	{
@@ -65,38 +55,28 @@ export class BingMapsProvider extends MapProvider
 
 	/**
 	 * Display an aerial view of the map.
-	 *
-	 * @type {string}
 	 */
-	public static AERIAL = 'a';
+	public static AERIAL: string = 'a';
 
 	/**
 	 * Display a road view of the map.
-	 *
-	 * @type {string}
 	 */
-	public static ROAD = 'r';
+	public static ROAD: string = 'r';
 
 	/**
 	 * Display an aerial view of the map with labels.
-	 *
-	 * @type {string}
 	 */
-	public static AERIAL_LABELS = 'h';
+	public static AERIAL_LABELS: string = 'h';
 
 	/**
 	 * Use this value to display a bird's eye (oblique) view of the map.
-	 *
-	 * @type {string}
 	 */
-	public static OBLIQUE = 'o';
+	public static OBLIQUE: string = 'o';
 
 	/**
 	 * Display a bird's eye (oblique) with labels view of the map.
-	 *
-	 * @type {string}
 	 */
-	public static OBLIQUE_LABELS = 'b';
+	public static OBLIQUE_LABELS: string = 'b';
 
 	/**
 	 * Get the base URL for the map configuration requested.
@@ -105,7 +85,7 @@ export class BingMapsProvider extends MapProvider
 	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
 	 *
 	 */
-	getMetaData() 
+	public getMetaData(): void 
 	{
 		const self = this;
 		const address = 'http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
@@ -122,10 +102,8 @@ export class BingMapsProvider extends MapProvider
 	 * Convert x, y, zoom quadtree to a bing maps specific quadkey.
 	 *
 	 * Adapted from original C# code at https://msdn.microsoft.com/en-us/library/bb259689.aspx.
-	 *
-	 * @param {number} x
 	 */
-	public static quadKey(zoom, x, y) 
+	public static quadKey(zoom: number, x: number, y: number): string
 	{
 		let quad = '';
 
@@ -150,7 +128,7 @@ export class BingMapsProvider extends MapProvider
 		return quad;
 	}
 
-	fetchTile(zoom, x, y) 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
 	{
 		return new CancelablePromise((resolve, reject) => 
 		{

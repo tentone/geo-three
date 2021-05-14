@@ -138,7 +138,7 @@ export class HereMapsProvider extends MapProvider
 
 	getMetaData() {}
 
-	fetchTile(zoom, x, y) 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
 	{
 		this.nextServer();
 

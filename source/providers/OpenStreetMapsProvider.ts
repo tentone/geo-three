@@ -31,7 +31,7 @@ export class OpenStreetMapsProvider extends MapProvider
 		this.format = 'png';
 	}
 
-	fetchTile(zoom: number, x: number, y: number) 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
 	{
 		return new CancelablePromise<HTMLImageElement>((resolve, reject) => 
 		{

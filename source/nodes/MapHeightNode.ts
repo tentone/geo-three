@@ -13,7 +13,7 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  */
 export class MapHeightNode extends MapNode 
 {
-	public  static USE_DISPLACEMENT: boolean = false;
+	public static USE_DISPLACEMENT: boolean = false;
 
 	public static MAX_HEIGHT = 0;
 

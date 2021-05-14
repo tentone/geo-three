@@ -9,12 +9,10 @@ export class DebugProvider extends MapProvider
 {
 	/**
 	 * Resolution in px of each tile.
-	 *
-	 * @type {number}
 	 */
-	resolution = 256;
+	public resolution: number = 256;
 
-	fetchTile(zoom, x, y) 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
 	{
 		const canvas = new OffscreenCanvas(this.resolution, this.resolution);
 		const context = canvas.getContext('2d');
@@ -34,6 +32,6 @@ export class DebugProvider extends MapProvider
 		context.fillText('(' + zoom + ')', this.resolution / 2, this.resolution * 0.4);
 		context.fillText('(' + x + ', ' + y + ')', this.resolution / 2, this.resolution * 0.6);
 
-		return Promise.resolve(canvas);
+		return CancelablePromise.resolve(canvas);
 	}
 }

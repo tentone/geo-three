@@ -63,7 +63,7 @@ export class OpenMapTilesProvider extends MapProvider
 		});
 	}
 
-	fetchTile(zoom, x, y) 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
 	{
 		return new CancelablePromise((resolve, reject) => 
 		{

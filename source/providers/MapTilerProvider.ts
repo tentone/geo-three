@@ -8,33 +8,25 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *
  * API Reference
  *  - https://www.maptiler.com/
- *
- * @param {string} apiKey
  */
 export class MapTilerProvider extends MapProvider 
 {
 	/**
 	 * Server API access token.
-	 *
-	 * @type {string}
 	 */
-	apiKey: string;
+	public apiKey: string;
 
 	/**
 	 * Map image tile file format (e.g png, jpg)
 	 *
 	 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
-	 *
-	 * @type {string}
 	 */
-	format: string;
+	public format: string;
 
 	/**
 	 * Tile category (e.g. maps, tiles),
-	 *
-	 * @type {string}
 	 */
-	category: string;
+	public category: string;
 
 	/**
 	 * Map tile type, some of the vectorial styles available.
@@ -42,12 +34,10 @@ export class MapTilerProvider extends MapProvider
 	 * Can be used for rasterized vectorial maps (e.g, basic, bright, darkmatter, hybrid, positron, streets, topo, voyager).
 	 *
 	 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
-	 *
-	 * @type {string}
 	 */
-	style: string;
+	public style: string;
 
-	resolution;
+	public resolution: number;
 
 	public constructor(apiKey, category, style, format) 
 	{
@@ -64,7 +54,7 @@ export class MapTilerProvider extends MapProvider
 		this.resolution = 512;
 	}
 
-	fetchTile(zoom, x, y) 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any> 
 	{
 		return new CancelablePromise((resolve, reject) => 
 		{

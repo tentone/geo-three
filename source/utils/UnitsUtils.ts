@@ -2,9 +2,6 @@
  * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
  *
  * Devices with a GPS, for example, can take a minute or more to get a GPS fix, so less accurate data (IP location or wifi) may be returned.
- *
- * @static
- * @class UnitsUtils
  */
 export class UnitsUtils 
 {

@@ -1,3 +1,5 @@
+import {CancelablePromise} from '../utils/CancelablePromise';
+
 /**
  * A map provider is a object that handles the access to map tiles of a specific service.
  *
@@ -9,40 +11,30 @@ export class MapProvider
 {
 	/**
 	 * Name of the map provider
-	 *
-	 * @type {string}
 	 */
-	name: string = '';
+	public name: string = '';
 
 	/**
 	 * Minimum tile level.
-	 *
-	 * @type {number}
 	 */
-	minZoom: number = 0;
+	public minZoom: number = 0;
 
-	/**
+	 /**
 	 * Maximum tile level.
-	 *
-	 * @type {number}
 	 */
-	maxZoom: number = 20;
+	public maxZoom: number = 20;
 
-	/**
+	 /**
 	 * Map bounds.
-	 *
-	 * @type {Array}
 	 */
-	bounds: number[] = [];
+	public bounds: number[] = [];
 
-	/**
+	 /**
 	 * Map center point.
-	 *
-	 * @type {Array}
 	 */
-	center: number[] = [];
+	public center: number[] = [];
 
-	/**
+	 /**
 	 * Get a tile for the x, y, zoom based on the provider configuration.
 	 *
 	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
@@ -50,18 +42,17 @@ export class MapProvider
 	 * @param {number} zoom Zoom level.
 	 * @param {number} x Tile x.
 	 * @param {number} y Tile y.
-	 * @returns {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
+	 * @returns Promise with the image obtained for the tile ready to use.
 	 */
-	async fetchTile(zoom: number, x: number, y: number): Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap> 
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any> 
 	{
 		return null;
 	}
 
-	/**
+	 /**
 	 * Get map meta data from server if supported.
 	 *
 	 * Usually map server have API method to retrieve TileJSON metadata.
-	 *
 	 */
-	getMetaData() {}
+	 public getMetaData(): void {}
 }

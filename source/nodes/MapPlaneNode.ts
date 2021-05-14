@@ -11,9 +11,9 @@ export class MapPlaneNode extends MapNode
 	{
 		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 
-		this.matrixAutoUpdate: boolean = false;
+		this.matrixAutoUpdate = false;
 		this.isMesh = true;
-		this.visible: boolean = false;
+		this.visible = false;
 	}
 
 	/**
