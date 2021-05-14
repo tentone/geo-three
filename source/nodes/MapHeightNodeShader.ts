@@ -4,6 +4,7 @@ import { MapNodeGeometry } from '../geometries/MapNodeGeometry';
 import { MapPlaneNode } from './MapPlaneNode';
 import { UnitsUtils } from '../utils/UnitsUtils';
 import { MapNode } from './MapNode';
+import { MapView } from '../MapView';
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
@@ -19,7 +20,7 @@ import { MapNode } from './MapNode';
  * @param y {number} Y position of the node in the tile tree.
  */
 export class MapHeightNodeShader extends MapHeightNode {
-	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) {
+	constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) {
 		let material = new MeshPhongMaterial({ map: MapHeightNodeShader.EMPTY_TEXTURE });
 		material = MapHeightNodeShader.prepareMaterial(material);
 

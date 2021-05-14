@@ -5,8 +5,6 @@ import { BufferGeometry, Float32BufferAttribute } from 'three';
  *
  * Consists of a XZ plane with normals facing +Y.
  *
- * @class MapNodeGeometry
- * @extends {BufferGeometry}
  * @param {number} width Width of the node.
  * @param {number} height Height of the node.
  * @param {number} widthSegments Number of subdivisions along the width.

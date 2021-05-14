@@ -3,15 +3,13 @@ import { BufferGeometry, Float32BufferAttribute, Vector3 } from 'three';
 /**
  * Map node geometry is a geometry used to represent the spherical map nodes.
  *
- * @class MapSphereNodeGeometry
- * @extends {BufferGeometry}
  * @param {number} width Width of the node.
  * @param {number} height Height of the node.
  * @param {number} widthSegments Number of subdivisions along the width.
  * @param {number} heightSegments Number of subdivisions along the height.
  */
 export class MapSphereNodeGeometry extends BufferGeometry {
-	constructor(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength) {
+	constructor(radius: number, widthSegments: number, heightSegments: number, phiStart: number, phiLength: number, thetaStart: number, thetaLength: number) {
 		super();
 
 		const thetaEnd = thetaStart + thetaLength;

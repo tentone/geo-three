@@ -32,20 +32,14 @@
 		"three": ">0.80.0"
 	},
 	"devDependencies": {
-		"@rollup/plugin-strip": "~2.0.1",
-		"@rollup/plugin-typescript": "~8.2.1",
 		"@types/node": "~14.6.2",
 		"@typescript-eslint/eslint-plugin": "^4.22.1",
 		"@typescript-eslint/parser": "^4.22.1",
 		"eslint": "^7.26.0",
-		"eslint-config-prettier": "^8.3.0",
-		"eslint-plugin-prettier": "^3.4.0",
+		"eslint-plugin-import": "~2.22.1",
+		"eslint-plugin-tsdoc": "^0.2.11",
+		"eslint-plugin-typescript": "~0.14.0",
 		"jsdoc": "~3.6.6",
-		"prettier": "^2.3.0",
-		"rollup": "~2.47.0",
-        "rollup-plugin-livereload": "~2.0.0",
-        "rollup-plugin-serve": "~2.0.0-beta.0",
-		"rollup-plugin-uglify": "~6.0.4",
 		"three": "~0.125.0",
 		"typescript": "^4.2.4",
 		"uglify-js": "~3.13.5"

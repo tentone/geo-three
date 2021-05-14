@@ -1,4 +1,4 @@
-import { LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture } from 'three';
+import { LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3, BufferGeometry } from 'three';
 import { MapView } from '../MapView';
 
 /**
@@ -13,17 +13,11 @@ import { MapView } from '../MapView';
 export class MapNode extends Mesh {
 	/**
 	 * The map view.
-	 *
-	 * @attribute mapView
-	 * @type {MapView}
 	 */
 	mapView: MapView;
 
 	/**
 	 * Parent node (from an upper tile level).
-	 *
-	 * @attribute parentNode
-	 * @type {MapNode}
 	 */
 	parentNode: MapNode;
 
@@ -31,63 +25,42 @@ export class MapNode extends Mesh {
 	 * Index of the map node in the quad-tree parent node.
 	 *
 	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
-	 *
-	 * @attribute location
-	 * @type {number}
 	 */
 	location: number;
 
 	/**
 	 * Tile level of this node.
-	 *
-	 * @attribute level
-	 * @type {number}
 	 */
 	level: number;
 
 	/**
 	 * Tile x position.
-	 *
-	 * @attribute x
-	 * @type {number}
 	 */
 	x: number;
 
 	/**
 	 * Tile y position.
-	 *
-	 * @attribute y
-	 * @type {number}
 	 */
 	y: number;
 
 	/**
 	 * Indicates how many children nodes where loaded.
-	 *
-	 * @attribute nodesLoaded
-	 * @type {number}
 	 */
-	nodesLoaded = 0;
+	nodesLoaded: number = 0;
 
 	/**
 	 * Variable to check if the node is subdivided.
 	 *
 	 * To avoid bad visibility changes on node load.
-	 *
-	 * @attribute subdivided
-	 * @type {boolean}
 	 */
-	subdivided = false;
+	subdivided: boolean = false;
 
 	/**
 	 * Variable to check if the node is a mesh.
 	 *
 	 * Used to draw or not draw the node
-	 *
-	 * @attribute subdivided
-	 * @type {boolean}
 	 */
-	isMesh;
+	isMesh: boolean = true;
 
 	/**
 	 * Cache with the children objects created from subdivision.
@@ -95,13 +68,8 @@ export class MapNode extends Mesh {
 	 * Used to avoid recreate object after simplification and subdivision.
 	 *
 	 * The default value is null.
-	 *
-	 * @attribute childrenCache
-	 * @type {Array}
 	 */
-	childrenCache = null;
-
-	material: Material;
+	childrenCache: any[] = null;
 
 	constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) {
 		super(geometry, material);
@@ -131,72 +99,44 @@ export class MapNode extends Mesh {
 	 * Base geometry is attached to the map viewer object.
 	 *
 	 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
-	 *
-	 * @static
-	 * @attribute BASE_GEOMETRY
-	 * @type {THREE.Geometry}
 	 */
-	static BASE_GEOMETRY = null;
+	static BASE_GEOMETRY: BufferGeometry = null;
 
 	/**
 	 * Base scale applied to the map viewer object.
-	 *
-	 * @static
-	 * @attribute BASE_SCALE
-	 * @type {THREE.Vector3}
 	 */
-	static BASE_SCALE = null;
+	static BASE_SCALE: Vector3 = null;
 
 	/**
 	 * How many children each branch of the tree has.
 	 *
 	 * For a quad-tree this value is 4.
-	 *
-	 * @static
-	 * @attribute CHILDRENS
-	 * @type {number}
 	 */
-	static CHILDRENS = 4;
+	static CHILDRENS: number = 4;
 
 	/**
 	 * Root node has no location.
-	 *
-	 * @static
-	 * @attribute ROOT
-	 * @type {number}
 	 */
-	static ROOT = -1;
+	static ROOT: number = -1;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute TOP_LEFT
-	 * @type {number}
 	 */
-	static TOP_LEFT = 0;
+	static TOP_LEFT: number = 0;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute TOP_RIGHT
-	 * @type {number}
 	 */
-	static TOP_RIGHT = 1;
+	static TOP_RIGHT: number = 1;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute BOTTOM_LEFT
-	 * @type {number}
 	 */
 	static BOTTOM_LEFT = 2;
 
@@ -204,10 +144,6 @@ export class MapNode extends Mesh {
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
-	 *
-	 * @static
-	 * @attribute BOTTOM_RIGHT
-	 * @type {number}
 	 */
 	static BOTTOM_RIGHT = 3;
 
@@ -215,8 +151,6 @@ export class MapNode extends Mesh {
 	 * Initialize resources that require access to data from the MapView.
 	 *
 	 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
-	 *
-	 * @method initialize
 	 */
 	initialize() {}
 
@@ -224,8 +158,6 @@ export class MapNode extends Mesh {
 	 * Create the child nodes to represent the next tree level.
 	 *
 	 * These nodes should be added to the object, and their transformations matrix should be updated.
-	 *
-	 * @method createChildNodes
 	 */
 	createChildNodes() {}
 
@@ -233,8 +165,6 @@ export class MapNode extends Mesh {
 	 * Subdivide node,check the maximum depth allowed for the tile provider.
 	 *
 	 * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
-	 *
-	 * @method subdivide
 	 */
 	subdivide() {
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
@@ -258,8 +188,6 @@ export class MapNode extends Mesh {
 	 * Reset the subdivided flag and restore the visibility.
 	 *
 	 * This base method assumes that the node implementation is based off Mesh and that the isMesh property is used to toggle visibility.
-	 *
-	 * @method simplify
 	 */
 	simplify() {
 		if (this.children.length > 0) {
@@ -275,9 +203,6 @@ export class MapNode extends Mesh {
 	 * Load tile texture from the server.
 	 *
 	 * This base method assumes the existence of a material attribute with a map texture.
-	 *
-	 * @method loadTexture
-	 * @param {Function} onLoad
 	 */
 	loadTexture() {
 		const self = this;
@@ -292,7 +217,7 @@ export class MapNode extends Mesh {
 				texture.minFilter = LinearFilter;
 				texture.needsUpdate = true;
 
-				(self.material as MeshPhongMaterial).map = texture;
+				self.material.map = texture;
 				self.nodeReady();
 			})
 			.catch(function () {
@@ -305,7 +230,7 @@ export class MapNode extends Mesh {
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
 
-				(self.material as MeshPhongMaterial).map = texture;
+				self.material.map = texture;
 				self.nodeReady();
 			});
 	}
@@ -341,11 +266,10 @@ export class MapNode extends Mesh {
 	/**
 	 * Get all the neighbors in a specific direction (left, right, up down).
 	 *
-	 * @method getNeighborsDirection
-	 * @param {number} direction
-	 * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+	 * @param - direction Direction to get neighbors.
+	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
-	getNeighborsDirection(direction) {
+	getNeighborsDirection(direction: number): MapNode[] {
 		// TODO <ADD CODE HERE>
 
 		return null;
@@ -354,10 +278,9 @@ export class MapNode extends Mesh {
 	/**
 	 * Get all the quad tree nodes neighbors. Are considered neighbors all the nodes directly in contact with a edge of this node.
 	 *
-	 * @method getNeighbors
-	 * @return {MapNode[]} The neighbors array, if no neighbors found returns empty.
+	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
-	getNeighbors() {
+	getNeighbors(): MapNode[] {
 		const neighbors = [];
 
 		// TODO <ADD CODE HERE>
