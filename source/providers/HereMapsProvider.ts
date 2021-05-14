@@ -14,7 +14,7 @@ export class HereMapsProvider extends MapProvider
 	 *
 	 * Version of the api is fixed 2.1.
 	 */
-	static PATH = '/maptile/2.1/';
+	public static PATH = '/maptile/2.1/';
 
 	/**
 	 * Service application access token.

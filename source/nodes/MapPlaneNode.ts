@@ -21,11 +21,11 @@ export class MapPlaneNode extends MapNode
 	 *
 	 * @type {PlaneBufferGeometry}
 	 */
-	static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
+	public static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
 
-	static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
+	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	initialize() 
 	{

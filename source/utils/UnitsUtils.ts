@@ -12,19 +12,19 @@ export class UnitsUtils
 	 * Aproximated radius of earth in meters.
 	 *
 	 */
-	static EARTH_RADIUS: number = 6378137;
+	public static EARTH_RADIUS: number = 6378137;
 
 	/**
 	 * Earth equator perimeter in meters.
 	 *
 	 */
-	static EARTH_PERIMETER: number = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
+	public static EARTH_PERIMETER: number = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 
 	/**
 	 * Earth equator perimeter in meters.
 	 *
 	 */
-	static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
+	public static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 	/**
 	 * Get the current geolocation from the browser using the location API.
@@ -33,7 +33,7 @@ export class UnitsUtils
 	 *
 	 * @param {Function} onResult Callback function onResult(coords, timestamp).
 	 */
-	static get(onResult, onError) 
+	public static get(onResult, onError) 
 	{
 		navigator.geolocation.getCurrentPosition(function(result) 
 		{
@@ -47,7 +47,7 @@ export class UnitsUtils
 	 * @param {number} latitude
 	 * @param {number} longitude
 	 */
-	static datumsToSpherical(latitude, longitude) 
+	public static datumsToSpherical(latitude, longitude) 
 	{
 		const x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
 		let y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
@@ -63,7 +63,7 @@ export class UnitsUtils
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static sphericalToDatums(x, y) 
+	public static sphericalToDatums(x, y) 
 	{
 		const longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
 		let latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
@@ -80,7 +80,7 @@ export class UnitsUtils
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static quadtreeToDatums(zoom, x, y) 
+	public static quadtreeToDatums(zoom, x, y) 
 	{
 		const n = Math.pow(2.0, zoom);
 		const longitude = x / n * 360.0 - 180.0;

@@ -23,19 +23,19 @@ export class MapSphereNode extends MapNode
 		this.visible = false;
 	}
 	
-	static BASE_GEOMETRY = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+	public static BASE_GEOMETRY = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 
-	static BASE_SCALE = new Vector3(1, 1, 1);
+	public static BASE_SCALE = new Vector3(1, 1, 1);
 
 	/**
 	 * Number of segments per node geometry.
 	 * 
 	 * Can be configured globally and is applied to all nodes.
 	 *
-	 * @static SEGMENTS
+	 * @public static SEGMENTS
 	 * @type {number}
 	 */
-	static SEGMENTS = 80;
+	public static SEGMENTS = 80;
 	
 	initialize() 
 	{
@@ -49,7 +49,7 @@ export class MapSphereNode extends MapNode
 	 * @param {number} x
 	 * @param {number} y
 	 */
-	static createGeometry(zoom, x, y) 
+	public static createGeometry(zoom, x, y) 
 	{
 		const range = Math.pow(2, zoom);
 		const max = 40;

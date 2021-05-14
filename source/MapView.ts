@@ -24,35 +24,35 @@ export class MapView extends Mesh
 	 *
 	 * @type {number}
 	 */
-	static PLANAR = 200;
+	public static PLANAR = 200;
 
 	/**
 	 * Spherical map projection.
 	 *
 	 * @type {number}
 	 */
-	static SPHERICAL = 201;
+	public static SPHERICAL = 201;
 
 	/**
 	 * Planar map projection with height deformation.
 	 *
 	 * @type {number}
 	 */
-	static HEIGHT = 202;
+	public static HEIGHT = 202;
 
 	/**
 	 * Planar map projection with height deformation using the GPU for height generation.
 	 *
 	 * @type {number}
 	 */
-	static HEIGHT_SHADER = 203;
+	public static HEIGHT_SHADER = 203;
 
 	/**
 	 * Map of the map node types available.
 	 *
 	 * @type {Map}
 	 */
-	static mapModes = new Map([
+	public static mapModes = new Map([
 		[MapView.PLANAR, MapPlaneNode],
 		[MapView.SPHERICAL, MapSphereNode],
 		[MapView.HEIGHT, MapHeightNode],

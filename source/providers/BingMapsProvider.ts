@@ -68,35 +68,35 @@ export class BingMapsProvider extends MapProvider
 	 *
 	 * @type {string}
 	 */
-	static AERIAL = 'a';
+	public static AERIAL = 'a';
 
 	/**
 	 * Display a road view of the map.
 	 *
 	 * @type {string}
 	 */
-	static ROAD = 'r';
+	public static ROAD = 'r';
 
 	/**
 	 * Display an aerial view of the map with labels.
 	 *
 	 * @type {string}
 	 */
-	static AERIAL_LABELS = 'h';
+	public static AERIAL_LABELS = 'h';
 
 	/**
 	 * Use this value to display a bird's eye (oblique) view of the map.
 	 *
 	 * @type {string}
 	 */
-	static OBLIQUE = 'o';
+	public static OBLIQUE = 'o';
 
 	/**
 	 * Display a bird's eye (oblique) with labels view of the map.
 	 *
 	 * @type {string}
 	 */
-	static OBLIQUE_LABELS = 'b';
+	public static OBLIQUE_LABELS = 'b';
 
 	/**
 	 * Get the base URL for the map configuration requested.
@@ -125,7 +125,7 @@ export class BingMapsProvider extends MapProvider
 	 *
 	 * @param {number} x
 	 */
-	static quadKey(zoom, x, y) 
+	public static quadKey(zoom, x, y) 
 	{
 		let quad = '';
 

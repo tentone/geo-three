@@ -100,52 +100,52 @@ export class MapNode extends Mesh
 	 *
 	 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
 	 */
-	static BASE_GEOMETRY: BufferGeometry = null;
+	public static BASE_GEOMETRY: BufferGeometry = null;
 
 	/**
 	 * Base scale applied to the map viewer object.
 	 */
-	static BASE_SCALE: Vector3 = null;
+	public static BASE_SCALE: Vector3 = null;
 
 	/**
 	 * How many children each branch of the tree has.
 	 *
 	 * For a quad-tree this value is 4.
 	 */
-	static CHILDRENS: number = 4;
+	public static CHILDRENS: number = 4;
 
 	/**
 	 * Root node has no location.
 	 */
-	static ROOT: number = -1;
+	public static ROOT: number = -1;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
-	static TOP_LEFT: number = 0;
+	public static TOP_LEFT: number = 0;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
-	static TOP_RIGHT: number = 1;
+	public static TOP_RIGHT: number = 1;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
-	static BOTTOM_LEFT = 2;
+	public static BOTTOM_LEFT = 2;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
-	static BOTTOM_RIGHT = 3;
+	public static BOTTOM_RIGHT = 3;
 
 	/**
 	 * Initialize resources that require access to data from the MapView.

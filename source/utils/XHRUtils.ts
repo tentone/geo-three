@@ -1,5 +1,5 @@
 /**
- * XHR utils contains static methods to allow easy access to services via XHR.
+ * XHR utils contains public static methods to allow easy access to services via XHR.
  *
  * @static
  * @class XHRUtils
@@ -13,7 +13,7 @@ export class XHRUtils
 	 * @param {Function} onLoad On load callback.
 	 * @param {Function} onError On progress callback.
 	 */
-	static get(url, onLoad?, onError?) 
+	public static get(url, onLoad?, onError?) 
 	{
 		const xhr = new XMLHttpRequest();
 		xhr.overrideMimeType('text/plain');
@@ -49,7 +49,7 @@ export class XHRUtils
 	 * @param {Function} onLoad On load callback, receives data (String or Object) and XHR as arguments.
 	 * @param {Function} onError XHR onError callback.
 	 */
-	static request(url, type, header?, body?, onLoad?, onError?, onProgress?) 
+	public static request(url, type, header?, body?, onLoad?, onError?, onProgress?) 
 	{
 		function parseResponse(response) 
 		{

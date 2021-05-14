@@ -13,9 +13,9 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  */
 export class MapHeightNode extends MapNode 
 {
-	public static USE_DISPLACEMENT: boolean = false;
+	public  static USE_DISPLACEMENT: boolean = false;
 
-	static MAX_HEIGHT = 0;
+	public static MAX_HEIGHT = 0;
 
 	public heightLoaded: boolean = false;
 
@@ -78,23 +78,23 @@ export class MapHeightNode extends MapNode
 	/**
 	 * Original tile size of the images retrieved from the height provider.
 	 */
-	static TILE_SIZE: number = 256;
+	public static TILE_SIZE: number = 256;
 
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.}
 	 */
-	static GEOMETRY_SIZE: number = 16;
+	public static GEOMETRY_SIZE: number = 16;
 
 	/**
 	 * Map node plane geometry.
 	 *
 	 * @type {PlaneBufferGeometry}
 	 */
-	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	public static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
-	static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
+	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	initialize() 
 	{

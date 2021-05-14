@@ -16,21 +16,21 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  */
 export class MapBoxProvider extends MapProvider 
 {
-	static ADDRESS = 'https://api.mapbox.com/';
+	public static ADDRESS = 'https://api.mapbox.com/';
 
 	/**
 	 * Access the map data using a map style.
 	 *
 	 * @type {number}
 	 */
-	static STYLE = 100;
+	public static STYLE = 100;
 
 	/**
 	 * Access the map data using a map id.
 	 *
 	 * @type {number}
 	 */
-	static MAP_ID = 101;
+	public static MAP_ID = 101;
 
 	/**
 	 * Server API access token.

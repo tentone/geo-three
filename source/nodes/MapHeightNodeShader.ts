@@ -35,32 +35,32 @@ export class MapHeightNodeShader extends MapHeightNode
 	 *
 	 * @type {Texture}
 	 */
-	static EMPTY_TEXTURE = new Texture();
+	public static EMPTY_TEXTURE = new Texture();
 
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
 	 *
 	 * @type {number}
 	 */
-	static GEOMETRY_SIZE = 256;
+	public static GEOMETRY_SIZE = 256;
 
 	/**
 	 * Map node plane geometry.
 	 *
 	 * @type {PlaneBufferGeometry}
 	 */
-	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	public static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
-	static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
+	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
-	static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
 	 * Prepare the threejs material to be used in the map tile.
 	 *
 	 * @param {Material} material Material to be transformed.
 	 */
-	static prepareMaterial(material) 
+	public static prepareMaterial(material) 
 {
 		material.userData = {heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}};
 
