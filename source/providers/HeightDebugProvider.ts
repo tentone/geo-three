@@ -14,7 +14,6 @@ export class HeightDebugProvider extends MapProvider
 	/**
 	 * The provider used to retrieve the base RGB information to be debugged.
 	 *
-	 * @attribute provider
 	 * @type {MapProvider}
 	 */
 	provider: MapProvider;
@@ -22,7 +21,6 @@ export class HeightDebugProvider extends MapProvider
 	/**
 	 * Initial color to be used for lower values.
 	 *
-	 * @attribute fromColor
 	 * @type {Color}
 	 */
 	fromColor = new Color(0xff0000);
@@ -30,12 +28,11 @@ export class HeightDebugProvider extends MapProvider
 	/**
 	 * Final color to be used for higher values.
 	 *
-	 * @attribute toColor
 	 * @type {Color}
 	 */
 	toColor = new Color(0x00ff00);
 
-	constructor(provider) 
+	public constructor(provider) 
 	{
 		super();
 

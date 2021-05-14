@@ -4,15 +4,16 @@ import {BufferGeometry, Float32BufferAttribute} from 'three';
  * Map node geometry is a geometry used to represent the map nodes.
  *
  * Consists of a XZ plane with normals facing +Y.
- *
- * @param {number} width Width of the node.
- * @param {number} height Height of the node.
- * @param {number} widthSegments Number of subdivisions along the width.
- * @param {number} heightSegments Number of subdivisions along the height.
  */
 export class MapNodeGeometry extends BufferGeometry 
-{
-	constructor(width, height, widthSegments, heightSegments) 
+{	
+	/**
+	 * @param {number} width Width of the node.
+	 * @param {number} height Height of the node.
+	 * @param {number} widthSegments Number of subdivisions along the width.
+	 * @param {number} heightSegments Number of subdivisions along the height.
+	 */
+	public constructor(width: number, height: number, widthSegments: number, heightSegments: number) 
 	{
 		super();
 

@@ -18,7 +18,6 @@ export class GoogleMapsProvider extends MapProvider
 	/**
 	 * Server API access token.
 	 *
-	 * @attribute apiToken
 	 * @type {string}
 	 */
 	apiToken: string;
@@ -28,7 +27,6 @@ export class GoogleMapsProvider extends MapProvider
 	 *
 	 * The session token is required for subsequent requests for tile and viewport information.
 	 *
-	 * @attribute sessionToken
 	 * @type {string}
 	 */
 	sessionToken = null;
@@ -38,7 +36,6 @@ export class GoogleMapsProvider extends MapProvider
 	 *
 	 * Can be 0, 90, 180 or 270.
 	 *
-	 * @attribute orientation
 	 * @type {number}
 	 */
 	orientation = 0;
@@ -48,7 +45,6 @@ export class GoogleMapsProvider extends MapProvider
 	 *  - png PNG
 	 *  - jpg JPG
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format = 'png';
@@ -60,7 +56,6 @@ export class GoogleMapsProvider extends MapProvider
 	 *  - terrain: Shaded relief maps of 3D terrain. When selecting terrain as the map type, you must also include the layerRoadmap layer type (described in the Optional fields section below).
 	 *  - streetview: Street View panoramas. See the Street View guide.
 	 *
-	 * @attribute mapType
 	 * @type {string}
 	 */
 	mapType = 'roadmap';
@@ -68,12 +63,11 @@ export class GoogleMapsProvider extends MapProvider
 	/**
 	 * If true overlays are shown.
 	 *
-	 * @attribute overlay
 	 * @type {boolean}
 	 */
 	overlay = false;
 
-	constructor(apiToken) 
+	public constructor(apiToken) 
 	{
 		super();
 

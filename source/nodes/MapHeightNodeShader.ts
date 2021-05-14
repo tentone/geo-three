@@ -21,8 +21,8 @@ import {MapView} from '../MapView';
  */
 export class MapHeightNodeShader extends MapHeightNode 
 {
-	constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
-{
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
+	{
 		let material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 		material = MapHeightNodeShader.prepareMaterial(material);
 
@@ -34,8 +34,6 @@ export class MapHeightNodeShader extends MapHeightNode
 	/**
 	 * Empty texture used as a placeholder for missing textures.
 	 *
-	 * @static
-	 * @attribute EMPTY_TEXTURE
 	 * @type {Texture}
 	 */
 	static EMPTY_TEXTURE = new Texture();
@@ -43,8 +41,6 @@ export class MapHeightNodeShader extends MapHeightNode
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
 	 *
-	 * @static
-	 * @attribute GEOMETRY_SIZE
 	 * @type {number}
 	 */
 	static GEOMETRY_SIZE = 256;
@@ -52,8 +48,6 @@ export class MapHeightNodeShader extends MapHeightNode
 	/**
 	 * Map node plane geometry.
 	 *
-	 * @static
-	 * @attribute GEOMETRY
 	 * @type {PlaneBufferGeometry}
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);

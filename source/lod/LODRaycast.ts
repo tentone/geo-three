@@ -17,7 +17,6 @@ export class LODRaycast extends LODControl
 	 *
 	 * N rays are cast each frame dependeing on this value to check distance to the visible map nodes. A single ray should be enough for must scenarios.
 	 *
-	 * @attribute subdivisionRays
 	 * @type {boolean}
 	 */
 	subdivisionRays = 1;
@@ -27,7 +26,6 @@ export class LODRaycast extends LODControl
 	 *
 	 * Lower value will subdivide earlier (less zoom required to subdivide).
 	 *
-	 * @attribute thresholdUp
 	 * @type {number}
 	 */
 	thresholdUp = 0.6;
@@ -37,7 +35,6 @@ export class LODRaycast extends LODControl
 	 *
 	 * Higher value will simplify earlier.
 	 *
-	 * @attribute thresholdDown
 	 * @type {number}
 	 */
 	thresholdDown = 0.15;
@@ -45,7 +42,6 @@ export class LODRaycast extends LODControl
 	/**
 	 * Raycaster object used to cast rays into the world and check for hits.
 	 *
-	 * @attribute raycaster
 	 * @type {Raycaster}
 	 */
 	raycaster = new Raycaster();
@@ -53,7 +49,6 @@ export class LODRaycast extends LODControl
 	/**
 	 * Normalized mouse coordinates.
 	 *
-	 * @attribute mouse
 	 * @type {Vector2}
 	 */
 	mouse = new Vector2();
@@ -61,7 +56,6 @@ export class LODRaycast extends LODControl
 	/**
 	 * Consider the distance powered to level of the node.
 	 *
-	 * @attribute powerDistance
 	 * @type {boolean}
 	 */
 	powerDistance = false;
@@ -69,7 +63,6 @@ export class LODRaycast extends LODControl
 	/**
 	 * Consider the scale of the node when calculating the distance.
 	 *
-	 * @attribute scaleDistance
 	 * @type {boolean}
 	 */
 	scaleDistance = true;

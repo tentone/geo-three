@@ -9,7 +9,7 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  */
 export class MapPlaneNode extends MapNode 
 {
-	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	public constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
 	{
 		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
 
@@ -21,8 +21,6 @@ export class MapPlaneNode extends MapNode
 	/**
 	 * Map node plane geometry.
 	 *
-	 * @static
-	 * @attribute GEOMETRY
 	 * @type {PlaneBufferGeometry}
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);

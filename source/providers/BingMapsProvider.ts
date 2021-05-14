@@ -20,7 +20,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Server API access token.
 	 *
-	 * @attribute apiKey
 	 * @type {string}
 	 */
 	apiKey: string;
@@ -28,7 +27,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * The type of the map used.
 	 *
-	 * @attribute type
 	 * @type {string}
 	 */
 	type: string;
@@ -39,7 +37,6 @@ export class BingMapsProvider extends MapProvider
 	 *  - jpeg: Use JPEG image format. JPEG format is the default for Road, Aerial and AerialWithLabels imagery.
 	 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format = 'jpeg';
@@ -47,7 +44,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Size of the map tiles.
 	 *
-	 * @attribute mapSize
 	 * @type {number}
 	 */
 	mapSize = 512;
@@ -55,12 +51,11 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Tile server subdomain.
 	 *
-	 * @attribute subdomain
 	 * @type {string}
 	 */
 	subdomain = 't1';
 
-	constructor(apiKey, type) 
+	public constructor(apiKey, type) 
 	{
 		super();
 
@@ -72,8 +67,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Display an aerial view of the map.
 	 *
-	 * @static
-	 * @attribute AERIAL
 	 * @type {string}
 	 */
 	static AERIAL = 'a';
@@ -81,8 +74,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Display a road view of the map.
 	 *
-	 * @static
-	 * @attribute AERIAL
 	 * @type {string}
 	 */
 	static ROAD = 'r';
@@ -90,8 +81,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Display an aerial view of the map with labels.
 	 *
-	 * @static
-	 * @attribute AERIAL_LABELS
 	 * @type {string}
 	 */
 	static AERIAL_LABELS = 'h';
@@ -99,8 +88,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Use this value to display a bird's eye (oblique) view of the map.
 	 *
-	 * @static
-	 * @attribute AERIAL
 	 * @type {string}
 	 */
 	static OBLIQUE = 'o';
@@ -108,8 +95,6 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Display a bird's eye (oblique) with labels view of the map.
 	 *
-	 * @static
-	 * @attribute AERIAL
 	 * @type {string}
 	 */
 	static OBLIQUE_LABELS = 'b';

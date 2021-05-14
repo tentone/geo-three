@@ -22,8 +22,6 @@ export class MapBoxProvider extends MapProvider
 	/**
 	 * Access the map data using a map style.
 	 *
-	 * @static
-	 * @attribute STYLE
 	 * @type {number}
 	 */
 	static STYLE = 100;
@@ -31,8 +29,6 @@ export class MapBoxProvider extends MapProvider
 	/**
 	 * Access the map data using a map id.
 	 *
-	 * @static
-	 * @attribute MAP_ID
 	 * @type {number}
 	 */
 	static MAP_ID = 101;
@@ -40,7 +36,6 @@ export class MapBoxProvider extends MapProvider
 	/**
 	 * Server API access token.
 	 *
-	 * @attribute apiToken
 	 * @type {string}
 	 */
 	apiToken: string;
@@ -57,7 +52,6 @@ export class MapBoxProvider extends MapProvider
 	 *  - jpg90 90% quality JPG
 	 *  - pngraw Raw png (no interpolation)
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format: string;
@@ -65,7 +59,6 @@ export class MapBoxProvider extends MapProvider
 	/**
 	 * Flag to indicate if should use high resolution tiles
 	 *
-	 * @attribute useHDPI
 	 * @type {boolean}
 	 */
 	useHDPI: boolean;
@@ -75,7 +68,6 @@ export class MapBoxProvider extends MapProvider
 	 *  - MapBoxProvider.STYLE
 	 *  - MapBoxProvider.MAP_ID
 	 *
-	 * @attribute mode
 	 * @type {number}
 	 */
 	mode: number;
@@ -90,7 +82,6 @@ export class MapBoxProvider extends MapProvider
 	 *  - mapbox.mapbox-traffic-v1
 	 *  - mapbox.terrain-rgb
 	 *
-	 * @attribute mapId
 	 * @type {string}
 	 */
 	mapId: string;
@@ -110,7 +101,6 @@ export class MapBoxProvider extends MapProvider
 	 *  - mapbox/navigation-guidance-day-v4
 	 *  - mapbox/navigation-guidance-night-v4
 	 *
-	 * @attribute style
 	 * @type {string}
 	 */
 	style: string;
@@ -120,12 +110,11 @@ export class MapBoxProvider extends MapProvider
 
 	 *  - mapbox/navigation-guidance-night-v4
 	 *
-	 * @attribute version
 	 * @type {string}
 	 */
 	version: string;
 
-	constructor(apiToken, id, mode, format, useHDPI, version) 
+	public constructor(apiToken, id, mode, format, useHDPI, version) 
 	{
 		super();
 

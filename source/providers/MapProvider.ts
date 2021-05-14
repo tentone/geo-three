@@ -12,7 +12,6 @@ export class MapProvider
 	/**
 	 * Name of the map provider
 	 *
-	 * @attribute name
 	 * @type {string}
 	 */
 	name: string = '';
@@ -20,7 +19,6 @@ export class MapProvider
 	/**
 	 * Minimum tile level.
 	 *
-	 * @attribute minZoom
 	 * @type {number}
 	 */
 	minZoom: number = 0;
@@ -28,7 +26,6 @@ export class MapProvider
 	/**
 	 * Maximum tile level.
 	 *
-	 * @attribute maxZoom
 	 * @type {number}
 	 */
 	maxZoom: number = 20;
@@ -36,7 +33,6 @@ export class MapProvider
 	/**
 	 * Map bounds.
 	 *
-	 * @attribute bounds
 	 * @type {Array}
 	 */
 	bounds: number[] = [];
@@ -44,7 +40,6 @@ export class MapProvider
 	/**
 	 * Map center point.
 	 *
-	 * @attribute center
 	 * @type {Array}
 	 */
 	center: number[] = [];

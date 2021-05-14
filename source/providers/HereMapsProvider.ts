@@ -21,7 +21,6 @@ export class HereMapsProvider extends MapProvider
 	/**
 	 * Service application access token.
 	 *
-	 * @attribute appId
 	 * @type {string}
 	 */
 	appId: string;
@@ -29,7 +28,6 @@ export class HereMapsProvider extends MapProvider
 	/**
 	 * Service application code token.
 	 *
-	 * @attribute appCode
 	 * @type {string}
 	 */
 	appCode: string;
@@ -47,7 +45,6 @@ export class HereMapsProvider extends MapProvider
 	 *  - Pano Tiles https://{1-4}.pano.maps.api.here.com
 	 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
 	 *
-	 * @attribute style
 	 * @type {string}
 	 */
 	style: string;
@@ -63,7 +60,6 @@ export class HereMapsProvider extends MapProvider
 	 *
 	 * Be aware that invalid combinations of schemes and tiles are rejected. For all satellite, hybrid and terrain schemes, you need to use the Aerial Tiles base URL instead of the normal one.
 	 *
-	 * @attribute scheme
 	 * @type {string}
 	 */
 	scheme: string;
@@ -74,7 +70,6 @@ export class HereMapsProvider extends MapProvider
 	 *  - png8 8 bit indexed PNG
 	 *  - jpg JPG at 90% quality
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format: string;
@@ -87,7 +82,6 @@ export class HereMapsProvider extends MapProvider
 	 *  - 512
 	 *  - 128 (deprecated, although usage is still accepted)
 	 *
-	 * @attribute size
 	 * @type {number}
 	 */
 	size: number;
@@ -95,7 +89,6 @@ export class HereMapsProvider extends MapProvider
 	/**
 	 * Specifies the map version, either newest or with a hash value.
 	 *
-	 * @attribute version
 	 * @type {string}
 	 */
 	version: string;
@@ -107,7 +100,6 @@ export class HereMapsProvider extends MapProvider
 	 *
 	 * On each request this number is updated.
 	 *
-	 * @attribute server
 	 * @type {number}
 	 */
 	server: number;
@@ -121,7 +113,7 @@ export class HereMapsProvider extends MapProvider
 	 * @param {string} format Image format.
 	 * @param {number} size Tile size.
 	 */
-	constructor(appId, appCode, style, scheme, format, size) 
+	public constructor(appId, appCode, style, scheme, format, size) 
 	{
 		super();
 

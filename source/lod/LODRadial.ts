@@ -8,16 +8,12 @@ const position = new Vector3();
  * Check the planar distance between the nodes center and the view position.
  *
  * Distance is adjusted with the node level, more consistent results since every node is considered.
- *
- * @class LODRadial
- * @extends {LODControl}
  */
 export class LODRadial extends LODControl 
 {
 	/**
 	 * Minimum ditance to subdivide nodes.
 	 *
-	 * @attribute subdivideDistance
 	 * @type {number}
 	 */
 	subdivideDistance = 50;
@@ -25,7 +21,6 @@ export class LODRadial extends LODControl
 	/**
 	 * Minimum ditance to simplify far away nodes that are subdivided.
 	 *
-	 * @attribute simplifyDistance
 	 * @type {number}
 	 */
 	simplifyDistance = 300;

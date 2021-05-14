@@ -17,7 +17,6 @@ export class MapTilerProvider extends MapProvider
 	/**
 	 * Server API access token.
 	 *
-	 * @attribute apiToken
 	 * @type {string}
 	 */
 	apiKey: string;
@@ -27,7 +26,6 @@ export class MapTilerProvider extends MapProvider
 	 *
 	 * Format can be for image or for geometry fetched from the system (e.g quantized-mesh-1.0)
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format: string;
@@ -35,7 +33,6 @@ export class MapTilerProvider extends MapProvider
 	/**
 	 * Tile category (e.g. maps, tiles),
 	 *
-	 * @attribute category
 	 * @type {string}
 	 */
 	category: string;
@@ -47,14 +44,13 @@ export class MapTilerProvider extends MapProvider
 	 *
 	 * Cam be used for data tiles (e.g hillshades, terrain-rgb, satellite).
 	 *
-	 * @attribute style
 	 * @type {string}
 	 */
 	style: string;
 
 	resolution;
 
-	constructor(apiKey, category, style, format) 
+	public constructor(apiKey, category, style, format) 
 	{
 		super();
 

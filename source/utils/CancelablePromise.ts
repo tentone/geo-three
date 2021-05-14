@@ -21,7 +21,7 @@ export class CancelablePromise<T>
 
 	value: T;
 
-	constructor(executor) 
+	public constructor(executor) 
 	{
 		function resolve(v) 
 		{

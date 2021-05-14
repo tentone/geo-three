@@ -35,7 +35,7 @@ export class MapHeightNode extends MapNode
 	 * @param material {Material} Material used to render this height node.
 	 * @param geometry {Geometry} Geometry used to render this height node.
 	 */
-	constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material?: Material, geometry?) 
+	public constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0, material?: Material, geometry?) 
 {
 		super(
 			geometry === undefined ? MapHeightNode.GEOMETRY : geometry,
@@ -80,8 +80,6 @@ export class MapHeightNode extends MapNode
 	/**
 	 * Original tile size of the images retrieved from the height provider.
 	 *
-	 * @static
-	 * @attribute TILE_SIZE
 	 * @type {number}
 	 */
 	static TILE_SIZE = 256;
@@ -89,8 +87,6 @@ export class MapHeightNode extends MapNode
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
 	 *
-	 * @static
-	 * @attribute GEOMETRY_SIZE
 	 * @type {number}
 	 */
 	static GEOMETRY_SIZE = 16;
@@ -98,8 +94,6 @@ export class MapHeightNode extends MapNode
 	/**
 	 * Map node plane geometry.
 	 *
-	 * @static
-	 * @attribute GEOMETRY
 	 * @type {PlaneBufferGeometry}
 	 */
 	static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);

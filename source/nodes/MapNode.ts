@@ -72,7 +72,7 @@ export class MapNode extends Mesh
 	 */
 	childrenCache: any[] = null;
 
-	constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	public constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
 	{
 		super(geometry, material);
 

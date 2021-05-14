@@ -11,24 +11,18 @@ export class UnitsUtils
 	/**
 	 * Aproximated radius of earth in meters.
 	 *
-	 * @static
-	 * @attribute EARTH_RADIUS
 	 */
 	static EARTH_RADIUS = 6378137;
 
 	/**
 	 * Earth equator perimeter in meters.
 	 *
-	 * @static
-	 * @attribute EARTH_RADIUS
 	 */
 	static EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 
 	/**
 	 * Earth equator perimeter in meters.
 	 *
-	 * @static
-	 * @attribute EARTH_ORIGIN
 	 */
 	static EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 

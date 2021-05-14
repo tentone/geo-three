@@ -10,9 +10,6 @@ const position = new Vector3();
  * Check the planar distance between the nodes center and the view position.
  *
  * Only subdivides elements inside of the camera frustum.
- *
- * @class LODFrustum
- * @extends {LODRadial}
  */
 export class LODFrustum extends LODRadial 
 {
@@ -25,7 +22,6 @@ export class LODFrustum extends LODRadial
 	 *
 	 * Otherwise the object bouding sphere will be tested, providing better results for nodes on frustum edge but will lower performance.
 	 *
-	 * @attribute testCenter
 	 * @type {boolean}
 	 */
 	testCenter = true;

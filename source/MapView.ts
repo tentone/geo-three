@@ -25,8 +25,6 @@ export class MapView extends Mesh
 	/**
 	 * Planar map projection.
 	 *
-	 * @static
-	 * @attribute PLANAR
 	 * @type {number}
 	 */
 	static PLANAR = 200;
@@ -34,8 +32,6 @@ export class MapView extends Mesh
 	/**
 	 * Spherical map projection.
 	 *
-	 * @static
-	 * @attribute SPHERICAL
 	 * @type {number}
 	 */
 	static SPHERICAL = 201;
@@ -43,8 +39,6 @@ export class MapView extends Mesh
 	/**
 	 * Planar map projection with height deformation.
 	 *
-	 * @static
-	 * @attribute HEIGHT
 	 * @type {number}
 	 */
 	static HEIGHT = 202;
@@ -52,8 +46,6 @@ export class MapView extends Mesh
 	/**
 	 * Planar map projection with height deformation using the GPU for height generation.
 	 *
-	 * @static
-	 * @attribute HEIGHT_DISPLACEMENT
 	 * @type {number}
 	 */
 	static HEIGHT_SHADER = 203;
@@ -61,8 +53,6 @@ export class MapView extends Mesh
 	/**
 	 * Map of the map node types available.
 	 *
-	 * @static
-	 * @attribute mapModes
 	 * @type {Map}
 	 */
 	static mapModes = new Map([
@@ -75,7 +65,6 @@ export class MapView extends Mesh
 	/**
 	 * LOD control object used to defined how tiles are loaded in and out of memory.
 	 *
-	 * @attribute lod
 	 * @type {LODControl}
 	 */
 	lod: LODRaycast;
@@ -83,7 +72,6 @@ export class MapView extends Mesh
 	/**
 	 * Map tile color layer provider.
 	 *
-	 * @attribute provider
 	 * @type {MapProvider}
 	 */
 	provider: MapProvider;
@@ -91,7 +79,6 @@ export class MapView extends Mesh
 	/**
 	 * Map height (terrain elevation) layer provider.
 	 *
-	 * @attribute heightProvider
 	 * @type {MapProvider}
 	 */
 	heightProvider: MapProvider;
@@ -99,7 +86,6 @@ export class MapView extends Mesh
 	/**
 	 * Root map node.
 	 *
-	 * @attribute root
 	 * @type {MapNode}
 	 */
 	root: MapNode;
@@ -111,7 +97,7 @@ export class MapView extends Mesh
 	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
 	 */
-	constructor(root, provider, heightProvider) 
+	public constructor(root, provider, heightProvider) 
 	{
 		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 
@@ -151,7 +137,7 @@ export class MapView extends Mesh
 			}
 
 			const rootConstructor = MapView.mapModes.get(root) as typeof MapNode;
-			root = new rootConstructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
+			root = new rootpublic constructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
 		}
 
 		if (this.root !== null) 

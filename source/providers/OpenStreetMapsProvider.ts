@@ -15,7 +15,6 @@ export class OpenStreetMapsProvider extends MapProvider
 	 *
 	 * By default the open OSM tile server is used.
 	 *
-	 * @attribute address
 	 * @type {string}
 	 */
 	address: string;
@@ -23,12 +22,11 @@ export class OpenStreetMapsProvider extends MapProvider
 	/**
 	 * Map image tile format.
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format: string;
 
-	constructor(address = 'https://a.tile.openstreetmap.org/') 
+	public constructor(address = 'https://a.tile.openstreetmap.org/') 
 	{
 		super();
 		this.address = address;

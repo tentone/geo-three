@@ -17,7 +17,6 @@ export class OpenMapTilesProvider extends MapProvider
 	 *
 	 * By default the open OSM tile server is used.
 	 *
-	 * @attribute address
 	 * @type {string}
 	 */
 	address: string;
@@ -25,7 +24,6 @@ export class OpenMapTilesProvider extends MapProvider
 	/**
 	 * Map image tile format.
 	 *
-	 * @attribute format
 	 * @type {string}
 	 */
 	format: string;
@@ -37,12 +35,11 @@ export class OpenMapTilesProvider extends MapProvider
 	 * - osm-bright
 	 * - positron
 	 *
-	 * @attribute theme
 	 * @type {string}
 	 */
 	theme: string;
 
-	constructor(address) 
+	public constructor(address) 
 	{
 		super();
 		this.address = address;
