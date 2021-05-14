@@ -10,7 +10,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *  - https://msdn.microsoft.com/en-us/library/mt823633.aspx (Directly accessing the Bing Maps tiles)
  *  - https://www.bingmapsportal.com/
  *
- * @class BingMapsProvider
  * @param {string} apiKey Bing API key.
  */
 export class BingMapsProvider extends MapProvider 

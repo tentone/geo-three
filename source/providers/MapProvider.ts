@@ -4,8 +4,6 @@
  * They contain the access configuration and are responsible for handling the map theme size etc.
  *
  * MapProvider should be used as a base for all the providers.
- *
- * @class MapProvider
  */
 export class MapProvider 
 {

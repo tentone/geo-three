@@ -8,7 +8,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  * API Reference
  *  - https://www.mapbox.com/
  *
- * @class MapBoxProvider
  * @param {string} apiToken Map box api token.
  * @param {string} id Map style or mapID if the mode is set to MAP_ID.
  * @param {number} mode Map tile access mode.

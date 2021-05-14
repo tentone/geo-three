@@ -2,8 +2,6 @@
  * Cancelable promises extend base promises and provide a cancel functionality than can be used to cancel the execution or task of the promise.
  *
  * These type of promises can be used to prevent additional processing when the data is not longer required (e.g. HTTP request for data that is not longer necessary)
- *
- * @class CancelablePromise
  */
 export class CancelablePromise<T> 
 {

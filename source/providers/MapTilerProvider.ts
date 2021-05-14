@@ -9,7 +9,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  * API Reference
  *  - https://www.maptiler.com/
  *
- * @class MapTilerProvider
  * @param {string} apiKey
  */
 export class MapTilerProvider extends MapProvider 

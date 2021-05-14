@@ -11,7 +11,6 @@ import {MapView} from '../MapView';
  *
  * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
  *
- * @class MapHeightNodeShader
  * @param parentNode {MapHeightNode} The parent node of this node.
  * @param mapView {MapView} Map view object where this node is placed.
  * @param location {number} Position in the node tree relative to the parent.

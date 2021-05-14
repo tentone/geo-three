@@ -4,8 +4,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Debug provider can be used to debug the levels of the map three based on the zoom level they change between green and red.
- *
- * @class DebugProvider
  */
 export class DebugProvider extends MapProvider 
 {

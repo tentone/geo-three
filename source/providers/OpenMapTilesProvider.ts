@@ -7,8 +7,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *
  * API Reference
  *  - https://openmaptiles.org/
- *
- * @class OpenMapTilesProvider
  */
 export class OpenMapTilesProvider extends MapProvider 
 {

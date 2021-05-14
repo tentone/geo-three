@@ -10,8 +10,6 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  * Its important to update match the height of the tile with the neighbors nodes edge heights to ensure proper continuity of the surface.
  *
  * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
- *
- * @class MapHeightNode
  */
 export class MapHeightNode extends MapNode 
 {

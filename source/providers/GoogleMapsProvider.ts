@@ -10,8 +10,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  * API Reference
  *  - https://developers.google.com/maps/documentation/javascript/coordinates
  *  - https://developers.google.com/maps/documentation/tile
- *
- * @class GoogleMapsProvider
  */
 export class GoogleMapsProvider extends MapProvider 
 {

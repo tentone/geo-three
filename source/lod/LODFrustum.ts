@@ -13,9 +13,9 @@ const position = new Vector3();
  */
 export class LODFrustum extends LODRadial 
 {
-	subdivideDistance = 120;
+	public subdivideDistance = 120;
 
-	simplifyDistance = 400;
+	public simplifyDistance = 400;
 
 	/**
 	 * If true only the central point of the plane geometry will be used
@@ -24,9 +24,9 @@ export class LODFrustum extends LODRadial
 	 *
 	 * @type {boolean}
 	 */
-	testCenter = true;
+	public testCenter = true;
 
-	pointOnly: boolean;
+	public pointOnly: boolean;
 
 	updateLOD(view, camera, renderer, scene) 
 	{

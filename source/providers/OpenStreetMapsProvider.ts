@@ -5,8 +5,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  * Open street maps tile server.
  *
  * Works with any service that uses a address/zoom/x/y.format URL for tile access.
- *
- * @class OpenStreetMapsProvider
  */
 export class OpenStreetMapsProvider extends MapProvider 
 {

@@ -6,8 +6,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *
  * API Reference
  *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
- *
- * @class HereMapsProvider
  */
 export class HereMapsProvider extends MapProvider 
 {

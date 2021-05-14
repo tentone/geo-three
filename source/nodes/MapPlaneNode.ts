@@ -4,8 +4,6 @@ import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
 /**
  * Represents a basic plane tile node.
- *
- * @class MapPlaneNode
  */
 export class MapPlaneNode extends MapNode 
 {

@@ -7,8 +7,6 @@ import {MapView} from '../MapView';
  * Each map node can be subdivided into other nodes.
  *
  * It is intended to be used as a base class for other map node implementations.
- *
- * @class MapNode
  */
 export class MapNode extends Mesh 
 {

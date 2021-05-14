@@ -16,9 +16,6 @@ import {MapProvider} from './providers/MapProvider';
  * It was designed to work with a OpenMapTiles but can also be used with another map tiles.
  *
  * The map is drawn in plane map nodes using a quad tree that is subdivided as necessary to guaratee good map quality.
- *
- * @class MapView
- * @extends {Mesh}
  */
 export class MapView extends Mesh 
 {

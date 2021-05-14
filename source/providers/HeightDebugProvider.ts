@@ -6,8 +6,6 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  * Height debug provider takes a RGB encoded height map from another provider and converts it to a gradient for preview.
  *
  * Usefull to preview and compare height of different providers. Can also be usefull to generate grayscale maps to be feed into other libraries (e.g. physics engine).
- *
- * @class HeightDebugProvider
  */
 export class HeightDebugProvider extends MapProvider 
 {
