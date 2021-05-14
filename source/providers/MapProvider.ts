@@ -51,7 +51,7 @@ export class MapProvider
 	 * @param {number} zoom Zoom level.
 	 * @param {number} x Tile x.
 	 * @param {number} y Tile y.
-	 * @return {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
+	 * @returns {Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap>} Promise with the image obtained for the tile ready to use.
 	 */
 	async fetchTile(zoom: number, x: number, y: number): Promise<HTMLImageElement | HTMLCanvasElement | OffscreenCanvas | ImageBitmap> 
 	{

@@ -185,7 +185,7 @@ export class MapHeightNode extends MapNode
 	 * Load height texture from the server and create a geometry to match it.
 	 *
 	 * @method loadHeightGeometry
-	 * @return {Promise<void>} Returns a promise indicating when the geometry generation has finished.
+	 * @returns {Promise<void>} Returns a promise indicating when the geometry generation has finished.
 	 */
 	loadHeightGeometry() 
 {
