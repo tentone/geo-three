@@ -14,17 +14,13 @@ export class OpenMapTilesProvider extends MapProvider
 	 * Map server address.
 	 *
 	 * By default the open OSM tile server is used.
-	 *
-	 * @type {string}
 	 */
-	address: string;
+	public address: string;
 
 	/**
 	 * Map image tile format.
-	 *
-	 * @type {string}
 	 */
-	format: string;
+	public format: string;
 
 	/**
 	 * Map tile theme, some of the styles available.
@@ -32,20 +28,19 @@ export class OpenMapTilesProvider extends MapProvider
 	 * - klokantech-basic
 	 * - osm-bright
 	 * - positron
-	 *
-	 * @type {string}
 	 */
-	theme: string;
+	public theme: string;
 
-	public constructor(address) 
+	public constructor(address: string, format: string = 'png', theme: string = 'klokantech-basic') 
 	{
 		super();
+		
 		this.address = address;
-		this.format = 'png';
-		this.theme = 'klokantech-basic';
+		this.format = format;
+		this.theme = theme;
 	}
 
-	getMetaData() 
+	public getMetaData(): void
 	{
 		const self = this;
 		const address = this.address + 'styles/' + this.theme + '.json';

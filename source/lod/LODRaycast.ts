@@ -6,7 +6,7 @@ import {Raycaster, Vector2, Vector3} from 'three';
  *
  * Overall the fastest solution but does not include out of screen objects.
  */
-export class LODRaycast extends LODControl 
+export class LODRaycast implements LODControl 
 {
 	/**
 	 * Number of rays used to test nodes and subdivide the map.

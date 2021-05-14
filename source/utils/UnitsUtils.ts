@@ -7,19 +7,16 @@ export class UnitsUtils
 {
 	/**
 	 * Aproximated radius of earth in meters.
-	 *
 	 */
 	public static EARTH_RADIUS: number = 6378137;
 
 	/**
 	 * Earth equator perimeter in meters.
-	 *
 	 */
 	public static EARTH_PERIMETER: number = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 
 	/**
 	 * Earth equator perimeter in meters.
-	 *
 	 */
 	public static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
 
@@ -28,23 +25,25 @@ export class UnitsUtils
 	 *
 	 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
 	 *
-	 * @param {Function} onResult Callback function onResult(coords, timestamp).
+	 * @param onResult - Callback function onResult(coords, timestamp).
+	 * @param onError - Callback to handle errors.
 	 */
-	public static get(onResult, onError) 
+	public static get(onResult: Function, onError: Function) 
 	{
 		navigator.geolocation.getCurrentPosition(function(result) 
 		{
 			onResult(result.coords, result.timestamp);
+		// @ts-ignore
 		}, onError);
 	}
 
 	/**
 	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 	 *
-	 * @param {number} latitude
-	 * @param {number} longitude
+	 * @param latitude - Latitude value in degrees.
+	 * @param longitude - Longitude value in degrees.
 	 */
-	public static datumsToSpherical(latitude, longitude) 
+	public static datumsToSpherical(latitude: number, longitude: number) 
 	{
 		const x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
 		let y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
@@ -57,10 +56,10 @@ export class UnitsUtils
 	/**
 	 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
 	 *
-	 * @param {number} x
-	 * @param {number} y
+	 * @param x - X coordinate.
+	 * @param y - Y coordinate.
 	 */
-	public static sphericalToDatums(x, y) 
+	public static sphericalToDatums(x: number, y: number) 
 	{
 		const longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
 		let latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
@@ -73,11 +72,11 @@ export class UnitsUtils
 	/**
 	 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
 	 *
-	 * @param {number} zoom
-	 * @param {number} x
-	 * @param {number} y
+	 * @param zoom - Zoom level of the quad tree.
+	 * @param x - X coordinate.
+	 * @param y - Y coordinate.
 	 */
-	public static quadtreeToDatums(zoom, x, y) 
+	public static quadtreeToDatums(zoom: number, x: number, y: number) 
 	{
 		const n = Math.pow(2.0, zoom);
 		const longitude = x / n * 360.0 - 180.0;

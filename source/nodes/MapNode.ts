@@ -11,55 +11,55 @@ import {MapView} from '../MapView';
 export class MapNode extends Mesh 
 {
 	/**
-	 * The map view.
+	 * The map view object where the node is placed.
 	 */
-	mapView: MapView;
+	public mapView: MapView;
 
 	/**
 	 * Parent node (from an upper tile level).
 	 */
-	parentNode: MapNode;
+	public parentNode: MapNode;
 
 	/**
 	 * Index of the map node in the quad-tree parent node.
 	 *
 	 * Position in the tree parent, can be TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT or BOTTOM_RIGHT.
 	 */
-	location: number;
+	public location: number;
 
 	/**
 	 * Tile level of this node.
 	 */
-	level: number;
+	public level: number;
 
 	/**
 	 * Tile x position.
 	 */
-	x: number;
+	public x: number;
 
 	/**
 	 * Tile y position.
 	 */
-	y: number;
+	public y: number;
 
 	/**
 	 * Indicates how many children nodes where loaded.
 	 */
-	nodesLoaded: number = 0;
+	public nodesLoaded: number = 0;
 
 	/**
 	 * Variable to check if the node is subdivided.
 	 *
 	 * To avoid bad visibility changes on node load.
 	 */
-	subdivided: boolean = false;
+	public subdivided: boolean = false;
 
 	/**
 	 * Variable to check if the node is a mesh.
 	 *
 	 * Used to draw or not draw the node
 	 */
-	isMesh: boolean = true;
+	public isMesh: boolean = true;
 
 	/**
 	 * Cache with the children objects created from subdivision.
@@ -68,7 +68,7 @@ export class MapNode extends Mesh
 	 *
 	 * The default value is null.
 	 */
-	childrenCache: any[] = null;
+	public childrenCache: any[] = null;
 
 	public constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
 	{
@@ -83,13 +83,6 @@ export class MapNode extends Mesh
 		this.nodesLoaded = 0;
 		this.subdivided = false;
 		this.childrenCache = null;
-
-		/**
-		 * The map view object where the node is placed.
-		 *
-		 * @attribute mapView
-		 * @type {MapView}
-		 */
 		this.mapView = mapView;
 
 		this.initialize();
@@ -152,21 +145,21 @@ export class MapNode extends Mesh
 	 *
 	 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
 	 */
-	initialize() {}
+	public initialize(): void {}
 
 	/**
 	 * Create the child nodes to represent the next tree level.
 	 *
 	 * These nodes should be added to the object, and their transformations matrix should be updated.
 	 */
-	createChildNodes() {}
+	public createChildNodes(): void {}
 
 	/**
 	 * Subdivide node,check the maximum depth allowed for the tile provider.
 	 *
 	 * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
 	 */
-	subdivide() 
+	public subdivide(): void 
 	{
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
 		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS) 
@@ -194,7 +187,7 @@ export class MapNode extends Mesh
 	 *
 	 * This base method assumes that the node implementation is based off Mesh and that the isMesh property is used to toggle visibility.
 	 */
-	simplify() 
+	public simplify(): void
 	{
 		if (this.children.length > 0) 
 		{
@@ -211,7 +204,7 @@ export class MapNode extends Mesh
 	 *
 	 * This base method assumes the existence of a material attribute with a map texture.
 	 */
-	loadTexture() 
+	public loadTexture(): void
 	{
 		const self = this;
 
@@ -225,7 +218,8 @@ export class MapNode extends Mesh
 				texture.magFilter = LinearFilter;
 				texture.minFilter = LinearFilter;
 				texture.needsUpdate = true;
-
+				
+				// @ts-ignore
 				self.material.map = texture;
 				self.nodeReady();
 			})
@@ -239,7 +233,7 @@ export class MapNode extends Mesh
 				const texture = new Texture(canvas as any);
 				texture.generateMipmaps = false;
 				texture.needsUpdate = true;
-
+				// @ts-ignore
 				self.material.map = texture;
 				self.nodeReady();
 			});
@@ -251,7 +245,7 @@ export class MapNode extends Mesh
 	 * Should be called after a map node is ready for display.
 	 *
 	 */
-	nodeReady() 
+	public nodeReady(): void
 	{
 		// Update parent nodes loaded
 		if (this.parentNode !== null) 
@@ -284,7 +278,7 @@ export class MapNode extends Mesh
 	 * @param - direction Direction to get neighbors.
 	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
-	getNeighborsDirection(direction: number): MapNode[] 
+	public getNeighborsDirection(direction: number): MapNode[] 
 	{
 		// TODO <ADD CODE HERE>
 
@@ -296,7 +290,7 @@ export class MapNode extends Mesh
 	 *
 	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
-	getNeighbors(): MapNode[] 
+	public getNeighbors(): MapNode[] 
 	{
 		const neighbors = [];
 

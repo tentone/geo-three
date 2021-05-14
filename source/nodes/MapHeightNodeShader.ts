@@ -1,4 +1,4 @@
-import {LinearFilter, Mesh, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Vector3} from 'three';
+import {LinearFilter, Material, Mesh, MeshPhongMaterial, NearestFilter, Object3D, Raycaster, RGBFormat, Texture, Vector3} from 'three';
 import {MapHeightNode} from './MapHeightNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapPlaneNode} from './MapPlaneNode';
@@ -11,38 +11,35 @@ import {MapView} from '../MapView';
  *
  * This solution is faster if no mesh interaction is required since all trasnformations are done in the GPU the transformed mesh cannot be accessed for CPU operations (e.g. raycasting).
  *
- * @param parentNode {MapHeightNode} The parent node of this node.
- * @param mapView {MapView} Map view object where this node is placed.
- * @param location {number} Position in the node tree relative to the parent.
- * @param level {number} Zoom level in the tile tree of the node.
- * @param x {number} X position of the node in the tile tree.
- * @param y {number} Y position of the node in the tile tree.
+ * @param parentNode - The parent node of this node.
+ * @param mapView - Map view object where this node is placed.
+ * @param location - Position in the node tree relative to the parent.
+ * @param level - Zoom level in the tile tree of the node.
+ * @param x - X position of the node in the tile tree.
+ * @param y - Y position of the node in the tile tree.
  */
 export class MapHeightNodeShader extends MapHeightNode 
 {
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
 	{
 		let material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
+		// @ts-ignore
 		material = MapHeightNodeShader.prepareMaterial(material);
 
 		super(parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
 
-		this.frustumCulled: boolean = false;
+		this.frustumCulled = false;
 	}
 
 	/**
 	 * Empty texture used as a placeholder for missing textures.
-	 *
-	 * @type {Texture}
 	 */
-	public static EMPTY_TEXTURE = new Texture();
+	public static EMPTY_TEXTURE: Texture = new Texture();
 
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
-	 *
-	 * @type {number}
 	 */
-	public static GEOMETRY_SIZE = 256;
+	public static GEOMETRY_SIZE: number = 256;
 
 	/**
 	 * Map node plane geometry.
@@ -60,15 +57,15 @@ export class MapHeightNodeShader extends MapHeightNode
 	 *
 	 * @param {Material} material Material to be transformed.
 	 */
-	public static prepareMaterial(material) 
-{
+	public static prepareMaterial(material: Material): Material
+	{
 		material.userData = {heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}};
 
 		material.onBeforeCompile = (shader) => 
-{
+		{
 			// Pass uniforms from userData to the
 			for (const i in material.userData) 
-{
+			{
 				shader.uniforms[i] = material.userData[i];
 			}
 
@@ -98,28 +95,29 @@ export class MapHeightNodeShader extends MapHeightNode
 		return material;
 	}
 
-	loadTexture() 
-{
+	public loadTexture(): void 
+	{
 		const self = this;
 
 		this.mapView.provider
 			.fetchTile(this.level, this.x, this.y)
 			.then(function(image) 
-{
+			{
 				const texture = new Texture(image as any);
-				texture.public generateMipmaps: boolean = false;
+				texture.generateMipmaps = false;
 				texture.format = RGBFormat;
 				texture.magFilter = LinearFilter;
 				texture.minFilter = LinearFilter;
 				texture.needsUpdate = true;
 
-				self.material as MeshPhongMaterial.map = texture;
+				// @ts-ignore
+				self.material.map = texture;
 
 				self.textureLoaded = true;
 				self.nodeReady();
 			})
 			.catch(function(err) 
-{
+			{
 				console.error('GeoThree: Failed to load color node data.', err);
 				self.textureLoaded = true;
 				self.nodeReady();
@@ -128,10 +126,10 @@ export class MapHeightNodeShader extends MapHeightNode
 		this.loadHeightGeometry();
 	}
 
-	loadHeightGeometry() 
-{
+	public loadHeightGeometry(): void
+	{
 		if (this.mapView.heightProvider === null) 
-{
+		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
@@ -140,21 +138,22 @@ export class MapHeightNodeShader extends MapHeightNode
 		this.mapView.heightProvider
 			.fetchTile(this.level, this.x, this.y)
 			.then(function(image) 
-{
+			{
 				const texture = new Texture(image as any);
-				texture.public generateMipmaps: boolean = false;
+				texture.generateMipmaps = false;
 				texture.format = RGBFormat;
 				texture.magFilter = NearestFilter;
 				texture.minFilter = NearestFilter;
 				texture.needsUpdate = true;
 
+				// @ts-ignore
 				self.material.userData.heightMap.value = texture;
 
 				self.heightLoaded = true;
 				self.nodeReady();
 			})
 			.catch(function(err) 
-{
+			{
 				console.error('GeoThree: Failed to load height node data.', err);
 				self.heightLoaded = true;
 				self.nodeReady();
@@ -165,12 +164,11 @@ export class MapHeightNodeShader extends MapHeightNode
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
 	 *
 	 * Switches the geometry for a simpler one for faster raycasting.
-	 *
 	 */
-	raycast(raycaster, intersects) 
-{
+	public raycast(raycaster: Raycaster, intersects: Object3D[]): boolean
+	{
 		if (this.isMesh === true) 
-{
+		{
 			this.geometry = MapPlaneNode.GEOMETRY;
 
 			const result = Mesh.prototype.raycast.call(this, raycaster, intersects);

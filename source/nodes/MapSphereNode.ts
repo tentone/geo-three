@@ -1,4 +1,4 @@
-import {Matrix4, Mesh, MeshBasicMaterial, Quaternion, Vector3} from 'three';
+import {Matrix4, Mesh, MeshBasicMaterial, Quaternion, Vector3, Raycaster, Object3D} from 'three';
 import {MapNode} from './MapNode';
 import {MapSphereNodeGeometry} from '../geometries/MapSphereNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
@@ -7,8 +7,6 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  * Represents a map tile node.
  * 
  * A map node can be subdivided into other nodes (Quadtree).
- * 
- * @class MapSphereNode
  */
 export class MapSphereNode extends MapNode 
 {
@@ -31,13 +29,10 @@ export class MapSphereNode extends MapNode
 	 * Number of segments per node geometry.
 	 * 
 	 * Can be configured globally and is applied to all nodes.
-	 *
-	 * @public static SEGMENTS
-	 * @type {number}
 	 */
-	public static SEGMENTS = 80;
+	public static SEGMENTS: number = 80;
 	
-	initialize() 
+	public initialize(): void
 	{
 		this.loadTexture();
 	}
@@ -45,11 +40,11 @@ export class MapSphereNode extends MapNode
 	/**
 	 * Create a geometry for a sphere map node.
 	 *
-	 * @param {number} zoom
-	 * @param {number} x
-	 * @param {number} y
+	 * @param zoom - Zoom level to generate the geometry for.
+	 * @param x - X tile position.
+	 * @param y - Y tile position.
 	 */
-	public static createGeometry(zoom, x, y) 
+	public static createGeometry(zoom: number, x: number, y: number): MapSphereNodeGeometry
 	{
 		const range = Math.pow(2, zoom);
 		const max = 40;
@@ -68,9 +63,8 @@ export class MapSphereNode extends MapNode
 	
 	/** 
 	 * Apply scale and offset position to the sphere node geometry.
-	 *
 	 */
-	applyScaleNode() 
+	public applyScaleNode(): void
 	{
 		this.geometry.computeBoundingBox();
 	
@@ -87,13 +81,13 @@ export class MapSphereNode extends MapNode
 		this.updateMatrixWorld();
 	}
 	
-	updateMatrix() 
+	public updateMatrix(): void
 	{
 		this.matrix.setPosition(this.position);
 		this.matrixWorldNeedsUpdate = true;
 	}
 	
-	updateMatrixWorld(force = false) 
+	public updateMatrixWorld(force: boolean = false): void
 	{
 		if (this.matrixWorldNeedsUpdate || force) 
 		{
@@ -102,7 +96,7 @@ export class MapSphereNode extends MapNode
 		}
 	}
 	
-	createChildNodes() 
+	public createChildNodes(): void
 	{
 		const level = this.level + 1;
 
@@ -132,10 +126,8 @@ export class MapSphereNode extends MapNode
 	
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
-	 * 
-	 * @method raycast
 	 */
-	raycast(raycaster, intersects) 
+	public raycast(raycaster: Raycaster, intersects: Object3D[]): boolean
 	{
 		if (this.isMesh === true) 
 		{

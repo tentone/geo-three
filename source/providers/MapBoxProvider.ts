@@ -7,37 +7,25 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *
  * API Reference
  *  - https://www.mapbox.com/
- *
- * @param {string} apiToken Map box api token.
- * @param {string} id Map style or mapID if the mode is set to MAP_ID.
- * @param {number} mode Map tile access mode.
- * @param {string} format Image format.
- * @param {boolean} useHDPI
  */
 export class MapBoxProvider extends MapProvider 
 {
-	public static ADDRESS = 'https://api.mapbox.com/';
+	public static ADDRESS: string = 'https://api.mapbox.com/';
 
 	/**
 	 * Access the map data using a map style.
-	 *
-	 * @type {number}
 	 */
-	public static STYLE = 100;
+	public static STYLE: number = 100;
 
 	/**
 	 * Access the map data using a map id.
-	 *
-	 * @type {number}
 	 */
-	public static MAP_ID = 101;
+	public static MAP_ID: number = 101;
 
 	/**
 	 * Server API access token.
-	 *
-	 * @type {string}
 	 */
-	apiToken: string;
+	public apiToken: string;
 
 	/**
 	 * Map image tile format, the formats available are:
@@ -50,26 +38,20 @@ export class MapBoxProvider extends MapProvider
 	 *  - jpg80 80% quality JPG
 	 *  - jpg90 90% quality JPG
 	 *  - pngraw Raw png (no interpolation)
-	 *
-	 * @type {string}
 	 */
-	format: string;
+	public format: string;
 
 	/**
 	 * Flag to indicate if should use high resolution tiles
-	 *
-	 * @type {boolean}
 	 */
-	useHDPI: boolean;
+	public useHDPI: boolean;
 
 	/**
 	 * Map tile access mode
 	 *  - MapBoxProvider.STYLE
 	 *  - MapBoxProvider.MAP_ID
-	 *
-	 * @type {number}
 	 */
-	mode: number;
+	public mode: number;
 
 	/**
 	 * Map identifier composed of {username}.{style}
@@ -80,10 +62,8 @@ export class MapBoxProvider extends MapProvider
 	 *  - mapbox.mapbox-terrain-v2
 	 *  - mapbox.mapbox-traffic-v1
 	 *  - mapbox.terrain-rgb
-	 *
-	 * @type {string}
 	 */
-	mapId: string;
+	public mapId: string;
 
 	/**
 	 * Map style to be used composed of {username}/{style_id}
@@ -99,40 +79,36 @@ export class MapBoxProvider extends MapProvider
 	 *  - mapbox/navigation-preview-night-v4
 	 *  - mapbox/navigation-guidance-day-v4
 	 *  - mapbox/navigation-guidance-night-v4
-	 *
-	 * @type {string}
 	 */
-	style: string;
+	public style: string;
 
 	/**
 	 * Mapbox api version
-
 	 *  - mapbox/navigation-guidance-night-v4
-	 *
-	 * @type {string}
 	 */
-	version: string;
+	public version: string;
 
-	public constructor(apiToken, id, mode, format, useHDPI, version) 
+	/**
+	 * @param apiToken - Map box api token.
+	 * @param id - Map style or map ID if the mode is set to MAP_ID.
+	 * @param mode - Map tile access mode.
+	 * @param format - Image format.
+	 * @param useHDPI - If true uses high DPI mode.
+	 */
+	public constructor(apiToken: string = '', id: string = '', mode: number = MapBoxProvider.STYLE, format: string = 'png', useHDPI: boolean = false, version: string = 'v4') 
 	{
 		super();
 
-		/**
-		 * Server API access token.
-		 *
-		 * @attribute apiToken
-		 * @type {string}
-		 */
-		this.apiToken = apiToken !== undefined ? apiToken : '';
-		this.format = format !== undefined ? format : 'png';
-		this.useHDPI = useHDPI !== undefined ? useHDPI : false;
-		this.mode = mode !== undefined ? mode : MapBoxProvider.STYLE;
-		this.mapId = id !== undefined ? id : '';
-		this.style = id !== undefined ? id : '';
-		this.version = version !== undefined ? version : 'v4';
+		this.apiToken = apiToken;
+		this.format = format;
+		this.useHDPI = useHDPI;
+		this.mode = mode;
+		this.mapId = id;
+		this.style = id;
+		this.version = version;
 	}
 
-	getMetaData() 
+	public getMetaData(): void
 	{
 		const self = this;
 		const address = MapBoxProvider.ADDRESS + this.version + '/' + this.mapId + '.json?access_token=' + this.apiToken;

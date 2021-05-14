@@ -9,21 +9,17 @@ const position = new Vector3();
  *
  * Distance is adjusted with the node level, more consistent results since every node is considered.
  */
-export class LODRadial extends LODControl 
+export class LODRadial implements LODControl 
 {
 	/**
 	 * Minimum ditance to subdivide nodes.
-	 *
-	 * @type {number}
 	 */
-	subdivideDistance = 50;
+	public subdivideDistance: number = 50;
 
 	/**
 	 * Minimum ditance to simplify far away nodes that are subdivided.
-	 *
-	 * @type {number}
 	 */
-	simplifyDistance = 300;
+	public simplifyDistance: number = 300;
 
 	updateLOD(view, camera, renderer, scene) 
 	{

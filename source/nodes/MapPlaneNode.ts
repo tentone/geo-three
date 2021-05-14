@@ -18,21 +18,19 @@ export class MapPlaneNode extends MapNode
 
 	/**
 	 * Map node plane geometry.
-	 *
-	 * @type {PlaneBufferGeometry}
 	 */
-	public static GEOMETRY = new MapNodeGeometry(1, 1, 1, 1);
+	public static GEOMETRY: MapNodeGeometry = new MapNodeGeometry(1, 1, 1, 1);
 
 	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
 
 	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
-	initialize() 
+	public initialize(): void
 	{
 		this.loadTexture();
 	}
 
-	createChildNodes() 
+	public createChildNodes(): void
 	{
 		const level = this.level + 1;
 
@@ -70,9 +68,8 @@ export class MapPlaneNode extends MapNode
 
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
-	 *
 	 */
-	raycast(raycaster, intersects) 
+	public raycast(raycaster: Raycaster, intersects: Object3D[]): boolean
 	{
 		if (this.isMesh === true) 
 		{

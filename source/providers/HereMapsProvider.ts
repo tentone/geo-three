@@ -18,17 +18,13 @@ export class HereMapsProvider extends MapProvider
 
 	/**
 	 * Service application access token.
-	 *
-	 * @type {string}
 	 */
-	appId: string;
+	public appId: string;
 
 	/**
 	 * Service application code token.
-	 *
-	 * @type {string}
 	 */
-	appCode: string;
+	public appCode: string;
 
 	/**
 	 * The type of maps to be used.
@@ -42,10 +38,8 @@ export class HereMapsProvider extends MapProvider
 	 *  - Base Map Tiles https://{1-4}.base.maps.api.here.com
 	 *  - Pano Tiles https://{1-4}.pano.maps.api.here.com
 	 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
-	 *
-	 * @type {string}
 	 */
-	style: string;
+	public style: string;
 
 	/**
 	 * Specifies the view scheme. A complete list of the supported schemes may be obtained by using the Info resouce.
@@ -57,20 +51,16 @@ export class HereMapsProvider extends MapProvider
 	 * Check the scheme list at https://developer.here.com/documentation/map-tile/topics/resource-info.html
 	 *
 	 * Be aware that invalid combinations of schemes and tiles are rejected. For all satellite, hybrid and terrain schemes, you need to use the Aerial Tiles base URL instead of the normal one.
-	 *
-	 * @type {string}
 	 */
-	scheme: string;
+	public scheme: string;
 
 	/**
 	 * Map image tile format, the formats available are:
 	 *  - png True color PNG
 	 *  - png8 8 bit indexed PNG
 	 *  - jpg JPG at 90% quality
-	 *
-	 * @type {string}
 	 */
-	format: string;
+	public format: string;
 
 	/**
 	 * Returned tile map image size.
@@ -79,17 +69,13 @@ export class HereMapsProvider extends MapProvider
 	 *  - 256
 	 *  - 512
 	 *  - 128 (deprecated, although usage is still accepted)
-	 *
-	 * @type {number}
 	 */
-	size: number;
+	public size: number;
 
 	/**
 	 * Specifies the map version, either newest or with a hash value.
-	 *
-	 * @type {string}
 	 */
-	version: string;
+	public version: string;
 
 	/**
 	 * Server to be used next.
@@ -97,10 +83,8 @@ export class HereMapsProvider extends MapProvider
 	 * There are 4 server available in here maps.
 	 *
 	 * On each request this number is updated.
-	 *
-	 * @type {number}
 	 */
-	server: number;
+	public server: number;
 
 	/**
 	 *
@@ -131,12 +115,12 @@ export class HereMapsProvider extends MapProvider
 	 * There are 4 server (1 to 4).
 	 *
 	 */
-	nextServer() 
+	public nextServer(): void
 	{
 		this.server = this.server % 4 === 0 ? 1 : this.server + 1;
 	}
 
-	getMetaData() {}
+	public getMetaData(): void {}
 
 	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
 	{

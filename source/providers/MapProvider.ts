@@ -39,9 +39,9 @@ export class MapProvider
 	 *
 	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
 	 *
-	 * @param {number} zoom Zoom level.
-	 * @param {number} x Tile x.
-	 * @param {number} y Tile y.
+	 * @param zoom - Zoom level.
+	 * @param x - Tile x.
+	 * @param y - Tile y.
 	 * @returns Promise with the image obtained for the tile ready to use.
 	 */
 	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any> 
@@ -54,5 +54,5 @@ export class MapProvider
 	 *
 	 * Usually map server have API method to retrieve TileJSON metadata.
 	 */
-	 public getMetaData(): void {}
+	public getMetaData(): void {}
 }

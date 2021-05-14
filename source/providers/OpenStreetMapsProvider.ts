@@ -24,7 +24,7 @@ export class OpenStreetMapsProvider extends MapProvider
 	 */
 	format: string;
 
-	public constructor(address = 'https://a.tile.openstreetmap.org/') 
+	public constructor(address: string = 'https://a.tile.openstreetmap.org/') 
 	{
 		super();
 		this.address = address;

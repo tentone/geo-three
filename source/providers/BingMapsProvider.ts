@@ -9,22 +9,23 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *  - https://msdn.microsoft.com/en-us/library/bb259689.aspx (Bing Maps Tile System)
  *  - https://msdn.microsoft.com/en-us/library/mt823633.aspx (Directly accessing the Bing Maps tiles)
  *  - https://www.bingmapsportal.com/
- *
- * @param {string} apiKey Bing API key.
  */
 export class BingMapsProvider extends MapProvider 
 {
-	maxZoom = 19;
+	/**
+	 * Maximum zoom level allows by the provider.
+	 */
+	public maxZoom: number = 19;
 
 	/**
 	 * Server API access token.
 	 */
-	apiKey: string;
+	public apiKey: string;
 
 	/**
 	 * The type of the map used.
 	 */
-	type: string;
+	public type: string;
 
 	/**
 	 * Map image tile format, the formats available are:
@@ -32,25 +33,28 @@ export class BingMapsProvider extends MapProvider
 	 *  - jpeg: Use JPEG image format. JPEG format is the default for Road, Aerial and AerialWithLabels imagery.
 	 *  - png: Use PNG image format. PNG is the default format for OrdnanceSurvey imagery.
 	 */
-	format: string = 'jpeg';
+	public format: string = 'jpeg';
 
 	/**
 	 * Size of the map tiles.
 	 */
-	mapSize: number = 512;
+	public mapSize: number = 512;
 
 	/**
 	 * Tile server subdomain.
 	 */
-	subdomain: string = 't1';
+	public subdomain: string = 't1';
 
-	public constructor(apiKey, type) 
+	/**
+	 * @param apiKey - Bing API key.
+	 * @param type - Type provider.
+	 */
+	public constructor(apiKey: string = '', type: string = BingMapsProvider.AERIAL) 
 	{
 		super();
 
-		this.apiKey = apiKey !== undefined ? apiKey : '';
-
-		this.type = type !== undefined ? type : BingMapsProvider.AERIAL;
+		this.apiKey = apiKey;
+		this.type = type;
 	}
 
 	/**
@@ -83,11 +87,9 @@ export class BingMapsProvider extends MapProvider
 	 *
 	 * Uses the follwing format
 	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
-	 *
 	 */
 	public getMetaData(): void 
 	{
-		const self = this;
 		const address = 'http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
 
 		XHRUtils.get(address, function(data) 

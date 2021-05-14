@@ -15,7 +15,7 @@ export class MapHeightNode extends MapNode
 {
 	public static USE_DISPLACEMENT: boolean = false;
 
-	public static MAX_HEIGHT = 0;
+	public static MAX_HEIGHT: number = 0;
 
 	public heightLoaded: boolean = false;
 
@@ -54,6 +54,7 @@ export class MapHeightNode extends MapNode
 		);
 
 		this.matrixAutoUpdate = false;
+
 		this.isMesh = true;
 
 		this.visible = false;
@@ -96,7 +97,7 @@ export class MapHeightNode extends MapNode
 
 	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
-	initialize() 
+	public initialize(): void 
 	{
 		this.loadTexture();
 		this.loadHeightGeometry();
@@ -108,7 +109,7 @@ export class MapHeightNode extends MapNode
 	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
 	 *
 	 */
-	loadTexture() 
+	public loadTexture(): void 
 	{
 		const self = this;
 
@@ -129,7 +130,7 @@ export class MapHeightNode extends MapNode
 		});
 	}
 
-	nodeReady() 
+	public nodeReady(): void 
 	{
 		if (!this.heightLoaded || !this.textureLoaded) 
 		{
@@ -141,7 +142,7 @@ export class MapHeightNode extends MapNode
 		MapNode.prototype.nodeReady.call(this);
 	}
 
-	createChildNodes() 
+	public createChildNodes(): void 
 	{
 		const level = this.level + 1;
 
@@ -182,7 +183,7 @@ export class MapHeightNode extends MapNode
 	 *
 	 * @returns {Promise<void>} Returns a promise indicating when the geometry generation has finished.
 	 */
-	loadHeightGeometry() 
+	public loadHeightGeometry(): void 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
@@ -232,9 +233,8 @@ export class MapHeightNode extends MapNode
 
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
-	 *
 	 */
-	raycast(raycaster, intersects) 
+	public raycast(raycaster: Raycaster, intersects: Object3D[]): boolean
 	{
 		if (this.isMesh === true) 
 		{

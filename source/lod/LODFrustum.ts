@@ -13,20 +13,29 @@ const position = new Vector3();
  */
 export class LODFrustum extends LODRadial 
 {
-	public subdivideDistance = 120;
+	/**
+	 * Distance to subdivide the tiles.
+	 */
+	public subdivideDistance: number = 120;
 
-	public simplifyDistance = 400;
+	/**
+	 * Distance to simplify the tiles.
+	 */
+	public simplifyDistance: number = 400;
 
 	/**
 	 * If true only the central point of the plane geometry will be used
 	 *
 	 * Otherwise the object bouding sphere will be tested, providing better results for nodes on frustum edge but will lower performance.
-	 *
-	 * @type {boolean}
 	 */
-	public testCenter = true;
+	public testCenter: boolean = true;
 
-	public pointOnly: boolean;
+	/**
+	 * If set true only the center point of the object is considered. 
+	 * 
+	 * Otherwise the full bouding box of the objects are considered.
+	 */
+	public pointOnly: boolean = false;
 
 	updateLOD(view, camera, renderer, scene) 
 	{

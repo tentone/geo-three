@@ -15,37 +15,29 @@ export class GoogleMapsProvider extends MapProvider
 {
 	/**
 	 * Server API access token.
-	 *
-	 * @type {string}
 	 */
-	apiToken: string;
+	public apiToken: string;
 
 	/**
 	 * After the first call a session token is stored.
 	 *
 	 * The session token is required for subsequent requests for tile and viewport information.
-	 *
-	 * @type {string}
 	 */
-	sessionToken = null;
+	public sessionToken: string = null;
 
 	/**
 	 * The map orientation in degrees.
 	 *
 	 * Can be 0, 90, 180 or 270.
-	 *
-	 * @type {number}
 	 */
-	orientation = 0;
+	public orientation: number = 0;
 
 	/**
 	 * Map image tile format, the formats available are:
 	 *  - png PNG
 	 *  - jpg JPG
-	 *
-	 * @type {string}
 	 */
-	format = 'png';
+	public format: string = 'png';
 
 	/**
 	 * The type of base map. This can be one of the following:
@@ -53,15 +45,11 @@ export class GoogleMapsProvider extends MapProvider
 	 *  - satellite: Satellite imagery.
 	 *  - terrain: Shaded relief maps of 3D terrain. When selecting terrain as the map type, you must also include the layerRoadmap layer type (described in the Optional fields section below).
 	 *  - streetview: Street View panoramas. See the Street View guide.
-	 *
-	 * @type {string}
 	 */
-	mapType = 'roadmap';
+	public mapType: string = 'roadmap';
 
 	/**
 	 * If true overlays are shown.
-	 *
-	 * @type {boolean}
 	 */
 	public overlay: boolean = false;
 
@@ -80,7 +68,7 @@ export class GoogleMapsProvider extends MapProvider
 	 * This method needs to be called before using the provider
 	 *
 	 */
-	createSession() 
+	public createSession(): void 
 	{
 		const self = this;
 
