@@ -53,7 +53,7 @@ export class GoogleMapsProvider extends MapProvider
 	 */
 	public overlay: boolean = false;
 
-	public constructor(apiToken) 
+	public constructor(apiToken: string) 
 	{
 		super();
 
@@ -69,8 +69,6 @@ export class GoogleMapsProvider extends MapProvider
 	 */
 	public createSession(): void 
 	{
-		const self = this;
-
 		const address = 'https://www.googleapis.com/tile/v1/createSession?key=' + this.apiToken;
 		const data = JSON.stringify({
 			mapType: this.mapType,
@@ -81,21 +79,14 @@ export class GoogleMapsProvider extends MapProvider
 			scale: 'scaleFactor1x'
 		});
 
-		XHRUtils.request(
-			address,
-			'GET',
-			{'Content-Type': 'text/json'},
-			data,
-			function(response, xhr) 
-			{
-				console.log('Created google maps session.', response, xhr);
-				self.sessionToken = response.session;
-			},
-			function(xhr) 
-			{
-				console.warn('Unable to create a google maps session.', xhr);
-			}
-		);
+		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, data, (response, xhr) =>
+		{
+			console.log('Created google maps session.', response, xhr);
+			this.sessionToken = response.session;
+		}, function(xhr) 
+		{
+			console.warn('Unable to create a google maps session.', xhr);
+		});
 	}
 
 	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>

@@ -37,26 +37,25 @@ export class LODFrustum extends LODRadial
 	 */
 	public pointOnly: boolean = false;
 
-	updateLOD(view, camera, renderer, scene) 
+	public updateLOD(view, camera, renderer, scene): void
 	{
 		projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 		frustum.setFromProjectionMatrix(projection);
 		camera.getWorldPosition(pov);
 
-		const self = this;
-		view.children[0].traverse(function(node) 
+		view.children[0].traverse((node) => 
 		{
 			node.getWorldPosition(position);
 			let distance = pov.distanceTo(position);
 			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
-			const inFrustum = self.pointOnly ? frustum.containsPoint(position) : frustum.intersectsObject(node);
+			const inFrustum = this.pointOnly ? frustum.containsPoint(position) : frustum.intersectsObject(node);
 
-			if (distance < self.subdivideDistance && inFrustum) 
+			if (distance < this.subdivideDistance && inFrustum) 
 			{
 				node.subdivide();
 			}
-			else if (distance > self.simplifyDistance && node.parentNode) 
+			else if (distance > this.simplifyDistance && node.parentNode) 
 			{
 				node.parentNode.simplify();
 			}

@@ -21,24 +21,22 @@ export class LODRadial implements LODControl
 	 */
 	public simplifyDistance: number = 300;
 
-	updateLOD(view, camera, renderer, scene) 
+	public updateLOD(view, camera, renderer, scene): void
 	{
-		const self = this;
-
 		camera.getWorldPosition(pov);
 
-		view.children[0].traverse(function(node) 
+		view.children[0].traverse((node) =>
 		{
 			node.getWorldPosition(position);
 
 			let distance = pov.distanceTo(position);
 			distance /= Math.pow(2, view.provider.maxZoom - node.level);
 
-			if (distance < self.subdivideDistance) 
+			if (distance < this.subdivideDistance) 
 			{
 				node.subdivide();
 			}
-			else if (distance > self.simplifyDistance && node.parentNode) 
+			else if (distance > this.simplifyDistance && node.parentNode) 
 			{
 				node.parentNode.simplify();
 			}

@@ -42,19 +42,17 @@ export class OpenMapTilesProvider extends MapProvider
 
 	public getMetaData(): void
 	{
-		const self = this;
 		const address = this.address + 'styles/' + this.theme + '.json';
 
-		XHRUtils.get(address, function(data) 
+		XHRUtils.get(address, (data: any) => 
 		{
 			const meta = JSON.parse(data);
-
-			self.name = meta.name;
-			self.format = meta.format;
-			self.minZoom = meta.minZoom;
-			self.maxZoom = meta.maxZoom;
-			self.bounds = meta.bounds;
-			self.center = meta.center;
+			this.name = meta.name;
+			this.format = meta.format;
+			this.minZoom = meta.minZoom;
+			this.maxZoom = meta.maxZoom;
+			this.bounds = meta.bounds;
+			this.center = meta.center;
 		});
 	}
 

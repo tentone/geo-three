@@ -19,22 +19,22 @@ export class MapProvider
 	 */
 	public minZoom: number = 0;
 
-	 /**
+	/**
 	 * Maximum tile level.
 	 */
 	public maxZoom: number = 20;
 
-	 /**
+	/**
 	 * Map bounds.
 	 */
 	public bounds: number[] = [];
 
-	 /**
+	/**
 	 * Map center point.
 	 */
 	public center: number[] = [];
 
-	 /**
+	/**
 	 * Get a tile for the x, y, zoom based on the provider configuration.
 	 *
 	 * The tile should be returned as a image object, compatible with canvas context 2D drawImage() and with webgl texImage2D() method.
@@ -49,7 +49,7 @@ export class MapProvider
 		return null;
 	}
 
-	 /**
+	/**
 	 * Get map meta data from server if supported.
 	 *
 	 * Usually map server have API method to retrieve TileJSON metadata.

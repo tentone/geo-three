@@ -49,7 +49,7 @@ export class LODRaycast implements LODControl
 	 */
 	public scaleDistance: boolean = true;
 
-	updateLOD(view, camera, renderer, scene) 
+	public updateLOD(view, camera, renderer, scene): void 
 	{
 		const intersects = [];
 

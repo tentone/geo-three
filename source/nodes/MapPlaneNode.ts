@@ -1,4 +1,4 @@
-import {BufferGeometry, Mesh, MeshBasicMaterial, Vector3} from 'three';
+import {BufferGeometry, Intersection, Mesh, MeshBasicMaterial, Raycaster, Vector3} from 'three';
 import {MapNode} from './MapNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
@@ -69,13 +69,14 @@ export class MapPlaneNode extends MapNode
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
 	 */
-	public raycast(raycaster: Raycaster, intersects: Object3D[]): boolean
+	public raycast(raycaster: Raycaster, intersects: Intersection[]): void
 	{
 		if (this.isMesh === true) 
 		{
-			return Mesh.prototype.raycast.call(this, raycaster, intersects);
+			return super.raycast(raycaster, intersects);
 		}
-
+		
+		// @ts-ignore
 		return false;
 	}
 }

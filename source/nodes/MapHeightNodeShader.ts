@@ -1,10 +1,11 @@
-import {LinearFilter, Material, Mesh, MeshPhongMaterial, NearestFilter, Object3D, Raycaster, RGBFormat, Texture, Vector3} from 'three';
+import {Intersection, LinearFilter, Material, Mesh, MeshPhongMaterial, NearestFilter, Object3D, Raycaster, RGBFormat, Texture, Vector3} from 'three';
 import {MapHeightNode} from './MapHeightNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapNode} from './MapNode';
 import {MapView} from '../MapView';
+import { CancelablePromise } from '../utils/CancelablePromise';
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
@@ -97,67 +98,58 @@ export class MapHeightNodeShader extends MapHeightNode
 
 	public loadTexture(): void 
 	{
-		const self = this;
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image) 
+		{
+			const texture = new Texture(image as any);
+			texture.generateMipmaps = false;
+			texture.format = RGBFormat;
+			texture.magFilter = LinearFilter;
+			texture.minFilter = LinearFilter;
+			texture.needsUpdate = true;
 
-		this.mapView.provider
-			.fetchTile(this.level, this.x, this.y)
-			.then(function(image) 
-			{
-				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
-				texture.format = RGBFormat;
-				texture.magFilter = LinearFilter;
-				texture.minFilter = LinearFilter;
-				texture.needsUpdate = true;
-
-				// @ts-ignore
-				self.material.map = texture;
-
-				self.textureLoaded = true;
-				self.nodeReady();
-			})
-			.catch(function(err) 
-			{
-				console.error('GeoThree: Failed to load color node data.', err);
-				self.textureLoaded = true;
-				self.nodeReady();
-			});
+			// @ts-ignore
+			this.material.map = texture;
+			this.textureLoaded = true;
+			this.nodeReady();
+		})
+		.catch(function(err) 
+		{
+			console.error('GeoThree: Failed to load color node data.', err);
+			this.textureLoaded = true;
+			this.nodeReady();
+		});
 
 		this.loadHeightGeometry();
 	}
 
-	public loadHeightGeometry(): void
+	public loadHeightGeometry(): CancelablePromise<any> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		const self = this;
+		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image) 
+		{
+			const texture = new Texture(image as any);
+			texture.generateMipmaps = false;
+			texture.format = RGBFormat;
+			texture.magFilter = NearestFilter;
+			texture.minFilter = NearestFilter;
+			texture.needsUpdate = true;
 
-		this.mapView.heightProvider
-			.fetchTile(this.level, this.x, this.y)
-			.then(function(image) 
-			{
-				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
-				texture.format = RGBFormat;
-				texture.magFilter = NearestFilter;
-				texture.minFilter = NearestFilter;
-				texture.needsUpdate = true;
+			// @ts-ignore
+			this.material.userData.heightMap.value = texture;
 
-				// @ts-ignore
-				self.material.userData.heightMap.value = texture;
-
-				self.heightLoaded = true;
-				self.nodeReady();
-			})
-			.catch(function(err) 
-			{
-				console.error('GeoThree: Failed to load height node data.', err);
-				self.heightLoaded = true;
-				self.nodeReady();
-			});
+			this.heightLoaded = true;
+			this.nodeReady();
+		})
+		.catch(function(err) 
+		{
+			console.error('GeoThree: Failed to load height node data.', err);
+			this.heightLoaded = true;
+			this.nodeReady();
+		});
 	}
 
 	/**
@@ -165,19 +157,20 @@ export class MapHeightNodeShader extends MapHeightNode
 	 *
 	 * Switches the geometry for a simpler one for faster raycasting.
 	 */
-	public raycast(raycaster: Raycaster, intersects: Object3D[]): boolean
+	public raycast(raycaster: Raycaster, intersects: Intersection[]): void
 	{
 		if (this.isMesh === true) 
 		{
 			this.geometry = MapPlaneNode.GEOMETRY;
 
-			const result = Mesh.prototype.raycast.call(this, raycaster, intersects);
+			const result = super.raycast(raycaster, intersects);
 
 			this.geometry = MapHeightNodeShader.GEOMETRY;
 
 			return result;
 		}
-
+		
+		// @ts-ignore
 		return false;
 	}
 }

@@ -132,14 +132,14 @@ export class MapNode extends Mesh
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
-	public static BOTTOM_LEFT = 2;
+	public static BOTTOM_LEFT: number = 2;
 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
-	public static BOTTOM_RIGHT = 3;
+	public static BOTTOM_RIGHT: number = 3;
 
 	/**
 	 * Initialize resources that require access to data from the MapView.
@@ -207,44 +207,39 @@ export class MapNode extends Mesh
 	 */
 	public loadTexture(): void
 	{
-		const self = this;
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) =>
+		{
+			const texture = new Texture(image as any);
+			texture.generateMipmaps = false;
+			texture.format = RGBFormat;
+			texture.magFilter = LinearFilter;
+			texture.minFilter = LinearFilter;
+			texture.needsUpdate = true;
+			
+			// @ts-ignore
+			this.material.map = texture;
+			this.nodeReady();
+		})
+		.catch(() => 
+		{
+			const canvas = new OffscreenCanvas(1, 1);
+			const context = canvas.getContext('2d');
+			context.fillStyle = '#FF0000';
+			context.fillRect(0, 0, 1, 1);
 
-		this.mapView.provider
-			.fetchTile(this.level, this.x, this.y)
-			.then(function(image) 
-			{
-				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
-				texture.format = RGBFormat;
-				texture.magFilter = LinearFilter;
-				texture.minFilter = LinearFilter;
-				texture.needsUpdate = true;
-				
-				// @ts-ignore
-				self.material.map = texture;
-				self.nodeReady();
-			})
-			.catch(function() 
-			{
-				const canvas = new OffscreenCanvas(1, 1);
-				const context = canvas.getContext('2d');
-				context.fillStyle = '#FF0000';
-				context.fillRect(0, 0, 1, 1);
-
-				const texture = new Texture(canvas as any);
-				texture.generateMipmaps = false;
-				texture.needsUpdate = true;
-				// @ts-ignore
-				self.material.map = texture;
-				self.nodeReady();
-			});
+			const texture = new Texture(canvas as any);
+			texture.generateMipmaps = false;
+			texture.needsUpdate = true;
+			// @ts-ignore
+			this.material.map = texture;
+			this.nodeReady();
+		});
 	}
 
 	/**
 	 * Increment the child loaded counter.
 	 *
 	 * Should be called after a map node is ready for display.
-	 *
 	 */
 	public nodeReady(): void
 	{
@@ -276,7 +271,7 @@ export class MapNode extends Mesh
 	/**
 	 * Get all the neighbors in a specific direction (left, right, up down).
 	 *
-	 * @param - direction Direction to get neighbors.
+	 * @param direction - Direction to get neighbors.
 	 * @returns The neighbors array, if no neighbors found returns empty.
 	 */
 	public getNeighborsDirection(direction: number): MapNode[] 

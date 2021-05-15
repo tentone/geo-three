@@ -110,18 +110,17 @@ export class MapBoxProvider extends MapProvider
 
 	public getMetaData(): void
 	{
-		const self = this;
 		const address = MapBoxProvider.ADDRESS + this.version + '/' + this.mapId + '.json?access_token=' + this.apiToken;
 
-		XHRUtils.get(address, function(data) 
+		XHRUtils.get(address, (data: any): void =>
 		{
 			const meta = JSON.parse(data);
 
-			self.name = meta.name;
-			self.minZoom = meta.minZoom;
-			self.maxZoom = meta.maxZoom;
-			self.bounds = meta.bounds;
-			self.center = meta.center;
+			this.name = meta.name;
+			this.minZoom = meta.minZoom;
+			this.maxZoom = meta.maxZoom;
+			this.bounds = meta.bounds;
+			this.center = meta.center;
 		});
 	}
 

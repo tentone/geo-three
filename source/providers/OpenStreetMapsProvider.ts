@@ -9,43 +9,40 @@ import {CancelablePromise} from '../utils/CancelablePromise';
 export class OpenStreetMapsProvider extends MapProvider 
 {
 	/**
-	 * Map server address.
-	 *
-	 * By default the open OSM tile server is used.
-	 *
-	 * @type {string}
-	 */
+	* Map server address.
+	*
+	* By default the open OSM tile server is used.
+	*/
 	public address: string;
 
 	/**
-	 * Map image tile format.
-	 *
-	 * @type {string}
-	 */
-	 public format: string;
+	* Map image tile format.
+	*/
+	public format: string;
 
-	 public constructor(address: string = 'https://a.tile.openstreetmap.org/') 
-	 {
-	 	super();
-	 	this.address = address;
-	 	this.format = 'png';
-	 }
+	public constructor(address: string = 'https://a.tile.openstreetmap.org/')
+	{
+		super();
 
-	 public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
-	 {
-	 	return new CancelablePromise<HTMLImageElement>((resolve, reject) => 
-	 	{
-	 		const image = document.createElement('img');
-	 		image.onload = function() 
-	 		{
-	 			resolve(image);
-	 		};
-	 		image.onerror = function() 
-	 		{
-	 			reject();
-	 		};
-	 		image.crossOrigin = 'Anonymous';
-	 		image.src = this.address + '/' + zoom + '/' + x + '/' + y + '.' + this.format;
-	 	});
-	 }
+		this.address = address;
+		this.format = 'png';
+	}
+
+	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
+	{
+		return new CancelablePromise<HTMLImageElement>((resolve, reject) => 
+		{
+			const image = document.createElement('img');
+			image.onload = function() 
+			{
+				resolve(image);
+			};
+			image.onerror = function() 
+			{
+				reject();
+			};
+			image.crossOrigin = 'Anonymous';
+			image.src = this.address + '/' + zoom + '/' + x + '/' + y + '.' + this.format;
+		});
+	}
 }
