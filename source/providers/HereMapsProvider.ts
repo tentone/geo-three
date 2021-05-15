@@ -37,7 +37,7 @@ export class HereMapsProvider extends MapProvider
 	 *  - Aerial Tiles https://\{1-4\}.aerial.maps.api.here.com
 	 *  - Base Map Tiles https://\{1-4\}.base.maps.api.here.com
 	 *  - Pano Tiles https://\{1-4\}.pano.maps.api.here.com
-	 *  - Traffic Tiles https://\\{1-4}.traffic.maps.api.here.com
+	 *  - Traffic Tiles https://\{1-4\}.traffic.maps.api.here.com
 	 */
 	public style: string;
 
