@@ -10,7 +10,7 @@ export class XHRUtils
 	 * @param onLoad - On load callback.
 	 * @param onError - On progress callback.
 	 */
-	public static get(url: string, onLoad?: Function, onError?: Function) 
+	public static get(url: string, onLoad?: Function, onError?: Function): XMLHttpRequest
 	{
 		const xhr = new XMLHttpRequest();
 		xhr.overrideMimeType('text/plain');
@@ -26,6 +26,7 @@ export class XHRUtils
 
 		if (onError !== undefined) 
 		{
+			// @ts-ignore
 			xhr.onerror = onError;
 		}
 
@@ -46,7 +47,7 @@ export class XHRUtils
 	 * @param onLoad - On load callback, receives data (String or Object) and XHR as arguments.
 	 * @param onError - XHR onError callback.
 	 */
-	public static request(url: string, type: string, header?: any, body?: any, onLoad?: Function, onError?: Function, onProgress?: Function) 
+	public static request(url: string, type: string, header?: any, body?: any, onLoad?: Function, onError?: Function, onProgress?: Function): XMLHttpRequest 
 	{
 		function parseResponse(response) 
 		{

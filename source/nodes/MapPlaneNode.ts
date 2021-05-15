@@ -1,4 +1,4 @@
-import {Mesh, MeshBasicMaterial, Vector3} from 'three';
+import {BufferGeometry, Mesh, MeshBasicMaterial, Vector3} from 'three';
 import {MapNode} from './MapNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
@@ -19,11 +19,11 @@ export class MapPlaneNode extends MapNode
 	/**
 	 * Map node plane geometry.
 	 */
-	public static GEOMETRY: MapNodeGeometry = new MapNodeGeometry(1, 1, 1, 1);
+	public static GEOMETRY: BufferGeometry = new MapNodeGeometry(1, 1, 1, 1);
 
-	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
+	public static BASE_GEOMETRY: BufferGeometry = MapPlaneNode.GEOMETRY;
 
-	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static BASE_SCALE: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	public initialize(): void
 	{

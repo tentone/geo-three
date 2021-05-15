@@ -1,3 +1,5 @@
+import {Vector2} from 'three';
+
 /**
  * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
  *
@@ -28,7 +30,7 @@ export class UnitsUtils
 	 * @param onResult - Callback function onResult(coords, timestamp).
 	 * @param onError - Callback to handle errors.
 	 */
-	public static get(onResult: Function, onError: Function) 
+	public static get(onResult: Function, onError: Function): void
 	{
 		navigator.geolocation.getCurrentPosition(function(result) 
 		{
@@ -43,14 +45,14 @@ export class UnitsUtils
 	 * @param latitude - Latitude value in degrees.
 	 * @param longitude - Longitude value in degrees.
 	 */
-	public static datumsToSpherical(latitude: number, longitude: number) 
+	public static datumsToSpherical(latitude: number, longitude: number): Vector2
 	{
 		const x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
 		let y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
 
 		y = y * UnitsUtils.EARTH_ORIGIN / 180.0;
 
-		return {x: x, y: y};
+		return new Vector2(x, y);
 	}
 
 	/**
@@ -59,7 +61,7 @@ export class UnitsUtils
 	 * @param x - X coordinate.
 	 * @param y - Y coordinate.
 	 */
-	public static sphericalToDatums(x: number, y: number) 
+	public static sphericalToDatums(x: number, y: number): {latitude: number, longitude: number}
 	{
 		const longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
 		let latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
@@ -76,7 +78,7 @@ export class UnitsUtils
 	 * @param x - X coordinate.
 	 * @param y - Y coordinate.
 	 */
-	public static quadtreeToDatums(zoom: number, x: number, y: number) 
+	public static quadtreeToDatums(zoom: number, x: number, y: number): {latitude: number, longitude: number}
 	{
 		const n = Math.pow(2.0, zoom);
 		const longitude = x / n * 360.0 - 180.0;

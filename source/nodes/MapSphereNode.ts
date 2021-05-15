@@ -1,4 +1,4 @@
-import {Matrix4, Mesh, MeshBasicMaterial, Quaternion, Vector3, Raycaster, Object3D} from 'three';
+import {Matrix4, Mesh, BufferGeometry, MeshBasicMaterial, Quaternion, Vector3, Raycaster, Object3D} from 'three';
 import {MapNode} from './MapNode';
 import {MapSphereNodeGeometry} from '../geometries/MapSphereNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
@@ -21,9 +21,9 @@ export class MapSphereNode extends MapNode
 		this.visible = false;
 	}
 	
-	public static BASE_GEOMETRY = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+	public static BASE_GEOMETRY: BufferGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 
-	public static BASE_SCALE = new Vector3(1, 1, 1);
+	public static BASE_SCALE: Vector3 = new Vector3(1, 1, 1);
 
 	/**
 	 * Number of segments per node geometry.

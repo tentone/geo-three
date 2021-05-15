@@ -1,4 +1,4 @@
-import {LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3} from 'three';
+import {LinearFilter, Material, Mesh, MeshPhongMaterial, BufferGeometry, RGBFormat, Texture, Vector3} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
@@ -17,8 +17,14 @@ export class MapHeightNode extends MapNode
 
 	public static MAX_HEIGHT: number = 0;
 
+	/**
+	 * Flag indicating if the tile height data was loaded.
+	 */
 	public heightLoaded: boolean = false;
 
+	/**
+	 * Flag indicating if the tile texture was loaded.
+	 */
 	public textureLoaded: boolean = false;
 
 	/**
@@ -54,25 +60,11 @@ export class MapHeightNode extends MapNode
 		);
 
 		this.matrixAutoUpdate = false;
-
 		this.isMesh = true;
-
 		this.visible = false;
 
-		/**
-		 * Flag indicating if the tile texture was loaded.
-		 *
-		 * @attribute textureLoaded
-		 * @type {boolean}
-		 */
-		this.textureLoaded = false;
 
-		/**
-		 * Flag indicating if the tile height data was loaded.
-		 *
-		 * @attribute heightLoaded
-		 * @type {boolean}
-		 */
+		this.textureLoaded = false;
 		this.heightLoaded = false;
 	}
 
@@ -88,14 +80,12 @@ export class MapHeightNode extends MapNode
 
 	/**
 	 * Map node plane geometry.
-	 *
-	 * @type {PlaneBufferGeometry}
 	 */
-	public static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	public static GEOMETRY: BufferGeometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
-	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
+	public static BASE_GEOMETRY: BufferGeometry = MapPlaneNode.GEOMETRY;
 
-	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static BASE_SCALE: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	public initialize(): void 
 	{

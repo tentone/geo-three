@@ -8,6 +8,8 @@ import {BufferGeometry, Float32BufferAttribute} from 'three';
 export class MapNodeGeometry extends BufferGeometry 
 {	
 	/**
+	 * Map node geometry constructor.
+	 * 
 	 * @param {number} width Width of the node.
 	 * @param {number} height Height of the node.
 	 * @param {number} widthSegments Number of subdivisions along the width.
