@@ -2,7 +2,7 @@ import {MapProvider} from './MapProvider';
 import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
- * Here maps tile server.
+ * Here maps tile server provider.
  *
  * API Reference
  *  - https://developer.here.com/documentation/map-tile/topics/example-satellite-map.html
@@ -34,10 +34,10 @@ export class HereMapsProvider extends MapProvider
 	 *  - traffic
 	 *
 	 * For each type HERE maps has 4 servers:
-	 *  - Aerial Tiles https://{1-4}.aerial.maps.api.here.com
-	 *  - Base Map Tiles https://{1-4}.base.maps.api.here.com
-	 *  - Pano Tiles https://{1-4}.pano.maps.api.here.com
-	 *  - Traffic Tiles https://{1-4}.traffic.maps.api.here.com
+	 *  - Aerial Tiles https://\{1-4\}.aerial.maps.api.here.com
+	 *  - Base Map Tiles https://\{1-4\}.base.maps.api.here.com
+	 *  - Pano Tiles https://\{1-4\}.pano.maps.api.here.com
+	 *  - Traffic Tiles https://\\{1-4}.traffic.maps.api.here.com
 	 */
 	public style: string;
 
@@ -87,15 +87,16 @@ export class HereMapsProvider extends MapProvider
 	public server: number;
 
 	/**
-	 *
-	 * @param {string} appId HERE maps app id.
-	 * @param {string} appCode HERE maps app code.
-	 * @param {string} style Map style.
-	 * @param {number} scheme Map scheme.
-	 * @param {string} format Image format.
-	 * @param {number} size Tile size.
+	 * Here maps provider constructor.
+	 * 
+	 * @param appId - HERE maps app id.
+	 * @param appCode - HERE maps app code.
+	 * @param style - Map style.
+	 * @param scheme - Map scheme.
+	 * @param format - Image format.
+	 * @param size - Tile size.
 	 */
-	public constructor(appId, appCode, style, scheme, format, size) 
+	public constructor(appId: string, appCode: string, style: string, scheme: string, format: string, size: number) 
 	{
 		super();
 
@@ -113,7 +114,6 @@ export class HereMapsProvider extends MapProvider
 	 * Update the server counter.
 	 *
 	 * There are 4 server (1 to 4).
-	 *
 	 */
 	public nextServer(): void
 	{
@@ -138,29 +138,10 @@ export class HereMapsProvider extends MapProvider
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';
-			image.src =
-				'https://' +
-				this.server +
-				'.' +
-				this.style +
-				'.maps.api.here.com/maptile/2.1/maptile/' +
-				this.version +
-				'/' +
-				this.scheme +
-				'/' +
-				zoom +
-				'/' +
-				x +
-				'/' +
-				y +
-				'/' +
-				this.size +
-				'/' +
-				this.format +
-				'?app_id=' +
-				this.appId +
-				'&app_code=' +
-				this.appCode;
+
+			image.src = 'https://' + this.server + '.' + this.style + '.maps.api.here.com/maptile/2.1/maptile/' +
+				this.version + '/' + this.scheme + '/' + zoom + '/' + x + '/' + y + '/' +
+				this.size + '/' + this.format + '?app_id=' + this.appId + '&app_code=' + this.appCode;
 		});
 	}
 }

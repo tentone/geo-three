@@ -220,20 +220,20 @@ export class MapNode extends Mesh
 			this.material.map = texture;
 			this.nodeReady();
 		})
-		.catch(() => 
-		{
-			const canvas = new OffscreenCanvas(1, 1);
-			const context = canvas.getContext('2d');
-			context.fillStyle = '#FF0000';
-			context.fillRect(0, 0, 1, 1);
+			.catch(() => 
+			{
+				const canvas = new OffscreenCanvas(1, 1);
+				const context = canvas.getContext('2d');
+				context.fillStyle = '#FF0000';
+				context.fillRect(0, 0, 1, 1);
 
-			const texture = new Texture(canvas as any);
-			texture.generateMipmaps = false;
-			texture.needsUpdate = true;
-			// @ts-ignore
-			this.material.map = texture;
-			this.nodeReady();
-		});
+				const texture = new Texture(canvas as any);
+				texture.generateMipmaps = false;
+				texture.needsUpdate = true;
+				// @ts-ignore
+				this.material.map = texture;
+				this.nodeReady();
+			});
 	}
 
 	/**

@@ -3,8 +3,8 @@ import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
-import { MapView } from '../MapView';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {MapView} from '../MapView';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -76,7 +76,7 @@ export class MapHeightNode extends MapNode
 	public static TILE_SIZE: number = 256;
 
 	/**
-	 * Size of the grid of the geometry displayed on the scene for each tile.}
+	 * Size of the grid of the geometry displayed on the scene for each tile.
 	 */
 	public static GEOMETRY_SIZE: number = 16;
 
@@ -172,7 +172,7 @@ export class MapHeightNode extends MapNode
 	 *
 	 * @returns Returns a promise indicating when the geometry generation has finished.
 	 */
-	public loadHeightGeometry(): CancelablePromise<void> 
+	public loadHeightGeometry(): CancelablePromise<any> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
@@ -208,12 +208,12 @@ export class MapHeightNode extends MapNode
 			this.heightLoaded = true;
 			this.nodeReady();
 		})
-		.catch(() =>
-		{
-			console.error('GeoThree: Failed to load height node data.', this);
-			this.heightLoaded = true;
-			this.nodeReady();
-		});
+			.catch(() =>
+			{
+				console.error('GeoThree: Failed to load height node data.', this);
+				this.heightLoaded = true;
+				this.nodeReady();
+			});
 	}
 
 	/**

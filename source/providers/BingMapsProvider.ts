@@ -86,7 +86,8 @@ export class BingMapsProvider extends MapProvider
 	 * Get the base URL for the map configuration requested.
 	 *
 	 * Uses the follwing format
-	 * http://ecn.{subdomain}.tiles.virtualearth.net/tiles/r{quadkey}.jpeg?g=129&mkt={culture}&shading=hill&stl=H
+	 * 
+	 * http://ecn.\{subdomain\}.tiles.virtualearth.net/tiles/r\{quadkey\}.jpeg?g=129&mkt=\{culture\}&shading=hill&stl=H
 	 */
 	public getMetaData(): void 
 	{

@@ -1,11 +1,11 @@
-import {Intersection, LinearFilter, Material, Mesh, MeshPhongMaterial, NearestFilter, Object3D, Raycaster, RGBFormat, Texture, Vector3} from 'three';
+import {BufferGeometry, Intersection, LinearFilter, Material, Mesh, MeshPhongMaterial, NearestFilter, Object3D, Raycaster, RGBFormat, Texture, Vector3} from 'three';
 import {MapHeightNode} from './MapHeightNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapNode} from './MapNode';
 import {MapView} from '../MapView';
-import { CancelablePromise } from '../utils/CancelablePromise';
+import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
@@ -44,19 +44,17 @@ export class MapHeightNodeShader extends MapHeightNode
 
 	/**
 	 * Map node plane geometry.
-	 *
-	 * @type {PlaneBufferGeometry}
 	 */
-	public static GEOMETRY = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	public static GEOMETRY: BufferGeometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
 
-	public static BASE_GEOMETRY = MapPlaneNode.GEOMETRY;
+	public static BASE_GEOMETRY: BufferGeometry = MapPlaneNode.GEOMETRY;
 
-	public static BASE_SCALE = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static BASE_SCALE: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
 	 * Prepare the threejs material to be used in the map tile.
 	 *
-	 * @param {Material} material Material to be transformed.
+	 * @param material - Material to be transformed.
 	 */
 	public static prepareMaterial(material: Material): Material
 	{
@@ -77,9 +75,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			` + shader.vertexShader;
 
 			// Vertex depth logic
-			shader.vertexShader = shader.vertexShader.replace(
-				'#include <fog_vertex>',
-				`
+			shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>', `
 			#include <fog_vertex>
 	
 			// Calculate height of the title
@@ -89,8 +85,7 @@ export class MapHeightNodeShader extends MapHeightNode
 	
 			// Vertex position based on height
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(_transformed, 1.0);
-			`
-			);
+			`);
 		};
 
 		return material;
@@ -111,8 +106,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			this.material.map = texture;
 			this.textureLoaded = true;
 			this.nodeReady();
-		})
-		.catch(function(err) 
+		}).catch(function(err) 
 		{
 			console.error('GeoThree: Failed to load color node data.', err);
 			this.textureLoaded = true;
@@ -143,8 +137,7 @@ export class MapHeightNodeShader extends MapHeightNode
 
 			this.heightLoaded = true;
 			this.nodeReady();
-		})
-		.catch(function(err) 
+		}).catch(function(err) 
 		{
 			console.error('GeoThree: Failed to load height node data.', err);
 			this.heightLoaded = true;
