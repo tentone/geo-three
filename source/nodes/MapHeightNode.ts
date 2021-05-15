@@ -97,7 +97,6 @@ export class MapHeightNode extends MapNode
 	 * Load tile texture from the server.
 	 *
 	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
-	 *
 	 */
 	public loadTexture(): void 
 	{

@@ -21,7 +21,7 @@ export class CancelablePromise<T>
 
 	public constructor(executor: Function) 
 	{
-		function resolve(v) 
+		function resolve(v): void
 		{
 			this.fulfilled = true;
 			this.value = v;
@@ -33,7 +33,7 @@ export class CancelablePromise<T>
 			}
 		}
 
-		function reject(reason) 
+		function reject(reason): void
 		{
 			this.rejected = true;
 			this.value = reason;
@@ -156,7 +156,7 @@ export class CancelablePromise<T>
 		const fulfilledPromises = [];
 		const result = [];
 
-		function executor(resolve, reject) 
+		function executor(resolve, reject): void 
 		{
 			promises.forEach((promise, index) =>
 			{

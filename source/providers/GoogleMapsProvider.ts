@@ -66,7 +66,6 @@ export class GoogleMapsProvider extends MapProvider
 	 * Create a map tile session in the maps API.
 	 *
 	 * This method needs to be called before using the provider
-	 *
 	 */
 	public createSession(): void 
 	{

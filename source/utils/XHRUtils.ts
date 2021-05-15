@@ -49,7 +49,7 @@ export class XHRUtils
 	 */
 	public static request(url: string, type: string, header?: any, body?: any, onLoad?: Function, onError?: Function, onProgress?: Function): XMLHttpRequest 
 	{
-		function parseResponse(response) 
+		function parseResponse(response): void 
 		{
 			try 
 			{
@@ -84,11 +84,13 @@ export class XHRUtils
 
 		if (onError !== undefined) 
 		{
+			// @ts-ignore
 			xhr.onerror = onError;
 		}
 
 		if (onProgress !== undefined) 
 		{
+			// @ts-ignore
 			xhr.onprogress = onProgress;
 		}
 

@@ -59,6 +59,7 @@ export class MapNode extends Mesh
 	 *
 	 * Used to draw or not draw the node
 	 */
+	// @ts-ignore
 	public isMesh: boolean = true;
 
 	/**

@@ -1,4 +1,4 @@
-import {Mesh, MeshBasicMaterial} from 'three';
+import {BufferGeometry, Camera, Group, Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Scene, WebGLRenderer} from 'three';
 import {MapSphereNodeGeometry} from './geometries/MapSphereNodeGeometry';
 import {OpenStreetMapsProvider} from './providers/OpenStreetMapsProvider';
 import {MapNode} from './nodes/MapNode';
@@ -9,6 +9,7 @@ import {UnitsUtils} from './utils/UnitsUtils';
 import {MapHeightNodeShader} from './nodes/MapHeightNodeShader';
 import {LODRaycast} from './lod/LODRaycast';
 import {MapProvider} from './providers/MapProvider';
+import {LODControl} from './lod/LODControl';
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -21,80 +22,64 @@ export class MapView extends Mesh
 {
 	/**
 	 * Planar map projection.
-	 *
-	 * @type {number}
 	 */
-	public static PLANAR = 200;
+	public static PLANAR: number = 200;
 
 	/**
 	 * Spherical map projection.
-	 *
-	 * @type {number}
 	 */
-	public static SPHERICAL = 201;
+	public static SPHERICAL: number = 201;
 
 	/**
 	 * Planar map projection with height deformation.
-	 *
-	 * @type {number}
 	 */
-	public static HEIGHT = 202;
+	public static HEIGHT: number = 202;
 
 	/**
 	 * Planar map projection with height deformation using the GPU for height generation.
-	 *
-	 * @type {number}
 	 */
-	public static HEIGHT_SHADER = 203;
+	public static HEIGHT_SHADER: number = 203;
 
 	/**
 	 * Map of the map node types available.
-	 *
-	 * @type {Map}
 	 */
-	public static mapModes = new Map([
+	public static mapModes: Map<number, any> = new Map<number, any>([
 		[MapView.PLANAR, MapPlaneNode],
 		[MapView.SPHERICAL, MapSphereNode],
 		[MapView.HEIGHT, MapHeightNode],
 		[MapView.HEIGHT_SHADER, MapHeightNodeShader]
-	] as any);
+	]);
 
 	/**
 	 * LOD control object used to defined how tiles are loaded in and out of memory.
-	 *
-	 * @type {LODControl}
 	 */
-	lod: LODRaycast;
+	public lod: LODControl;
 
 	/**
 	 * Map tile color layer provider.
-	 *
-	 * @type {MapProvider}
 	 */
-	provider: MapProvider;
+	public provider: MapProvider;
 
 	/**
 	 * Map height (terrain elevation) layer provider.
-	 *
-	 * @type {MapProvider}
 	 */
-	heightProvider: MapProvider;
+	public heightProvider: MapProvider;
 
 	/**
-	 * Root map node.
+	 * Define the type of map node in use, defined how the map is presented.
 	 *
-	 * @type {MapNode}
+	 * Should only be set on creation.
 	 */
-	root: MapNode;
+	public root: MapNode;
 
 	/**
 	 * Constructor for the map view objects.
 	 *
-	 * @param {number | MapNode} root Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
-	 * @param {number} provider Map color tile provider by default a OSM maps provider is used if none specified.
-	 * @param {number} heightProvider Map height tile provider, by default no height provider is used.
+	 * @param root - Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
+	 * @param provider - Map color tile provider by default a OSM maps provider is used if none specified.
+	 * @param heightProvider - Map height tile provider, by default no height provider is used.
 	 */
-	public constructor(root, provider, heightProvider) 
+	public constructor(root: (number | MapNode), provider: MapProvider, heightProvider: MapProvider) 
 	{
 		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 
@@ -104,14 +89,7 @@ export class MapView extends Mesh
 
 		this.heightProvider = heightProvider !== undefined ? heightProvider : null;
 
-		/**
-		 * Define the type of map node in use, defined how the map is presented.
-		 *
-		 * Should only be set on creationg.
-		 *
-		 * @attribute root
-		 * @type {MapNode}
-		 */
+		// @ts-ignore
 		this.root = root !== undefined ? root : MapView.PLANAR;
 		this.setRoot(root);
 	}
@@ -121,9 +99,9 @@ export class MapView extends Mesh
 	 *
 	 * Is set by the constructor by default, can be changed in runtime.
 	 *
-	 * @param {MapNode} root Map node to be used as root.
+	 * @param root - Map node to be used as root.
 	 */
-	setRoot(root) 
+	public setRoot(root: (MapNode | number)): void
 	{
 		if (typeof root === 'number') 
 		{
@@ -133,7 +111,9 @@ export class MapView extends Mesh
 			}
 
 			const rootConstructor = MapView.mapModes.get(root) as typeof MapNode;
-			root = new rootpublic constructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
+
+			// @ts-ignore
+			root = new root.constructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
 		}
 
 		if (this.root !== null) 
@@ -142,10 +122,14 @@ export class MapView extends Mesh
 			this.root = null;
 		}
 
+		// @ts-ignore
 		this.root = root;
 
-		this.geometry = this.root.constructor as typeof MapNode.BASE_GEOMETRY;
-		this.scale.copy(this.root.constructor as typeof MapNode.BASE_SCALE);
+		// @ts-ignore
+		this.geometry = this.root.constructor.BASE_GEOMETRY;
+
+		// @ts-ignore
+		this.scale.copy(this.root.constructor.BASE_SCALE);
 
 		this.root.mapView = this;
 		this.add(this.root);
@@ -155,9 +139,8 @@ export class MapView extends Mesh
 	 * Change the map provider of this map view.
 	 *
 	 * Will discard all the tiles already loaded using the old provider.
-	 *
 	 */
-	setProvider(provider) 
+	public setProvider(provider: MapProvider): void
 	{
 		if (provider !== this.provider) 
 		{
@@ -170,9 +153,8 @@ export class MapView extends Mesh
 	 * Change the map height provider of this map view.
 	 *
 	 * Will discard all the tiles already loaded using the old provider.
-	 *
 	 */
-	setHeightProvider(heightProvider) 
+	public setHeightProvider(heightProvider: MapProvider): void
 	{
 		if (heightProvider !== this.heightProvider) 
 		{
@@ -185,22 +167,26 @@ export class MapView extends Mesh
 	 * Clears all tiles from memory and reloads data. Used when changing the provider.
 	 *
 	 * Should be called manually if any changed to the provider are made without setting the provider.
-	 *
 	 */
-	clear() 
+	public clear(): any
 	{
-		this.traverse(function(children: MapNode) 
+		this.traverse(function(children: Object3D): void
 		{
-			if (children.childrenCache !== undefined && children.childrenCache !== null) 
+			// @ts-ignore
+			if (children.childrenCache) 
 			{
+				// @ts-ignore
 				children.childrenCache = null;
 			}
 
+			// @ts-ignore
 			if (children.loadTexture !== undefined) 
 			{
+				// @ts-ignore
 				children.loadTexture();
 			}
 		});
+
 		return this;
 	}
 
@@ -208,23 +194,21 @@ export class MapView extends Mesh
 	 * Ajust node configuration depending on the camera distance.
 	 *
 	 * Called everytime before render.
-	 *
 	 */
-	onBeforeRender = (renderer, scene, camera, geometry, material, group) => 
+	public onBeforeRender: (renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: Group)=> void = (renderer, scene, camera, geometry, material, group) => 
 	{
 		this.lod.updateLOD(this, camera, renderer, scene);
 	};
 
 	/**
 	 * Get map meta data from server if supported.
-	 *
 	 */
-	getMetaData() 
+	public getMetaData(): void
 	{
 		this.provider.getMetaData();
 	}
 
-	raycast(raycaster, intersects) 
+	public raycast(raycaster: Raycaster, intersects: any[]): boolean
 	{
 		return false;
 	}
