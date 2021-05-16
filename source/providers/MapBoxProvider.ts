@@ -54,7 +54,7 @@ export class MapBoxProvider extends MapProvider
 	public mode: number;
 
 	/**
-	 * Map identifier composed of {username}.{style}
+	 * Map identifier composed of \{username\}.\{style\}
 	 *
 	 * Some examples of the public mapbox identifiers:
 	 *  - mapbox.mapbox-streets-v7
@@ -66,7 +66,7 @@ export class MapBoxProvider extends MapProvider
 	public mapId: string;
 
 	/**
-	 * Map style to be used composed of {username}/{style_id}
+	 * Map style to be used composed of \{username\}/\{style_id\}
 	 *
 	 * Some example of the syles available:
 	 *  - mapbox/streets-v10

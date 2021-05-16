@@ -18,7 +18,7 @@ export default {
 	],
 	output: [
 		{
-			globals: { three: 'THREE' },
+			globals: {three: 'THREE'},
 			format: 'umd',
 			name: 'Geo',
 			file: 'build/geo-three.js',

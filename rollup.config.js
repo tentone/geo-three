@@ -19,7 +19,7 @@ export default {
 			indent: '\t'
 		},
 		{
-			globals: { three: 'THREE' },
+			globals: {three: 'THREE'},
 			format: 'umd',
 			name: 'Geo',
 			file: 'build/geo-three.js',
