@@ -37,7 +37,7 @@ export class MapHeightNode extends MapNode
 	 * @param material - Material used to render this height node.
 	 * @param geometry - Geometry used to render this height node.
 	 */
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, material?: Material = new MeshPhongMaterial({color: 0x000000, emissive: 0xffffff}), geometry?: BufferGeometry = MapHeightNode.GEOMETRY) 
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, material: Material = new MeshPhongMaterial({color: 0x000000, emissive: 0xffffff}), geometry: BufferGeometry = MapHeightNode.GEOMETRY) 
 	{
 		super(geometry, material, parentNode, mapView, location, level, x, y);
 
