@@ -3,7 +3,7 @@
  *
  * These type of promises can be used to prevent additional processing when the data is not longer required (e.g. HTTP request for data that is not longer necessary)
  */
-export class CancelablePromise<T> 
+export class CancelablePromise<T> // extends Promise<T>
 {
 	public onResolve: (value: any)=> void;
 
@@ -19,8 +19,10 @@ export class CancelablePromise<T>
 
 	public value: T;
 
-	public constructor(executor: Function) 
+	public constructor(executor: (resolve: (value: T | PromiseLike<T>)=> void, reject: (reason?: any)=> void)=> void) 
 	{
+		// super(executor);
+
 		function resolve(v): void
 		{
 			this.fulfilled = true;

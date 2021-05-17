@@ -23,8 +23,8 @@
 		"strictNullChecks": false,
 		"forceConsistentCasingInFileNames": true,
 		"checkJs": false,
-		"allowJs": true,
-		"esModuleInterop": false,
+		"allowJs": false,
+		"esModuleInterop": true,
 		"importHelpers": false
     },
     "include": ["source/**/*"],

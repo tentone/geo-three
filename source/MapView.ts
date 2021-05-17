@@ -53,24 +53,24 @@ export class MapView extends Mesh
 	/**
 	 * LOD control object used to defined how tiles are loaded in and out of memory.
 	 */
-	public lod: LODControl;
+	public lod: LODControl = null;
 
 	/**
 	 * Map tile color layer provider.
 	 */
-	public provider: MapProvider;
+	public provider: MapProvider = null;
 
 	/**
 	 * Map height (terrain elevation) layer provider.
 	 */
-	public heightProvider: MapProvider;
+	public heightProvider: MapProvider = null;
 
 	/**
 	 * Define the type of map node in use, defined how the map is presented.
 	 *
 	 * Should only be set on creation.
 	 */
-	public root: MapNode;
+	public root: MapNode = null;
 
 	/**
 	 * Constructor for the map view objects.
@@ -79,18 +79,15 @@ export class MapView extends Mesh
 	 * @param provider - Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param heightProvider - Map height tile provider, by default no height provider is used.
 	 */
-	public constructor(root: (number | MapNode), provider: MapProvider, heightProvider: MapProvider) 
+	public constructor(root: (number | MapNode) = MapView.PLANAR, provider: MapProvider = new OpenStreetMapsProvider(), heightProvider: MapProvider = null) 
 	{
 		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 
 		this.lod = new LODRaycast();
 
-		this.provider = provider !== undefined ? provider : new OpenStreetMapsProvider();
-
-		this.heightProvider = heightProvider !== undefined ? heightProvider : null;
-
-		// @ts-ignore
-		this.root = root !== undefined ? root : MapView.PLANAR;
+		this.provider = provider;
+		this.heightProvider = heightProvider;
+		
 		this.setRoot(root);
 	}
 
@@ -110,10 +107,10 @@ export class MapView extends Mesh
 				throw new Error('Map mode ' + root + ' does is not registered.');
 			}
 
-			const rootConstructor = MapView.mapModes.get(root) as typeof MapNode;
+			const rootConstructor = MapView.mapModes.get(root);
 
 			// @ts-ignore
-			root = new root.constructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
+			root = new rootConstructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
 		}
 
 		if (this.root !== null) 
@@ -125,14 +122,19 @@ export class MapView extends Mesh
 		// @ts-ignore
 		this.root = root;
 
-		// @ts-ignore
-		this.geometry = this.root.constructor.BASE_GEOMETRY;
+		console.log(this.root.constructor);
 
-		// @ts-ignore
-		this.scale.copy(this.root.constructor.BASE_SCALE);
+		if (this.root !== null) 
+		{
+			// @ts-ignore
+			this.geometry = this.root.constructor.BASE_GEOMETRY;
 
-		this.root.mapView = this;
-		this.add(this.root);
+			// @ts-ignore
+			this.scale.copy(this.root.constructor.BASE_SCALE);
+
+			this.root.mapView = this;
+			this.add(this.root);
+		}
 	}
 
 	/**

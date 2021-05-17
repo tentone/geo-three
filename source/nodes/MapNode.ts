@@ -55,14 +55,6 @@ export class MapNode extends Mesh
 	public subdivided: boolean = false;
 
 	/**
-	 * Variable to check if the node is a mesh.
-	 *
-	 * Used to draw or not draw the node
-	 */
-	// @ts-ignore
-	public isMesh: boolean = true;
-
-	/**
 	 * Cache with the children objects created from subdivision.
 	 *
 	 * Used to avoid recreate object after simplification and subdivision.
@@ -71,23 +63,13 @@ export class MapNode extends Mesh
 	 */
 	public childrenCache: any[] = null;
 
-	public constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
-	{
-		super(geometry, material);
-
-		this.mapView = mapView;
-		this.parentNode = parentNode;
-		this.location = location;
-		this.level = level;
-		this.x = x;
-		this.y = y;
-		this.nodesLoaded = 0;
-		this.subdivided = false;
-		this.childrenCache = null;
-		this.mapView = mapView;
-
-		this.initialize();
-	}
+	/**
+	 * Variable to check if the node is a mesh.
+	 *
+	 * Used to draw or not draw the node
+	 */
+	// @ts-ignore
+	public isMesh: boolean = true;
 
 	/**
 	 * Base geometry is attached to the map viewer object.
@@ -100,46 +82,60 @@ export class MapNode extends Mesh
 	 * Base scale applied to the map viewer object.
 	 */
 	public static BASE_SCALE: Vector3 = null;
-
+ 
 	/**
 	 * How many children each branch of the tree has.
 	 *
 	 * For a quad-tree this value is 4.
 	 */
 	public static CHILDRENS: number = 4;
-
+ 
 	/**
 	 * Root node has no location.
 	 */
 	public static ROOT: number = -1;
-
+ 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
 	public static TOP_LEFT: number = 0;
-
+ 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
 	public static TOP_RIGHT: number = 1;
-
+ 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
 	public static BOTTOM_LEFT: number = 2;
-
+ 
 	/**
 	 * Index of top left quad-tree branch node.
 	 *
 	 * Can be used to navigate the children array looking for neighbors.
 	 */
 	public static BOTTOM_RIGHT: number = 3;
+
+	public constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	{
+		super(geometry, material);
+
+		this.mapView = mapView;
+		this.parentNode = parentNode;
+		this.location = location;
+		this.level = level;
+		this.x = x;
+		this.y = y;
+
+		this.initialize();
+	}
 
 	/**
 	 * Initialize resources that require access to data from the MapView.
@@ -219,21 +215,20 @@ export class MapNode extends Mesh
 			// @ts-ignore
 			this.material.map = texture;
 			this.nodeReady();
-		})
-			.catch(() => 
-			{
-				const canvas = new OffscreenCanvas(1, 1);
-				const context = canvas.getContext('2d');
-				context.fillStyle = '#FF0000';
-				context.fillRect(0, 0, 1, 1);
+		}).catch(() => 
+		{
+			const canvas = new OffscreenCanvas(1, 1);
+			const context = canvas.getContext('2d');
+			context.fillStyle = '#FF0000';
+			context.fillRect(0, 0, 1, 1);
 
-				const texture = new Texture(canvas as any);
-				texture.generateMipmaps = false;
-				texture.needsUpdate = true;
-				// @ts-ignore
-				this.material.map = texture;
-				this.nodeReady();
-			});
+			const texture = new Texture(canvas as any);
+			texture.generateMipmaps = false;
+			texture.needsUpdate = true;
+			// @ts-ignore
+			this.material.map = texture;
+			this.nodeReady();
+		});
 	}
 
 	/**

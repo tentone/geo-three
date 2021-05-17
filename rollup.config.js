@@ -6,9 +6,7 @@ export default {
 	plugins: [
 		typescript(),
 		strip({
-			functions: ['assert.*', 'debug', 'alert'],
-			debugger: false,
-			sourceMap: false
+			functions: ['assert.*', 'debug', 'alert']
 		})
 	],
 
