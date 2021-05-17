@@ -1,4 +1,4 @@
-import {LinearFilter, Material, Mesh, MeshPhongMaterial, BufferGeometry, RGBFormat, Texture, Vector3, Raycaster, Object3D, Intersection} from 'three';
+import {LinearFilter, Material, MeshPhongMaterial, BufferGeometry, RGBFormat, Texture, Vector3, Raycaster, Intersection} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';

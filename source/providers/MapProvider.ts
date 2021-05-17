@@ -7,7 +7,7 @@ import {CancelablePromise} from '../utils/CancelablePromise';
  *
  * MapProvider should be used as a base for all the providers.
  */
-export class MapProvider 
+export abstract class MapProvider 
 {
 	/**
 	 * Name of the map provider

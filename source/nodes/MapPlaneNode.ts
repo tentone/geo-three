@@ -1,4 +1,4 @@
-import {BufferGeometry, Intersection, Mesh, MeshBasicMaterial, Raycaster, Vector3} from 'three';
+import {BufferGeometry, Intersection, MeshBasicMaterial, Raycaster, Vector3} from 'three';
 import {MapNode} from './MapNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
