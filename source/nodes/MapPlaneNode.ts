@@ -9,7 +9,7 @@ export class MapPlaneNode extends MapNode
 {
 	public constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
 	{
-		super(MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}), parentNode, mapView, location, level, x, y);
+		super(parentNode, mapView, location, level, x, y, MapPlaneNode.GEOMETRY, new MeshBasicMaterial({wireframe: false}));
 
 		this.matrixAutoUpdate = false;
 		this.isMesh = true;

@@ -13,12 +13,12 @@ export class MapNode extends Mesh
 	/**
 	 * The map view object where the node is placed.
 	 */
-	public mapView: MapView;
+	public mapView: MapView = null;
 
 	/**
 	 * Parent node (from an upper tile level).
 	 */
-	public parentNode: MapNode;
+	public parentNode: MapNode = null;
 
 	/**
 	 * Index of the map node in the quad-tree parent node.
@@ -123,12 +123,13 @@ export class MapNode extends Mesh
 	 */
 	public static BOTTOM_RIGHT: number = 3;
 
-	public constructor(geometry = null, material = null, parentNode = null, mapView: MapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	public constructor(parentNode: MapNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = null, material: Material = null) 
 	{
 		super(geometry, material);
 
 		this.mapView = mapView;
 		this.parentNode = parentNode;
+
 		this.location = location;
 		this.level = level;
 		this.x = x;

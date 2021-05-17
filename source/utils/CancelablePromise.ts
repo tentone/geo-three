@@ -21,9 +21,7 @@ export class CancelablePromise<T> // extends Promise<T>
 
 	public constructor(executor: (resolve: (value: T | PromiseLike<T>)=> void, reject: (reason?: any)=> void)=> void) 
 	{
-		// super(executor);
-
-		function resolve(v): void
+		const resolve = (v): void =>
 		{
 			this.fulfilled = true;
 			this.value = v;
@@ -33,9 +31,9 @@ export class CancelablePromise<T> // extends Promise<T>
 				this.onResolve(this.value);
 				this.called = true;
 			}
-		}
+		};
 
-		function reject(reason): void
+		const reject = (reason): void =>
 		{
 			this.rejected = true;
 			this.value = reason;
@@ -45,7 +43,7 @@ export class CancelablePromise<T> // extends Promise<T>
 				this.onReject(this.value);
 				this.called = true;
 			}
-		}
+		};
 
 		try 
 		{

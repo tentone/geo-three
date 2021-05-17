@@ -110,7 +110,7 @@ export class MapView extends Mesh
 			const rootConstructor = MapView.mapModes.get(root);
 
 			// @ts-ignore
-			root = new rootConstructor(null, null, null, this, MapNode.ROOT, 0, 0, 0);
+			root = new rootConstructor(null, this);
 		}
 
 		if (this.root !== null) 

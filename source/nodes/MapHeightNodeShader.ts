@@ -23,11 +23,10 @@ export class MapHeightNodeShader extends MapHeightNode
 {
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
 	{
-		let material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
-		// @ts-ignore
+		let material: Material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
 		material = MapHeightNodeShader.prepareMaterial(material);
 
-		super(parentNode, mapView, location, level, x, y, material, MapHeightNodeShader.GEOMETRY);
+		super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.GEOMETRY, material);
 
 		this.frustumCulled = false;
 	}
