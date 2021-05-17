@@ -23,8 +23,7 @@ export class MapHeightNodeShader extends MapHeightNode
 {
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
 	{
-		let material: Material = new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE});
-		material = MapHeightNodeShader.prepareMaterial(material);
+		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE}));
 
 		super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.GEOMETRY, material);
 
@@ -51,7 +50,7 @@ export class MapHeightNodeShader extends MapHeightNode
 	public static BASE_SCALE: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
-	 * Prepare the threejs material to be used in the map tile.
+	 * Prepare the three.js material to be used in the map tile.
 	 *
 	 * @param material - Material to be transformed.
 	 */
@@ -101,7 +100,6 @@ export class MapHeightNodeShader extends MapHeightNode
 			texture.minFilter = LinearFilter;
 			texture.needsUpdate = true;
 
-			// @ts-ignore
 			this.material.map = texture;
 			this.textureLoaded = true;
 			this.nodeReady();
@@ -131,7 +129,6 @@ export class MapHeightNodeShader extends MapHeightNode
 			texture.minFilter = NearestFilter;
 			texture.needsUpdate = true;
 
-			// @ts-ignore
 			this.material.userData.heightMap.value = texture;
 
 			this.heightLoaded = true;

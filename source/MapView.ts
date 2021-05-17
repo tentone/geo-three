@@ -122,8 +122,6 @@ export class MapView extends Mesh
 		// @ts-ignore
 		this.root = root;
 
-		console.log(this.root.constructor);
-
 		if (this.root !== null) 
 		{
 			// @ts-ignore
