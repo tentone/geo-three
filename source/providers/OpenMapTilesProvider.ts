@@ -1,6 +1,6 @@
 import {MapProvider} from './MapProvider';
 import {XHRUtils} from '../utils/XHRUtils';
-import {CancelablePromise} from '../utils/CancelablePromise';
+
 
 /**
  * Open tile map server tile provider.
@@ -56,9 +56,9 @@ export class OpenMapTilesProvider extends MapProvider
 		});
 	}
 
-	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
+	public fetchTile(zoom: number, x: number, y: number): Promise<any>
 	{
-		return new CancelablePromise((resolve, reject) => 
+		return new Promise((resolve, reject) => 
 		{
 			const image = document.createElement('img');
 			image.onload = function() 

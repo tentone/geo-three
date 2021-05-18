@@ -3,7 +3,7 @@
  *
  * These type of promises can be used to prevent additional processing when the data is not longer required (e.g. HTTP request for data that is not longer necessary)
  */
-export class CancelablePromise<T> // extends Promise<T>
+export class CancelablePromise<T>
 {
 	public onResolve: (value: any)=> void;
 

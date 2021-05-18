@@ -1,5 +1,5 @@
 import {MapProvider} from './MapProvider';
-import {CancelablePromise} from '../utils/CancelablePromise';
+
 
 /**
  * Here maps tile server provider.
@@ -122,11 +122,11 @@ export class HereMapsProvider extends MapProvider
 
 	public getMetaData(): void {}
 
-	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any>
+	public fetchTile(zoom: number, x: number, y: number): Promise<any>
 	{
 		this.nextServer();
 
-		return new CancelablePromise((resolve, reject) => 
+		return new Promise((resolve, reject) => 
 		{
 			const image = document.createElement('img');
 			image.onload = function() 

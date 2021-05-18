@@ -1,4 +1,4 @@
-import {CancelablePromise} from '../utils/CancelablePromise';
+
 
 /**
  * A map provider is a object that handles the access to map tiles of a specific service.
@@ -44,7 +44,7 @@ export abstract class MapProvider
 	 * @param y - Tile y.
 	 * @returns Promise with the image obtained for the tile ready to use.
 	 */
-	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any> 
+	public fetchTile(zoom: number, x: number, y: number): Promise<any> 
 	{
 		return null;
 	}

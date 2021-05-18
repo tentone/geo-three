@@ -1,5 +1,5 @@
 import {MapProvider} from './MapProvider';
-import {CancelablePromise} from '../utils/CancelablePromise';
+
 
 /**
  * Map tiler provider API.
@@ -54,9 +54,9 @@ export class MapTilerProvider extends MapProvider
 		this.resolution = 512;
 	}
 
-	public fetchTile(zoom: number, x: number, y: number): CancelablePromise<any> 
+	public fetchTile(zoom: number, x: number, y: number): Promise<any> 
 	{
-		return new CancelablePromise((resolve, reject) => 
+		return new Promise((resolve, reject) => 
 		{
 			const image = document.createElement('img');
 			image.onload = function() 

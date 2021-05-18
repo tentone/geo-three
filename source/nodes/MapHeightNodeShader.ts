@@ -5,7 +5,6 @@ import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapNode} from './MapNode';
 import {MapView} from '../MapView';
-import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
@@ -113,7 +112,7 @@ export class MapHeightNodeShader extends MapHeightNode
 		this.loadHeightGeometry();
 	}
 
-	public loadHeightGeometry(): CancelablePromise<any> 
+	public loadHeightGeometry(): Promise<any> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{

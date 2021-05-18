@@ -4,7 +4,6 @@ import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
-import {CancelablePromise} from '../utils/CancelablePromise';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -148,7 +147,7 @@ export class MapHeightNode extends MapNode
 	 *
 	 * @returns Returns a promise indicating when the geometry generation has finished.
 	 */
-	public loadHeightGeometry(): CancelablePromise<any> 
+	public loadHeightGeometry(): Promise<any> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{

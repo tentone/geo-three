@@ -1,11 +1,9 @@
 import {BufferGeometry, Camera, Group, Material, Mesh, MeshBasicMaterial, Object3D, Raycaster, Scene, WebGLRenderer} from 'three';
-import {MapSphereNodeGeometry} from './geometries/MapSphereNodeGeometry';
 import {OpenStreetMapsProvider} from './providers/OpenStreetMapsProvider';
 import {MapNode} from './nodes/MapNode';
 import {MapHeightNode} from './nodes/MapHeightNode';
 import {MapPlaneNode} from './nodes/MapPlaneNode';
 import {MapSphereNode} from './nodes/MapSphereNode';
-import {UnitsUtils} from './utils/UnitsUtils';
 import {MapHeightNodeShader} from './nodes/MapHeightNodeShader';
 import {LODRaycast} from './lod/LODRaycast';
 import {MapProvider} from './providers/MapProvider';
