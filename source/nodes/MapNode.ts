@@ -8,7 +8,7 @@ import {MapView} from '../MapView';
  *
  * It is intended to be used as a base class for other map node implementations.
  */
-export class MapNode extends Mesh 
+export abstract class MapNode extends Mesh 
 {
 	/**
 	 * The map view object where the node is placed.
