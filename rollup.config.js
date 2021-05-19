@@ -1,28 +1,27 @@
 import strip from '@rollup/plugin-strip';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
-	input: "source/Main.js",
+	input: 'source/Main.ts',
 	plugins: [
-		strip(
-			{
-				functions: ["assert.*", "debug", "alert"],
-				debugger: false,
-				sourceMap: false
-			})
+		typescript(),
+		strip({
+			functions: ['assert.*', 'debug', 'alert']
+		})
 	],
-	
+
 	output: [
 		{
-			format: "es",
-			file: "build/geo-three.module.js",
-			indent: "\t"
+			format: 'es',
+			file: 'build/geo-three.module.js',
+			indent: '\t'
 		},
-		{	
-			globals: {"three": "THREE"},
-			format: "umd",
-			name: "Geo",
-			file: "build/geo-three.js",
-			indent: "\t"
+		{
+			globals: {three: 'THREE'},
+			format: 'umd',
+			name: 'Geo',
+			file: 'build/geo-three.js',
+			indent: '\t'
 		}
 	]
 };
