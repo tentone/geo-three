@@ -28,7 +28,7 @@ jobs:
         run: npm install
 
       - name: Build Project
-        run: npm run build-dev
+        run: npm run build
 
   eslint:
     name: ES Lint
