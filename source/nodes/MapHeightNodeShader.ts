@@ -90,7 +90,7 @@ export class MapHeightNodeShader extends MapHeightNode
 
 	public loadTexture(): void 
 	{
-		this.mapView.provider.fetchTile(this.level, this.x, this.y).then(function(image) 
+		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
 			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
@@ -98,11 +98,12 @@ export class MapHeightNodeShader extends MapHeightNode
 			texture.magFilter = LinearFilter;
 			texture.minFilter = LinearFilter;
 			texture.needsUpdate = true;
-
+			
+			// @ts-ignore
 			this.material.map = texture;
 			this.textureLoaded = true;
 			this.nodeReady();
-		}).catch(function(err) 
+		}).catch((err) => 
 		{
 			console.error('GeoThree: Failed to load color node data.', err);
 			this.textureLoaded = true;
@@ -119,7 +120,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(function(image) 
+		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
 			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
@@ -127,12 +128,13 @@ export class MapHeightNodeShader extends MapHeightNode
 			texture.magFilter = NearestFilter;
 			texture.minFilter = NearestFilter;
 			texture.needsUpdate = true;
-
+			
+			// @ts-ignore
 			this.material.userData.heightMap.value = texture;
 
 			this.heightLoaded = true;
 			this.nodeReady();
-		}).catch(function(err) 
+		}).catch((err) =>  
 		{
 			console.error('GeoThree: Failed to load height node data.', err);
 			this.heightLoaded = true;
