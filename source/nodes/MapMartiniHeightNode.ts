@@ -1,4 +1,4 @@
-import {BufferGeometry, Float32BufferAttribute, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
+import {BufferGeometry, DoubleSide, Float32BufferAttribute, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapView} from '../MapView';
 import Martini from '../martini/index.js';
@@ -106,11 +106,18 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public static prepareMaterial(material, level, exageration): any 
 	{
+
+		// not all are used
+		// but for now it helps in fast switching between martini and height shader
 		material.userData = {
 			heightMap: {value: MapMartiniHeightNode.EMPTY_TEXTURE},
-			drawNormals: {value: 1},
+			drawNormals: {value: 0},
+			drawBlack: {value: 0},
 			zoomlevel: {value: level},
-			exageration: {value: exageration}
+			exageration: {value: exageration},
+			computeNormals: {value: 1},
+			drawTexture: {value: 1},
+			elevationDecoder: {value: null}
 		};
 
 		material.onBeforeCompile = (shader) => 
@@ -123,30 +130,28 @@ export class MapMartiniHeightNode extends MapHeightNode
 			// Vertex variables
 			shader.vertexShader =
 				`
-				uniform bool drawNormals;
-				uniform float exageration;
+				uniform bool computeNormals;
 				uniform float zoomlevel;
 				uniform sampler2D heightMap;
-				float getElevation(vec2 coord, float bias) {
-					// Convert encoded elevation value to meters
-					coord = clamp(coord, 0.0, 1.0);
-					vec4 e = texture2D(heightMap,vec2(coord.x, 1.0 -coord.y));
-					return (((e.r * 255.0 * 65536.0 + e.g * 255.0 * 256.0 + e.b * 255.0) * 0.1) - 10000.0) * exageration;
-					// return ((e.r * 255.0 * 256.0 + e.g  * 255.0+ e.b * 255.0 / 256.0) - 32768.0) * exageration;
-				}
 				` + shader.vertexShader;
 			shader.fragmentShader =
 				`
 				uniform bool drawNormals;
+				uniform bool drawTexture;
+				uniform bool drawBlack;
 				` + shader.fragmentShader;
 
 			// Vertex depth logic
 			shader.fragmentShader = shader.fragmentShader.replace(
 				'#include <dithering_fragment>',
 				`
-					if(drawNormals) {
-						gl_FragColor = vec4( ( 0.5 * vNormal + 0.5 ), 1.0 );
-					}
+				if(drawBlack) {
+					gl_FragColor = vec4( 0.0,0.0,0.0, 1.0 );
+				} else if(drawNormals) {
+					gl_FragColor = vec4( ( 0.5 * vNormal + 0.5 ), 1.0 );
+				} else if (!drawTexture) {
+					gl_FragColor = vec4( 0.0,0.0,0.0, 0.0 );
+				}
 					`
 			);
 			shader.vertexShader = shader.vertexShader.replace(
@@ -169,9 +174,8 @@ export class MapMartiniHeightNode extends MapHeightNode
 					// |   |   |   |
 					// +-----------+
 
-					// vec4 theight = texture2D(heightMap, vUv);
-					float e = getElevation(vUv, 0.0);
-					if (drawNormals) {
+					if (computeNormals) {
+						float e = getElevation(vUv, 0.0);
 						ivec2 size = textureSize(heightMap, 0);
 						float offset = 1.0 / float(size.x);
 						float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
@@ -192,14 +196,8 @@ export class MapMartiniHeightNode extends MapHeightNode
 						v0.z = (e + d + g + h) / 4.0;
 						v1.z = (e+ b + a + d) / 4.0;
 						v2.z = (e+ h + i + f) / 4.0;
-						vNormal = (normalize(cross(v2 - v0, v1 - v0)));
+						vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
 					}
-
-					// vec3 _transformed = position + e * normal;
-					// vec3 worldNormal = normalize ( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
-// 
-					// gl_Position = projectionMatrix * modelViewMatrix * vec4(_transformed, 1.0);
-					// gl_Position = projectionMatrix * modelViewMatrix * vec4(position.yzx, 1.0);
 					`
 			);
 		};
@@ -208,10 +206,10 @@ export class MapMartiniHeightNode extends MapHeightNode
 	}
 
 	public elevationDecoder = {
-		rScaler: 6553.6,
-		gScaler: 25.6,
-		bScaler: 0.1,
-		offset: -10000
+		rScaler: 256,
+		gScaler: 1,
+		bScaler: 1 / 256,
+		offset: -32768
 	}
 
 	public exageration = 1.0;
@@ -226,7 +224,8 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.GEOMETRY, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
 			map: MapMartiniHeightNode.EMPTY_TEXTURE,
-			color: 0xffffff
+			color: 0xffffff,
+			side: DoubleSide
 		}), level, exageration));
 
 		if (elevationDecoder) 
@@ -236,6 +235,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 		this.meshMaxError = meshMaxError;
 		this.exageration = exageration;
+		this.frustumCulled = false;
 	}
 	
 	/**
@@ -244,6 +244,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	*/
 	public static TILE_SIZE = 256;
 
+	
 	public async onHeightImage(image): Promise<void> 
 	{
 		if (image) 
@@ -286,18 +287,20 @@ export class MapMartiniHeightNode extends MapHeightNode
 	*/
 	public loadHeightGeometry(): Promise<any> 
 	{
-		if (this.mapView.heightProvider === null)
+		if (this.mapView.heightProvider === null) 
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
-		
-		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) =>
-		{	
-			return this.onHeightImage(image);
-		}).finally(() => 
-		{
-			this.heightLoaded = true;
-			this.nodeReady();
-		});
+		return this.mapView.heightProvider
+			.fetchTile(this.level, this.x, this.y)
+			.then(async(image) => 
+			{
+				this.onHeightImage(image);
+			})
+			.finally(() => 
+			{
+				this.heightLoaded = true;
+				this.nodeReady();
+			});
 	}
 }
