@@ -101,11 +101,11 @@ export class MapHeightNodeShader extends MapHeightNode
 			
 			// @ts-ignore
 			this.material.map = texture;
-			this.textureLoaded = true;
-			this.nodeReady();
 		}).catch((err) => 
 		{
 			console.error('GeoThree: Failed to load color node data.', err);
+		}).finally(() =>
+		{
 			this.textureLoaded = true;
 			this.nodeReady();
 		});
@@ -132,11 +132,11 @@ export class MapHeightNodeShader extends MapHeightNode
 			// @ts-ignore
 			this.material.userData.heightMap.value = texture;
 
-			this.heightLoaded = true;
-			this.nodeReady();
 		}).catch((err) =>  
 		{
 			console.error('GeoThree: Failed to load height node data.', err);
+		}).finally(() =>
+		{
 			this.heightLoaded = true;
 			this.nodeReady();
 		});
