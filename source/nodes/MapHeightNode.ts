@@ -75,18 +75,20 @@ export class MapHeightNode extends MapNode
 	 */
 	public loadTexture(): void 
 	{
-		this.isReady = true;
 		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
-			const texture = new Texture(image as any);
-			texture.generateMipmaps = false;
-			texture.format = RGBFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
-
-			// @ts-ignore
-			this.material.emissiveMap = texture;
+			if (image) 
+			{
+				const texture = new Texture(image as any);
+				texture.generateMipmaps = false;
+				texture.format = RGBFormat;
+				texture.magFilter = LinearFilter;
+				texture.minFilter = LinearFilter;
+				texture.needsUpdate = true;
+	
+				// @ts-ignore
+				this.material.map = texture;
+			}
 
 		}).finally(() =>
 		{
