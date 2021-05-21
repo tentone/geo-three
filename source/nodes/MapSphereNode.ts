@@ -17,8 +17,6 @@ export class MapSphereNode extends MapNode
 		this.applyScaleNode();
 	
 		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-		this.visible = false;
 	}
 	
 	public static BASE_GEOMETRY: BufferGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
@@ -102,23 +100,24 @@ export class MapSphereNode extends MapNode
 
 		const x = this.x * 2;
 		const y = this.y * 2;
+		var prototype = Object.getPrototypeOf(this);
 
-		let node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		let node = new prototype.constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node = new prototype.constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node = new prototype.constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node = new prototype.constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);

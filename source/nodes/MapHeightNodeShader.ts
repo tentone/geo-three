@@ -78,7 +78,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			// Calculate height of the title
 			vec4 _theight = texture2D(heightMap, vUv);
 			float _height = ((_theight.r * 255.0 * 65536.0 + _theight.g * 255.0 * 256.0 + _theight.b * 255.0) * 0.1) - 10000.0;
-			vec3 _transformed = position + _height * normal;
+			vec3 _transformed = position + _height * vec3(0,1,0);
 	
 			// Vertex position based on height
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(_transformed, 1.0);
@@ -101,11 +101,11 @@ export class MapHeightNodeShader extends MapHeightNode
 			
 			// @ts-ignore
 			this.material.map = texture;
-			this.textureLoaded = true;
-			this.nodeReady();
 		}).catch((err) => 
 		{
 			console.error('GeoThree: Failed to load color node data.', err);
+		}).finally(() =>
+		{
 			this.textureLoaded = true;
 			this.nodeReady();
 		});
@@ -132,11 +132,11 @@ export class MapHeightNodeShader extends MapHeightNode
 			// @ts-ignore
 			this.material.userData.heightMap.value = texture;
 
-			this.heightLoaded = true;
-			this.nodeReady();
 		}).catch((err) =>  
 		{
 			console.error('GeoThree: Failed to load height node data.', err);
+		}).finally(() =>
+		{
 			this.heightLoaded = true;
 			this.nodeReady();
 		});

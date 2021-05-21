@@ -36,6 +36,38 @@ export class XHRUtils
 	}
 
 	/**
+	 * Get raw file data from URL, using a XHR call.
+	 *
+	 * @param url - Target for the request.
+	 * @param onLoad - On load callback.
+	 * @param onError - On progress callback.
+	 */
+	public static getRaw(url: string, onLoad?: Function, onError?: Function): XMLHttpRequest
+	{
+		var xhr = new XMLHttpRequest();
+		xhr.responseType = 'arraybuffer';
+		xhr.open('GET', url, true);
+
+		if (onLoad !== undefined)
+		{
+			xhr.onload = function()
+			{
+				onLoad(xhr.response);
+			};
+		}
+
+		if (onError !== undefined)
+		{
+			// @ts-ignore
+			xhr.onerror = onError;
+		}
+
+		xhr.send(null);
+
+		return xhr;
+	}
+
+	/**
 	 * Perform a request with the specified configuration.
 	 *
 	 * Syncronous request should be avoided unless they are strictly necessary.
