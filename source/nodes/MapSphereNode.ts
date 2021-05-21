@@ -17,8 +17,6 @@ export class MapSphereNode extends MapNode
 		this.applyScaleNode();
 	
 		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-		this.visible = false;
 	}
 	
 	public static BASE_GEOMETRY: BufferGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);

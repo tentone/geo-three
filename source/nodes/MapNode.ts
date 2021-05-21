@@ -43,6 +43,12 @@ export abstract class MapNode extends Mesh
 	public y: number;
 
 	/**
+	 * Variable indicating if it ready to be drawn
+	 * which means it has started or loaded its textures
+	 */
+	public isReady: boolean;
+
+	/**
 	 * Indicates how many children nodes where loaded.
 	 */
 	public nodesLoaded: number = 0;
@@ -135,7 +141,15 @@ export abstract class MapNode extends Mesh
 		this.x = x;
 		this.y = y;
 
-		this.initialize();
+
+		const autoLoad = mapView.nodeShouldAutoLoad();
+
+		this.visible = !autoLoad;
+		this.isReady = autoLoad;
+		if (autoLoad) 
+		{
+			this.initialize();
+		}
 	}
 
 	/**
@@ -143,7 +157,10 @@ export abstract class MapNode extends Mesh
 	 *
 	 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
 	 */
-	public initialize(): void {}
+	public initialize(): void 
+	{
+		this.isReady = true;
+	}
 
 	/**
 	 * Create the child nodes to represent the next tree level.
@@ -240,7 +257,8 @@ export abstract class MapNode extends Mesh
 	public nodeReady(): void
 	{
 		// Update parent nodes loaded
-		if (this.parentNode !== null) 
+		this.isMesh = true;
+		if (parentNode !== null) 
 		{
 			this.parentNode.nodesLoaded++;
 
@@ -262,6 +280,7 @@ export abstract class MapNode extends Mesh
 		{
 			this.visible = true;
 		}
+		this.mapView.onNodeReady();
 	}
 
 	/**

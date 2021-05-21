@@ -39,10 +39,7 @@ export class MapHeightNode extends MapNode
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = MapHeightNode.GEOMETRY, material: Material = new MeshPhongMaterial({color: 0x000000, emissive: 0xffffff})) 
 	{
 		super(parentNode, mapView, location, level, x, y, geometry, material);
-
 		this.matrixAutoUpdate = false;
-		this.isMesh = true;
-		this.visible = false;
 	}
 
 	/**
@@ -66,6 +63,7 @@ export class MapHeightNode extends MapNode
 
 	public initialize(): void 
 	{
+		super.initialize();
 		this.loadTexture();
 		this.loadHeightGeometry();
 	}
@@ -77,6 +75,7 @@ export class MapHeightNode extends MapNode
 	 */
 	public loadTexture(): void 
 	{
+		this.isReady = true;
 		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
 			const texture = new Texture(image as any);
@@ -89,6 +88,8 @@ export class MapHeightNode extends MapNode
 			// @ts-ignore
 			this.material.emissiveMap = texture;
 
+		}).finally(() =>
+		{
 			this.textureLoaded = true;
 			this.nodeReady();
 		});
@@ -103,7 +104,7 @@ export class MapHeightNode extends MapNode
 
 		this.visible = true;
 
-		MapNode.prototype.nodeReady.call(this);
+		super.nodeReady();
 	}
 
 	public createChildNodes(): void 
@@ -180,12 +181,12 @@ export class MapHeightNode extends MapNode
 			}
 
 			this.geometry = geometry;
-			this.heightLoaded = true;
-			this.nodeReady();
 		})
 			.catch(() =>
 			{
 				console.error('GeoThree: Failed to load height node data.', this);
+			}).finally(() =>
+			{
 				this.heightLoaded = true;
 				this.nodeReady();
 			});
