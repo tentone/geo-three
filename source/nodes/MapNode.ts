@@ -244,15 +244,18 @@ export abstract class MapNode extends Mesh
 	{
 		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) =>
 		{
-			const texture = new Texture(image as any);
-			texture.generateMipmaps = false;
-			texture.format = RGBFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
-			
-			// @ts-ignore
-			this.material.map = texture;
+			if (image) 
+			{
+				const texture = new Texture(image as any);
+				texture.generateMipmaps = false;
+				texture.format = RGBFormat;
+				texture.magFilter = LinearFilter;
+				texture.minFilter = LinearFilter;
+				texture.needsUpdate = true;
+				
+				// @ts-ignore
+				this.material.map = texture;
+			}
 			this.nodeReady();
 		}).catch(() => 
 		{
