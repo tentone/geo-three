@@ -168,7 +168,7 @@ export class MapView extends Mesh
 	 */
 	public clear(): any
 	{
-		this.traverse(function(children: Object3D): void
+		this.traverseVisible(function(children: Object3D): void
 		{
 			// @ts-ignore
 			if (children.childrenCache) 
@@ -178,10 +178,10 @@ export class MapView extends Mesh
 			}
 
 			// @ts-ignore
-			if (children.loadTexture !== undefined) 
+			if (children.initialize !== undefined) 
 			{
 				// @ts-ignore
-				children.loadTexture();
+				children.initialize();
 			}
 		});
 
