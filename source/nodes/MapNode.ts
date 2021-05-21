@@ -1,5 +1,6 @@
-import {LinearFilter, Material, Mesh, MeshPhongMaterial, RGBFormat, Texture, Vector3, BufferGeometry} from 'three';
+import {Group, LinearFilter, Material, Mesh, MeshPhongMaterial, Object3D, RGBFormat, Texture, Vector3, BufferGeometry} from 'three';
 import {MapView} from '../MapView';
+
 
 /**
  * Represents a map tile node inside of the tiles quad-tree
@@ -78,6 +79,11 @@ export abstract class MapNode extends Mesh
 	public isMesh: boolean = true;
 
 	/**
+	 * Three Group used to show markers or anything related to the tile.
+	 */
+	public objectsHolder: THREE.Group;
+
+	/**
 	 * Base geometry is attached to the map viewer object.
 	 *
 	 * It should have the full size of the world so that operations over the MapView bounding box/sphere work correctly.
@@ -146,6 +152,10 @@ export abstract class MapNode extends Mesh
 
 		this.visible = !autoLoad;
 		this.isReady = autoLoad;
+
+		this.objectsHolder = new Group();
+		this.objectsHolder.visible = !autoLoad;
+		this.add(this.objectsHolder);
 		if (autoLoad) 
 		{
 			this.initialize();
@@ -174,10 +184,10 @@ export abstract class MapNode extends Mesh
 	 *
 	 * Uses the createChildNodes() method to actually create the child nodes that represent the next tree level.
 	 */
-	public subdivide(): void 
+	public subdivide(): void
 	{
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS) 
+		if (this.subdivided || this.children.length > 1 || this.level + 1 > maxZoom) 
 		{
 			return;
 		}
@@ -187,6 +197,15 @@ export abstract class MapNode extends Mesh
 		if (this.childrenCache !== null) 
 		{
 			this.isMesh = false;
+			this.objectsHolder.visible = false;
+			this.childrenCache.forEach((n) => 
+			{
+				if (n !== this.objectsHolder) 
+				{
+					n.isMesh = !n.subdivided;
+					n.objectsHolder.visible = !n.subdivided;
+				}
+			});
 			this.children = this.childrenCache;
 		}
 		else 
@@ -204,14 +223,16 @@ export abstract class MapNode extends Mesh
 	 */
 	public simplify(): void
 	{
-		if (this.children.length > 0) 
+		if (!this.subdivided) 
 		{
-			this.childrenCache = this.children;
+			return;
 		}
+		this.childrenCache = this.children;
 
+		this.objectsHolder.visible = true;
 		this.subdivided = false;
 		this.isMesh = true;
-		this.children = [];
+		this.children = [this.objectsHolder];
 	}
 
 	/**
@@ -258,27 +279,38 @@ export abstract class MapNode extends Mesh
 	{
 		// Update parent nodes loaded
 		this.isMesh = true;
+		const parentNode = this.parentNode;
 		if (parentNode !== null) 
 		{
-			this.parentNode.nodesLoaded++;
+			parentNode.nodesLoaded++;
 
-			if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS) 
+			if (parentNode.nodesLoaded >= MapNode.CHILDRENS) 
 			{
-				if (this.parentNode.subdivided === true) 
+				if (parentNode.subdivided === true) 
 				{
-					this.parentNode.isMesh = false;
+					parentNode.isMesh = false;
+					parentNode.objectsHolder.visible = false;
 				}
 
-				for (let i = 0; i < this.parentNode.children.length; i++) 
+				parentNode.children.forEach((child, index) => 
 				{
-					this.parentNode.children[i].visible = true;
-				}
+					if (child !== parentNode.objectsHolder) 
+					{
+						let theNode = child as MapNode;
+						// child.visible = true;
+						// child.objectsHolder.visible = true;
+						// child.visible = true;
+						theNode.isMesh = !theNode.subdivided;
+						theNode.objectsHolder.visible = !theNode.subdivided;
+					}
+				});
 			}
 		}
 		// If its the root object just set visible
-		else 
+		else if (!this.subdivided)
 		{
 			this.visible = true;
+			this.objectsHolder.visible = true;
 		}
 		this.mapView.onNodeReady();
 	}
