@@ -1,14 +1,51 @@
 
-export default class Martini 
+/**
+ * Martini mesh tile generator (Mapbox's Awesome Right-Triangulated Irregular Networks, Improved).
+ * 
+ * Represents a height map tile node using the RTIN method from the paper "Right Triangulated Irregular Networks".
+ * 
+ * Based off the library https://github.com/mapbox/martini.
+ */
+export class Martini 
 {
-	constructor(gridSize = 257) 
+	/**
+	 * Size of the grid to be generated.
+	 */
+	public gridSize: number;
+
+	/**
+	 * Number of triangles to be used in the tile.
+	 */
+	public numTriangles: number;
+
+	/**
+	 * Number of triangles in the parent node.
+	 */
+	public numParentTriangles: number;
+
+	/**
+	 * Indices of the triangles faces.
+	 */
+	public indices: Uint32Array;
+
+	/**
+	 * Coordinates of the points composing the mesh.
+	 */
+	public coords: Uint16Array;
+
+	/**
+	 * Constructor for the generator.
+	 * 
+	 * @param gridSize - Size of the grid.
+	 */
+	public constructor(gridSize: number = 257) 
 	{
 		this.gridSize = gridSize;
 		const tileSize = gridSize - 1;
+		
 		if (tileSize & tileSize - 1) 
 		{
-			throw new Error(
-				`Expected grid size to be 2^n+1, got ${gridSize}.`);
+			throw new Error(`Expected grid size to be 2^n+1, got ${gridSize}.`);
 		}
 
 		this.numTriangles = tileSize * tileSize * 2 - 2;
@@ -57,21 +94,39 @@ export default class Martini
 		}
 	}
 
-	createTile(terrain) 
+	public createTile(terrain): Tile
 	{
 		return new Tile(terrain, this);
 	}
 }
 
+/**
+ * Class describes the generation of a tile using the Martini method.
+ */
 class Tile 
 {
-	constructor(terrain, martini) 
+	/**
+	 * Pointer to the martini generator object.
+	 */
+	public martini: Martini;
+
+	/**
+	 * Terrain to generate the tile for.
+	 */
+	public terrain: Float32Array;
+
+	/**
+	 * Errors detected while creating the tile.
+	 */
+	public errors: Float32Array;
+
+	public constructor(terrain: Float32Array, martini: Martini) 
 	{
 		const size = martini.gridSize;
+
 		if (terrain.length !== size * size) 
 		{
-			throw new Error(
-				`Expected terrain data of length ${size * size} (${size} x ${size}), got ${terrain.length}.`);
+			throw new Error(`Expected terrain data of length ${size * size} (${size} x ${size}), got ${terrain.length}.`);
 		}
 
 		this.terrain = terrain;
@@ -80,7 +135,7 @@ class Tile
 		this.update();
 	}
 
-	update() 
+	public update(): void
 	{
 		const {numTriangles, numParentTriangles, coords, gridSize: size} = this.martini;
 		const {terrain, errors} = this;
@@ -114,7 +169,7 @@ class Tile
 		}
 	}
 
-	getMesh(maxError = 0, withSkirts = false) 
+	public getMesh(maxError: number = 0, withSkirts: boolean = false): {vertices: any, triangles: any, numVerticesWithoutSkirts: number} 
 	{
 		const {gridSize: size, indices} = this.martini;
 		const {errors} = this;
@@ -122,18 +177,20 @@ class Tile
 		let numTriangles = 0;
 		const max = size - 1;
 		let aIndex, bIndex, cIndex = 0;
+
 		// Skirt indices
 		const leftSkirtIndices = [];
 		const rightSkirtIndices = [];
 		const bottomSkirtIndices = [];
 		const topSkirtIndices = [];
+
 		// use an index grid to keep track of vertices that were already used to avoid duplication
 		indices.fill(0);
 
 		// retrieve mesh in two stages that both traverse the error map:
 		// - countElements: find used vertices (and assign each an index), and count triangles (for minimum allocation)
 		// - processTriangle: fill the allocated vertices & triangles typed arrays
-		function countElements(ax, ay, bx, by, cx, cy) 
+		function countElements(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): void
 		{
 			const mx = ax + bx >> 1;
 			const my = ay + by >> 1;
@@ -219,29 +276,25 @@ class Tile
 				numTriangles++;
 			}
 		}
+
 		countElements(0, 0, max, max, max, 0);
 		countElements(max, max, 0, 0, 0, max);
 
 		let numTotalVertices =numVertices * 2;
-		let numTotalTriangles = numTriangles * 3 ;
+		let numTotalTriangles = numTriangles * 3;
+
 		if (withSkirts) 
 		{
-			numTotalVertices +=(leftSkirtIndices.length +
-                    rightSkirtIndices.length +
-                    bottomSkirtIndices.length +
-                    topSkirtIndices.length) * 2;
-			numTotalTriangles += (
-				(leftSkirtIndices.length - 1) * 2 +
-                    (rightSkirtIndices.length - 1) * 2 +
-                    (bottomSkirtIndices.length - 1) * 2 +
-                    (topSkirtIndices.length - 1) * 2) * 3;
+			numTotalVertices +=(leftSkirtIndices.length + rightSkirtIndices.length + bottomSkirtIndices.length + topSkirtIndices.length) * 2;
+			numTotalTriangles += ((leftSkirtIndices.length - 1) * 2 + (rightSkirtIndices.length - 1) * 2 + (bottomSkirtIndices.length - 1) * 2 + (topSkirtIndices.length - 1) * 2) * 3;
 		}
 
 		const vertices = new Uint16Array(numTotalVertices);
 		const triangles = new Uint32Array(numTotalTriangles);
 
 		let triIndex = 0;
-		function processTriangle(ax, ay, bx, by, cx, cy) 
+
+		function processTriangle(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): void
 		{
 			const mx = ax + bx >> 1;
 			const my = ay + by >> 1;
@@ -273,8 +326,10 @@ class Tile
 				triangles[triIndex++] = c;
 			}
 		}
+
 		processTriangle(0, 0, max, max, max, 0);
 		processTriangle(max, max, 0, 0, 0, max);
+
 		if (withSkirts) 
 		{
 			// Sort skirt indices to create adjacent triangles
@@ -292,9 +347,10 @@ class Tile
 			let currIndex, nextIndex, currentSkirt, nextSkirt, skirtLength = 0;
 
 			// Add skirt vertices from index of last mesh vertex
-			function constructSkirt(skirt) 
+			function constructSkirt(skirt: number[]): void
 			{
 				skirtLength = skirt.length;
+
 				// Loop through indices in groups of two to generate triangles
 				for (let i = 0; i < skirtLength - 1; i++) 
 				{
@@ -313,6 +369,7 @@ class Tile
 					triangles[triIndex++] = nextSkirt;
 					triangles[triIndex++] = nextIndex;
 				}
+
 				// Add vertices of last skirt not added above (i < skirtLength - 1)
 				vertices[skirtIndex++] = vertices[2 * skirt[skirtLength - 1]];
 				vertices[skirtIndex++] = vertices[2 * skirt[skirtLength - 1] + 1];
@@ -324,7 +381,6 @@ class Tile
 			constructSkirt(topSkirtIndices);
 		}
 
- 
 		// Return vertices and triangles and index into vertices array where skirts start
 		return {vertices: vertices, triangles: triangles, numVerticesWithoutSkirts: numVertices};
 	}

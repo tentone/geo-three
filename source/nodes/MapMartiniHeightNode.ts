@@ -1,88 +1,14 @@
 import {BufferGeometry, DoubleSide, Float32BufferAttribute, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapView} from '../MapView';
-import Martini from '../martini/index.js';
+import {Martini} from '../martini/Martini';
 import {MapHeightNode} from './MapHeightNode';
 import {MapNode} from './MapNode.js';
 
-
-function getTerrain(imageData, tileSize, elevationDecoder): Float32Array
-{
-	const {rScaler, bScaler, gScaler, offset} = elevationDecoder;
-  
-	const gridSize = tileSize + 1;
-	// From Martini demo
-	// https://observablehq.com/@mourner/martin-real-time-rtin-terrain-mesh
-	const terrain = new Float32Array(gridSize * gridSize);
-	// decode terrain values
-	for (let i = 0, y = 0; y < tileSize; y++) 
-	{
-		for (let x = 0; x < tileSize; x++, i++) 
-		{
-			const k = i * 4;
-			const r = imageData[k + 0];
-			const g = imageData[k + 1];
-			const b = imageData[k + 2];
-			terrain[i + y] = r * rScaler + g * gScaler + b * bScaler + offset;
-		}
-	}
-	// backfill bottom border
-	for (let i = gridSize * (gridSize - 1), x = 0; x < gridSize - 1; x++, i++) 
-	{
-		terrain[i] = terrain[i - gridSize];
-	}
-	// backfill right border
-	for (let i = gridSize - 1, y = 0; y < gridSize; y++, i += gridSize) 
-	{
-		terrain[i] = terrain[i - 1];
-	}
-	return terrain;
-}
-
-function getMeshAttributes(vertices, terrain, tileSize, bounds, exageration): {
-	position: {value: Float32Array, size: number},
-	uv: {value: Float32Array, size: number}
-	// NORMAL: {}, - optional, but creates the high poly look with lighting
-  }
-{
-	const gridSize = tileSize + 1;
-	const numOfVerticies = vertices.length / 2;
-	// vec3. x, y in pixels, z in meters
-	const positions = new Float32Array(numOfVerticies * 3);
-	// vec2. 1 to 1 relationship with position. represents the uv on the texture image. 0,0 to 1,1.
-	const texCoords = new Float32Array(numOfVerticies * 2);
-  
-	const [minX, minY, maxX, maxY] = bounds || [0, 0, tileSize, tileSize];
-	const xScale = (maxX - minX) / tileSize;
-	const yScale = (maxY - minY) / tileSize;
-  
-	for (let i = 0; i < numOfVerticies; i++) 
-	{
-		const x = vertices[i * 2];
-		const y = vertices[i * 2 + 1];
-		const pixelIdx = y * gridSize + x;
-  
-		positions[3 * i + 0] = x * xScale + minX;
-		positions[3 * i + 1] = -terrain[pixelIdx] * exageration;
-		positions[3 * i + 2] = -y * yScale + maxY;
-
-  
-		texCoords[2 * i + 0] = x / tileSize;
-		texCoords[2 * i + 1] = y / tileSize;
-	}
-  
-	return {
-		position: {value: positions, size: 3},
-		uv: {value: texCoords, size: 2}
-	};
-}
-
 /** 
- * Represents a height map tile node that can be subdivided into other height nodes.
+ * Represents a height map tile node using the RTIN method from the paper "Right Triangulated Irregular Networks".
  * 
- * Its important to update match the height of the tile with the neighbors nodes edge heights to ensure proper continuity of the surface.
- * 
- * The height node is designed to use MapBox elevation tile encoded data as described in https://www.mapbox.com/help/access-elevation-data/
+ * Based off the library https://github.com/mapbox/martini (Mapbox's Awesome Right-Triangulated Irregular Networks, Improved)
  *
  * @param parentNode  -The parent node of this node.
  * @param mapView - Map view object where this node is placed.
@@ -104,11 +30,50 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public static GEOMETRY = new MapNodeGeometry(1, 1, MapMartiniHeightNode.GEOMETRY_SIZE, MapMartiniHeightNode.GEOMETRY_SIZE);
 
+	public elevationDecoder = {
+		rScaler: 256,
+		gScaler: 1,
+		bScaler: 1 / 256,
+		offset: -32768
+	}
+
+	/**
+	 * Original tile size of the images retrieved from the height provider.
+	 */
+	public static TILE_SIZE: number = 256;
+
+	/**
+	 * Exageration (scale) of the terrain height.
+	 */
+	public exageration = 1.0;
+
+	public meshMaxError: number | Function = 10;
+
+	public material: MeshPhongMaterial
+
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
+	{
+		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.GEOMETRY, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
+			map: MapMartiniHeightNode.EMPTY_TEXTURE,
+			color: 0xffffff,
+			side: DoubleSide
+		}), level, exageration));
+
+		if (elevationDecoder) 
+		{
+			this.elevationDecoder = elevationDecoder;
+		}
+
+		this.meshMaxError = meshMaxError;
+		this.exageration = exageration;
+		this.frustumCulled = false;
+	}
+
+
 	public static prepareMaterial(material, level, exageration): any 
 	{
 
-		// not all are used
-		// but for now it helps in fast switching between martini and height shader
+		// not all are used but for now it helps in fast switching between martini and height shader
 		material.userData = {
 			heightMap: {value: MapMartiniHeightNode.EMPTY_TEXTURE},
 			drawNormals: {value: 0},
@@ -127,6 +92,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 			{
 				shader.uniforms[i] = material.userData[i];
 			}
+
 			// Vertex variables
 			shader.vertexShader =
 				`
@@ -134,6 +100,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 				uniform float zoomlevel;
 				uniform sampler2D heightMap;
 				` + shader.vertexShader;
+			
 			shader.fragmentShader =
 				`
 				uniform bool drawNormals;
@@ -204,48 +171,91 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 		return material;
 	}
-
-	public elevationDecoder = {
-		rScaler: 256,
-		gScaler: 1,
-		bScaler: 1 / 256,
-		offset: -32768
-	}
-
-	public exageration = 1.0;
-
-	public meshMaxError: number | Function = 10;
 	
-
-	public material: MeshPhongMaterial
-
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
+	public static getTerrain(imageData, tileSize, elevationDecoder): Float32Array
 	{
+		const {rScaler, bScaler, gScaler, offset} = elevationDecoder;
 
-		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.GEOMETRY, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
-			map: MapMartiniHeightNode.EMPTY_TEXTURE,
-			color: 0xffffff,
-			side: DoubleSide
-		}), level, exageration));
-
-		if (elevationDecoder) 
+		const gridSize = tileSize + 1;
+		// From Martini demo
+		// https://observablehq.com/@mourner/martin-real-time-rtin-terrain-mesh
+		const terrain = new Float32Array(gridSize * gridSize);
+		// decode terrain values
+		for (let i = 0, y = 0; y < tileSize; y++) 
 		{
-			this.elevationDecoder = elevationDecoder;
+			for (let x = 0; x < tileSize; x++, i++) 
+			{
+				const k = i * 4;
+				const r = imageData[k + 0];
+				const g = imageData[k + 1];
+				const b = imageData[k + 2];
+				terrain[i + y] = r * rScaler + g * gScaler + b * bScaler + offset;
+			}
 		}
-
-		this.meshMaxError = meshMaxError;
-		this.exageration = exageration;
-		this.frustumCulled = false;
+		// backfill bottom border
+		for (let i = gridSize * (gridSize - 1), x = 0; x < gridSize - 1; x++, i++) 
+		{
+			terrain[i] = terrain[i - gridSize];
+		}
+		// backfill right border
+		for (let i = gridSize - 1, y = 0; y < gridSize; y++, i += gridSize) 
+		{
+			terrain[i] = terrain[i - 1];
+		}
+		return terrain;
 	}
 	
 	/**
-	* Original tile size of the images retrieved from the height provider.
-	*
-	*/
-	public static TILE_SIZE = 256;
-
+	 * Get the attributes that compose the mesh.
+	 * 
+	 * @param vertices - Vertices.
+	 * @param terrain  - Terrain
+	 * @param tileSize - Size of each tile.
+	 * @param bounds - Array with the bound of the map.
+	 * @param exageration - Vertical exageration of the map scale.
+	 * @returns The position and UV coordinates of the mesh.
+	 */
+	public static getMeshAttributes(vertices: number[], terrain: Float32Array, tileSize: number, bounds: number[], exageration: number): {position: {value: Float32Array, size: number}, uv: {value: Float32Array, size: number}} // NORMAL: {}, - optional, but creates the high poly look with lighting}
+	{
+		const gridSize = tileSize + 1;
+		const numOfVerticies = vertices.length / 2;
 	
-	public async onHeightImage(image): Promise<void> 
+		// vec3. x, y in pixels, z in meters
+		const positions = new Float32Array(numOfVerticies * 3);
+	
+		// vec2. 1 to 1 relationship with position. represents the uv on the texture image. 0,0 to 1,1.
+		const texCoords = new Float32Array(numOfVerticies * 2);
+
+		const [minX, minY, maxX, maxY] = bounds || [0, 0, tileSize, tileSize];
+		const xScale = (maxX - minX) / tileSize;
+		const yScale = (maxY - minY) / tileSize;
+
+		for (let i = 0; i < numOfVerticies; i++) 
+		{
+			const x = vertices[i * 2];
+			const y = vertices[i * 2 + 1];
+			const pixelIdx = y * gridSize + x;
+
+			positions[3 * i + 0] = x * xScale + minX;
+			positions[3 * i + 1] = -terrain[pixelIdx] * exageration;
+			positions[3 * i + 2] = -y * yScale + maxY;
+	
+			texCoords[2 * i + 0] = x / tileSize;
+			texCoords[2 * i + 1] = y / tileSize;
+		}
+
+		return {
+			position: {value: positions, size: 3},
+			uv: {value: texCoords, size: 2}
+		};
+	}	
+
+	/**
+	 * Process the height texture received from the tile data provider.
+	 * 
+	 * @param image - Image element received by the tile provider.
+	 */
+	public async onHeightImage(image: HTMLImageElement): Promise<void> 
 	{
 		if (image) 
 		{
@@ -260,11 +270,13 @@ export class MapMartiniHeightNode extends MapHeightNode
 			var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			var data = imageData.data;
 
-			const terrain = getTerrain(data, tileSize, this.elevationDecoder);
+			const terrain = MapMartiniHeightNode.getTerrain(data, tileSize, this.elevationDecoder);
 			const martini = new Martini(gridSize);
 			const tile = martini.createTile(terrain);
 			const {vertices, triangles} = tile.getMesh(typeof this.meshMaxError === 'function' ? this.meshMaxError(this.level) : this.meshMaxError);
-			const attributes = getMeshAttributes(vertices, terrain, tileSize, [-0.5, -0.5, 0.5, 0.5], this.exageration);
+
+			const attributes = MapMartiniHeightNode.getMeshAttributes(vertices, terrain, tileSize, [-0.5, -0.5, 0.5, 0.5], this.exageration);
+
 			this.geometry = new BufferGeometry();
 			this.geometry.setIndex(new Uint32BufferAttribute(triangles, 1));
 			this.geometry.setAttribute( 'position', new Float32BufferAttribute( attributes.position.value, attributes.position.size ) );
@@ -281,16 +293,16 @@ export class MapMartiniHeightNode extends MapHeightNode
 		}
 	}
 	
-	/** 
-	* Load height texture from the server and create a geometry to match it.
-	*
-	*/
+	/**
+	 * Load height texture from the server and create a geometry to match it.
+	 */
 	public loadHeightGeometry(): Promise<any> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
+
 		return this.mapView.heightProvider
 			.fetchTile(this.level, this.x, this.y)
 			.then(async(image) => 
