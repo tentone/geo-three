@@ -7,6 +7,11 @@ module.exports = {
 		'eslint-plugin-import',
 		'eslint-plugin-tsdoc'
 	],
+	parserOptions: {
+		sourceType: 'module',
+		tsconfigRootDir: __dirname,
+		project: ['./tsconfig.json'],
+	},
 	extends: [
 		'eslint:recommended',
 		'plugin:@typescript-eslint/eslint-recommended',
@@ -35,12 +40,15 @@ module.exports = {
 		'@typescript-eslint/no-unused-vars': 'off',
 		'@typescript-eslint/no-use-before-define': 'off',
 		'@typescript-eslint/no-var-requires': 'off',
+		'@typescript-eslint/no-this-alias': 'error',
 		'@typescript-eslint/prefer-for-of': 'off',
 		'@typescript-eslint/prefer-function-type': 'error',
 		'@typescript-eslint/prefer-namespace-keyword': 'error',
+		'@typescript-eslint/prefer-as-const': 'error',
 		'@typescript-eslint/quotes': ['error', 'single'],
 		'@typescript-eslint/type-annotation-spacing': ['error', {before: false, after: true}],
 		'@typescript-eslint/triple-slash-reference': 'error',
+		'@typescript-eslint/naming-convention': 'off',
 		'tsdoc/syntax': 'error',
 		'arrow-body-style': ['error', 'always'],
 		'arrow-parens': 'error',
