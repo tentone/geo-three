@@ -1,5 +1,6 @@
 import {LODControl} from './LODControl';
-import {Vector3} from 'three';
+import {Camera, Object3D, Vector3, WebGLRenderer} from 'three';
+import {MapView} from '../MapView';
 
 const pov = new Vector3();
 const position = new Vector3();
@@ -21,11 +22,11 @@ export class LODRadial implements LODControl
 	 */
 	public simplifyDistance: number = 300;
 
-	public updateLOD(view, camera, renderer, scene): void
+	public updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void
 	{
 		camera.getWorldPosition(pov);
 
-		view.children[0].traverse((node) =>
+		view.children[0].traverse((node: any) =>
 		{
 			node.getWorldPosition(position);
 

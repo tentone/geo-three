@@ -14,5 +14,5 @@ export interface LODControl
 	 * @param renderer - Renderer object.
 	 * @param scene - Scene that compose the mapview.
 	 */
-	updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D);
+	updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void;
 }

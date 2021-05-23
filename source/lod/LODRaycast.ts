@@ -1,5 +1,6 @@
 import {LODControl} from './LODControl';
-import {Raycaster, Vector2, Vector3} from 'three';
+import {Camera, Object3D, Raycaster, Vector2, Vector3, WebGLRenderer} from 'three';
+import {MapView} from '../MapView';
 
 /**
  * Use random raycasting to randomly pick n objects to be tested on screen space.
@@ -49,7 +50,7 @@ export class LODRaycast implements LODControl
 	 */
 	public scaleDistance: boolean = true;
 
-	public updateLOD(view, camera, renderer, scene): void 
+	public updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void
 	{
 		const intersects = [];
 

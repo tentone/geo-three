@@ -1,5 +1,6 @@
 import {LODRadial} from './LODRadial';
-import {Frustum, Matrix4, Vector3} from 'three';
+import {Camera, Frustum, Matrix4, Object3D, Vector3, WebGLRenderer} from 'three';
+import {MapView} from '../MapView';
 
 const projection = new Matrix4();
 const pov = new Vector3();
@@ -37,13 +38,13 @@ export class LODFrustum extends LODRadial
 	 */
 	public pointOnly: boolean = false;
 
-	public updateLOD(view, camera, renderer, scene): void
+	public updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void
 	{
 		projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
 		frustum.setFromProjectionMatrix(projection);
 		camera.getWorldPosition(pov);
 
-		view.children[0].traverse((node) => 
+		view.children[0].traverse((node: any) => 
 		{
 			node.getWorldPosition(position);
 			let distance = pov.distanceTo(position);

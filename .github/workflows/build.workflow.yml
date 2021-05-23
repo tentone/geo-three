@@ -1,4 +1,4 @@
-name: Lint
+name: Build
 
 on:
   pull_request:
@@ -9,8 +9,8 @@ on:
       - master
 
 jobs:
-  eslint:
-    name: ESLint
+  build:
+    name: Build
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -27,5 +27,5 @@ jobs:
       - name: Install depedencies from NPM
         run: npm install
 
-      - name: ESLint
-        run: npm run lint
+      - name: Build Project
+        run: npm run build
