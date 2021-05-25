@@ -81,7 +81,7 @@ export class MapView extends Mesh
 	 * @param provider - Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param heightProvider - Map height tile provider, by default no height provider is used.
 	 */
-	public constructor(root: (number | MapNode) = MapView.PLANAR, provider: MapProvider = new OpenStreetMapsProvider(), heightProvider: MapProvider = null, nodeAutoLoad = false, onNodeReady?: Function) 
+	public constructor(root: (number | MapNode) = MapView.PLANAR, provider: MapProvider = new OpenStreetMapsProvider(), heightProvider: MapProvider = null, nodeAutoLoad: boolean = false, onNodeReady: Function = null) 
 	{
 		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 
@@ -90,28 +90,20 @@ export class MapView extends Mesh
 		this.provider = provider;
 		this.heightProvider = heightProvider;
 		this.nodeAutoLoad = nodeAutoLoad;
+		this.onNodeReady = onNodeReady;
 
-		if (onNodeReady) 
-		{
-			this.onNodeReady = onNodeReady;
-		}
-		else 
-		{
-			// Ajust node configuration depending on the camera distance.
-			// Called everytime before render.
-			this.onBeforeRender = (renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: Group) => 
-			{
-				this.lod.updateLOD(this, camera, renderer, scene);
-			};
-		}
-		
 		this.setRoot(root);
 	}
 
-	public nodeShouldAutoLoad(): boolean
+	/**
+	 * Ajust node configuration depending on the camera distance.
+	 *
+	 * Called everytime before render.
+	 */
+	public onBeforeRender: (renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: Group)=> void = (renderer, scene, camera, geometry, material, group) => 
 	{
-		return this.nodeAutoLoad;
-	}
+		this.lod.updateLOD(this, camera, renderer, scene);
+	};
 
 	/**
 	 * Set the root of the map view.
@@ -192,7 +184,7 @@ export class MapView extends Mesh
 	 */
 	public clear(): any
 	{
-		this.traverseVisible(function(children: Object3D): void
+		this.traverse(function(children: Object3D): void
 		{
 			// @ts-ignore
 			if (children.childrenCache) 
@@ -202,7 +194,7 @@ export class MapView extends Mesh
 			}
 
 			// @ts-ignore
-			if (children.initialize !== undefined) 
+			if (children.initialize) 
 			{
 				// @ts-ignore
 				children.initialize();

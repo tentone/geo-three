@@ -1,3 +1,5 @@
+
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -94,18 +96,35 @@
 	        this.level = level;
 	        this.x = x;
 	        this.y = y;
-	        this.initialize();
+	        const autoLoad = mapView.nodeAutoLoad;
+	        this.visible = !autoLoad;
+	        this.isReady = autoLoad;
+	        this.group = new three.Group();
+	        this.group.visible = !autoLoad;
+	        this.add(this.group);
+	        if (autoLoad) {
+	            this.initialize();
+	        }
 	    }
-	    initialize() { }
+	    initialize() {
+	        this.isReady = true;
+	    }
 	    createChildNodes() { }
 	    subdivide() {
 	        const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-	        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.CHILDRENS) {
+	        if (this.subdivided || this.children.length > 1 || this.level + 1 > maxZoom) {
 	            return;
 	        }
 	        this.subdivided = true;
 	        if (this.childrenCache !== null) {
 	            this.isMesh = false;
+	            this.group.visible = false;
+	            this.childrenCache.forEach((n) => {
+	                if (n !== this.group) {
+	                    n.isMesh = !n.subdivided;
+	                    n.objectsHolder.visible = !n.subdivided;
+	                }
+	            });
 	            this.children = this.childrenCache;
 	        }
 	        else {
@@ -113,22 +132,26 @@
 	        }
 	    }
 	    simplify() {
-	        if (this.children.length > 0) {
-	            this.childrenCache = this.children;
+	        if (!this.subdivided) {
+	            return;
 	        }
+	        this.childrenCache = this.children;
+	        this.group.visible = true;
 	        this.subdivided = false;
 	        this.isMesh = true;
-	        this.children = [];
+	        this.children = [this.group];
 	    }
 	    loadTexture() {
 	        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
-	            const texture = new three.Texture(image);
-	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
-	            texture.magFilter = three.LinearFilter;
-	            texture.minFilter = three.LinearFilter;
-	            texture.needsUpdate = true;
-	            this.material.map = texture;
+	            if (image) {
+	                const texture = new three.Texture(image);
+	                texture.generateMipmaps = false;
+	                texture.format = three.RGBFormat;
+	                texture.magFilter = three.LinearFilter;
+	                texture.minFilter = three.LinearFilter;
+	                texture.needsUpdate = true;
+	                this.material.map = texture;
+	            }
 	            this.nodeReady();
 	        }).catch(() => {
 	            const canvas = new OffscreenCanvas(1, 1);
@@ -143,19 +166,30 @@
 	        });
 	    }
 	    nodeReady() {
-	        if (this.parentNode !== null) {
-	            this.parentNode.nodesLoaded++;
-	            if (this.parentNode.nodesLoaded >= MapNode.CHILDRENS) {
-	                if (this.parentNode.subdivided === true) {
-	                    this.parentNode.isMesh = false;
+	        this.isMesh = true;
+	        const parentNode = this.parentNode;
+	        if (parentNode !== null) {
+	            parentNode.nodesLoaded++;
+	            if (parentNode.nodesLoaded >= MapNode.CHILDRENS) {
+	                if (parentNode.subdivided === true) {
+	                    parentNode.isMesh = false;
+	                    parentNode.group.visible = false;
 	                }
-	                for (let i = 0; i < this.parentNode.children.length; i++) {
-	                    this.parentNode.children[i].visible = true;
-	                }
+	                parentNode.children.forEach((child, index) => {
+	                    if (child !== parentNode.group) {
+	                        let theNode = child;
+	                        theNode.isMesh = !theNode.subdivided;
+	                        theNode.group.visible = !theNode.subdivided;
+	                    }
+	                });
 	            }
 	        }
-	        else {
+	        else if (!this.subdivided) {
 	            this.visible = true;
+	            this.group.visible = true;
+	        }
+	        if (this.mapView.onNodeReady) {
+	            this.mapView.onNodeReady();
 	        }
 	    }
 	    getNeighborsDirection(direction) {
@@ -260,11 +294,12 @@
 	        super(parentNode, mapView, location, level, x, y, geometry, material);
 	        this.heightLoaded = false;
 	        this.textureLoaded = false;
-	        this.matrixAutoUpdate = false;
 	        this.isMesh = true;
 	        this.visible = false;
+	        this.matrixAutoUpdate = false;
 	    }
 	    initialize() {
+	        super.initialize();
 	        this.loadTexture();
 	        this.loadHeightGeometry();
 	    }
@@ -277,6 +312,7 @@
 	            texture.minFilter = three.LinearFilter;
 	            texture.needsUpdate = true;
 	            this.material.emissiveMap = texture;
+	        }).finally(() => {
 	            this.textureLoaded = true;
 	            this.nodeReady();
 	        });
@@ -286,31 +322,32 @@
 	            return;
 	        }
 	        this.visible = true;
-	        MapNode.prototype.nodeReady.call(this);
+	        super.nodeReady();
 	    }
 	    createChildNodes() {
 	        const level = this.level + 1;
+	        const Constructor = Object.getPrototypeOf(this).constructor;
 	        const x = this.x * 2;
 	        const y = this.y * 2;
-	        let node = new MapHeightNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	        let node = new Constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(-0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapHeightNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(-0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapHeightNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(0.25, 0, 0.25);
 	        this.add(node);
@@ -338,11 +375,9 @@
 	                vertices[j + 1] = value;
 	            }
 	            this.geometry = geometry;
-	            this.heightLoaded = true;
-	            this.nodeReady();
-	        })
-	            .catch(() => {
+	        }).catch(() => {
 	            console.error('GeoThree: Failed to load height node data.', this);
+	        }).finally(() => {
 	            this.heightLoaded = true;
 	            this.nodeReady();
 	        });
@@ -455,19 +490,20 @@
 	        const level = this.level + 1;
 	        const x = this.x * 2;
 	        const y = this.y * 2;
-	        let node = new MapSphereNode(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+	        const Constructor = Object.getPrototypeOf(this).constructor;
+	        let node = new Constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapSphereNode(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapSphereNode(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
@@ -526,6 +562,7 @@
 	            this.nodeReady();
 	        }).catch((err) => {
 	            console.error('GeoThree: Failed to load color node data.', err);
+	        }).finally(() => {
 	            this.textureLoaded = true;
 	            this.nodeReady();
 	        });
@@ -543,10 +580,9 @@
 	            texture.minFilter = three.NearestFilter;
 	            texture.needsUpdate = true;
 	            this.material.userData.heightMap.value = texture;
-	            this.heightLoaded = true;
-	            this.nodeReady();
 	        }).catch((err) => {
 	            console.error('GeoThree: Failed to load height node data.', err);
+	        }).finally(() => {
 	            this.heightLoaded = true;
 	            this.nodeReady();
 	        });
@@ -610,18 +646,21 @@
 	}
 
 	class MapView extends three.Mesh {
-	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null) {
+	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null, nodeAutoLoad = false, onNodeReady = null) {
 	        super(undefined, new three.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
 	        this.lod = null;
 	        this.provider = null;
 	        this.heightProvider = null;
 	        this.root = null;
+	        this.onNodeReady = null;
 	        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
 	            this.lod.updateLOD(this, camera, renderer, scene);
 	        };
 	        this.lod = new LODRaycast();
 	        this.provider = provider;
 	        this.heightProvider = heightProvider;
+	        this.nodeAutoLoad = nodeAutoLoad;
+	        this.onNodeReady = onNodeReady;
 	        this.setRoot(root);
 	    }
 	    setRoot(root) {
@@ -661,8 +700,8 @@
 	            if (children.childrenCache) {
 	                children.childrenCache = null;
 	            }
-	            if (children.loadTexture !== undefined) {
-	                children.loadTexture();
+	            if (children.initialize) {
+	                children.initialize();
 	            }
 	        });
 	        return this;
@@ -743,6 +782,21 @@
 	    static get(url, onLoad, onError) {
 	        const xhr = new XMLHttpRequest();
 	        xhr.overrideMimeType('text/plain');
+	        xhr.open('GET', url, true);
+	        if (onLoad !== undefined) {
+	            xhr.onload = function () {
+	                onLoad(xhr.response);
+	            };
+	        }
+	        if (onError !== undefined) {
+	            xhr.onerror = onError;
+	        }
+	        xhr.send(null);
+	        return xhr;
+	    }
+	    static getRaw(url, onLoad, onError) {
+	        var xhr = new XMLHttpRequest();
+	        xhr.responseType = 'arraybuffer';
 	        xhr.open('GET', url, true);
 	        if (onLoad !== undefined) {
 	            xhr.onload = function () {
@@ -1188,6 +1242,7 @@
 	exports.OpenMapTilesProvider = OpenMapTilesProvider;
 	exports.OpenStreetMapsProvider = OpenStreetMapsProvider;
 	exports.UnitsUtils = UnitsUtils;
+	exports.XHRUtils = XHRUtils;
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 

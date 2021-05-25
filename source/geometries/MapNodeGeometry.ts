@@ -31,6 +31,7 @@ export class MapNodeGeometry extends BufferGeometry
 		// Buffers
 		const indices = [];
 		const vertices = [];
+		const normals = [];
 		const uvs = [];
 
 		// Generate vertices, normals and uvs
@@ -43,6 +44,7 @@ export class MapNodeGeometry extends BufferGeometry
 				const x = ix * segmentWidth - widthHalf;
 
 				vertices.push(x, 0, z);
+				normals.push(0, 1, 0);
 				uvs.push(ix / widthSegments);
 				uvs.push(1 - iz / heightSegments);
 			}
@@ -66,6 +68,7 @@ export class MapNodeGeometry extends BufferGeometry
 
 		this.setIndex(indices);
 		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
 		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 	}
 }

@@ -39,6 +39,9 @@ export class MapHeightNode extends MapNode
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = MapHeightNode.GEOMETRY, material: Material = new MeshPhongMaterial({color: 0x000000, emissive: 0xffffff})) 
 	{
 		super(parentNode, mapView, location, level, x, y, geometry, material);
+
+		this.isMesh = true;
+		this.visible = false;
 		this.matrixAutoUpdate = false;
 	}
 
@@ -64,6 +67,7 @@ export class MapHeightNode extends MapNode
 	public initialize(): void 
 	{
 		super.initialize();
+
 		this.loadTexture();
 		this.loadHeightGeometry();
 	}
@@ -77,19 +81,15 @@ export class MapHeightNode extends MapNode
 	{
 		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
-			if (image) 
-			{
-				const texture = new Texture(image as any);
-				texture.generateMipmaps = false;
-				texture.format = RGBFormat;
-				texture.magFilter = LinearFilter;
-				texture.minFilter = LinearFilter;
-				texture.needsUpdate = true;
-	
-				// @ts-ignore
-				this.material.map = texture;
-			}
+			const texture = new Texture(image as any);
+			texture.generateMipmaps = false;
+			texture.format = RGBFormat;
+			texture.magFilter = LinearFilter;
+			texture.minFilter = LinearFilter;
+			texture.needsUpdate = true;
 
+			// @ts-ignore
+			this.material.emissiveMap = texture;
 		}).finally(() =>
 		{
 			this.textureLoaded = true;
@@ -112,32 +112,32 @@ export class MapHeightNode extends MapNode
 	public createChildNodes(): void 
 	{
 		const level = this.level + 1;
-		var prototype = Object.getPrototypeOf(this);
+		const Constructor = Object.getPrototypeOf(this).constructor;
 
 		const x = this.x * 2;
 		const y = this.y * 2;
-		let node = new prototype.constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		let node = new Constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(-0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new prototype.constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node = new Constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new prototype.constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node = new Constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(-0.25, 0, 0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new prototype.constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node = new Constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
 		node.scale.set(0.5, 1, 0.5);
 		node.position.set(0.25, 0, 0.25);
 		this.add(node);
@@ -183,15 +183,14 @@ export class MapHeightNode extends MapNode
 			}
 
 			this.geometry = geometry;
-		})
-			.catch(() =>
-			{
-				console.error('GeoThree: Failed to load height node data.', this);
-			}).finally(() =>
-			{
-				this.heightLoaded = true;
-				this.nodeReady();
-			});
+		}).catch(() =>
+		{
+			console.error('GeoThree: Failed to load height node data.', this);
+		}).finally(() =>
+		{
+			this.heightLoaded = true;
+			this.nodeReady();
+		});
 	}
 
 	/**

@@ -44,8 +44,9 @@ export abstract class MapNode extends Mesh
 	public y: number;
 
 	/**
-	 * Variable indicating if it ready to be drawn
-	 * which means it has started or loaded its textures
+	 * Variable indicating if it ready to be drawn.
+	 * 
+	 * Which means it has started or loaded its textures.
 	 */
 	public isReady: boolean;
 
@@ -79,9 +80,9 @@ export abstract class MapNode extends Mesh
 	public isMesh: boolean = true;
 
 	/**
-	 * Three Group used to show markers or anything related to the tile.
+	 * Group used to show markers or anything related to the tile.
 	 */
-	public objectsHolder: THREE.Group;
+	public group: Group;
 
 	/**
 	 * Base geometry is attached to the map viewer object.
@@ -148,14 +149,14 @@ export abstract class MapNode extends Mesh
 		this.y = y;
 
 
-		const autoLoad = mapView.nodeShouldAutoLoad();
-
+		const autoLoad = mapView.nodeAutoLoad;
 		this.visible = !autoLoad;
 		this.isReady = autoLoad;
 
-		this.objectsHolder = new Group();
-		this.objectsHolder.visible = !autoLoad;
-		this.add(this.objectsHolder);
+		this.group = new Group();
+		this.group.visible = !autoLoad;
+		this.add(this.group);
+		
 		if (autoLoad) 
 		{
 			this.initialize();
@@ -197,10 +198,10 @@ export abstract class MapNode extends Mesh
 		if (this.childrenCache !== null) 
 		{
 			this.isMesh = false;
-			this.objectsHolder.visible = false;
+			this.group.visible = false;
 			this.childrenCache.forEach((n) => 
 			{
-				if (n !== this.objectsHolder) 
+				if (n !== this.group) 
 				{
 					n.isMesh = !n.subdivided;
 					n.objectsHolder.visible = !n.subdivided;
@@ -229,10 +230,10 @@ export abstract class MapNode extends Mesh
 		}
 		this.childrenCache = this.children;
 
-		this.objectsHolder.visible = true;
+		this.group.visible = true;
 		this.subdivided = false;
 		this.isMesh = true;
-		this.children = [this.objectsHolder];
+		this.children = [this.group];
 	}
 
 	/**
@@ -292,19 +293,19 @@ export abstract class MapNode extends Mesh
 				if (parentNode.subdivided === true) 
 				{
 					parentNode.isMesh = false;
-					parentNode.objectsHolder.visible = false;
+					parentNode.group.visible = false;
 				}
 
 				parentNode.children.forEach((child, index) => 
 				{
-					if (child !== parentNode.objectsHolder) 
+					if (child !== parentNode.group) 
 					{
 						let theNode = child as MapNode;
 						// child.visible = true;
 						// child.objectsHolder.visible = true;
 						// child.visible = true;
 						theNode.isMesh = !theNode.subdivided;
-						theNode.objectsHolder.visible = !theNode.subdivided;
+						theNode.group.visible = !theNode.subdivided;
 					}
 				});
 			}
@@ -313,9 +314,13 @@ export abstract class MapNode extends Mesh
 		else if (!this.subdivided)
 		{
 			this.visible = true;
-			this.objectsHolder.visible = true;
+			this.group.visible = true;
 		}
-		this.mapView.onNodeReady();
+
+		if (this.mapView.onNodeReady)
+		{
+			this.mapView.onNodeReady();
+		}
 	}
 
 	/**
