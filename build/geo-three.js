@@ -646,13 +646,14 @@
 	}
 
 	class MapView extends three.Mesh {
-	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null, nodeAutoLoad = false, onNodeReady = null) {
+	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null, nodeAutoLoad = true, onNodeReady = null) {
 	        super(undefined, new three.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
 	        this.lod = null;
 	        this.provider = null;
 	        this.heightProvider = null;
 	        this.root = null;
 	        this.onNodeReady = null;
+	        this.nodeAutoLoad = true;
 	        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
 	            this.lod.updateLOD(this, camera, renderer, scene);
 	        };
