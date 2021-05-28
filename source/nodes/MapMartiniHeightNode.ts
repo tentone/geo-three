@@ -1,7 +1,7 @@
 import {BufferGeometry, DoubleSide, Float32BufferAttribute, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapView} from '../MapView';
-import {Martini} from '../martini/Martini';
+import {Martini} from './Martini';
 import {MapHeightNode} from './MapHeightNode';
 import {MapNode} from './MapNode.js';
 
