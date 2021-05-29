@@ -30,7 +30,10 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public static GEOMETRY = new MapNodeGeometry(1, 1, MapMartiniHeightNode.GEOMETRY_SIZE, MapMartiniHeightNode.GEOMETRY_SIZE);
 
-	public elevationDecoder = {
+	/**
+	 * Elevation decoder configuration.
+	 */
+	public elevationDecoder: any = {
 		rScaler: 256,
 		gScaler: 1,
 		bScaler: 1 / 256,
@@ -172,15 +175,16 @@ export class MapMartiniHeightNode extends MapHeightNode
 		return material;
 	}
 	
-	public static getTerrain(imageData, tileSize, elevationDecoder): Float32Array
+	public static getTerrain(imageData: ImageData, tileSize: number, elevationDecoder: any): Float32Array
 	{
 		const {rScaler, bScaler, gScaler, offset} = elevationDecoder;
-
 		const gridSize = tileSize + 1;
+
 		// From Martini demo
 		// https://observablehq.com/@mourner/martin-real-time-rtin-terrain-mesh
 		const terrain = new Float32Array(gridSize * gridSize);
-		// decode terrain values
+
+		// Decode terrain values
 		for (let i = 0, y = 0; y < tileSize; y++) 
 		{
 			for (let x = 0; x < tileSize; x++, i++) 
