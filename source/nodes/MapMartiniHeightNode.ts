@@ -75,16 +75,13 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public static prepareMaterial(material, level, exageration): any 
 	{
-		// not all are used but for now it helps in fast switching between martini and height shader
 		material.userData = {
 			heightMap: {value: MapMartiniHeightNode.EMPTY_TEXTURE},
 			drawNormals: {value: 0},
 			drawBlack: {value: 0},
 			zoomlevel: {value: level},
-			exageration: {value: exageration},
 			computeNormals: {value: 1},
-			drawTexture: {value: 1},
-			elevationDecoder: {value: null}
+			drawTexture: {value: 1}
 		};
 
 		material.onBeforeCompile = (shader) => 
@@ -174,9 +171,9 @@ export class MapMartiniHeightNode extends MapHeightNode
 		return material;
 	}
 	
-	public static getTerrain(imageData: ImageData, tileSize: number, elevationDecoder: any): Float32Array
+	public static getTerrain(imageData: Uint8ClampedArray, tileSize: number, elevation: any): Float32Array
 	{
-		const {rScaler, bScaler, gScaler, offset} = elevationDecoder;
+		const {rScaler, bScaler, gScaler, offset} = elevation;
 		const gridSize = tileSize + 1;
 
 		// From Martini demo
@@ -195,16 +192,19 @@ export class MapMartiniHeightNode extends MapHeightNode
 				terrain[i + y] = r * rScaler + g * gScaler + b * bScaler + offset;
 			}
 		}
-		// backfill bottom border
+
+		// Backfill bottom border
 		for (let i = gridSize * (gridSize - 1), x = 0; x < gridSize - 1; x++, i++) 
 		{
 			terrain[i] = terrain[i - gridSize];
 		}
-		// backfill right border
+
+		// Backfill right border
 		for (let i = gridSize - 1, y = 0; y < gridSize; y++, i += gridSize) 
 		{
 			terrain[i] = terrain[i - 1];
 		}
+
 		return terrain;
 	}
 	
