@@ -27,7 +27,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	* Empty texture used as a placeholder for missing textures.
 	*/
 	public static EMPTY_TEXTURE: Texture = new Texture();
-
+	
 	public static GEOMETRY = new MapNodeGeometry(1, 1, MapMartiniHeightNode.GEOMETRY_SIZE, MapMartiniHeightNode.GEOMETRY_SIZE);
 
 	/**
@@ -58,7 +58,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	{
 		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.GEOMETRY, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
 			map: MapMartiniHeightNode.EMPTY_TEXTURE,
-			color: 0xffffff,
+			color: 0xFFFFFF,
 			side: DoubleSide
 		}), level, exageration));
 
@@ -75,7 +75,6 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public static prepareMaterial(material, level, exageration): any 
 	{
-
 		// not all are used but for now it helps in fast switching between martini and height shader
 		material.userData = {
 			heightMap: {value: MapMartiniHeightNode.EMPTY_TEXTURE},

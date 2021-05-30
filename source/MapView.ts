@@ -8,6 +8,7 @@ import {MapHeightNodeShader} from './nodes/MapHeightNodeShader';
 import {LODRaycast} from './lod/LODRaycast';
 import {MapProvider} from './providers/MapProvider';
 import {LODControl} from './lod/LODControl';
+import {MapMartiniHeightNode} from './nodes/MapMartiniHeightNode';
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -39,13 +40,19 @@ export class MapView extends Mesh
 	public static HEIGHT_SHADER: number = 203;
 
 	/**
+	 * RTIN map mode.
+	 */
+	public static MARTINI: number = 204;
+
+	/**
 	 * Map of the map node types available.
 	 */
 	public static mapModes: Map<number, any> = new Map<number, any>([
 		[MapView.PLANAR, MapPlaneNode],
 		[MapView.SPHERICAL, MapSphereNode],
 		[MapView.HEIGHT, MapHeightNode],
-		[MapView.HEIGHT_SHADER, MapHeightNodeShader]
+		[MapView.HEIGHT_SHADER, MapHeightNodeShader],
+		[MapView.MARTINI, MapMartiniHeightNode]
 	]);
 
 	/**
