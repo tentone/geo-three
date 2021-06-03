@@ -344,20 +344,20 @@ class Tile
 			topSkirtIndices.sort((a, b) => {return vertices[2 * a] - vertices[2 * b];});
 
 			let skirtIndex = numVertices * 2;
-			let currIndex, nextIndex, currentSkirt, nextSkirt, skirtLength = 0;
 
 			// Add skirt vertices from index of last mesh vertex
 			function constructSkirt(skirt: number[]): void
 			{
-				skirtLength = skirt.length;
+				const skirtLength = skirt.length;
 
 				// Loop through indices in groups of two to generate triangles
 				for (let i = 0; i < skirtLength - 1; i++) 
 				{
-					currIndex = skirt[i];
-					nextIndex = skirt[i + 1];
-					currentSkirt = skirtIndex / 2;
-					nextSkirt = (skirtIndex + 2) / 2;
+					const currIndex = skirt[i];
+					const nextIndex = skirt[i + 1];
+					const currentSkirt = skirtIndex / 2;
+					const nextSkirt = (skirtIndex + 2) / 2;
+
 					vertices[skirtIndex++] = vertices[2 * currIndex];
 					vertices[skirtIndex++] = vertices[2 * currIndex + 1];
 

@@ -10,7 +10,18 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  */
 export class MapSphereNode extends MapNode 
 {
-	public constructor(parentNode = null, mapView = null, location = MapNode.ROOT, level = 0, x = 0, y = 0) 
+	public static baseGeometry: BufferGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
+
+	public static baseScale: Vector3 = new Vector3(1, 1, 1);
+
+	/**
+	 * Number of segments per node geometry.
+	 * 
+	 * Can be configured globally and is applied to all nodes.
+	 */
+	public static segments: number = 80;
+
+	public constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) 
 	{
 		super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}));
 	
@@ -21,19 +32,10 @@ export class MapSphereNode extends MapNode
 		this.visible = false;
 	}
 	
-	public static BASE_GEOMETRY: BufferGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
-
-	public static BASE_SCALE: Vector3 = new Vector3(1, 1, 1);
-
-	/**
-	 * Number of segments per node geometry.
-	 * 
-	 * Can be configured globally and is applied to all nodes.
-	 */
-	public static SEGMENTS: number = 80;
-	
 	public initialize(): void
 	{
+		super.initialize();
+		
 		this.loadTexture();
 	}
 
@@ -48,7 +50,7 @@ export class MapSphereNode extends MapNode
 	{
 		const range = Math.pow(2, zoom);
 		const max = 40;
-		const segments = Math.floor(MapSphereNode.SEGMENTS * (max / (zoom + 1)) / max);
+		const segments = Math.floor(MapSphereNode.segments * (max / (zoom + 1)) / max);
 	
 		// X
 		const phiLength = 1 / range * 2 * Math.PI;
@@ -105,22 +107,22 @@ export class MapSphereNode extends MapNode
 
 		const Constructor = Object.getPrototypeOf(this).constructor;
 
-		let node = new Constructor(this, this.mapView, MapNode.TOP_LEFT, level, x, y);
+		let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.TOP_RIGHT, level, x + 1, y);
+		node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.BOTTOM_LEFT, level, x, y + 1);
+		node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.BOTTOM_RIGHT, level, x + 1, y + 1);
+		node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);

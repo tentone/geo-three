@@ -152,10 +152,10 @@ export class MapView extends Mesh
 		if (this.root !== null) 
 		{
 			// @ts-ignore
-			this.geometry = this.root.constructor.BASE_GEOMETRY;
+			this.geometry = this.root.constructor.baseGeometry;
 
 			// @ts-ignore
-			this.scale.copy(this.root.constructor.BASE_SCALE);
+			this.scale.copy(this.root.constructor.baseScale);
 
 			this.root.mapView = this;
 			this.add(this.root);

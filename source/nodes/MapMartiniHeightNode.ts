@@ -1,4 +1,4 @@
-import {BufferGeometry, DoubleSide, Float32BufferAttribute, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
+import {BufferGeometry, DoubleSide, Float32BufferAttribute, Material, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapView} from '../MapView';
 import {Martini} from './Martini';
@@ -21,14 +21,14 @@ import {MapNode} from './MapNode.js';
  */
 export class MapMartiniHeightNode extends MapHeightNode
 {
-	public static GEOMETRY_SIZE = 16;
+	public static geometrySize = 16;
 
 	/**
 	* Empty texture used as a placeholder for missing textures.
 	*/
-	public static EMPTY_TEXTURE: Texture = new Texture();
+	public static emptyTexture: Texture = new Texture();
 	
-	public static GEOMETRY = new MapNodeGeometry(1, 1, MapMartiniHeightNode.GEOMETRY_SIZE, MapMartiniHeightNode.GEOMETRY_SIZE);
+	public static geometry = new MapNodeGeometry(1, 1, MapMartiniHeightNode.geometrySize, MapMartiniHeightNode.geometrySize);
 
 	/**
 	 * Elevation decoder configuration.
@@ -43,7 +43,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	/**
 	 * Original tile size of the images retrieved from the height provider.
 	 */
-	public static TILE_SIZE: number = 256;
+	public static tileSize: number = 256;
 
 	/**
 	 * Exageration (scale) of the terrain height.
@@ -54,10 +54,10 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public material: MeshPhongMaterial
 
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
 	{
-		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.GEOMETRY, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
-			map: MapMartiniHeightNode.EMPTY_TEXTURE,
+		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.geometry, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
+			map: MapMartiniHeightNode.emptyTexture,
 			color: 0xFFFFFF,
 			side: DoubleSide
 		}), level, exageration));
@@ -73,10 +73,10 @@ export class MapMartiniHeightNode extends MapHeightNode
 	}
 
 
-	public static prepareMaterial(material, level, exageration): any 
+	public static prepareMaterial(material: Material, level: number, exageration: number = 1.0): any 
 	{
 		material.userData = {
-			heightMap: {value: MapMartiniHeightNode.EMPTY_TEXTURE},
+			heightMap: {value: MapMartiniHeightNode.emptyTexture},
 			drawNormals: {value: 0},
 			drawBlack: {value: 0},
 			zoomlevel: {value: level},
@@ -260,40 +260,37 @@ export class MapMartiniHeightNode extends MapHeightNode
 	 */
 	public async onHeightImage(image: HTMLImageElement): Promise<void> 
 	{
-		if (image) 
-		{
-			const tileSize = image.width;
-			const gridSize = tileSize + 1;
-			var canvas = new OffscreenCanvas(tileSize, tileSize);
-	
-			var context = canvas.getContext('2d');
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, tileSize, tileSize, 0, 0, canvas.width, canvas.height);
-			
-			var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			var data = imageData.data;
+		const tileSize = image.width;
+		const gridSize = tileSize + 1;
+		var canvas = new OffscreenCanvas(tileSize, tileSize);
 
-			const terrain = MapMartiniHeightNode.getTerrain(data, tileSize, this.elevationDecoder);
-			const martini = new Martini(gridSize);
-			const tile = martini.createTile(terrain);
-			const {vertices, triangles} = tile.getMesh(typeof this.meshMaxError === 'function' ? this.meshMaxError(this.level) : this.meshMaxError);
+		var context = canvas.getContext('2d');
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, tileSize, tileSize, 0, 0, canvas.width, canvas.height);
+		
+		var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		var data = imageData.data;
 
-			const attributes = MapMartiniHeightNode.getMeshAttributes(vertices, terrain, tileSize, [-0.5, -0.5, 0.5, 0.5], this.exageration);
+		const terrain = MapMartiniHeightNode.getTerrain(data, tileSize, this.elevationDecoder);
+		const martini = new Martini(gridSize);
+		const tile = martini.createTile(terrain);
+		const {vertices, triangles} = tile.getMesh(typeof this.meshMaxError === 'function' ? this.meshMaxError(this.level) : this.meshMaxError);
 
-			this.geometry = new BufferGeometry();
-			this.geometry.setIndex(new Uint32BufferAttribute(triangles, 1));
-			this.geometry.setAttribute( 'position', new Float32BufferAttribute( attributes.position.value, attributes.position.size ) );
-			this.geometry.setAttribute( 'uv', new Float32BufferAttribute( attributes.uv.value, attributes.uv.size ) );
-			this.geometry.rotateX(Math.PI);
+		const attributes = MapMartiniHeightNode.getMeshAttributes(vertices, terrain, tileSize, [-0.5, -0.5, 0.5, 0.5], this.exageration);
 
-			var texture = new Texture(image);
-			texture.generateMipmaps = false;
-			texture.format = RGBFormat;
-			texture.magFilter = NearestFilter;
-			texture.minFilter = NearestFilter;
-			texture.needsUpdate = true;
-			this.material.userData.heightMap.value = texture;
-		}
+		this.geometry = new BufferGeometry();
+		this.geometry.setIndex(new Uint32BufferAttribute(triangles, 1));
+		this.geometry.setAttribute('position', new Float32BufferAttribute( attributes.position.value, attributes.position.size));
+		this.geometry.setAttribute('uv', new Float32BufferAttribute( attributes.uv.value, attributes.uv.size));
+		this.geometry.rotateX(Math.PI);
+
+		var texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBFormat;
+		texture.magFilter = NearestFilter;
+		texture.minFilter = NearestFilter;
+		texture.needsUpdate = true;
+		this.material.userData.heightMap.value = texture;
 	}
 	
 	/**

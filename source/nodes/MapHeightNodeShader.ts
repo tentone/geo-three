@@ -20,11 +20,11 @@ import {MapView} from '../MapView';
  */
 export class MapHeightNodeShader extends MapHeightNode 
 {
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.ROOT, level: number = 0, x: number = 0, y: number = 0) 
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0) 
 	{
-		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapHeightNodeShader.EMPTY_TEXTURE}));
+		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapHeightNodeShader.emptyTexture}));
 
-		super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.GEOMETRY, material);
+		super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
 
 		this.frustumCulled = false;
 	}
@@ -32,21 +32,21 @@ export class MapHeightNodeShader extends MapHeightNode
 	/**
 	 * Empty texture used as a placeholder for missing textures.
 	 */
-	public static EMPTY_TEXTURE: Texture = new Texture();
+	public static emptyTexture: Texture = new Texture();
 
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
 	 */
-	public static GEOMETRY_SIZE: number = 256;
+	public static geometrySize: number = 256;
 
 	/**
 	 * Map node plane geometry.
 	 */
-	public static GEOMETRY: BufferGeometry = new MapNodeGeometry(1, 1, MapHeightNode.GEOMETRY_SIZE, MapHeightNode.GEOMETRY_SIZE);
+	public static geometry: BufferGeometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
 
-	public static BASE_GEOMETRY: BufferGeometry = MapPlaneNode.GEOMETRY;
+	public static baseGeometry: BufferGeometry = MapPlaneNode.geometry;
 
-	public static BASE_SCALE: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static baseScale: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
 	 * Prepare the three.js material to be used in the map tile.
@@ -55,7 +55,7 @@ export class MapHeightNodeShader extends MapHeightNode
 	 */
 	public static prepareMaterial(material: Material): Material
 	{
-		material.userData = {heightMap: {value: MapHeightNodeShader.EMPTY_TEXTURE}};
+		material.userData = {heightMap: {value: MapHeightNodeShader.emptyTexture}};
 
 		material.onBeforeCompile = (shader) => 
 		{
@@ -153,11 +153,11 @@ export class MapHeightNodeShader extends MapHeightNode
 	{
 		if (this.isMesh === true) 
 		{
-			this.geometry = MapPlaneNode.GEOMETRY;
+			this.geometry = MapPlaneNode.geometry;
 
 			const result = super.raycast(raycaster, intersects);
 
-			this.geometry = MapHeightNodeShader.GEOMETRY;
+			this.geometry = MapHeightNodeShader.geometry;
 
 			return result;
 		}
