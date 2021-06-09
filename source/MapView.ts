@@ -78,23 +78,13 @@ export class MapView extends Mesh
 	public root: MapNode = null;
 
 	/**
-	 * Method to be called when a node is ready.
-	 */
-	public onNodeReady: Function = null;
-
-	/**
-	 * Indicates if the nodes should be automatically loaded.
-	 */
-	public nodeAutoLoad: boolean = true;
-
-	/**
 	 * Constructor for the map view objects.
 	 *
 	 * @param root - Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.
 	 * @param provider - Map color tile provider by default a OSM maps provider is used if none specified.
 	 * @param heightProvider - Map height tile provider, by default no height provider is used.
 	 */
-	public constructor(root: (number | MapNode) = MapView.PLANAR, provider: MapProvider = new OpenStreetMapsProvider(), heightProvider: MapProvider = null, nodeAutoLoad: boolean = true, onNodeReady: Function = null) 
+	public constructor(root: (number | MapNode) = MapView.PLANAR, provider: MapProvider = new OpenStreetMapsProvider(), heightProvider: MapProvider = null) 
 	{
 		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
 
@@ -102,8 +92,6 @@ export class MapView extends Mesh
 
 		this.provider = provider;
 		this.heightProvider = heightProvider;
-		this.nodeAutoLoad = nodeAutoLoad;
-		this.onNodeReady = onNodeReady;
 
 		this.setRoot(root);
 	}

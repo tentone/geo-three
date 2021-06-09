@@ -163,7 +163,7 @@ export abstract class MapNode extends Mesh
 	public subdivide(): void
 	{
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-		if (this.subdivided || this.children.length > 1 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens)
+		if (this.subdivided || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens)
 		{
 			return;
 		}
@@ -272,11 +272,6 @@ export abstract class MapNode extends Mesh
 		else
 		{
 			this.visible = true;
-		}
-
-		if (this.mapView.onNodeReady)
-		{
-			this.mapView.onNodeReady();
 		}
 	}
 
