@@ -96,22 +96,18 @@
 	        this.level = level;
 	        this.x = x;
 	        this.y = y;
-	        this.visible = true;
 	        this.initialize();
 	    }
 	    initialize() { }
 	    createChildNodes() { }
 	    subdivide() {
 	        const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-	        if (this.subdivided || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
+	        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
 	            return;
 	        }
 	        this.subdivided = true;
 	        if (this.childrenCache !== null) {
 	            this.isMesh = false;
-	            for (let i = 0; i < this.childrenCache.length; i++) {
-	                this.childrenCache[i].isMesh = false;
-	            }
 	            this.children = this.childrenCache;
 	        }
 	        else {
@@ -119,10 +115,9 @@
 	        }
 	    }
 	    simplify() {
-	        if (!this.subdivided) {
-	            return;
+	        if (this.children.length > 0) {
+	            this.childrenCache = this.children;
 	        }
-	        this.childrenCache = this.children;
 	        this.subdivided = false;
 	        this.isMesh = true;
 	        this.children = [];
@@ -157,7 +152,7 @@
 	                    this.parentNode.isMesh = false;
 	                }
 	                for (let i = 0; i < this.parentNode.children.length; i++) {
-	                    this.parentNode.children[i].isMesh = true;
+	                    this.parentNode.children[i].visible = true;
 	                }
 	            }
 	        }
@@ -227,25 +222,26 @@
 	        const level = this.level + 1;
 	        const x = this.x * 2;
 	        const y = this.y * 2;
-	        let node = new MapPlaneNode(this, this.mapView, MapNode.topLeft, level, x, y);
+	        const Constructor = Object.getPrototypeOf(this).constructor;
+	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(-0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapPlaneNode(this, this.mapView, MapNode.topRight, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapPlaneNode(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(-0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapPlaneNode(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
 	        node.scale.set(0.5, 1, 0.5);
 	        node.position.set(0.25, 0, 0.25);
 	        this.add(node);
@@ -465,20 +461,19 @@
 	        const level = this.level + 1;
 	        const x = this.x * 2;
 	        const y = this.y * 2;
-	        const Constructor = Object.getPrototypeOf(this).constructor;
-	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+	        let node = new MapSphereNode(this, this.mapView, MapNode.topLeft, level, x, y);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+	        node = new MapSphereNode(this, this.mapView, MapNode.topRight, level, x + 1, y);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+	        node = new MapSphereNode(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+	        node = new MapSphereNode(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);

@@ -136,8 +136,6 @@ export abstract class MapNode extends Mesh
 		this.x = x;
 		this.y = y;
 
-		this.visible = true;
-
 		this.initialize();
 	}
 
@@ -163,7 +161,7 @@ export abstract class MapNode extends Mesh
 	public subdivide(): void
 	{
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
-		if (this.subdivided || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens)
+		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens)
 		{
 			return;
 		}
@@ -173,12 +171,6 @@ export abstract class MapNode extends Mesh
 		if (this.childrenCache !== null) 
 		{
 			this.isMesh = false;
-			
-			for (let i = 0; i < this.childrenCache.length; i++)
-			{
-				this.childrenCache[i].isMesh = false;
-			}
-
 			this.children = this.childrenCache;
 		}
 		else 
@@ -196,12 +188,11 @@ export abstract class MapNode extends Mesh
 	 */
 	public simplify(): void
 	{
-		if (!this.subdivided) 
+		if (this.children.length > 0) 
 		{
-			return;
+			this.childrenCache = this.children;
 		}
 		
-		this.childrenCache = this.children;
 		this.subdivided = false;
 		this.isMesh = true;
 		this.children = [];
@@ -263,8 +254,7 @@ export abstract class MapNode extends Mesh
 				
 				for (let i = 0; i < this.parentNode.children.length; i++) 
 				{
-					// @ts-ignore
-					this.parentNode.children[i].isMesh = true;
+					this.parentNode.children[i].visible = true;
 				}
 			}
 		}
