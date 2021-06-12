@@ -32,6 +32,8 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	/**
 	 * Elevation decoder configuration.
+	 * 
+	 * Indicates how the pixels should be unpacked and transformed into height data.
 	 */
 	public elevationDecoder: any = {
 		rScaler: 256,
@@ -154,11 +156,11 @@ export class MapMartiniHeightNode extends MapHeightNode
 						float i = getElevation(vUv + vec2(offset,offset), 0.0);
 
 
-						float NormalLength = 500.0 / zoomlevel;
+						float normalLength = 500.0 / zoomlevel;
 
 						vec3 v0 = vec3(0.0, 0.0, 0.0);
-						vec3 v1 = vec3(0.0, NormalLength, 0.0);
-						vec3 v2 = vec3(NormalLength, 0.0, 0.0);
+						vec3 v1 = vec3(0.0, normalLength, 0.0);
+						vec3 v2 = vec3(normalLength, 0.0, 0.0);
 						v0.z = (e + d + g + h) / 4.0;
 						v1.z = (e+ b + a + d) / 4.0;
 						v2.z = (e+ h + i + f) / 4.0;
