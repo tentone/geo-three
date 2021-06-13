@@ -5,82 +5,32 @@ import {BufferGeometry, Float32BufferAttribute, Vector3} from 'three';
  *
  * Consists of a XZ plane with normals facing +Y.
  */
-export class MapNodeGeometry extends BufferGeometry 
-{	
+export class MapNodeGeometry extends BufferGeometry
+{
 	/**
 	 * Map node geometry constructor.
-	 * 
+	 *
 	 * @param width - Width of the node.
 	 * @param height - Height of the node.
 	 * @param widthSegments - Number of subdivisions along the width.
 	 * @param heightSegments - Number of subdivisions along the height.
 	 * @param skirt - Skirt around the plane to mask gaps between tiles.
 	 */
-	public constructor(width: number, height: number, widthSegments: number = 1.0, heightSegments: number = 1.0, skirt: boolean = false) 
+	public constructor(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, skirt: boolean = true, skirtDepth: number = 1.0, skirtSegments: number = 1.0)
 	{
 		super();
-
-		const widthHalf = width / 2;
-		const heightHalf = height / 2;
-
-		const gridX = widthSegments + 1;
-		const gridZ = heightSegments + 1;
-
-		const segmentWidth = width / widthSegments;
-		const segmentHeight = height / heightSegments;
 
 		// Buffers
 		const indices = [];
 		const vertices = [];
 		const normals = [];
 		const uvs = [];
-
-		// Generate vertices, normals and uvs
-		for (let iz = 0; iz < gridZ; iz++) 
-		{
-			const z = iz * segmentHeight - heightHalf;
-
-			for (let ix = 0; ix < gridX; ix++) 
-			{
-				const x = ix * segmentWidth - widthHalf;
-
-				vertices.push(x, 0, z);
-				normals.push(0, 1, 0);
-
-				uvs.push(ix / widthSegments);
-				uvs.push(1 - iz / heightSegments);
-			}
-		}
-
-		// Indices
-		for (let iz = 0; iz < heightSegments; iz++) 
-		{
-			for (let ix = 0; ix < widthSegments; ix++) 
-			{
-				const a = ix + gridX * iz;
-				const b = ix + gridX * (iz + 1);
-				const c = ix + 1 + gridX * (iz + 1);
-				const d = ix + 1 + gridX * iz;
-
-				// faces
-				indices.push(a, b, d);
-				indices.push(b, c, d);
-			}
-		}
-
-
-		// Generate geometry skirt
-		if (skirt)
-		{
-			// TODO <ADD CODE HERE>
-		}
-
-
+		
+		// Count the number of vertices.
 		let numberOfVertices = 0;
-		let groupStart = 0;
 
 		// Auxiliar method to build a plane geometry
-		const buildPlane = (u: string, v: string, w: string, udir: number, vdir: number, width: number, height: number, depth: number, gridX: number, gridY: number, materialIndex: number): void =>
+		const buildPlane = (u: string, v: string, w: string, udir: number, vdir: number, width: number, height: number, depth: number, gridX: number, gridY: number): void =>
 		{
 			const segmentWidth = width / gridX;
 			const segmentHeight = height / gridY;
@@ -93,16 +43,15 @@ export class MapNodeGeometry extends BufferGeometry
 			const gridY1 = gridY + 1;
 
 			let vertexCounter = 0;
-			let groupCount = 0;
 
 			const vector = new Vector3();
 
 			// Generate vertices, normals and uvs
-			for (let iy = 0; iy < gridY1; iy++) 
+			for (let iy = 0; iy < gridY1; iy++)
 			{
 				const y = iy * segmentHeight - heightHalf;
 
-				for (let ix = 0; ix < gridX1; ix++) 
+				for (let ix = 0; ix < gridX1; ix++)
 				{
 					const x = ix * segmentWidth - widthHalf;
 
@@ -132,9 +81,9 @@ export class MapNodeGeometry extends BufferGeometry
 			}
 
 			// Three indices to draw a single face, each segment consists of two faces, we generate six (2*3) indices per segment
-			for (let iy = 0; iy < gridY; iy ++) 
+			for (let iy = 0; iy < gridY; iy ++)
 			{
-				for (let ix = 0; ix < gridX; ix ++) 
+				for (let ix = 0; ix < gridX; ix ++)
 				{
 					const a = numberOfVertices + ix + gridX1 * iy;
 					const b = numberOfVertices + ix + gridX1 * (iy + 1);
@@ -144,20 +93,27 @@ export class MapNodeGeometry extends BufferGeometry
 					// Faces
 					indices.push(a, b, d);
 					indices.push(b, c, d);
-
-					groupCount += 6;
 				}
 			}
-
-			// Add a group to the geometry. this will ensure multi material support
-			this.addGroup(groupStart, groupCount, materialIndex);
-
-			// Calculate new start value for groups
-			groupStart += groupCount;
 
 			// Update total number of vertices
 			numberOfVertices += vertexCounter;
 		};
+
+		// Build top plane
+		buildPlane( 'x', 'z', 'y', 1, 1, width, height, skirtDepth, widthSegments, skirtSegments); // py
+
+		// Skirt
+		buildPlane('z', 'y', 'x', -1, -1, height, skirtDepth, width, skirtSegments, heightSegments);
+		buildPlane('z', 'y', 'x', 1, -1, height, skirtDepth, -width, skirtSegments, heightSegments); // nx
+		buildPlane('x', 'y', 'z', 1, -1, width, skirtDepth, height, widthSegments, heightSegments); // pz
+		buildPlane('x', 'y', 'z', -1, -1, width, skirtDepth, -height, widthSegments, heightSegments); // nz
+
+		// Generate geometry skirt
+		if (skirt)
+		{
+
+		}
 
 		this.setIndex(indices);
 		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
@@ -165,5 +121,5 @@ export class MapNodeGeometry extends BufferGeometry
 		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 	}
 
-	
+
 }

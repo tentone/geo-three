@@ -42,28 +42,28 @@ export class MapPlaneNode extends MapNode
 		const Constructor = Object.getPrototypeOf(this).constructor;
 		
 		let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
-		node.scale.set(0.5, 1, 0.5);
+		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(-0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
 		node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
-		node.scale.set(0.5, 1, 0.5);
+		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
 		node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
-		node.scale.set(0.5, 1, 0.5);
+		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(-0.25, 0, 0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
 		node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
-		node.scale.set(0.5, 1, 0.5);
+		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(0.25, 0, 0.25);
 		this.add(node);
 		node.updateMatrix();

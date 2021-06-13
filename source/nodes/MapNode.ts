@@ -1,4 +1,4 @@
-import {LinearFilter, Material, Mesh, RGBFormat, Texture, Vector3, BufferGeometry} from 'three';
+import {LinearFilter, Material, Mesh, RGBFormat, Texture, Vector3, BufferGeometry, Object3D} from 'three';
 import {MapView} from '../MapView';
 
 
@@ -60,9 +60,16 @@ export abstract class MapNode extends Mesh
 	 *
 	 * Used to avoid recreate object after simplification and subdivision.
 	 *
-	 * The default value is null.
+	 * The default value is null. Only used if "cacheChild" is set to true.
 	 */
-	public childrenCache: any[] = null;
+	public childrenCache: Object3D[] = null;
+
+	/**
+	 * Indicate if the node should cache its children when it is simplified.
+	 * 
+	 * Should only be used if the child generation process is time consuming.
+	 */
+	public cacheChild: boolean = false;
 
 	/**
 	 * Variable to check if the node is a mesh.
@@ -130,6 +137,7 @@ export abstract class MapNode extends Mesh
 
 		this.mapView = mapView;
 		this.parentNode = parentNode;
+	
 
 		this.location = location;
 		this.level = level;
@@ -167,8 +175,8 @@ export abstract class MapNode extends Mesh
 		}
 
 		this.subdivided = true;
-
-		if (this.childrenCache !== null) 
+		
+		if (this.cacheChild && this.childrenCache !== null) 
 		{
 			this.isMesh = false;
 			this.children = this.childrenCache;
@@ -188,7 +196,7 @@ export abstract class MapNode extends Mesh
 	 */
 	public simplify(): void
 	{
-		if (this.children.length > 0) 
+		if (this.cacheChild && this.children.length > 0) 
 		{
 			this.childrenCache = this.children;
 		}

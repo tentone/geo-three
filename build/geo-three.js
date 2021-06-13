@@ -42,38 +42,57 @@
 	}
 
 	class MapNodeGeometry extends three.BufferGeometry {
-	    constructor(width, height, widthSegments = 1.0, heightSegments = 1.0, skirt = false) {
+	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = true, skirtDepth = 1.0, skirtSegments = 1.0) {
 	        super();
-	        const widthHalf = width / 2;
-	        const heightHalf = height / 2;
-	        const gridX = widthSegments + 1;
-	        const gridZ = heightSegments + 1;
-	        const segmentWidth = width / widthSegments;
-	        const segmentHeight = height / heightSegments;
 	        const indices = [];
 	        const vertices = [];
 	        const normals = [];
 	        const uvs = [];
-	        for (let iz = 0; iz < gridZ; iz++) {
-	            const z = iz * segmentHeight - heightHalf;
-	            for (let ix = 0; ix < gridX; ix++) {
-	                const x = ix * segmentWidth - widthHalf;
-	                vertices.push(x, 0, z);
-	                normals.push(0, 1, 0);
-	                uvs.push(ix / widthSegments);
-	                uvs.push(1 - iz / heightSegments);
+	        let numberOfVertices = 0;
+	        const buildPlane = (u, v, w, udir, vdir, width, height, depth, gridX, gridY) => {
+	            const segmentWidth = width / gridX;
+	            const segmentHeight = height / gridY;
+	            const widthHalf = width / 2;
+	            const heightHalf = height / 2;
+	            const depthHalf = depth / 2;
+	            const gridX1 = gridX + 1;
+	            const gridY1 = gridY + 1;
+	            let vertexCounter = 0;
+	            const vector = new three.Vector3();
+	            for (let iy = 0; iy < gridY1; iy++) {
+	                const y = iy * segmentHeight - heightHalf;
+	                for (let ix = 0; ix < gridX1; ix++) {
+	                    const x = ix * segmentWidth - widthHalf;
+	                    vector[u] = x * udir;
+	                    vector[v] = y * vdir;
+	                    vector[w] = depthHalf;
+	                    vertices.push(vector.x, vector.y, vector.z);
+	                    vector[u] = 0;
+	                    vector[v] = 0;
+	                    vector[w] = depth > 0 ? 1 : -1;
+	                    normals.push(vector.x, vector.y, vector.z);
+	                    uvs.push(ix / gridX);
+	                    uvs.push(1 - iy / gridY);
+	                    vertexCounter += 1;
+	                }
 	            }
-	        }
-	        for (let iz = 0; iz < heightSegments; iz++) {
-	            for (let ix = 0; ix < widthSegments; ix++) {
-	                const a = ix + gridX * iz;
-	                const b = ix + gridX * (iz + 1);
-	                const c = ix + 1 + gridX * (iz + 1);
-	                const d = ix + 1 + gridX * iz;
-	                indices.push(a, b, d);
-	                indices.push(b, c, d);
+	            for (let iy = 0; iy < gridY; iy++) {
+	                for (let ix = 0; ix < gridX; ix++) {
+	                    const a = numberOfVertices + ix + gridX1 * iy;
+	                    const b = numberOfVertices + ix + gridX1 * (iy + 1);
+	                    const c = numberOfVertices + (ix + 1) + gridX1 * (iy + 1);
+	                    const d = numberOfVertices + (ix + 1) + gridX1 * iy;
+	                    indices.push(a, b, d);
+	                    indices.push(b, c, d);
+	                }
 	            }
-	        }
+	            numberOfVertices += vertexCounter;
+	        };
+	        buildPlane('x', 'z', 'y', 1, 1, width, height, skirtDepth, widthSegments, skirtSegments);
+	        buildPlane('z', 'y', 'x', -1, -1, height, skirtDepth, width, skirtSegments, heightSegments);
+	        buildPlane('z', 'y', 'x', 1, -1, height, skirtDepth, -width, skirtSegments, heightSegments);
+	        buildPlane('x', 'y', 'z', 1, -1, width, skirtDepth, height, widthSegments, heightSegments);
+	        buildPlane('x', 'y', 'z', -1, -1, width, skirtDepth, -height, widthSegments, heightSegments);
 	        this.setIndex(indices);
 	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
 	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
@@ -89,6 +108,7 @@
 	        this.nodesLoaded = 0;
 	        this.subdivided = false;
 	        this.childrenCache = null;
+	        this.cacheChild = false;
 	        this.isMesh = true;
 	        this.mapView = mapView;
 	        this.parentNode = parentNode;
@@ -106,7 +126,7 @@
 	            return;
 	        }
 	        this.subdivided = true;
-	        if (this.childrenCache !== null) {
+	        if (this.cacheChild && this.childrenCache !== null) {
 	            this.isMesh = false;
 	            this.children = this.childrenCache;
 	        }
@@ -115,7 +135,7 @@
 	        }
 	    }
 	    simplify() {
-	        if (this.children.length > 0) {
+	        if (this.cacheChild && this.children.length > 0) {
 	            this.childrenCache = this.children;
 	        }
 	        this.subdivided = false;
@@ -224,25 +244,25 @@
 	        const y = this.y * 2;
 	        const Constructor = Object.getPrototypeOf(this).constructor;
 	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
 	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
 	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
 	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
@@ -300,25 +320,25 @@
 	        const x = this.x * 2;
 	        const y = this.y * 2;
 	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
 	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
 	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
 	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
-	        node.scale.set(0.5, 1, 0.5);
+	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
@@ -461,19 +481,20 @@
 	        const level = this.level + 1;
 	        const x = this.x * 2;
 	        const y = this.y * 2;
-	        let node = new MapSphereNode(this, this.mapView, MapNode.topLeft, level, x, y);
+	        const Constructor = Object.getPrototypeOf(this).constructor;
+	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapSphereNode(this, this.mapView, MapNode.topRight, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapSphereNode(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new MapSphereNode(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
