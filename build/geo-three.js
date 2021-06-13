@@ -46,7 +46,6 @@
 	        super();
 	        const indices = [];
 	        const vertices = [];
-	        const normals = [];
 	        const uvs = [];
 	        let numberOfVertices = 0;
 	        const buildPlane = (u, v, w, udir, vdir, width, height, depth, gridX, gridY) => {
@@ -95,7 +94,6 @@
 	        buildPlane('x', 'y', 'z', -1, -1, width, skirtDepth, -height, widthSegments, heightSegments);
 	        this.setIndex(indices);
 	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
-	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
 	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
 	    }
 	}
@@ -116,9 +114,19 @@
 	        this.level = level;
 	        this.x = x;
 	        this.y = y;
-	        this.initialize();
+	        const autoLoad = mapView.nodeShouldAutoLoad();
+	        this.visible = !autoLoad;
+	        this.isReady = autoLoad;
+	        this.objectsHolder = new three.Group();
+	        this.objectsHolder.visible = !autoLoad;
+	        this.add(this.objectsHolder);
+	        if (autoLoad) {
+	            this.initialize();
+	        }
 	    }
-	    initialize() { }
+	    initialize() {
+	        this.isReady = true;
+	    }
 	    createChildNodes() { }
 	    subdivide() {
 	        const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
@@ -128,6 +136,13 @@
 	        this.subdivided = true;
 	        if (this.cacheChild && this.childrenCache !== null) {
 	            this.isMesh = false;
+	            this.objectsHolder.visible = false;
+	            this.childrenCache.forEach((n) => {
+	                if (n !== this.objectsHolder) {
+	                    n.isMesh = !n.subdivided;
+	                    n.objectsHolder.visible = !n.subdivided;
+	                }
+	            });
 	            this.children = this.childrenCache;
 	        }
 	        else {
@@ -138,19 +153,23 @@
 	        if (this.cacheChild && this.children.length > 0) {
 	            this.childrenCache = this.children;
 	        }
+	        this.childrenCache = this.children;
+	        this.objectsHolder.visible = true;
 	        this.subdivided = false;
 	        this.isMesh = true;
-	        this.children = [];
+	        this.children = [this.objectsHolder];
 	    }
 	    loadTexture() {
 	        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
-	            const texture = new three.Texture(image);
-	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
-	            texture.magFilter = three.LinearFilter;
-	            texture.minFilter = three.LinearFilter;
-	            texture.needsUpdate = true;
-	            this.material.map = texture;
+	            if (image) {
+	                const texture = new three.Texture(image);
+	                texture.generateMipmaps = false;
+	                texture.format = three.RGBFormat;
+	                texture.magFilter = three.LinearFilter;
+	                texture.minFilter = three.LinearFilter;
+	                texture.needsUpdate = true;
+	                this.material.map = texture;
+	            }
 	            this.nodeReady();
 	        }).catch(() => {
 	            const canvas = new OffscreenCanvas(1, 1);
@@ -171,14 +190,20 @@
 	                if (this.parentNode.subdivided === true) {
 	                    this.parentNode.isMesh = false;
 	                }
-	                for (let i = 0; i < this.parentNode.children.length; i++) {
-	                    this.parentNode.children[i].visible = true;
-	                }
+	                parentNode.children.forEach((child, index) => {
+	                    if (child !== parentNode.objectsHolder) {
+	                        let theNode = child;
+	                        theNode.isMesh = !theNode.subdivided;
+	                        theNode.objectsHolder.visible = !theNode.subdivided;
+	                    }
+	                });
 	            }
 	        }
-	        else {
+	        else if (!this.subdivided) {
 	            this.visible = true;
+	            this.objectsHolder.visible = true;
 	        }
+	        this.mapView.onNodeReady();
 	    }
 	    getNeighborsDirection(direction) {
 	        return null;
@@ -231,8 +256,6 @@
 	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
 	        super(parentNode, mapView, location, level, x, y, MapPlaneNode.geometry, new three.MeshBasicMaterial({ wireframe: false }));
 	        this.matrixAutoUpdate = false;
-	        this.isMesh = true;
-	        this.visible = false;
 	    }
 	    initialize() {
 	        super.initialize();
@@ -439,8 +462,6 @@
 	        super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new three.MeshBasicMaterial({ wireframe: false }));
 	        this.applyScaleNode();
 	        this.matrixAutoUpdate = false;
-	        this.isMesh = true;
-	        this.visible = false;
 	    }
 	    initialize() {
 	        super.initialize();
@@ -532,7 +553,7 @@
 			// Calculate height of the title
 			vec4 _theight = texture2D(heightMap, vUv);
 			float _height = ((_theight.r * 255.0 * 65536.0 + _theight.g * 255.0 * 256.0 + _theight.b * 255.0) * 0.1) - 10000.0;
-			vec3 _transformed = position + _height * normal;
+			vec3 _transformed = position + _height * vec3(0,1,0);
 	
 			// Vertex position based on height
 			gl_Position = projectionMatrix * modelViewMatrix * vec4(_transformed, 1.0);
@@ -549,8 +570,6 @@
 	            texture.minFilter = three.LinearFilter;
 	            texture.needsUpdate = true;
 	            this.material.map = texture;
-	            this.textureLoaded = true;
-	            this.nodeReady();
 	        }).catch((err) => {
 	            console.error('GeoThree: Failed to load color node data.', err);
 	        }).finally(() => {
@@ -1084,19 +1103,29 @@
 	MapMartiniHeightNode.tileSize = 256;
 
 	class MapView extends three.Mesh {
-	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null) {
+	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null, nodeAutoLoad = false, onNodeReady) {
 	        super(undefined, new three.MeshBasicMaterial({ transparent: true, opacity: 0.0 }));
 	        this.lod = null;
 	        this.provider = null;
 	        this.heightProvider = null;
 	        this.root = null;
-	        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
-	            this.lod.updateLOD(this, camera, renderer, scene);
-	        };
+	        this.onNodeReady = null;
 	        this.lod = new LODRaycast();
 	        this.provider = provider;
 	        this.heightProvider = heightProvider;
+	        this.nodeAutoLoad = nodeAutoLoad;
+	        if (onNodeReady) {
+	            this.onNodeReady = onNodeReady;
+	        }
+	        else {
+	            this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+	                this.lod.updateLOD(this, camera, renderer, scene);
+	            };
+	        }
 	        this.setRoot(root);
+	    }
+	    nodeShouldAutoLoad() {
+	        return this.nodeAutoLoad;
 	    }
 	    setRoot(root) {
 	        if (typeof root === 'number') {
@@ -1131,7 +1160,7 @@
 	        }
 	    }
 	    clear() {
-	        this.traverse(function (children) {
+	        this.traverseVisible(function (children) {
 	            if (children.childrenCache) {
 	                children.childrenCache = null;
 	            }
