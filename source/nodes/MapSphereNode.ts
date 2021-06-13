@@ -105,22 +105,24 @@ export class MapSphereNode extends MapNode
 		const x = this.x * 2;
 		const y = this.y * 2;
 
-		let node = new MapSphereNode(this, this.mapView, MapNode.topLeft, level, x, y);
+		const Constructor = Object.getPrototypeOf(this).constructor;
+
+		let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new MapSphereNode(this, this.mapView, MapNode.topRight, level, x + 1, y);
+		node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new MapSphereNode(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+		node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new MapSphereNode(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+		node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);

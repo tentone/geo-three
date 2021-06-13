@@ -42,7 +42,7 @@
 	}
 
 	class MapNodeGeometry extends three.BufferGeometry {
-	    constructor(width, height, widthSegments, heightSegments) {
+	    constructor(width, height, widthSegments = 1.0, heightSegments = 1.0, skirt = false) {
 	        super();
 	        const widthHalf = width / 2;
 	        const heightHalf = height / 2;
@@ -958,11 +958,11 @@
 						float i = getElevation(vUv + vec2(offset,offset), 0.0);
 
 
-						float NormalLength = 500.0 / zoomlevel;
+						float normalLength = 500.0 / zoomlevel;
 
 						vec3 v0 = vec3(0.0, 0.0, 0.0);
-						vec3 v1 = vec3(0.0, NormalLength, 0.0);
-						vec3 v2 = vec3(NormalLength, 0.0, 0.0);
+						vec3 v1 = vec3(0.0, normalLength, 0.0);
+						vec3 v2 = vec3(normalLength, 0.0, 0.0);
 						v0.z = (e + d + g + h) / 4.0;
 						v1.z = (e+ b + a + d) / 4.0;
 						v2.z = (e+ h + i + f) / 4.0;
