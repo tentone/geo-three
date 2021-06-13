@@ -104,7 +104,7 @@ export class MapNodeGeometry extends BufferGeometry
 		buildPlane( 'x', 'z', 'y', 1, 1, width, height, skirtDepth, widthSegments, skirtSegments); // py
 
 		// Skirt
-		buildPlane('z', 'y', 'x', -1, -1, height, skirtDepth, width, skirtSegments, heightSegments);
+		buildPlane('z', 'y', 'x', -1, -1, height, skirtDepth, width, skirtSegments, heightSegments); // px
 		buildPlane('z', 'y', 'x', 1, -1, height, skirtDepth, -width, skirtSegments, heightSegments); // nx
 		buildPlane('x', 'y', 'z', 1, -1, width, skirtDepth, height, widthSegments, heightSegments); // pz
 		buildPlane('x', 'y', 'z', -1, -1, width, skirtDepth, -height, widthSegments, heightSegments); // nz

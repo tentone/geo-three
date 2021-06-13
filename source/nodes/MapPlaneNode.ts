@@ -23,7 +23,7 @@ export class MapPlaneNode extends MapNode
 
 	public static baseGeometry: BufferGeometry = MapPlaneNode.geometry;
 
-	public static baseScale: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
+	public static baseScale: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1.0, UnitsUtils.EARTH_PERIMETER);
 
 	public initialize(): void
 	{
