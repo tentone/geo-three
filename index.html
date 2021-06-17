@@ -147,6 +147,10 @@
 		
 		var camera = new THREE.PerspectiveCamera(80, 1, 1e2, 1e12);
 
+		var test = new THREE.Mesh(new Geo.MapNodeGeometry(1e6, 2e6, 1.0, 1.0, true, 1e5), new THREE.MeshPhongMaterial({color: 0xFFFFFF}));
+		test.position.set(0, 1e6);
+		scene.add(test);
+		
 		var controls = new THREE.MapControls(camera, canvas);
 		controls.minDistance = 1e1;
 		controls.zoomSpeed = 2.0;

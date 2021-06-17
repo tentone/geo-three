@@ -16,7 +16,7 @@ export class MapNodeGeometry extends BufferGeometry
 	 * @param heightSegments - Number of subdivisions along the height.
 	 * @param skirt - Skirt around the plane to mask gaps between tiles.
 	 */
-	public constructor(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, skirt: boolean = true, skirtDepth: number = 1.0, skirtSegments: number = 1.0)
+	public constructor(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, skirt: boolean = true, skirtDepth: number = 10.0, skirtSegments: number = 1.0)
 	{
 		super();
 
@@ -30,14 +30,10 @@ export class MapNodeGeometry extends BufferGeometry
 		let numberOfVertices = 0;
 
 		// Auxiliar method to build a plane geometry
-		const buildPlane = (u: string, v: string, w: string, udir: number, vdir: number, width: number, height: number, depth: number, gridX: number, gridY: number): void =>
+		const buildPlane = (u: string, v: string, w: string, udir: number, vdir: number, size: Vector3, offset: Vector3, gridX: number, gridY: number): void =>
 		{
-			const segmentWidth = width / gridX;
-			const segmentHeight = height / gridY;
-
-			const widthHalf = width / 2;
-			const heightHalf = height / 2;
-			const depthHalf = depth / 2;
+			const segmentWidth = size.x / gridX;
+			const segmentHeight = size.y / gridY;
 
 			const gridX1 = gridX + 1;
 			const gridY1 = gridY + 1;
@@ -49,16 +45,16 @@ export class MapNodeGeometry extends BufferGeometry
 			// Generate vertices, normals and uvs
 			for (let iy = 0; iy < gridY1; iy++)
 			{
-				const y = iy * segmentHeight - heightHalf;
+				const y = iy * segmentHeight - offset.y;
 
 				for (let ix = 0; ix < gridX1; ix++)
 				{
-					const x = ix * segmentWidth - widthHalf;
+					const x = ix * segmentWidth - offset.x;
 
 					// Set values to correct vector component
 					vector[u] = x * udir;
 					vector[v] = y * vdir;
-					vector[w] = depthHalf;
+					vector[w] = offset.z;
 
 					// Now apply vector to vertex buffer
 					vertices.push(vector.x, vector.y, vector.z);
@@ -66,7 +62,7 @@ export class MapNodeGeometry extends BufferGeometry
 					// Set values to correct vector component
 					vector[u] = 0;
 					vector[v] = 0;
-					vector[w] = depth > 0 ? 1 : - 1;
+					vector[w] = size.z > 0 ? 1 : - 1;
 
 					// Now apply vector to normal buffer
 					normals.push(vector.x, vector.y, vector.z);
@@ -101,18 +97,15 @@ export class MapNodeGeometry extends BufferGeometry
 		};
 
 		// Build top plane
-		buildPlane( 'x', 'z', 'y', 1, 1, width, height, skirtDepth, widthSegments, skirtSegments); // py
-
-		// Skirt
-		buildPlane('z', 'y', 'x', -1, -1, height, skirtDepth, width, skirtSegments, heightSegments); // px
-		buildPlane('z', 'y', 'x', 1, -1, height, skirtDepth, -width, skirtSegments, heightSegments); // nx
-		buildPlane('x', 'y', 'z', 1, -1, width, skirtDepth, height, widthSegments, heightSegments); // pz
-		buildPlane('x', 'y', 'z', -1, -1, width, skirtDepth, -height, widthSegments, heightSegments); // nz
+		buildPlane('x', 'z', 'y', 1, 1, new Vector3(width, height, skirtDepth), new Vector3(width / 2, height / 2, 0), widthSegments, skirtSegments); // py
 
 		// Generate geometry skirt
 		if (skirt)
 		{
-
+			buildPlane('z', 'y', 'x', -1, -1, new Vector3(height, skirtDepth, width), new Vector3(height / 2, 0, width / 2), skirtSegments, heightSegments); // px
+			buildPlane('z', 'y', 'x', 1, -1, new Vector3(height, skirtDepth, -width), new Vector3(height / 2, 0, -width / 2), skirtSegments, heightSegments); // nx
+			buildPlane('x', 'y', 'z', 1, -1, new Vector3(width, skirtDepth, height), new Vector3(width / 2, 0, height / 2), widthSegments, heightSegments); // pz
+			buildPlane('x', 'y', 'z', -1, -1, new Vector3(width, skirtDepth, -height), new Vector3(width / 2, 0, -height / 2), widthSegments, heightSegments); // nz
 		}
 
 		this.setIndex(indices);

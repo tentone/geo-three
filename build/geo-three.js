@@ -42,34 +42,31 @@
 	}
 
 	class MapNodeGeometry extends three.BufferGeometry {
-	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = true, skirtDepth = 1.0, skirtSegments = 1.0) {
+	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = true, skirtDepth = 10.0, skirtSegments = 1.0) {
 	        super();
 	        const indices = [];
 	        const vertices = [];
 	        const normals = [];
 	        const uvs = [];
 	        let numberOfVertices = 0;
-	        const buildPlane = (u, v, w, udir, vdir, width, height, depth, gridX, gridY) => {
-	            const segmentWidth = width / gridX;
-	            const segmentHeight = height / gridY;
-	            const widthHalf = width / 2;
-	            const heightHalf = height / 2;
-	            const depthHalf = depth / 2;
+	        const buildPlane = (u, v, w, udir, vdir, size, offset, gridX, gridY) => {
+	            const segmentWidth = size.x / gridX;
+	            const segmentHeight = size.y / gridY;
 	            const gridX1 = gridX + 1;
 	            const gridY1 = gridY + 1;
 	            let vertexCounter = 0;
 	            const vector = new three.Vector3();
 	            for (let iy = 0; iy < gridY1; iy++) {
-	                const y = iy * segmentHeight - heightHalf;
+	                const y = iy * segmentHeight - offset.y;
 	                for (let ix = 0; ix < gridX1; ix++) {
-	                    const x = ix * segmentWidth - widthHalf;
+	                    const x = ix * segmentWidth - offset.x;
 	                    vector[u] = x * udir;
 	                    vector[v] = y * vdir;
-	                    vector[w] = depthHalf;
+	                    vector[w] = offset.z;
 	                    vertices.push(vector.x, vector.y, vector.z);
 	                    vector[u] = 0;
 	                    vector[v] = 0;
-	                    vector[w] = depth > 0 ? 1 : -1;
+	                    vector[w] = size.z > 0 ? 1 : -1;
 	                    normals.push(vector.x, vector.y, vector.z);
 	                    uvs.push(ix / gridX);
 	                    uvs.push(1 - iy / gridY);
@@ -88,11 +85,13 @@
 	            }
 	            numberOfVertices += vertexCounter;
 	        };
-	        buildPlane('x', 'z', 'y', 1, 1, width, height, skirtDepth, widthSegments, skirtSegments);
-	        buildPlane('z', 'y', 'x', -1, -1, height, skirtDepth, width, skirtSegments, heightSegments);
-	        buildPlane('z', 'y', 'x', 1, -1, height, skirtDepth, -width, skirtSegments, heightSegments);
-	        buildPlane('x', 'y', 'z', 1, -1, width, skirtDepth, height, widthSegments, heightSegments);
-	        buildPlane('x', 'y', 'z', -1, -1, width, skirtDepth, -height, widthSegments, heightSegments);
+	        buildPlane('x', 'z', 'y', 1, 1, new three.Vector3(width, height, skirtDepth), new three.Vector3(width / 2, height / 2, 0), widthSegments, skirtSegments);
+	        if (skirt) {
+	            buildPlane('z', 'y', 'x', -1, -1, new three.Vector3(height, skirtDepth, width), new three.Vector3(height / 2, 0, width / 2), skirtSegments, heightSegments);
+	            buildPlane('z', 'y', 'x', 1, -1, new three.Vector3(height, skirtDepth, -width), new three.Vector3(height / 2, 0, -width / 2), skirtSegments, heightSegments);
+	            buildPlane('x', 'y', 'z', 1, -1, new three.Vector3(width, skirtDepth, height), new three.Vector3(width / 2, 0, height / 2), widthSegments, heightSegments);
+	            buildPlane('x', 'y', 'z', -1, -1, new three.Vector3(width, skirtDepth, -height), new three.Vector3(width / 2, 0, -height / 2), widthSegments, heightSegments);
+	        }
 	        this.setIndex(indices);
 	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
 	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
@@ -275,7 +274,7 @@
 	        return false;
 	    }
 	}
-	MapPlaneNode.geometry = new MapNodeGeometry(1, 1, 1, 1);
+	MapPlaneNode.geometry = new MapNodeGeometry(1, 1, 1, 1, false);
 	MapPlaneNode.baseGeometry = MapPlaneNode.geometry;
 	MapPlaneNode.baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1.0, UnitsUtils.EARTH_PERIMETER);
 
