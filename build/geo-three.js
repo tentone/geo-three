@@ -42,55 +42,53 @@
 	}
 
 	class MapNodeGeometry extends three.BufferGeometry {
-	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = true, skirtDepth = 10.0, skirtSegments = 1.0) {
+	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = true, skirtDepth = 10.0) {
 	        super();
+	        const widthHalf = width / 2;
+	        const heightHalf = height / 2;
+	        const gridX = widthSegments + 1;
+	        const gridZ = heightSegments + 1;
+	        const segmentWidth = width / widthSegments;
+	        const segmentHeight = height / heightSegments;
 	        const indices = [];
 	        const vertices = [];
 	        const normals = [];
 	        const uvs = [];
-	        let numberOfVertices = 0;
-	        const buildPlane = (u, v, w, udir, vdir, size, offset, gridX, gridY) => {
-	            const segmentWidth = size.x / gridX;
-	            const segmentHeight = size.y / gridY;
-	            const gridX1 = gridX + 1;
-	            const gridY1 = gridY + 1;
-	            let vertexCounter = 0;
-	            const vector = new three.Vector3();
-	            for (let iy = 0; iy < gridY1; iy++) {
-	                const y = iy * segmentHeight - offset.y;
-	                for (let ix = 0; ix < gridX1; ix++) {
-	                    const x = ix * segmentWidth - offset.x;
-	                    vector[u] = x * udir;
-	                    vector[v] = y * vdir;
-	                    vector[w] = offset.z;
-	                    vertices.push(vector.x, vector.y, vector.z);
-	                    vector[u] = 0;
-	                    vector[v] = 0;
-	                    vector[w] = size.z > 0 ? 1 : -1;
-	                    normals.push(vector.x, vector.y, vector.z);
-	                    uvs.push(ix / gridX);
-	                    uvs.push(1 - iy / gridY);
-	                    vertexCounter += 1;
-	                }
+	        for (let iz = 0; iz < gridZ; iz++) {
+	            const z = iz * segmentHeight - heightHalf;
+	            for (let ix = 0; ix < gridX; ix++) {
+	                const x = ix * segmentWidth - widthHalf;
+	                vertices.push(x, 0, z);
+	                normals.push(0, 1, 0);
+	                uvs.push(ix / widthSegments, 1 - iz / heightSegments);
 	            }
-	            for (let iy = 0; iy < gridY; iy++) {
-	                for (let ix = 0; ix < gridX; ix++) {
-	                    const a = numberOfVertices + ix + gridX1 * iy;
-	                    const b = numberOfVertices + ix + gridX1 * (iy + 1);
-	                    const c = numberOfVertices + (ix + 1) + gridX1 * (iy + 1);
-	                    const d = numberOfVertices + (ix + 1) + gridX1 * iy;
-	                    indices.push(a, b, d);
-	                    indices.push(b, c, d);
-	                }
+	        }
+	        for (let iz = 0; iz < heightSegments; iz++) {
+	            for (let ix = 0; ix < widthSegments; ix++) {
+	                const a = ix + gridX * iz;
+	                const b = ix + gridX * (iz + 1);
+	                const c = ix + 1 + gridX * (iz + 1);
+	                const d = ix + 1 + gridX * iz;
+	                indices.push(a, b, d);
+	                indices.push(b, c, d);
 	            }
-	            numberOfVertices += vertexCounter;
-	        };
-	        buildPlane('x', 'z', 'y', 1, 1, new three.Vector3(width, height, skirtDepth), new three.Vector3(width / 2, height / 2, 0), widthSegments, skirtSegments);
+	        }
 	        if (skirt) {
-	            buildPlane('z', 'y', 'x', -1, -1, new three.Vector3(height, skirtDepth, width), new three.Vector3(height / 2, 0, width / 2), skirtSegments, heightSegments);
-	            buildPlane('z', 'y', 'x', 1, -1, new three.Vector3(height, skirtDepth, -width), new three.Vector3(height / 2, 0, -width / 2), skirtSegments, heightSegments);
-	            buildPlane('x', 'y', 'z', 1, -1, new three.Vector3(width, skirtDepth, height), new three.Vector3(width / 2, 0, height / 2), widthSegments, heightSegments);
-	            buildPlane('x', 'y', 'z', -1, -1, new three.Vector3(width, skirtDepth, -height), new three.Vector3(width / 2, 0, -height / 2), widthSegments, heightSegments);
+	            for (let ix = 0; ix < gridX; ix++) {
+	                const x = ix * segmentWidth - widthHalf;
+	                vertices.push(x, -skirtDepth, 0);
+	                normals.push(0, 0, 1);
+	                uvs.push(ix / widthSegments, 0);
+	            }
+	            const start = vertices.length / 3;
+	            for (let ix = 0; ix < widthSegments; ix++) {
+	                const a = ix;
+	                const d = ix + 1;
+	                const b = ix + start;
+	                const c = ix + start + 1;
+	                indices.push(a, b, d);
+	                indices.push(b, c, d);
+	            }
 	        }
 	        this.setIndex(indices);
 	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
