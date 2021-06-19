@@ -71,40 +71,75 @@ export class MapNodeGeometry extends BufferGeometry
 				const c = ix + 1 + gridX * (iz + 1);
 				const d = ix + 1 + gridX * iz;
 
-				// faces
-				indices.push(a, b, d);
-				indices.push(b, c, d);
+				// Faces
+				indices.push(a, b, d, b, c, d);
 			}
 		}
 		
 		if (skirt)
 		{
-			
+			let start = vertices.length / 3;
+
 			// Down X
 			for (let ix = 0; ix < gridX; ix++) 
 			{
 				const x = ix * segmentWidth - widthHalf;
+				const z = -heightHalf;
 
-				vertices.push(x, -skirtDepth, 0);
-				normals.push(0, 0, 1);
-				uvs.push(ix / widthSegments, 0);
+				vertices.push(x, -skirtDepth, z);
+				normals.push(0, 1, 0);
+				uvs.push(ix / widthSegments, 1);
 			}
 
 			// Indices
-			const start = vertices.length / 3;
-
 			for (let ix = 0; ix < widthSegments; ix++) 
 			{
+				
 				const a = ix;
 				const d = ix + 1;
 				const b = ix + start;
 				const c = ix + start + 1;
-
-
-				// faces
-				indices.push(a, b, d);
-				indices.push(b, c, d);
+				indices.push(a, b, d, b, c, d);
 			}
+
+			start = vertices.length / 3;
+
+			// Up X
+			for (let ix = 0; ix < gridX; ix++) 
+			{
+				const x = ix * segmentWidth - widthHalf;
+				const z = heightSegments * segmentHeight - heightHalf;
+
+				vertices.push(x, -skirtDepth, z);
+				normals.push(0, 1, 0);
+				uvs.push(ix / widthSegments, 0);
+			}
+			
+			// Index of the beginning of the last X row
+			let offset = gridX * gridZ - widthSegments - 1; 
+
+			for (let ix = 0; ix < widthSegments; ix++) 
+			{
+				const a = offset + ix;
+				const d = offset + ix + 1;
+				const b = ix + start;
+				const c = ix + start + 1;
+				indices.push(a, b, d, b, c, d);
+			}
+
+			start = vertices.length / 3;
+
+			// Down Z
+			for (let iz = 0; iz < gridZ; iz++) 
+			{
+				const z = iz * segmentHeight - heightHalf;
+				const x = 0 * segmentWidth - widthHalf;
+
+				vertices.push(x, -skirtDepth, z);
+				normals.push(0, 1, 0);
+				uvs.push(0 / widthSegments, 1 - iz / heightSegments);
+			}
+			
 		}
 
 		/*
