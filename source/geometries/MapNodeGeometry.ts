@@ -94,12 +94,11 @@ export class MapNodeGeometry extends BufferGeometry
 			// Indices
 			for (let ix = 0; ix < widthSegments; ix++) 
 			{
-				
 				const a = ix;
 				const d = ix + 1;
 				const b = ix + start;
 				const c = ix + start + 1;
-				indices.push(a, b, d, b, c, d);
+				indices.push(d, b, a, d, c, b);
 			}
 
 			start = vertices.length / 3;
@@ -133,98 +132,47 @@ export class MapNodeGeometry extends BufferGeometry
 			for (let iz = 0; iz < gridZ; iz++) 
 			{
 				const z = iz * segmentHeight - heightHalf;
-				const x = 0 * segmentWidth - widthHalf;
+				const x = - widthHalf;
 
 				vertices.push(x, -skirtDepth, z);
 				normals.push(0, 1, 0);
-				uvs.push(0 / widthSegments, 1 - iz / heightSegments);
+				uvs.push(0, 1 - iz / heightSegments);
 			}
-			
-		}
 
-		/*
-		// Count the number of vertices.
-		let numberOfVertices = 0;
-
-		// Auxiliar method to build a plane geometry
-		const buildPlane = (u: string, v: string, w: string, udir: number, vdir: number, size: Vector3, offset: Vector3, gridX: number, gridY: number): void =>
-		{
-			const segmentWidth = size.x / gridX;
-			const segmentHeight = size.y / gridY;
-
-			const gridX1 = gridX + 1;
-			const gridY1 = gridY + 1;
-
-			let vertexCounter = 0;
-
-			const vector = new Vector3();
-
-			// Generate vertices, normals and uvs
-			for (let iy = 0; iy < gridY1; iy++)
+			for (let iz = 0; iz < heightSegments; iz++) 
 			{
-				const y = iy * segmentHeight - offset.y;
+				const a = iz * gridZ;
+				const d = (iz + 1) * gridZ;
+				const b = iz + start;
+				const c = iz + start + 1;
 
-				for (let ix = 0; ix < gridX1; ix++)
-				{
-					const x = ix * segmentWidth - offset.x;
-
-					// Set values to correct vector component
-					vector[u] = x * udir;
-					vector[v] = y * vdir;
-					vector[w] = offset.z;
-
-					// Now apply vector to vertex buffer
-					vertices.push(vector.x, vector.y, vector.z);
-
-					// Set values to correct vector component
-					vector[u] = 0;
-					vector[v] = 0;
-					vector[w] = size.z > 0 ? 1 : - 1;
-
-					// Now apply vector to normal buffer
-					normals.push(vector.x, vector.y, vector.z);
-
-					// UVs
-					uvs.push(ix / gridX);
-					uvs.push(1 - iy / gridY);
-
-					// Counters
-					vertexCounter += 1;
-				}
+				indices.push(a, b, d, b, c, d);
 			}
 
-			// Three indices to draw a single face, each segment consists of two faces, we generate six (2*3) indices per segment
-			for (let iy = 0; iy < gridY; iy ++)
+			start = vertices.length / 3;
+
+			// Up Z
+			for (let iz = 0; iz < gridZ; iz++) 
 			{
-				for (let ix = 0; ix < gridX; ix ++)
-				{
-					const a = numberOfVertices + ix + gridX1 * iy;
-					const b = numberOfVertices + ix + gridX1 * (iy + 1);
-					const c = numberOfVertices + (ix + 1) + gridX1 * (iy + 1);
-					const d = numberOfVertices + (ix + 1) + gridX1 * iy;
+				const z = iz * segmentHeight - heightHalf;
+				const x = widthSegments * segmentWidth - widthHalf;
 
-					// Faces
-					indices.push(a, b, d);
-					indices.push(b, c, d);
-				}
+				vertices.push(x, -skirtDepth, z);
+				normals.push(0, 1, 0);
+
+				uvs.push(1.0, 1 - iz / heightSegments);
 			}
 
-			// Update total number of vertices
-			numberOfVertices += vertexCounter;
-		};
-
-		// Build top plane
-		buildPlane('x', 'z', 'y', 1, 1, new Vector3(width, height, skirtDepth), new Vector3(width / 2, height / 2, 0), widthSegments, skirtSegments); // py
-
-		// Generate geometry skirt
-		if (skirt)
-		{
-			buildPlane('z', 'y', 'x', -1, -1, new Vector3(height, skirtDepth, width), new Vector3(height / 2, 0, width / 2), skirtSegments, heightSegments); // px
-			buildPlane('z', 'y', 'x', 1, -1, new Vector3(height, skirtDepth, -width), new Vector3(height / 2, 0, -width / 2), skirtSegments, heightSegments); // nx
-			buildPlane('x', 'y', 'z', 1, -1, new Vector3(width, skirtDepth, height), new Vector3(width / 2, 0, height / 2), widthSegments, heightSegments); // pz
-			buildPlane('x', 'y', 'z', -1, -1, new Vector3(width, skirtDepth, -height), new Vector3(width / 2, 0, -height / 2), widthSegments, heightSegments); // nz
+			for (let iz = 0; iz < heightSegments; iz++) 
+			{
+				const a = iz * gridZ + heightSegments;
+				const d = (iz + 1) * gridZ + heightSegments;
+				const b = iz + start;
+				const c = iz + start + 1;
+				
+				indices.push(d, b, a, d, c, b);
+			}
 		}
-		*/
 
 		this.setIndex(indices);
 		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));

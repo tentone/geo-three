@@ -86,7 +86,7 @@
 	                const d = ix + 1;
 	                const b = ix + start;
 	                const c = ix + start + 1;
-	                indices.push(a, b, d, b, c, d);
+	                indices.push(d, b, a, d, c, b);
 	            }
 	            start = vertices.length / 3;
 	            for (let ix = 0; ix < gridX; ix++) {
@@ -107,10 +107,32 @@
 	            start = vertices.length / 3;
 	            for (let iz = 0; iz < gridZ; iz++) {
 	                const z = iz * segmentHeight - heightHalf;
-	                const x = 0 * segmentWidth - widthHalf;
+	                const x = -widthHalf;
 	                vertices.push(x, -skirtDepth, z);
 	                normals.push(0, 1, 0);
-	                uvs.push(0 / widthSegments, 1 - iz / heightSegments);
+	                uvs.push(0, 1 - iz / heightSegments);
+	            }
+	            for (let iz = 0; iz < heightSegments; iz++) {
+	                const a = iz * gridZ;
+	                const d = (iz + 1) * gridZ;
+	                const b = iz + start;
+	                const c = iz + start + 1;
+	                indices.push(a, b, d, b, c, d);
+	            }
+	            start = vertices.length / 3;
+	            for (let iz = 0; iz < gridZ; iz++) {
+	                const z = iz * segmentHeight - heightHalf;
+	                const x = widthSegments * segmentWidth - widthHalf;
+	                vertices.push(x, -skirtDepth, z);
+	                normals.push(0, 1, 0);
+	                uvs.push(1.0, 1 - iz / heightSegments);
+	            }
+	            for (let iz = 0; iz < heightSegments; iz++) {
+	                const a = iz * gridZ + heightSegments;
+	                const d = (iz + 1) * gridZ + heightSegments;
+	                const b = iz + start;
+	                const c = iz + start + 1;
+	                indices.push(d, b, a, d, c, b);
 	            }
 	        }
 	        this.setIndex(indices);
@@ -610,7 +632,7 @@
 	}
 	MapHeightNodeShader.emptyTexture = new three.Texture();
 	MapHeightNodeShader.geometrySize = 256;
-	MapHeightNodeShader.geometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
+	MapHeightNodeShader.geometry = new MapNodeGeometry(1.0, 1.0, MapHeightNode.geometrySize, MapHeightNode.geometrySize, true, 1.0);
 	MapHeightNodeShader.baseGeometry = MapPlaneNode.geometry;
 	MapHeightNodeShader.baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 

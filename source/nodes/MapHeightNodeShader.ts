@@ -42,7 +42,7 @@ export class MapHeightNodeShader extends MapHeightNode
 	/**
 	 * Map node plane geometry.
 	 */
-	public static geometry: BufferGeometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
+	public static geometry: BufferGeometry = new MapNodeGeometry(1.0, 1.0, MapHeightNode.geometrySize, MapHeightNode.geometrySize, true, 1.0);
 
 	public static baseGeometry: BufferGeometry = MapPlaneNode.geometry;
 
