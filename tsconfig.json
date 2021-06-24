@@ -8,7 +8,7 @@
 		"sourceMap": true,
 		"inlineSourceMap": false,
 		"inlineSources": false,
-		"declaration": false,
+		"declaration": true,
 		"allowUnreachableCode": false,
 		"allowUnusedLabels": false,
 		"emitDecoratorMetadata": true,
