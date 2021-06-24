@@ -1,6 +1,6 @@
 {
 	"name": "geo-three",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"description": "geo-three is library for tile based geographic map layers in with three.js supporting selective loading/unloading of real-time generated 3D tiles",
 	"main": "build/geo-three.min.js",
 	"repository": {
