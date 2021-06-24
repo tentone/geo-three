@@ -1,0 +1,420 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>geo-three</title>
+	<meta name="description" content="Documentation for geo-three">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">geo-three</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>geo-three</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#geo-three" id="geo-three" style="color: inherit; text-decoration: none;">
+					<h1>Geo-Three</h1>
+				</a>
+				<p><a href="https://badge.fury.io/js/geo-three"><img src="https://badge.fury.io/js/geo-three.svg" alt="npm version"></a><a href="https://badge.fury.io/gh/tentone%2Fgeo-three"><img src="https://badge.fury.io/gh/tentone%2Fgeo-three.svg" alt="GitHub version"></a></p>
+				<ul>
+					<li>Library to display maps using <code>three.js</code>. Allows for full world scale visualization of geographic data using tile based chunks.</li>
+					<li>Can generate 3D geometry for terrain from terrain height data using software generated tiles or using GPU displacement maps.</li>
+					<li>Supports multiple maps service providers (<a href="https://www.microsoft.com/en-us/maps">BingMaps</a>, <a href="https://developers.google.com/maps/documentation">GoogleMaps</a>, <a href="https://developer.here.com/">HereMaps</a>, <a href="https://docs.mapbox.com/api/">MapBox</a>, <a href="https://www.maptiler.com/">MapTiler</a>, <a href="https://openmaptiles.org/">OpenMapTiles</a>, <a href="https://www.openstreetmap.org/">OpenStreetMaps</a>).<ul>
+							<li>Each one of these map providers require a developer account and a API configuration to be used.</li>
+							<li>Its possible to implement new provides using the <code>MapProvider</code> interface.</li>
+							<li>Providers should have a tile based map system to be supported by the library.</li>
+						</ul>
+					</li>
+					<li>You can test the <a href="https://tentone.github.io/geo-three/examples/index.html">live demo of the library running</a> from the GitHub page.</li>
+				</ul>
+				<p><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/b.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/c.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/e.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/d.png" width="380"></p>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h3>Usage</h3>
+				</a>
+				<ul>
+					<li>To add the library to your project get the library trough NPM alongside with three.js and use it as a ES module.</li>
+					<li>You can also include the library directly in you webpage but ensure first that THREE is available globally.</li>
+				</ul>
+				<pre><code class="language-javascript"><span style="color: #008000">// Create a map tiles provider object</span>
+<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">provider</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">OpenStreetMapsProvider</span><span style="color: #000000">();</span>
+
+<span style="color: #008000">// Create the map view and add it to your THREE scene</span>
+<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">map</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MapView</span><span style="color: #000000">(</span><span style="color: #001080">MapView</span><span style="color: #000000">.</span><span style="color: #0070C1">PLANAR</span><span style="color: #000000">, </span><span style="color: #001080">provider</span><span style="color: #000000">);</span>
+<span style="color: #001080">scene</span><span style="color: #000000">.</span><span style="color: #795E26">add</span><span style="color: #000000">(</span><span style="color: #001080">map</span><span style="color: #000000">);</span>
+</code></pre>
+				<a href="#coordinates" id="coordinates" style="color: inherit; text-decoration: none;">
+					<h3>Coordinates</h3>
+				</a>
+				<ul>
+					<li>The project uses internally a XY <a href="https://epsg.io/900913">EPSG:900913</a> coordinate format to be compatible with the XYZ coordinates used in three.js</li>
+					<li>Use the <code>UnitsUtils</code> class to access the unit conversion methods for example to convert a latitude, longitude <a href="https://epsg.io/4326">WGS84</a> pair value to XY coordinates you can use the code bellow:</li>
+				</ul>
+				<pre><code class="language-javascript"><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">coords</span><span style="color: #000000"> = </span><span style="color: #001080">Geo</span><span style="color: #000000">.</span><span style="color: #001080">UnitsUtils</span><span style="color: #000000">.</span><span style="color: #795E26">datumsToSpherical</span><span style="color: #000000">(</span><span style="color: #098658">40.940119</span><span style="color: #000000">, -</span><span style="color: #098658">8.535589</span><span style="color: #000000">);</span>
+<span style="color: #001080">controls</span><span style="color: #000000">.</span><span style="color: #001080">target</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #001080">coords</span><span style="color: #000000">.</span><span style="color: #001080">x</span><span style="color: #000000">, </span><span style="color: #098658">0</span><span style="color: #000000">, -</span><span style="color: #001080">coords</span><span style="color: #000000">.</span><span style="color: #001080">y</span><span style="color: #000000">);</span>
+</code></pre>
+				<a href="#tile-loading" id="tile-loading" style="color: inherit; text-decoration: none;">
+					<h3>Tile Loading</h3>
+				</a>
+				<ul>
+					<li><p>Tiles are fetched from the service API configured, each one of the services requires specific configuration using the specific <code>MapProvider</code> object.</p>
+					</li>
+					<li><p>Base tiles are always loaded at the beginning of the process, then each frame a couple of rays are casted into the tile tree. The number of rays can be configured using the <code>MapView</code> <code>subdivisionRays</code> attribute.</p>
+					</li>
+					<li><p>The distance of the ray to the camera is used to define if the node needs to simplified or sub-divided. These values can be configured using the <code>thresholdUp</code> and <code>thresholdDown</code> values.</p>
+						<p>​    </p>
+					</li>
+				</ul>
+				<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/tiles.png" width="350">
+				<a href="#data-providers" id="data-providers" style="color: inherit; text-decoration: none;">
+					<h3>Data Providers</h3>
+				</a>
+				<ul>
+					<li><p>The library has support for multiple data providers that must be configured beforehand. Most of these data providers rely on external API that differ from service to service.</p>
+					</li>
+					<li><p>Each one of them has its own provider object implementation of the <code>MapProvider</code> interface.</p>
+					</li>
+					<li><p>The <code>DebugProvider</code> provides information about the tiles loaded, shows the zoom level and the coordinates of the tile relative to the origin in that specific level.</p>
+					</li>
+				</ul>
+				<p><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_sat.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/bing_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/heremaps_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/osm_vector.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/debug.png" width="270"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/providers/mapbox_height.png" width="270"></p>
+				<a href="#lod-control" id="lod-control" style="color: inherit; text-decoration: none;">
+					<h3>LOD Control</h3>
+				</a>
+				<ul>
+					<li>The library includes multiple methods for LOD control, that define how tiles are subdivided or simplified.<ul>
+							<li>Raycast: uses ray casting determine the distance of the nodes to the camera view, it only considers the nodes inside of the view frustum. It uses random sampling and takes some time to pick all nodes to be subdivided but is overall faster.</li>
+							<li>Radial: Calculates the distance from the camera to each one of the nodes, the nodes closer are subdivided and nodes far away are simplified a simple and effective method that considers all nodes, and provides a more consistent result.</li>
+							<li>Frustum: Similar to the radial mode but only nodes inside of the view frustum are considered for subdivision.</li>
+						</ul>
+					</li>
+					<li>Custom <code>LODControl</code> can be implemented by extending the <code>LODControl</code> object and implementing the <code>updateLOD(view, camera, renderer, scene)</code> method.</li>
+				</ul>
+				<pre><code class="language-javascript"><span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">DistanceLOD</span><span style="color: #000000"> </span><span style="color: #0000FF">extends</span><span style="color: #000000"> </span><span style="color: #267F99">LODControl</span>
+<span style="color: #000000">{</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">constructor</span><span style="color: #000000">() {</span><span style="color: #0000FF">super</span><span style="color: #000000">();}</span>
+
+<span style="color: #000000">    </span><span style="color: #795E26">updateLOD</span><span style="color: #000000">(</span><span style="color: #001080">view</span><span style="color: #000000">, </span><span style="color: #001080">camera</span><span style="color: #000000">, </span><span style="color: #001080">renderer</span><span style="color: #000000">, </span><span style="color: #001080">scene</span><span style="color: #000000">)</span>
+<span style="color: #000000">    {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// Get world position of the camera.</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">pov</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Vector3</span><span style="color: #000000">();</span>
+<span style="color: #000000">        </span><span style="color: #001080">camera</span><span style="color: #000000">.</span><span style="color: #795E26">getWorldPosition</span><span style="color: #000000">(</span><span style="color: #001080">pov</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">        </span><span style="color: #001080">view</span><span style="color: #000000">.</span><span style="color: #795E26">traverse</span><span style="color: #000000">(</span><span style="color: #0000FF">function</span><span style="color: #000000">(</span><span style="color: #001080">node</span><span style="color: #000000">)</span>
+<span style="color: #000000">        {</span>
+<span style="color: #000000">            </span><span style="color: #008000">// Check if child in a MapNode</span>
+<span style="color: #000000">            </span><span style="color: #AF00DB">if</span><span style="color: #000000">(</span><span style="color: #001080">node</span><span style="color: #000000"> </span><span style="color: #0000FF">instanceof</span><span style="color: #000000"> </span><span style="color: #267F99">MapNode</span><span style="color: #000000">)</span>
+<span style="color: #000000">            {</span>
+<span style="color: #000000">                </span><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">position</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Vector3</span><span style="color: #000000">();</span>
+<span style="color: #000000">                </span><span style="color: #001080">node</span><span style="color: #000000">.</span><span style="color: #795E26">getWorldPosition</span><span style="color: #000000">(</span><span style="color: #001080">position</span><span style="color: #000000">);</span>
+<span style="color: #000000">                </span>
+<span style="color: #000000">                </span><span style="color: #008000">// Distance between camera and tile</span>
+<span style="color: #000000">                </span><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">distance</span><span style="color: #000000"> = </span><span style="color: #001080">pov</span><span style="color: #000000">.</span><span style="color: #795E26">distanceTo</span><span style="color: #000000">(</span><span style="color: #001080">position</span><span style="color: #000000">);</span>
+<span style="color: #000000">                </span>
+<span style="color: #000000">                </span><span style="color: #008000">// Normalize distance based on tile level</span>
+<span style="color: #000000">                </span><span style="color: #001080">distance</span><span style="color: #000000"> /= </span><span style="color: #267F99">Math</span><span style="color: #000000">.</span><span style="color: #795E26">pow</span><span style="color: #000000">(</span><span style="color: #098658">2</span><span style="color: #000000">, </span><span style="color: #098658">20</span><span style="color: #000000"> - </span><span style="color: #001080">node</span><span style="color: #000000">.</span><span style="color: #001080">level</span><span style="color: #000000">);</span>
+<span style="color: #000000">                </span>
+<span style="color: #000000">                </span><span style="color: #008000">// If closer than X subdivide</span>
+<span style="color: #000000">                </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">distance</span><span style="color: #000000"> &lt; </span><span style="color: #098658">50</span><span style="color: #000000">)</span>
+<span style="color: #000000">                {</span>
+<span style="color: #000000">                    </span><span style="color: #001080">node</span><span style="color: #000000">.</span><span style="color: #795E26">subdivide</span><span style="color: #000000">();</span>
+<span style="color: #000000">                }</span>
+<span style="color: #000000">                </span><span style="color: #008000">// If far away, simplify parent</span>
+<span style="color: #000000">                </span><span style="color: #AF00DB">else</span><span style="color: #000000"> </span><span style="color: #AF00DB">if</span><span style="color: #000000"> (</span><span style="color: #001080">distance</span><span style="color: #000000"> &gt; </span><span style="color: #098658">200</span><span style="color: #000000"> </span><span style="color: #001080">node</span><span style="color: #000000">.</span><span style="color: #001080">parentNode</span><span style="color: #000000">)</span>
+<span style="color: #000000">                {</span>
+<span style="color: #000000">                    </span><span style="color: #001080">node</span><span style="color: #000000">.</span><span style="color: #001080">parentNode</span><span style="color: #000000">.</span><span style="color: #795E26">simplify</span><span style="color: #000000">();</span>
+<span style="color: #000000">                }</span>
+<span style="color: #000000">            }</span>
+<span style="color: #000000">        });</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<a href="#tiles-map-nodes" id="tiles-map-nodes" style="color: inherit; text-decoration: none;">
+					<h3>Tiles Map Nodes</h3>
+				</a>
+				<ul>
+					<li><code>MapNode</code> objects are used to define how the tiles should be represented in the space. <code>MapNode</code> are organized hierarchically, every node implements the MapNode class that is based on the THREE.Mesh class (every map node has a visual representation as a mesh).</li>
+					<li>The library has support for both planar and spherical representation of tiles. Most providers only have planar tiles available.<ul>
+							<li>It is required that the tiles for spherical mode are previously adjusted, since planar tiles get more stretched as closer you get to the poles.</li>
+						</ul>
+					</li>
+				</ul>
+				<p><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/planar.png" width="350"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/spherical.png" width="350"></p>
+				<ul>
+					<li>There are available formats for GPU shader generated geometry using height data directly from the providers. <ul>
+							<li>GPU generated geometry is more dense, more detailed and a lot faster. But the final geometry used is not accessible for ray casting, so interaction with these geometries is limited.</li>
+						</ul>
+					</li>
+					<li>On the left the geometry was generated in CPU and on the right the geometry was displaced directly in the vertex shader.</li>
+				</ul>
+				<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/shader.jpg" width="600">
+				<a href="#custom-data-providers" id="custom-data-providers" style="color: inherit; text-decoration: none;">
+					<h3>Custom Data Providers</h3>
+				</a>
+				<ul>
+					<li>It is possible to create new data providers to access data other tile sources. New data sources have to provide access to the rasterized tile as a compatible DOM element (e.g. <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement">Image</a>, <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement">Canvas</a>, ...)</li>
+					<li>Custom providers have to extend the base <code>MapProvider</code> class and implement the <code>fetchTile(zoom, x, y)</code> method that returns a <code>Promise</code> with access to the tile data.</li>
+					<li>Bellow is an implementation of a provider to access <a href="https://www.openstreetmap.org/">OpenStreetMaps</a> tile data using the <a href="https://wiki.openstreetmap.org/wiki/Tiles">Tile API</a> the provider simply loads the URL data into a image element.</li>
+					<li>These methods are called directly by nodes being loaded into the scene. These should be always asynchronous and should avoid any blocking actions.</li>
+				</ul>
+				<pre><code class="language-javascript"><span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">OpenStreetMapsProvider</span><span style="color: #000000"> </span><span style="color: #0000FF">extends</span><span style="color: #000000"> </span><span style="color: #267F99">MapProvider</span>
+<span style="color: #000000">{</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">constructor</span><span style="color: #000000">(</span><span style="color: #001080">address</span><span style="color: #000000">) {</span><span style="color: #0000FF">super</span><span style="color: #000000">();}</span>
+
+<span style="color: #000000">    </span><span style="color: #795E26">fetchTile</span><span style="color: #000000">(</span><span style="color: #001080">zoom</span><span style="color: #000000">, </span><span style="color: #001080">x</span><span style="color: #000000">, </span><span style="color: #001080">y</span><span style="color: #000000">)</span>
+<span style="color: #000000">    {</span>
+<span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #267F99">Promise</span><span style="color: #000000">((</span><span style="color: #001080">resolve</span><span style="color: #000000">, </span><span style="color: #001080">reject</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span>
+<span style="color: #000000">        {</span>
+<span style="color: #000000">            </span><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">image</span><span style="color: #000000"> = </span><span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">createElement</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;img&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">            </span><span style="color: #001080">image</span><span style="color: #000000">.</span><span style="color: #795E26">onload</span><span style="color: #000000"> = </span><span style="color: #0000FF">function</span><span style="color: #000000">(){</span><span style="color: #795E26">resolve</span><span style="color: #000000">(</span><span style="color: #001080">image</span><span style="color: #000000">);};</span>
+<span style="color: #000000">            </span><span style="color: #001080">image</span><span style="color: #000000">.</span><span style="color: #795E26">onerror</span><span style="color: #000000"> = </span><span style="color: #0000FF">function</span><span style="color: #000000">(){</span><span style="color: #795E26">reject</span><span style="color: #000000">();};</span>
+<span style="color: #000000">            </span><span style="color: #001080">image</span><span style="color: #000000">.</span><span style="color: #001080">crossOrigin</span><span style="color: #000000"> = </span><span style="color: #A31515">&quot;Anonymous&quot;</span><span style="color: #000000">;</span>
+<span style="color: #000000">            </span><span style="color: #001080">image</span><span style="color: #000000">.</span><span style="color: #001080">src</span><span style="color: #000000"> = </span><span style="color: #A31515">&quot;https://a.tile.openstreetmap.org/&quot;</span><span style="color: #000000"> + </span><span style="color: #001080">zoom</span><span style="color: #000000"> + </span><span style="color: #A31515">&quot;/&quot;</span><span style="color: #000000"> + </span><span style="color: #001080">x</span><span style="color: #000000"> + </span><span style="color: #A31515">&quot;/&quot;</span><span style="color: #000000"> + </span><span style="color: #001080">y</span><span style="color: #000000"> + </span><span style="color: #A31515">&quot;.png&quot;</span><span style="color: #000000">;</span>
+<span style="color: #000000">        });</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<ul>
+					<li>Tiles coordinates for each zoom level are counted from the left-top corner sequentially across the tiles.</li>
+					<li>Different API&#39;s might use different methods to index these tiles (e.g. <a href="https://docs.microsoft.com/en-us/bingmaps/articles/bing-maps-tile-system">Bing maps</a> uses a different indexing method).<ul>
+							<li>These coordinates need to be adapted to ensure correct loading when using this library.</li>
+						</ul>
+					</li>
+				</ul>
+				<img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/coords.png" width="600">
+				<ul>
+					<li>It is also possible to create fictional tiles without any external API to generate tiles by writing data directly into a canvas or even using a local image database to draw the map.</li>
+					<li>The code bellow shows how to implement a tile provided that draws a gradient from blue to red based on the zoom level of the tile with 16x16 pixels. This example can be used as basis for other code based tile generators.</li>
+				</ul>
+				<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">Color</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;three&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">BlueToRedProvider</span><span style="color: #000000"> </span><span style="color: #0000FF">extends</span><span style="color: #000000"> </span><span style="color: #267F99">MapProvider</span>
+<span style="color: #000000">{</span>
+<span style="color: #000000">    </span><span style="color: #795E26">fetchTile</span><span style="color: #000000">(</span><span style="color: #001080">zoom</span><span style="color: #000000">, </span><span style="color: #001080">x</span><span style="color: #000000">, </span><span style="color: #001080">y</span><span style="color: #000000">)</span>
+<span style="color: #000000">    {</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">canvas</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">OffscreenCanvas</span><span style="color: #000000">(</span><span style="color: #098658">16</span><span style="color: #000000">, </span><span style="color: #098658">16</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">context</span><span style="color: #000000"> = </span><span style="color: #001080">canvas</span><span style="color: #000000">.</span><span style="color: #795E26">getContext</span><span style="color: #000000">(</span><span style="color: #A31515">&#039;2d&#039;</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">blue</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Color</span><span style="color: #000000">(</span><span style="color: #098658">0x0000FF</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">red</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Color</span><span style="color: #000000">(</span><span style="color: #098658">0xFF0000</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">const</span><span style="color: #000000"> </span><span style="color: #0070C1">color</span><span style="color: #000000"> = </span><span style="color: #001080">blue</span><span style="color: #000000">.</span><span style="color: #795E26">lerpHSL</span><span style="color: #000000">(</span><span style="color: #001080">red</span><span style="color: #000000">, (</span><span style="color: #001080">zoom</span><span style="color: #000000"> - </span><span style="color: #0000FF">this</span><span style="color: #000000">.</span><span style="color: #001080">minZoom</span><span style="color: #000000">) / (</span><span style="color: #0000FF">this</span><span style="color: #000000">.</span><span style="color: #001080">maxZoom</span><span style="color: #000000"> - </span><span style="color: #0000FF">this</span><span style="color: #000000">.</span><span style="color: #001080">minZoom</span><span style="color: #000000">));</span>
+<span style="color: #000000">        </span>
+<span style="color: #000000">        </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #001080">fillStyle</span><span style="color: #000000"> = </span><span style="color: #001080">color</span><span style="color: #000000">.</span><span style="color: #795E26">getStyle</span><span style="color: #000000">();</span>
+<span style="color: #000000">        </span><span style="color: #001080">context</span><span style="color: #000000">.</span><span style="color: #795E26">fillRect</span><span style="color: #000000">(</span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #098658">16</span><span style="color: #000000">, </span><span style="color: #098658">16</span><span style="color: #000000">);</span>
+<span style="color: #000000">        </span><span style="color: #AF00DB">return</span><span style="color: #000000"> </span><span style="color: #267F99">Promise</span><span style="color: #000000">.</span><span style="color: #795E26">resolve</span><span style="color: #000000">(</span><span style="color: #001080">canvas</span><span style="color: #000000">);</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<a href="#custom-map-nodes" id="custom-map-nodes" style="color: inherit; text-decoration: none;">
+					<h3>Custom Map Nodes</h3>
+				</a>
+				<ul>
+					<li>To implement a custom <code>MapNode</code> we can create a new class that extends the base implementation.</li>
+					<li>The objects created from the class should then be passed as argument to the <code>MapView</code> object that is responsible for managing its life cycle.</li>
+					<li>All map nodes are based on three.js <code>Mesh</code> object and have attached a Geometry and Material used to render them into the scene.</li>
+					<li>These materials and geometries can be customized and are not required to be of any specific type. It is recommended to reuse them as much as possible to save memory.</li>
+				</ul>
+				<pre><code class="language-javascript"><span style="color: #AF00DB">import</span><span style="color: #000000"> {</span><span style="color: #001080">SphereGeometry</span><span style="color: #000000">, </span><span style="color: #001080">MeshBasicMaterial</span><span style="color: #000000">, </span><span style="color: #001080">Vector3</span><span style="color: #000000">} </span><span style="color: #AF00DB">from</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;three&quot;</span><span style="color: #000000">;</span>
+
+<span style="color: #008000">// The MapNode inherits from three Mesh object and requires a geometry and material</span>
+<span style="color: #AF00DB">export</span><span style="color: #000000"> </span><span style="color: #0000FF">class</span><span style="color: #000000"> </span><span style="color: #267F99">CustomMapNode</span><span style="color: #000000"> </span><span style="color: #0000FF">extends</span><span style="color: #000000"> </span><span style="color: #267F99">MapNode</span>
+<span style="color: #000000">{</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">constructor</span><span style="color: #000000">(</span><span style="color: #001080">parentNode</span><span style="color: #000000"> = </span><span style="color: #0000FF">null</span><span style="color: #000000">, </span><span style="color: #001080">mapView</span><span style="color: #000000"> = </span><span style="color: #0000FF">null</span><span style="color: #000000">, </span><span style="color: #001080">location</span><span style="color: #000000"> = </span><span style="color: #001080">MapNode</span><span style="color: #000000">.</span><span style="color: #0070C1">ROOT</span><span style="color: #000000">, </span><span style="color: #001080">level</span><span style="color: #000000"> = </span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #001080">x</span><span style="color: #000000"> = </span><span style="color: #098658">0</span><span style="color: #000000">, </span><span style="color: #001080">y</span><span style="color: #000000"> = </span><span style="color: #098658">0</span><span style="color: #000000">)</span>
+<span style="color: #000000">    {</span>
+<span style="color: #000000">        </span><span style="color: #0000FF">super</span><span style="color: #000000">(</span><span style="color: #001080">CustomMapNode</span><span style="color: #000000">.</span><span style="color: #0070C1">GEOMETRY</span><span style="color: #000000">, </span><span style="color: #001080">CustomMapNode</span><span style="color: #000000">.</span><span style="color: #0070C1">MATERIAL</span><span style="color: #000000">, </span><span style="color: #001080">parentNode</span><span style="color: #000000">, </span><span style="color: #001080">mapView</span><span style="color: #000000">, </span><span style="color: #001080">location</span><span style="color: #000000">, </span><span style="color: #001080">level</span><span style="color: #000000">, </span><span style="color: #001080">x</span><span style="color: #000000">, </span><span style="color: #001080">y</span><span style="color: #000000">);</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">    </span>
+<span style="color: #000000">    </span><span style="color: #0000FF">static</span><span style="color: #000000"> </span><span style="color: #001080">GEOMETRY</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">SphereGeometry</span><span style="color: #000000">(</span><span style="color: #098658">0.5</span><span style="color: #000000">, </span><span style="color: #098658">32</span><span style="color: #000000">, </span><span style="color: #098658">32</span><span style="color: #000000">); </span>
+<span style="color: #000000">    </span>
+<span style="color: #000000">    </span><span style="color: #0000FF">static</span><span style="color: #000000"> </span><span style="color: #001080">MATERIAL</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MeshBasicMaterial</span><span style="color: #000000">();</span>
+<span style="color: #000000">    </span>
+<span style="color: #000000">    </span><span style="color: #008000">// Base geometry applied to the map view.</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">static</span><span style="color: #000000"> </span><span style="color: #001080">BASE_GEOMETRY</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">MapNodeGeometry</span><span style="color: #000000">(</span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">);</span>
+<span style="color: #000000">    </span>
+<span style="color: #000000">    </span><span style="color: #008000">// Base scale is applied to the map view</span>
+<span style="color: #000000">    </span><span style="color: #0000FF">static</span><span style="color: #000000"> </span><span style="color: #001080">BASE_SCALE</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #795E26">Vector3</span><span style="color: #000000">(</span><span style="color: #001080">UnitsUtils</span><span style="color: #000000">.</span><span style="color: #0070C1">EARTH_PERIMETER</span><span style="color: #000000">, </span><span style="color: #098658">1</span><span style="color: #000000">, </span><span style="color: #001080">UnitsUtils</span><span style="color: #000000">.</span><span style="color: #0070C1">EARTH_PERIMETER</span><span style="color: #000000">);</span>
+
+<span style="color: #000000">    </span><span style="color: #795E26">initialize</span><span style="color: #000000">() {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// Method to initialize data of the node (e.g fetch assets)</span>
+<span style="color: #000000">    }</span>
+
+<span style="color: #000000">    </span><span style="color: #795E26">createChildNodes</span><span style="color: #000000">()</span>
+<span style="color: #000000">    {</span>
+<span style="color: #000000">        </span><span style="color: #008000">// Method called on subdivision to craete child nodes</span>
+<span style="color: #000000">    }</span>
+<span style="color: #000000">}</span>
+</code></pre>
+				<a href="#license" id="license" style="color: inherit; text-decoration: none;">
+					<h3>License</h3>
+				</a>
+				<ul>
+					<li>Project uses a MIT license that allow for commercial usage of the platform without any cost.</li>
+					<li>The license is available on the project GitHub page</li>
+				</ul>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Exports</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/main.html">Main</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/mapview.html">Map<wbr>View</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/geometries_mapnodegeometry.html">geometries/<wbr>Map<wbr>Node<wbr>Geometry</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/geometries_mapspherenodegeometry.html">geometries/<wbr>Map<wbr>Sphere<wbr>Node<wbr>Geometry</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/lod_lodcontrol.html">lod/LODControl</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/lod_lodfrustum.html">lod/LODFrustum</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/lod_lodradial.html">lod/LODRadial</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/lod_lodraycast.html">lod/LODRaycast</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_mapheightnode.html">nodes/<wbr>Map<wbr>Height<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_mapheightnodeshader.html">nodes/<wbr>Map<wbr>Height<wbr>Node<wbr>Shader</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_mapmartiniheightnode.html">nodes/<wbr>Map<wbr>Martini<wbr>Height<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_mapnode.html">nodes/<wbr>Map<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_mapplanenode.html">nodes/<wbr>Map<wbr>Plane<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_mapspherenode.html">nodes/<wbr>Map<wbr>Sphere<wbr>Node</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/nodes_martini.html">nodes/<wbr>Martini</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_bingmapsprovider.html">providers/<wbr>Bing<wbr>Maps<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_debugprovider.html">providers/<wbr>Debug<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_googlemapsprovider.html">providers/<wbr>Google<wbr>Maps<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_heightdebugprovider.html">providers/<wbr>Height<wbr>Debug<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_heremapsprovider.html">providers/<wbr>Here<wbr>Maps<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_mapboxprovider.html">providers/<wbr>Map<wbr>Box<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_mapprovider.html">providers/<wbr>Map<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_maptilerprovider.html">providers/<wbr>Map<wbr>Tiler<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_openmaptilesprovider.html">providers/<wbr>Open<wbr>Map<wbr>Tiles<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/providers_openstreetmapsprovider.html">providers/<wbr>Open<wbr>Street<wbr>Maps<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/utils_cancelablepromise.html">utils/<wbr>Cancelable<wbr>Promise</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/utils_unitsutils.html">utils/<wbr>Units<wbr>Utils</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/utils_xhrutils.html">utils/XHRUtils</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

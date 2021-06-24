@@ -21,11 +21,14 @@ import {MapNode} from './MapNode.js';
  */
 export class MapMartiniHeightNode extends MapHeightNode
 {
-	public static geometrySize = 16;
+	/**
+	 * Geometry size to be used for each martini height node.
+	 */
+	public static geometrySize: number = 16;
 
 	/**
-	* Empty texture used as a placeholder for missing textures.
-	*/
+	 * Empty texture used as a placeholder for missing textures.
+	 */
 	public static emptyTexture: Texture = new Texture();
 	
 	public static geometry = new MapNodeGeometry(1, 1, MapMartiniHeightNode.geometrySize, MapMartiniHeightNode.geometrySize);

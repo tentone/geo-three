@@ -6,6 +6,8 @@ import {BufferGeometry, Float32BufferAttribute, Vector3} from 'three';
  * Consists of a XZ plane with normals facing +Y.
  * 
  * The geometry points start in XZ plane that can be manipulated for example for height adjustment.
+ * 
+ * Geometry can also include skirts to mask off missalignments between tiles.
  */
 export class MapNodeGeometry extends BufferGeometry
 {
