@@ -37,7 +37,7 @@ export class MapHeightNode extends MapNode
 	/**
 	 * If true the tiles will compute their normals.
 	 */
-	public geometryNormals: boolean = true;
+	public geometryNormals: boolean = false;
 
 	/**
 	 * Map node plane geometry.
@@ -165,7 +165,7 @@ export class MapHeightNode extends MapNode
 		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
 			const geometry = new MapNodeGeometry(1, 1, this.geometrySize, this.geometrySize, true);
-			
+
 			const vertices = geometry.attributes.position.array as number[];
 
 			const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);

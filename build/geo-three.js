@@ -327,7 +327,7 @@
 	        this.heightLoaded = false;
 	        this.textureLoaded = false;
 	        this.geometrySize = 16;
-	        this.geometryNormals = true;
+	        this.geometryNormals = false;
 	        this.isMesh = true;
 	        this.visible = false;
 	        this.matrixAutoUpdate = false;
