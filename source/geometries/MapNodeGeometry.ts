@@ -20,7 +20,7 @@ export class MapNodeGeometry extends BufferGeometry
 	 * @param heightSegments - Number of subdivisions along the height.
 	 * @param skirt - Skirt around the plane to mask gaps between tiles.
 	 */
-	public constructor(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, skirt: boolean = true, skirtDepth: number = 10.0)
+	public constructor(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, skirt: boolean = false, skirtDepth: number = 10.0)
 	{
 		super();
 
@@ -78,6 +78,8 @@ export class MapNodeGeometry extends BufferGeometry
 			}
 		}
 		
+
+		// Generate the skirt
 		if (skirt)
 		{
 			let start = vertices.length / 3;

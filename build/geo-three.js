@@ -1,3 +1,5 @@
+
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -40,7 +42,7 @@
 	}
 
 	class MapNodeGeometry extends three.BufferGeometry {
-	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = true, skirtDepth = 10.0) {
+	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0) {
 	        super();
 	        const widthHalf = width / 2;
 	        const heightHalf = height / 2;
@@ -320,10 +322,12 @@
 	MapPlaneNode.baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1.0, UnitsUtils.EARTH_PERIMETER);
 
 	class MapHeightNode extends MapNode {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new three.MeshPhongMaterial({ color: 0x000000, emissive: 0xffffff })) {
+	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new three.MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
 	        super(parentNode, mapView, location, level, x, y, geometry, material);
 	        this.heightLoaded = false;
 	        this.textureLoaded = false;
+	        this.geometrySize = 16;
+	        this.geometryNormals = true;
 	        this.isMesh = true;
 	        this.visible = false;
 	        this.matrixAutoUpdate = false;
@@ -341,7 +345,7 @@
 	            texture.magFilter = three.LinearFilter;
 	            texture.minFilter = three.LinearFilter;
 	            texture.needsUpdate = true;
-	            this.material.emissiveMap = texture;
+	            this.material.map = texture;
 	        }).finally(() => {
 	            this.textureLoaded = true;
 	            this.nodeReady();
@@ -389,9 +393,9 @@
 	            throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	        }
 	        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
-	            const geometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
+	            const geometry = new MapNodeGeometry(1, 1, this.geometrySize, this.geometrySize, true);
 	            const vertices = geometry.attributes.position.array;
-	            const canvas = new OffscreenCanvas(MapHeightNode.geometrySize + 1, MapHeightNode.geometrySize + 1);
+	            const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 	            const context = canvas.getContext('2d');
 	            context.imageSmoothingEnabled = false;
 	            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
@@ -403,6 +407,9 @@
 	                const b = data[i + 2];
 	                const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
 	                vertices[j + 1] = value;
+	            }
+	            if (this.geometryNormals) {
+	                geometry.computeVertexNormals();
 	            }
 	            this.geometry = geometry;
 	        }).catch(() => {
@@ -420,8 +427,7 @@
 	    }
 	}
 	MapHeightNode.tileSize = 256;
-	MapHeightNode.geometrySize = 16;
-	MapHeightNode.geometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
+	MapHeightNode.geometry = new MapNodeGeometry(1, 1, 1, 1);
 	MapHeightNode.baseGeometry = MapPlaneNode.geometry;
 	MapHeightNode.baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
@@ -552,7 +558,7 @@
 
 	class MapHeightNodeShader extends MapHeightNode {
 	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
-	        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapHeightNodeShader.emptyTexture }));
+	        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF }));
 	        super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
 	        this.frustumCulled = false;
 	    }
@@ -630,7 +636,7 @@
 	}
 	MapHeightNodeShader.emptyTexture = new three.Texture();
 	MapHeightNodeShader.geometrySize = 256;
-	MapHeightNodeShader.geometry = new MapNodeGeometry(1.0, 1.0, MapHeightNode.geometrySize, MapHeightNode.geometrySize, true, 1.0);
+	MapHeightNodeShader.geometry = new MapNodeGeometry(1.0, 1.0, MapHeightNodeShader.geometrySize, MapHeightNodeShader.geometrySize, true);
 	MapHeightNodeShader.baseGeometry = MapPlaneNode.geometry;
 	MapHeightNodeShader.baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 

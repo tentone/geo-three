@@ -32,12 +32,17 @@ export class MapHeightNode extends MapNode
 	/**
 	 * Size of the grid of the geometry displayed on the scene for each tile.
 	 */
-	public static geometrySize: number = 16;
+	public geometrySize: number = 16;
+
+	/**
+	 * If true the tiles will compute their normals.
+	 */
+	public geometryNormals: boolean = true;
 
 	/**
 	 * Map node plane geometry.
 	 */
-	public static geometry: BufferGeometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
+	public static geometry: BufferGeometry = new MapNodeGeometry(1, 1, 1, 1);
 
 	public static baseGeometry: BufferGeometry = MapPlaneNode.geometry;
 
@@ -55,7 +60,7 @@ export class MapHeightNode extends MapNode
 	 * @param material - Material used to render this height node.
 	 * @param geometry - Geometry used to render this height node.
 	 */
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = MapHeightNode.geometry, material: Material = new MeshPhongMaterial({color: 0x000000, emissive: 0xffffff})) 
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = MapHeightNode.geometry, material: Material = new MeshPhongMaterial({wireframe: false, color: 0xffffff})) 
 	{
 		super(parentNode, mapView, location, level, x, y, geometry, material);
 
@@ -89,7 +94,7 @@ export class MapHeightNode extends MapNode
 			texture.needsUpdate = true;
 
 			// @ts-ignore
-			this.material.emissiveMap = texture;
+			this.material.map = texture;
 		}).finally(() =>
 		{
 			this.textureLoaded = true;
@@ -159,10 +164,11 @@ export class MapHeightNode extends MapNode
 
 		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
-			const geometry = new MapNodeGeometry(1, 1, MapHeightNode.geometrySize, MapHeightNode.geometrySize);
+			const geometry = new MapNodeGeometry(1, 1, this.geometrySize, this.geometrySize, true);
+			
 			const vertices = geometry.attributes.position.array as number[];
 
-			const canvas = new OffscreenCanvas(MapHeightNode.geometrySize + 1, MapHeightNode.geometrySize + 1);
+			const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 
 			const context = canvas.getContext('2d');
 			context.imageSmoothingEnabled = false;
@@ -170,6 +176,7 @@ export class MapHeightNode extends MapNode
 
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 			const data = imageData.data;
+
 			for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) 
 			{
 				const r = data[i];
@@ -180,6 +187,11 @@ export class MapHeightNode extends MapNode
 				const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
 
 				vertices[j + 1] = value;
+			}
+			
+			if (this.geometryNormals)
+			{
+				geometry.computeVertexNormals();
 			}
 
 			this.geometry = geometry;

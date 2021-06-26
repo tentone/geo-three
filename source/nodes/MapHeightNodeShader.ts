@@ -22,7 +22,7 @@ export class MapHeightNodeShader extends MapHeightNode
 {
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0) 
 	{
-		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapHeightNodeShader.emptyTexture}));
+		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF}));
 
 		super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
 
@@ -42,7 +42,7 @@ export class MapHeightNodeShader extends MapHeightNode
 	/**
 	 * Map node plane geometry.
 	 */
-	public static geometry: BufferGeometry = new MapNodeGeometry(1.0, 1.0, MapHeightNode.geometrySize, MapHeightNode.geometrySize, true, 1.0);
+	public static geometry: BufferGeometry = new MapNodeGeometry(1.0, 1.0, MapHeightNodeShader.geometrySize, MapHeightNodeShader.geometrySize, true);
 
 	public static baseGeometry: BufferGeometry = MapPlaneNode.geometry;
 
