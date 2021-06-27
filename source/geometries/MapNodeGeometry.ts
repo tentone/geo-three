@@ -78,7 +78,6 @@ export class MapNodeGeometry extends BufferGeometry
 			}
 		}
 		
-
 		// Generate the skirt
 		if (skirt)
 		{

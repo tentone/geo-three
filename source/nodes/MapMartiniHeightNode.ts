@@ -31,7 +31,10 @@ export class MapMartiniHeightNode extends MapHeightNode
 	 */
 	public static emptyTexture: Texture = new Texture();
 	
-	public static geometry = new MapNodeGeometry(1, 1, MapMartiniHeightNode.geometrySize, MapMartiniHeightNode.geometrySize);
+	/**
+	 * Base geometry appied before any custom geometru is used.
+	 */
+	public static geometry = new MapNodeGeometry(1, 1, 1, 1);
 
 	/**
 	 * Elevation decoder configuration.
@@ -43,7 +46,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 		gScaler: 1,
 		bScaler: 1 / 256,
 		offset: -32768
-	}
+	};
 
 	/**
 	 * Original tile size of the images retrieved from the height provider.
@@ -113,8 +116,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 				` + shader.fragmentShader;
 
 			// Vertex depth logic
-			shader.fragmentShader = shader.fragmentShader.replace(
-				'#include <dithering_fragment>',
+			shader.fragmentShader = shader.fragmentShader.replace('#include <dithering_fragment>',
 				`
 				if(drawBlack) {
 					gl_FragColor = vec4( 0.0,0.0,0.0, 1.0 );
@@ -122,54 +124,53 @@ export class MapMartiniHeightNode extends MapHeightNode
 					gl_FragColor = vec4( ( 0.5 * vNormal + 0.5 ), 1.0 );
 				} else if (!drawTexture) {
 					gl_FragColor = vec4( 0.0,0.0,0.0, 0.0 );
-				}
-					`
+				}`
 			);
-			shader.vertexShader = shader.vertexShader.replace(
-				'#include <fog_vertex>',
+
+			shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>',
 				`
-					#include <fog_vertex>
+				#include <fog_vertex>
 
-					// queried pixels:
-					// +-----------+
-					// |   |   |   |
-					// | a | b | c |
-					// |   |   |   |
-					// +-----------+
-					// |   |   |   |
-					// | d | e | f |
-					// |   |   |   |
-					// +-----------+
-					// |   |   |   |
-					// | g | h | i |
-					// |   |   |   |
-					// +-----------+
+				// queried pixels:
+				// +-----------+
+				// |   |   |   |
+				// | a | b | c |
+				// |   |   |   |
+				// +-----------+
+				// |   |   |   |
+				// | d | e | f |
+				// |   |   |   |
+				// +-----------+
+				// |   |   |   |
+				// | g | h | i |
+				// |   |   |   |
+				// +-----------+
 
-					if (computeNormals) {
-						float e = getElevation(vUv, 0.0);
-						ivec2 size = textureSize(heightMap, 0);
-						float offset = 1.0 / float(size.x);
-						float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
-						float b = getElevation(vUv + vec2(0, -offset), 0.0);
-						float c = getElevation(vUv + vec2(offset, -offset), 0.0);
-						float d = getElevation(vUv + vec2(-offset, 0), 0.0);
-						float f = getElevation(vUv + vec2(offset, 0), 0.0);
-						float g = getElevation(vUv + vec2(-offset, offset), 0.0);
-						float h = getElevation(vUv + vec2(0, offset), 0.0);
-						float i = getElevation(vUv + vec2(offset,offset), 0.0);
+				if (computeNormals) {
+					float e = getElevation(vUv, 0.0);
+					ivec2 size = textureSize(heightMap, 0);
+					float offset = 1.0 / float(size.x);
+					float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
+					float b = getElevation(vUv + vec2(0, -offset), 0.0);
+					float c = getElevation(vUv + vec2(offset, -offset), 0.0);
+					float d = getElevation(vUv + vec2(-offset, 0), 0.0);
+					float f = getElevation(vUv + vec2(offset, 0), 0.0);
+					float g = getElevation(vUv + vec2(-offset, offset), 0.0);
+					float h = getElevation(vUv + vec2(0, offset), 0.0);
+					float i = getElevation(vUv + vec2(offset,offset), 0.0);
 
 
-						float normalLength = 500.0 / zoomlevel;
+					float normalLength = 500.0 / zoomlevel;
 
-						vec3 v0 = vec3(0.0, 0.0, 0.0);
-						vec3 v1 = vec3(0.0, normalLength, 0.0);
-						vec3 v2 = vec3(normalLength, 0.0, 0.0);
-						v0.z = (e + d + g + h) / 4.0;
-						v1.z = (e+ b + a + d) / 4.0;
-						v2.z = (e+ h + i + f) / 4.0;
-						vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
-					}
-					`
+					vec3 v0 = vec3(0.0, 0.0, 0.0);
+					vec3 v1 = vec3(0.0, normalLength, 0.0);
+					vec3 v2 = vec3(normalLength, 0.0, 0.0);
+					v0.z = (e + d + g + h) / 4.0;
+					v1.z = (e+ b + a + d) / 4.0;
+					v2.z = (e+ h + i + f) / 4.0;
+					vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
+				}
+				`
 			);
 		};
 
