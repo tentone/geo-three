@@ -38,16 +38,26 @@ class OpenStreetMapsProvider extends MapProvider {
 class MapNodeGeometry extends BufferGeometry {
     constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0) {
         super();
+        const indices = [];
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
+        if (skirt) {
+            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
+        }
+        this.setIndex(indices);
+        this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+        this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+        this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+    }
+    static buildPlane(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, indices, vertices, normals, uvs) {
         const widthHalf = width / 2;
         const heightHalf = height / 2;
         const gridX = widthSegments + 1;
         const gridZ = heightSegments + 1;
         const segmentWidth = width / widthSegments;
         const segmentHeight = height / heightSegments;
-        const indices = [];
-        const vertices = [];
-        const normals = [];
-        const uvs = [];
         for (let iz = 0; iz < gridZ; iz++) {
             const z = iz * segmentHeight - heightHalf;
             for (let ix = 0; ix < gridX; ix++) {
@@ -66,73 +76,75 @@ class MapNodeGeometry extends BufferGeometry {
                 indices.push(a, b, d, b, c, d);
             }
         }
-        if (skirt) {
-            let start = vertices.length / 3;
-            for (let ix = 0; ix < gridX; ix++) {
-                const x = ix * segmentWidth - widthHalf;
-                const z = -heightHalf;
-                vertices.push(x, -skirtDepth, z);
-                normals.push(0, 1, 0);
-                uvs.push(ix / widthSegments, 1);
-            }
-            for (let ix = 0; ix < widthSegments; ix++) {
-                const a = ix;
-                const d = ix + 1;
-                const b = ix + start;
-                const c = ix + start + 1;
-                indices.push(d, b, a, d, c, b);
-            }
-            start = vertices.length / 3;
-            for (let ix = 0; ix < gridX; ix++) {
-                const x = ix * segmentWidth - widthHalf;
-                const z = heightSegments * segmentHeight - heightHalf;
-                vertices.push(x, -skirtDepth, z);
-                normals.push(0, 1, 0);
-                uvs.push(ix / widthSegments, 0);
-            }
-            let offset = gridX * gridZ - widthSegments - 1;
-            for (let ix = 0; ix < widthSegments; ix++) {
-                const a = offset + ix;
-                const d = offset + ix + 1;
-                const b = ix + start;
-                const c = ix + start + 1;
-                indices.push(a, b, d, b, c, d);
-            }
-            start = vertices.length / 3;
-            for (let iz = 0; iz < gridZ; iz++) {
-                const z = iz * segmentHeight - heightHalf;
-                const x = -widthHalf;
-                vertices.push(x, -skirtDepth, z);
-                normals.push(0, 1, 0);
-                uvs.push(0, 1 - iz / heightSegments);
-            }
-            for (let iz = 0; iz < heightSegments; iz++) {
-                const a = iz * gridZ;
-                const d = (iz + 1) * gridZ;
-                const b = iz + start;
-                const c = iz + start + 1;
-                indices.push(a, b, d, b, c, d);
-            }
-            start = vertices.length / 3;
-            for (let iz = 0; iz < gridZ; iz++) {
-                const z = iz * segmentHeight - heightHalf;
-                const x = widthSegments * segmentWidth - widthHalf;
-                vertices.push(x, -skirtDepth, z);
-                normals.push(0, 1, 0);
-                uvs.push(1.0, 1 - iz / heightSegments);
-            }
-            for (let iz = 0; iz < heightSegments; iz++) {
-                const a = iz * gridZ + heightSegments;
-                const d = (iz + 1) * gridZ + heightSegments;
-                const b = iz + start;
-                const c = iz + start + 1;
-                indices.push(d, b, a, d, c, b);
-            }
+    }
+    static buildSkirt(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirtDepth, indices, vertices, normals, uvs) {
+        const widthHalf = width / 2;
+        const heightHalf = height / 2;
+        const gridX = widthSegments + 1;
+        const gridZ = heightSegments + 1;
+        const segmentWidth = width / widthSegments;
+        const segmentHeight = height / heightSegments;
+        let start = vertices.length / 3;
+        for (let ix = 0; ix < gridX; ix++) {
+            const x = ix * segmentWidth - widthHalf;
+            const z = -heightHalf;
+            vertices.push(x, -skirtDepth, z);
+            normals.push(0, 1, 0);
+            uvs.push(ix / widthSegments, 1);
         }
-        this.setIndex(indices);
-        this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-        this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-        this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        for (let ix = 0; ix < widthSegments; ix++) {
+            const a = ix;
+            const d = ix + 1;
+            const b = ix + start;
+            const c = ix + start + 1;
+            indices.push(d, b, a, d, c, b);
+        }
+        start = vertices.length / 3;
+        for (let ix = 0; ix < gridX; ix++) {
+            const x = ix * segmentWidth - widthHalf;
+            const z = heightSegments * segmentHeight - heightHalf;
+            vertices.push(x, -skirtDepth, z);
+            normals.push(0, 1, 0);
+            uvs.push(ix / widthSegments, 0);
+        }
+        let offset = gridX * gridZ - widthSegments - 1;
+        for (let ix = 0; ix < widthSegments; ix++) {
+            const a = offset + ix;
+            const d = offset + ix + 1;
+            const b = ix + start;
+            const c = ix + start + 1;
+            indices.push(a, b, d, b, c, d);
+        }
+        start = vertices.length / 3;
+        for (let iz = 0; iz < gridZ; iz++) {
+            const z = iz * segmentHeight - heightHalf;
+            const x = -widthHalf;
+            vertices.push(x, -skirtDepth, z);
+            normals.push(0, 1, 0);
+            uvs.push(0, 1 - iz / heightSegments);
+        }
+        for (let iz = 0; iz < heightSegments; iz++) {
+            const a = iz * gridZ;
+            const d = (iz + 1) * gridZ;
+            const b = iz + start;
+            const c = iz + start + 1;
+            indices.push(a, b, d, b, c, d);
+        }
+        start = vertices.length / 3;
+        for (let iz = 0; iz < gridZ; iz++) {
+            const z = iz * segmentHeight - heightHalf;
+            const x = widthSegments * segmentWidth - widthHalf;
+            vertices.push(x, -skirtDepth, z);
+            normals.push(0, 1, 0);
+            uvs.push(1.0, 1 - iz / heightSegments);
+        }
+        for (let iz = 0; iz < heightSegments; iz++) {
+            const a = iz * gridZ + heightSegments;
+            const d = (iz + 1) * gridZ + heightSegments;
+            const b = iz + start;
+            const c = iz + start + 1;
+            indices.push(d, b, a, d, c, b);
+        }
     }
 }
 
@@ -315,6 +327,71 @@ MapPlaneNode.geometry = new MapNodeGeometry(1, 1, 1, 1, false);
 MapPlaneNode.baseGeometry = MapPlaneNode.geometry;
 MapPlaneNode.baseScale = new Vector3(UnitsUtils.EARTH_PERIMETER, 1.0, UnitsUtils.EARTH_PERIMETER);
 
+class MapNodeHeightGeometry extends BufferGeometry {
+    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0, imageData = null, calculateNormals = true) {
+        super();
+        const indices = [];
+        const vertices = [];
+        const normals = [];
+        const uvs = [];
+        MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
+        const data = imageData.data;
+        for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
+            vertices[j + 1] = value;
+        }
+        if (skirt) {
+            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
+        }
+        this.setIndex(indices);
+        this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+        this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+        this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        if (calculateNormals) {
+            this.computeNormals(widthSegments, heightSegments);
+        }
+    }
+    computeNormals(widthSegments, heightSegments) {
+        const positionAttribute = this.getAttribute('position');
+        if (positionAttribute !== undefined) {
+            let normalAttribute = this.getAttribute('normal');
+            const normalLength = heightSegments * widthSegments;
+            for (let i = 0; i < normalLength; i++) {
+                normalAttribute.setXYZ(i, 0, 0, 0);
+            }
+            const pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
+            const nA = new Vector3(), nB = new Vector3(), nC = new Vector3();
+            const cb = new Vector3(), ab = new Vector3();
+            const indexLength = heightSegments * widthSegments * 6;
+            for (let i = 0; i < indexLength; i += 3) {
+                const vA = this.index.getX(i + 0);
+                const vB = this.index.getX(i + 1);
+                const vC = this.index.getX(i + 2);
+                pA.fromBufferAttribute(positionAttribute, vA);
+                pB.fromBufferAttribute(positionAttribute, vB);
+                pC.fromBufferAttribute(positionAttribute, vC);
+                cb.subVectors(pC, pB);
+                ab.subVectors(pA, pB);
+                cb.cross(ab);
+                nA.fromBufferAttribute(normalAttribute, vA);
+                nB.fromBufferAttribute(normalAttribute, vB);
+                nC.fromBufferAttribute(normalAttribute, vC);
+                nA.add(cb);
+                nB.add(cb);
+                nC.add(cb);
+                normalAttribute.setXYZ(vA, nA.x, nA.y, nA.z);
+                normalAttribute.setXYZ(vB, nB.x, nB.y, nB.z);
+                normalAttribute.setXYZ(vC, nC.x, nC.y, nC.z);
+            }
+            this.normalizeNormals();
+            normalAttribute.needsUpdate = true;
+        }
+    }
+}
+
 class MapHeightNode extends MapNode {
     constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
         super(parentNode, mapView, location, level, x, y, geometry, material);
@@ -387,24 +464,12 @@ class MapHeightNode extends MapNode {
             throw new Error('GeoThree: MapView.heightProvider provider is null.');
         }
         return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
-            const geometry = new MapNodeGeometry(1, 1, this.geometrySize, this.geometrySize, true);
-            const vertices = geometry.attributes.position.array;
             const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
             const context = canvas.getContext('2d');
             context.imageSmoothingEnabled = false;
             context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
             const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const data = imageData.data;
-            for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) {
-                const r = data[i];
-                const g = data[i + 1];
-                const b = data[i + 2];
-                const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
-                vertices[j + 1] = value;
-            }
-            if (this.geometryNormals) {
-                geometry.computeVertexNormals();
-            }
+            const geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
             this.geometry = geometry;
         }).catch(() => {
             console.error('GeoThree: Failed to load height node data.', this);
@@ -985,51 +1050,50 @@ class MapMartiniHeightNode extends MapHeightNode {
 					gl_FragColor = vec4( ( 0.5 * vNormal + 0.5 ), 1.0 );
 				} else if (!drawTexture) {
 					gl_FragColor = vec4( 0.0,0.0,0.0, 0.0 );
-				}
-					`);
+				}`);
             shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>', `
-					#include <fog_vertex>
+				#include <fog_vertex>
 
-					// queried pixels:
-					// +-----------+
-					// |   |   |   |
-					// | a | b | c |
-					// |   |   |   |
-					// +-----------+
-					// |   |   |   |
-					// | d | e | f |
-					// |   |   |   |
-					// +-----------+
-					// |   |   |   |
-					// | g | h | i |
-					// |   |   |   |
-					// +-----------+
+				// queried pixels:
+				// +-----------+
+				// |   |   |   |
+				// | a | b | c |
+				// |   |   |   |
+				// +-----------+
+				// |   |   |   |
+				// | d | e | f |
+				// |   |   |   |
+				// +-----------+
+				// |   |   |   |
+				// | g | h | i |
+				// |   |   |   |
+				// +-----------+
 
-					if (computeNormals) {
-						float e = getElevation(vUv, 0.0);
-						ivec2 size = textureSize(heightMap, 0);
-						float offset = 1.0 / float(size.x);
-						float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
-						float b = getElevation(vUv + vec2(0, -offset), 0.0);
-						float c = getElevation(vUv + vec2(offset, -offset), 0.0);
-						float d = getElevation(vUv + vec2(-offset, 0), 0.0);
-						float f = getElevation(vUv + vec2(offset, 0), 0.0);
-						float g = getElevation(vUv + vec2(-offset, offset), 0.0);
-						float h = getElevation(vUv + vec2(0, offset), 0.0);
-						float i = getElevation(vUv + vec2(offset,offset), 0.0);
+				if (computeNormals) {
+					float e = getElevation(vUv, 0.0);
+					ivec2 size = textureSize(heightMap, 0);
+					float offset = 1.0 / float(size.x);
+					float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
+					float b = getElevation(vUv + vec2(0, -offset), 0.0);
+					float c = getElevation(vUv + vec2(offset, -offset), 0.0);
+					float d = getElevation(vUv + vec2(-offset, 0), 0.0);
+					float f = getElevation(vUv + vec2(offset, 0), 0.0);
+					float g = getElevation(vUv + vec2(-offset, offset), 0.0);
+					float h = getElevation(vUv + vec2(0, offset), 0.0);
+					float i = getElevation(vUv + vec2(offset,offset), 0.0);
 
 
-						float normalLength = 500.0 / zoomlevel;
+					float normalLength = 500.0 / zoomlevel;
 
-						vec3 v0 = vec3(0.0, 0.0, 0.0);
-						vec3 v1 = vec3(0.0, normalLength, 0.0);
-						vec3 v2 = vec3(normalLength, 0.0, 0.0);
-						v0.z = (e + d + g + h) / 4.0;
-						v1.z = (e+ b + a + d) / 4.0;
-						v2.z = (e+ h + i + f) / 4.0;
-						vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
-					}
-					`);
+					vec3 v0 = vec3(0.0, 0.0, 0.0);
+					vec3 v1 = vec3(0.0, normalLength, 0.0);
+					vec3 v2 = vec3(normalLength, 0.0, 0.0);
+					v0.z = (e + d + g + h) / 4.0;
+					v1.z = (e+ b + a + d) / 4.0;
+					v2.z = (e+ h + i + f) / 4.0;
+					vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
+				}
+				`);
         };
         return material;
     }
@@ -1120,7 +1184,7 @@ class MapMartiniHeightNode extends MapHeightNode {
 }
 MapMartiniHeightNode.geometrySize = 16;
 MapMartiniHeightNode.emptyTexture = new Texture();
-MapMartiniHeightNode.geometry = new MapNodeGeometry(1, 1, MapMartiniHeightNode.geometrySize, MapMartiniHeightNode.geometrySize);
+MapMartiniHeightNode.geometry = new MapNodeGeometry(1, 1, 1, 1);
 MapMartiniHeightNode.tileSize = 256;
 
 class MapView extends Mesh {
@@ -1696,4 +1760,5 @@ class CancelablePromise {
     }
 }
 
-export { BingMapsProvider, CancelablePromise, DebugProvider, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, UnitsUtils, XHRUtils };
+export { BingMapsProvider, CancelablePromise, DebugProvider, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, UnitsUtils, XHRUtils };
+//# sourceMappingURL=geo-three.module.js.map

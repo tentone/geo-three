@@ -17,6 +17,7 @@ export {DebugProvider} from './providers/DebugProvider';
 export {HeightDebugProvider} from './providers/HeightDebugProvider';
 
 export {MapNodeGeometry} from './geometries/MapNodeGeometry';
+export {MapNodeHeightGeometry} from './geometries/MapNodeHeightGeometry';
 export {MapSphereNodeGeometry} from './geometries/MapSphereNodeGeometry';
 
 export {MapHeightNode} from './nodes/MapHeightNode';

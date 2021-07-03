@@ -6,7 +6,6 @@
         "outDir": "./build",
         "rootDir": "./source",
 		"sourceMap": true,
-		"inlineSourceMap": false,
 		"inlineSources": false,
 		"declaration": true,
 		"allowUnreachableCode": false,

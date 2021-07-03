@@ -9,19 +9,20 @@ export default {
 			functions: ['assert.*', 'debug', 'alert']
 		})
 	],
-
 	output: [
 		{
 			format: 'es',
 			file: 'build/geo-three.module.js',
-			indent: '\t'
+			indent: '\t',
+			sourcemap: true
 		},
 		{
 			globals: {three: 'THREE'},
 			format: 'umd',
 			name: 'Geo',
 			file: 'build/geo-three.js',
-			indent: '\t'
+			indent: '\t',
+			sourcemap: true
 		}
 	]
 };
