@@ -333,6 +333,35 @@
 	MapPlaneNode.baseGeometry = MapPlaneNode.geometry;
 	MapPlaneNode.baseScale = new three.Vector3(UnitsUtils.EARTH_PERIMETER, 1.0, UnitsUtils.EARTH_PERIMETER);
 
+	class MapNodeHeightGeometry extends three.BufferGeometry {
+	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0, imageData = null, calculateNormals = true) {
+	        super();
+	        const indices = [];
+	        const vertices = [];
+	        const normals = [];
+	        const uvs = [];
+	        MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
+	        const data = imageData.data;
+	        for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) {
+	            const r = data[i];
+	            const g = data[i + 1];
+	            const b = data[i + 2];
+	            const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
+	            vertices[j + 1] = value;
+	        }
+	        if (skirt) {
+	            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
+	        }
+	        if (calculateNormals) {
+	            this.computeVertexNormals();
+	        }
+	        this.setIndex(indices);
+	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
+	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
+	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
+	    }
+	}
+
 	class MapHeightNode extends MapNode {
 	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new three.MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
 	        super(parentNode, mapView, location, level, x, y, geometry, material);
@@ -405,24 +434,12 @@
 	            throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	        }
 	        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
-	            const geometry = new MapNodeGeometry(1, 1, this.geometrySize, this.geometrySize, true);
-	            const vertices = geometry.attributes.position.array;
 	            const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 	            const context = canvas.getContext('2d');
 	            context.imageSmoothingEnabled = false;
 	            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
 	            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-	            const data = imageData.data;
-	            for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) {
-	                const r = data[i];
-	                const g = data[i + 1];
-	                const b = data[i + 2];
-	                const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
-	                vertices[j + 1] = value;
-	            }
-	            if (this.geometryNormals) {
-	                geometry.computeVertexNormals();
-	            }
+	            const geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 	            this.geometry = geometry;
 	        }).catch(() => {
 	            console.error('GeoThree: Failed to load height node data.', this);

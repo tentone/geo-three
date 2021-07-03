@@ -4,6 +4,7 @@ import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
+import { MapNodeHeightGeometry } from '../geometries/MapNodeHeightGeometry';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -164,10 +165,6 @@ export class MapHeightNode extends MapNode
 
 		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
-			const geometry = new MapNodeGeometry(1, 1, this.geometrySize, this.geometrySize, true);
-
-			const vertices = geometry.attributes.position.array as number[];
-
 			const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 
 			const context = canvas.getContext('2d');
@@ -175,24 +172,8 @@ export class MapHeightNode extends MapNode
 			context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
 
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-			const data = imageData.data;
 
-			for (let i = 0, j = 0; i < data.length && j < vertices.length; i += 4, j += 3) 
-			{
-				const r = data[i];
-				const g = data[i + 1];
-				const b = data[i + 2];
-
-				// The value will be composed of the bits RGB
-				const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
-
-				vertices[j + 1] = value;
-			}
-			
-			if (this.geometryNormals)
-			{
-				geometry.computeVertexNormals();
-			}
+			const geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 
 			this.geometry = geometry;
 		}).catch(() =>
