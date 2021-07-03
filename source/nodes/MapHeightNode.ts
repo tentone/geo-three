@@ -4,7 +4,7 @@ import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
-import { MapNodeHeightGeometry } from '../geometries/MapNodeHeightGeometry';
+import {MapNodeHeightGeometry} from '../geometries/MapNodeHeightGeometry';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.

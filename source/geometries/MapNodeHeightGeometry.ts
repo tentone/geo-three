@@ -50,9 +50,70 @@ export class MapNodeHeightGeometry extends BufferGeometry
 		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
 		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 
-        if (calculateNormals)
+		if (calculateNormals)
 		{
-			this.computeVertexNormals();
+			this.computeNormals(widthSegments, heightSegments);
+		}
+	}
+
+	/**
+	 * Compute normals for the height geometry.
+	 * 
+	 * Only computes normals for the surface of the map geometry. Skirts are not considered.
+	 * 
+	 * @param widthSegments - Number of segments in width.
+	 * @param heightSegments - Number of segments in height.
+	 */
+	public computeNormals(widthSegments: number, heightSegments: number): void 
+	{
+		
+		const positionAttribute = this.getAttribute('position');
+	
+		if (positionAttribute !== undefined)
+		{
+			// Reset existing normals to zero
+			let normalAttribute = this.getAttribute('normal');
+			const normalLength = heightSegments * widthSegments;
+			for (let i = 0; i < normalLength; i++)
+			{
+				normalAttribute.setXYZ(i, 0, 0, 0);
+			}
+
+			const pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
+			const nA = new Vector3(), nB = new Vector3(), nC = new Vector3();
+			const cb = new Vector3(), ab = new Vector3();
+			
+			const indexLength = heightSegments * widthSegments * 6;
+			for (let i = 0; i < indexLength ; i += 3)
+			{
+				const vA = this.index.getX(i + 0);
+				const vB = this.index.getX(i + 1);
+				const vC = this.index.getX(i + 2);
+
+				pA.fromBufferAttribute(positionAttribute, vA);
+				pB.fromBufferAttribute(positionAttribute, vB);
+				pC.fromBufferAttribute(positionAttribute, vC);
+
+				cb.subVectors(pC, pB);
+				ab.subVectors(pA, pB);
+				cb.cross(ab);
+
+				nA.fromBufferAttribute(normalAttribute, vA);
+				nB.fromBufferAttribute(normalAttribute, vB);
+				nC.fromBufferAttribute(normalAttribute, vC);
+
+				nA.add(cb);
+				nB.add(cb);
+				nC.add(cb);
+
+				normalAttribute.setXYZ(vA, nA.x, nA.y, nA.z);
+				normalAttribute.setXYZ(vB, nB.x, nB.y, nB.z);
+				normalAttribute.setXYZ(vC, nC.x, nC.y, nC.z);
+			}
+
+			this.normalizeNormals();
+
+			normalAttribute.needsUpdate = true;
 		}
 	}
 }

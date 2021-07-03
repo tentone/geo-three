@@ -357,7 +357,43 @@
 	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
 	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
 	        if (calculateNormals) {
-	            this.computeVertexNormals();
+	            this.computeNormals(widthSegments, heightSegments);
+	        }
+	    }
+	    computeNormals(widthSegments, heightSegments) {
+	        const positionAttribute = this.getAttribute('position');
+	        if (positionAttribute !== undefined) {
+	            let normalAttribute = this.getAttribute('normal');
+	            const normalLength = heightSegments * widthSegments;
+	            for (let i = 0; i < normalLength; i++) {
+	                normalAttribute.setXYZ(i, 0, 0, 0);
+	            }
+	            const pA = new three.Vector3(), pB = new three.Vector3(), pC = new three.Vector3();
+	            const nA = new three.Vector3(), nB = new three.Vector3(), nC = new three.Vector3();
+	            const cb = new three.Vector3(), ab = new three.Vector3();
+	            const indexLength = heightSegments * widthSegments * 6;
+	            for (let i = 0; i < indexLength; i += 3) {
+	                const vA = this.index.getX(i + 0);
+	                const vB = this.index.getX(i + 1);
+	                const vC = this.index.getX(i + 2);
+	                pA.fromBufferAttribute(positionAttribute, vA);
+	                pB.fromBufferAttribute(positionAttribute, vB);
+	                pC.fromBufferAttribute(positionAttribute, vC);
+	                cb.subVectors(pC, pB);
+	                ab.subVectors(pA, pB);
+	                cb.cross(ab);
+	                nA.fromBufferAttribute(normalAttribute, vA);
+	                nB.fromBufferAttribute(normalAttribute, vB);
+	                nC.fromBufferAttribute(normalAttribute, vC);
+	                nA.add(cb);
+	                nB.add(cb);
+	                nC.add(cb);
+	                normalAttribute.setXYZ(vA, nA.x, nA.y, nA.z);
+	                normalAttribute.setXYZ(vB, nB.x, nB.y, nB.z);
+	                normalAttribute.setXYZ(vC, nC.x, nC.y, nC.z);
+	            }
+	            this.normalizeNormals();
+	            normalAttribute.needsUpdate = true;
 	        }
 	    }
 	}
