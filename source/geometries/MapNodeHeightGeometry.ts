@@ -45,15 +45,14 @@ export class MapNodeHeightGeometry extends BufferGeometry
 			MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
 		}
 
-		if (calculateNormals)
-		{
-			this.computeVertexNormals();
-		}
-
 		this.setIndex(indices);
 		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
 		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
 		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 
+        if (calculateNormals)
+		{
+			this.computeVertexNormals();
+		}
 	}
 }

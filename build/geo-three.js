@@ -352,13 +352,13 @@
 	        if (skirt) {
 	            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
 	        }
-	        if (calculateNormals) {
-	            this.computeVertexNormals();
-	        }
 	        this.setIndex(indices);
 	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
 	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
 	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
+	        if (calculateNormals) {
+	            this.computeVertexNormals();
+	        }
 	    }
 	}
 
