@@ -44,16 +44,26 @@
 	class MapNodeGeometry extends three.BufferGeometry {
 	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0) {
 	        super();
+	        const indices = [];
+	        const vertices = [];
+	        const normals = [];
+	        const uvs = [];
+	        MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
+	        if (skirt) {
+	            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
+	        }
+	        this.setIndex(indices);
+	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
+	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
+	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
+	    }
+	    static buildPlane(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, indices, vertices, normals, uvs) {
 	        const widthHalf = width / 2;
 	        const heightHalf = height / 2;
 	        const gridX = widthSegments + 1;
 	        const gridZ = heightSegments + 1;
 	        const segmentWidth = width / widthSegments;
 	        const segmentHeight = height / heightSegments;
-	        const indices = [];
-	        const vertices = [];
-	        const normals = [];
-	        const uvs = [];
 	        for (let iz = 0; iz < gridZ; iz++) {
 	            const z = iz * segmentHeight - heightHalf;
 	            for (let ix = 0; ix < gridX; ix++) {
@@ -72,73 +82,75 @@
 	                indices.push(a, b, d, b, c, d);
 	            }
 	        }
-	        if (skirt) {
-	            let start = vertices.length / 3;
-	            for (let ix = 0; ix < gridX; ix++) {
-	                const x = ix * segmentWidth - widthHalf;
-	                const z = -heightHalf;
-	                vertices.push(x, -skirtDepth, z);
-	                normals.push(0, 1, 0);
-	                uvs.push(ix / widthSegments, 1);
-	            }
-	            for (let ix = 0; ix < widthSegments; ix++) {
-	                const a = ix;
-	                const d = ix + 1;
-	                const b = ix + start;
-	                const c = ix + start + 1;
-	                indices.push(d, b, a, d, c, b);
-	            }
-	            start = vertices.length / 3;
-	            for (let ix = 0; ix < gridX; ix++) {
-	                const x = ix * segmentWidth - widthHalf;
-	                const z = heightSegments * segmentHeight - heightHalf;
-	                vertices.push(x, -skirtDepth, z);
-	                normals.push(0, 1, 0);
-	                uvs.push(ix / widthSegments, 0);
-	            }
-	            let offset = gridX * gridZ - widthSegments - 1;
-	            for (let ix = 0; ix < widthSegments; ix++) {
-	                const a = offset + ix;
-	                const d = offset + ix + 1;
-	                const b = ix + start;
-	                const c = ix + start + 1;
-	                indices.push(a, b, d, b, c, d);
-	            }
-	            start = vertices.length / 3;
-	            for (let iz = 0; iz < gridZ; iz++) {
-	                const z = iz * segmentHeight - heightHalf;
-	                const x = -widthHalf;
-	                vertices.push(x, -skirtDepth, z);
-	                normals.push(0, 1, 0);
-	                uvs.push(0, 1 - iz / heightSegments);
-	            }
-	            for (let iz = 0; iz < heightSegments; iz++) {
-	                const a = iz * gridZ;
-	                const d = (iz + 1) * gridZ;
-	                const b = iz + start;
-	                const c = iz + start + 1;
-	                indices.push(a, b, d, b, c, d);
-	            }
-	            start = vertices.length / 3;
-	            for (let iz = 0; iz < gridZ; iz++) {
-	                const z = iz * segmentHeight - heightHalf;
-	                const x = widthSegments * segmentWidth - widthHalf;
-	                vertices.push(x, -skirtDepth, z);
-	                normals.push(0, 1, 0);
-	                uvs.push(1.0, 1 - iz / heightSegments);
-	            }
-	            for (let iz = 0; iz < heightSegments; iz++) {
-	                const a = iz * gridZ + heightSegments;
-	                const d = (iz + 1) * gridZ + heightSegments;
-	                const b = iz + start;
-	                const c = iz + start + 1;
-	                indices.push(d, b, a, d, c, b);
-	            }
+	    }
+	    static buildSkirt(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirtDepth, indices, vertices, normals, uvs) {
+	        const widthHalf = width / 2;
+	        const heightHalf = height / 2;
+	        const gridX = widthSegments + 1;
+	        const gridZ = heightSegments + 1;
+	        const segmentWidth = width / widthSegments;
+	        const segmentHeight = height / heightSegments;
+	        let start = vertices.length / 3;
+	        for (let ix = 0; ix < gridX; ix++) {
+	            const x = ix * segmentWidth - widthHalf;
+	            const z = -heightHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(ix / widthSegments, 1);
 	        }
-	        this.setIndex(indices);
-	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
-	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
-	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
+	        for (let ix = 0; ix < widthSegments; ix++) {
+	            const a = ix;
+	            const d = ix + 1;
+	            const b = ix + start;
+	            const c = ix + start + 1;
+	            indices.push(d, b, a, d, c, b);
+	        }
+	        start = vertices.length / 3;
+	        for (let ix = 0; ix < gridX; ix++) {
+	            const x = ix * segmentWidth - widthHalf;
+	            const z = heightSegments * segmentHeight - heightHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(ix / widthSegments, 0);
+	        }
+	        let offset = gridX * gridZ - widthSegments - 1;
+	        for (let ix = 0; ix < widthSegments; ix++) {
+	            const a = offset + ix;
+	            const d = offset + ix + 1;
+	            const b = ix + start;
+	            const c = ix + start + 1;
+	            indices.push(a, b, d, b, c, d);
+	        }
+	        start = vertices.length / 3;
+	        for (let iz = 0; iz < gridZ; iz++) {
+	            const z = iz * segmentHeight - heightHalf;
+	            const x = -widthHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(0, 1 - iz / heightSegments);
+	        }
+	        for (let iz = 0; iz < heightSegments; iz++) {
+	            const a = iz * gridZ;
+	            const d = (iz + 1) * gridZ;
+	            const b = iz + start;
+	            const c = iz + start + 1;
+	            indices.push(a, b, d, b, c, d);
+	        }
+	        start = vertices.length / 3;
+	        for (let iz = 0; iz < gridZ; iz++) {
+	            const z = iz * segmentHeight - heightHalf;
+	            const x = widthSegments * segmentWidth - widthHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(1.0, 1 - iz / heightSegments);
+	        }
+	        for (let iz = 0; iz < heightSegments; iz++) {
+	            const a = iz * gridZ + heightSegments;
+	            const d = (iz + 1) * gridZ + heightSegments;
+	            const b = iz + start;
+	            const c = iz + start + 1;
+	            indices.push(d, b, a, d, c, b);
+	        }
 	    }
 	}
 
@@ -991,51 +1003,50 @@
 					gl_FragColor = vec4( ( 0.5 * vNormal + 0.5 ), 1.0 );
 				} else if (!drawTexture) {
 					gl_FragColor = vec4( 0.0,0.0,0.0, 0.0 );
-				}
-					`);
+				}`);
 	            shader.vertexShader = shader.vertexShader.replace('#include <fog_vertex>', `
-					#include <fog_vertex>
+				#include <fog_vertex>
 
-					// queried pixels:
-					// +-----------+
-					// |   |   |   |
-					// | a | b | c |
-					// |   |   |   |
-					// +-----------+
-					// |   |   |   |
-					// | d | e | f |
-					// |   |   |   |
-					// +-----------+
-					// |   |   |   |
-					// | g | h | i |
-					// |   |   |   |
-					// +-----------+
+				// queried pixels:
+				// +-----------+
+				// |   |   |   |
+				// | a | b | c |
+				// |   |   |   |
+				// +-----------+
+				// |   |   |   |
+				// | d | e | f |
+				// |   |   |   |
+				// +-----------+
+				// |   |   |   |
+				// | g | h | i |
+				// |   |   |   |
+				// +-----------+
 
-					if (computeNormals) {
-						float e = getElevation(vUv, 0.0);
-						ivec2 size = textureSize(heightMap, 0);
-						float offset = 1.0 / float(size.x);
-						float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
-						float b = getElevation(vUv + vec2(0, -offset), 0.0);
-						float c = getElevation(vUv + vec2(offset, -offset), 0.0);
-						float d = getElevation(vUv + vec2(-offset, 0), 0.0);
-						float f = getElevation(vUv + vec2(offset, 0), 0.0);
-						float g = getElevation(vUv + vec2(-offset, offset), 0.0);
-						float h = getElevation(vUv + vec2(0, offset), 0.0);
-						float i = getElevation(vUv + vec2(offset,offset), 0.0);
+				if (computeNormals) {
+					float e = getElevation(vUv, 0.0);
+					ivec2 size = textureSize(heightMap, 0);
+					float offset = 1.0 / float(size.x);
+					float a = getElevation(vUv + vec2(-offset, -offset), 0.0);
+					float b = getElevation(vUv + vec2(0, -offset), 0.0);
+					float c = getElevation(vUv + vec2(offset, -offset), 0.0);
+					float d = getElevation(vUv + vec2(-offset, 0), 0.0);
+					float f = getElevation(vUv + vec2(offset, 0), 0.0);
+					float g = getElevation(vUv + vec2(-offset, offset), 0.0);
+					float h = getElevation(vUv + vec2(0, offset), 0.0);
+					float i = getElevation(vUv + vec2(offset,offset), 0.0);
 
 
-						float normalLength = 500.0 / zoomlevel;
+					float normalLength = 500.0 / zoomlevel;
 
-						vec3 v0 = vec3(0.0, 0.0, 0.0);
-						vec3 v1 = vec3(0.0, normalLength, 0.0);
-						vec3 v2 = vec3(normalLength, 0.0, 0.0);
-						v0.z = (e + d + g + h) / 4.0;
-						v1.z = (e+ b + a + d) / 4.0;
-						v2.z = (e+ h + i + f) / 4.0;
-						vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
-					}
-					`);
+					vec3 v0 = vec3(0.0, 0.0, 0.0);
+					vec3 v1 = vec3(0.0, normalLength, 0.0);
+					vec3 v2 = vec3(normalLength, 0.0, 0.0);
+					v0.z = (e + d + g + h) / 4.0;
+					v1.z = (e+ b + a + d) / 4.0;
+					v2.z = (e+ h + i + f) / 4.0;
+					vNormal = (normalize(cross(v2 - v0, v1 - v0))).rbg;
+				}
+				`);
 	        };
 	        return material;
 	    }
@@ -1126,7 +1137,7 @@
 	}
 	MapMartiniHeightNode.geometrySize = 16;
 	MapMartiniHeightNode.emptyTexture = new three.Texture();
-	MapMartiniHeightNode.geometry = new MapNodeGeometry(1, 1, MapMartiniHeightNode.geometrySize, MapMartiniHeightNode.geometrySize);
+	MapMartiniHeightNode.geometry = new MapNodeGeometry(1, 1, 1, 1);
 	MapMartiniHeightNode.tileSize = 256;
 
 	class MapView extends three.Mesh {

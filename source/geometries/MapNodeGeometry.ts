@@ -24,6 +24,30 @@ export class MapNodeGeometry extends BufferGeometry
 	{
 		super();
 
+		// Buffers
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
+
+
+		// Build plane
+		MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
+
+		// Generate the skirt
+		if (skirt)
+		{
+			MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
+		}
+
+		this.setIndex(indices);
+		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
+		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+	}
+
+	public static buildPlane(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, indices: number[], vertices: number[], normals: number[], uvs: number[]): void
+	{
 		// Half width X 
 		const widthHalf = width / 2;
 
@@ -41,12 +65,6 @@ export class MapNodeGeometry extends BufferGeometry
 		
 		// Height of each segment Z
 		const segmentHeight = height / heightSegments;
-
-		// Buffers
-		const indices = [];
-		const vertices = [];
-		const normals = [];
-		const uvs = [];
 
 		// Generate vertices, normals and uvs
 		for (let iz = 0; iz < gridZ; iz++) 
@@ -77,111 +95,121 @@ export class MapNodeGeometry extends BufferGeometry
 				indices.push(a, b, d, b, c, d);
 			}
 		}
-		
-		// Generate the skirt
-		if (skirt)
-		{
-			let start = vertices.length / 3;
-
-			// Down X
-			for (let ix = 0; ix < gridX; ix++) 
-			{
-				const x = ix * segmentWidth - widthHalf;
-				const z = -heightHalf;
-
-				vertices.push(x, -skirtDepth, z);
-				normals.push(0, 1, 0);
-				uvs.push(ix / widthSegments, 1);
-			}
-
-			// Indices
-			for (let ix = 0; ix < widthSegments; ix++) 
-			{
-				const a = ix;
-				const d = ix + 1;
-				const b = ix + start;
-				const c = ix + start + 1;
-				indices.push(d, b, a, d, c, b);
-			}
-
-			start = vertices.length / 3;
-
-			// Up X
-			for (let ix = 0; ix < gridX; ix++) 
-			{
-				const x = ix * segmentWidth - widthHalf;
-				const z = heightSegments * segmentHeight - heightHalf;
-
-				vertices.push(x, -skirtDepth, z);
-				normals.push(0, 1, 0);
-				uvs.push(ix / widthSegments, 0);
-			}
-			
-			// Index of the beginning of the last X row
-			let offset = gridX * gridZ - widthSegments - 1; 
-
-			for (let ix = 0; ix < widthSegments; ix++) 
-			{
-				const a = offset + ix;
-				const d = offset + ix + 1;
-				const b = ix + start;
-				const c = ix + start + 1;
-				indices.push(a, b, d, b, c, d);
-			}
-
-			start = vertices.length / 3;
-
-			// Down Z
-			for (let iz = 0; iz < gridZ; iz++) 
-			{
-				const z = iz * segmentHeight - heightHalf;
-				const x = - widthHalf;
-
-				vertices.push(x, -skirtDepth, z);
-				normals.push(0, 1, 0);
-				uvs.push(0, 1 - iz / heightSegments);
-			}
-
-			for (let iz = 0; iz < heightSegments; iz++) 
-			{
-				const a = iz * gridZ;
-				const d = (iz + 1) * gridZ;
-				const b = iz + start;
-				const c = iz + start + 1;
-
-				indices.push(a, b, d, b, c, d);
-			}
-
-			start = vertices.length / 3;
-
-			// Up Z
-			for (let iz = 0; iz < gridZ; iz++) 
-			{
-				const z = iz * segmentHeight - heightHalf;
-				const x = widthSegments * segmentWidth - widthHalf;
-
-				vertices.push(x, -skirtDepth, z);
-				normals.push(0, 1, 0);
-
-				uvs.push(1.0, 1 - iz / heightSegments);
-			}
-
-			for (let iz = 0; iz < heightSegments; iz++) 
-			{
-				const a = iz * gridZ + heightSegments;
-				const d = (iz + 1) * gridZ + heightSegments;
-				const b = iz + start;
-				const c = iz + start + 1;
-				
-				indices.push(d, b, a, d, c, b);
-			}
-		}
-
-		this.setIndex(indices);
-		this.setAttribute('position', new Float32BufferAttribute(vertices, 3));
-		this.setAttribute('normal', new Float32BufferAttribute(normals, 3));
-		this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
 	}
 
+	public static buildSkirt(width: number = 1.0, height: number = 1.0, widthSegments: number = 1.0, heightSegments: number = 1.0, skirtDepth: number, indices: number[], vertices: number[], normals: number[], uvs: number[]): void
+	{
+		// Half width X 
+		const widthHalf = width / 2;
 
+		// Half width Z
+		const heightHalf = height / 2;
+
+		// Size of the grid in X
+		const gridX = widthSegments + 1;
+
+		// Size of the grid in Z
+		const gridZ = heightSegments + 1;
+
+		// Width of each segment X
+		const segmentWidth = width / widthSegments;
+		
+		// Height of each segment Z
+		const segmentHeight = height / heightSegments;
+
+		let start = vertices.length / 3;
+
+		// Down X
+		for (let ix = 0; ix < gridX; ix++) 
+		{
+			const x = ix * segmentWidth - widthHalf;
+			const z = -heightHalf;
+
+			vertices.push(x, -skirtDepth, z);
+			normals.push(0, 1, 0);
+			uvs.push(ix / widthSegments, 1);
+		}
+
+		// Indices
+		for (let ix = 0; ix < widthSegments; ix++) 
+		{
+			const a = ix;
+			const d = ix + 1;
+			const b = ix + start;
+			const c = ix + start + 1;
+			indices.push(d, b, a, d, c, b);
+		}
+
+		start = vertices.length / 3;
+
+		// Up X
+		for (let ix = 0; ix < gridX; ix++) 
+		{
+			const x = ix * segmentWidth - widthHalf;
+			const z = heightSegments * segmentHeight - heightHalf;
+
+			vertices.push(x, -skirtDepth, z);
+			normals.push(0, 1, 0);
+			uvs.push(ix / widthSegments, 0);
+		}
+		
+		// Index of the beginning of the last X row
+		let offset = gridX * gridZ - widthSegments - 1; 
+
+		for (let ix = 0; ix < widthSegments; ix++) 
+		{
+			const a = offset + ix;
+			const d = offset + ix + 1;
+			const b = ix + start;
+			const c = ix + start + 1;
+			indices.push(a, b, d, b, c, d);
+		}
+
+		start = vertices.length / 3;
+
+		// Down Z
+		for (let iz = 0; iz < gridZ; iz++) 
+		{
+			const z = iz * segmentHeight - heightHalf;
+			const x = - widthHalf;
+
+			vertices.push(x, -skirtDepth, z);
+			normals.push(0, 1, 0);
+			uvs.push(0, 1 - iz / heightSegments);
+		}
+
+		for (let iz = 0; iz < heightSegments; iz++) 
+		{
+			const a = iz * gridZ;
+			const d = (iz + 1) * gridZ;
+			const b = iz + start;
+			const c = iz + start + 1;
+
+			indices.push(a, b, d, b, c, d);
+		}
+
+		start = vertices.length / 3;
+
+		// Up Z
+		for (let iz = 0; iz < gridZ; iz++) 
+		{
+			const z = iz * segmentHeight - heightHalf;
+			const x = widthSegments * segmentWidth - widthHalf;
+
+			vertices.push(x, -skirtDepth, z);
+			normals.push(0, 1, 0);
+
+			uvs.push(1.0, 1 - iz / heightSegments);
+		}
+
+		for (let iz = 0; iz < heightSegments; iz++) 
+		{
+			const a = iz * gridZ + heightSegments;
+			const d = (iz + 1) * gridZ + heightSegments;
+			const b = iz + start;
+			const c = iz + start + 1;
+			
+			indices.push(d, b, a, d, c, b);
+		}
+	}
 }
