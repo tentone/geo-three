@@ -1,0 +1,32 @@
+import { Material, Mesh, Vector3, BufferGeometry, Object3D } from 'three';
+import { MapView } from '../MapView';
+export declare abstract class MapNode extends Mesh {
+    mapView: MapView;
+    parentNode: MapNode;
+    location: number;
+    level: number;
+    x: number;
+    y: number;
+    nodesLoaded: number;
+    subdivided: boolean;
+    childrenCache: Object3D[];
+    cacheChild: boolean;
+    isMesh: boolean;
+    static baseGeometry: BufferGeometry;
+    static baseScale: Vector3;
+    static childrens: number;
+    static root: number;
+    static topLeft: number;
+    static topRight: number;
+    static bottomLeft: number;
+    static bottomRight: number;
+    constructor(parentNode?: MapNode, mapView?: MapView, location?: number, level?: number, x?: number, y?: number, geometry?: BufferGeometry, material?: Material);
+    initialize(): void;
+    createChildNodes(): void;
+    subdivide(): void;
+    simplify(): void;
+    loadTexture(): void;
+    nodeReady(): void;
+    getNeighborsDirection(direction: number): MapNode[];
+    getNeighbors(): MapNode[];
+}
