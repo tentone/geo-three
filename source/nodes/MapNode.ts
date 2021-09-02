@@ -1,6 +1,6 @@
 import {LinearFilter, Material, Mesh, RGBFormat, Texture, Vector3, BufferGeometry, Object3D} from 'three';
 import {MapView} from '../MapView';
-
+import {CanvasUtils} from '../utils/CanvasUtils';
 
 /**
  * Represents a map tile node inside of the tiles quad-tree
@@ -227,7 +227,7 @@ export abstract class MapNode extends Mesh
 			this.nodeReady();
 		}).catch(() => 
 		{
-			const canvas = new OffscreenCanvas(1, 1);
+			const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
 			const context = canvas.getContext('2d');
 			context.fillStyle = '#FF0000';
 			context.fillRect(0, 0, 1, 1);

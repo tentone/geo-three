@@ -1,6 +1,6 @@
 import {MapProvider} from './MapProvider';
 import {Color} from 'three';
-
+import {CanvasUtils} from '../utils/CanvasUtils';
 
 /**
  * Height debug provider takes a RGB encoded height map from another provider and converts it to a gradient for preview.
@@ -41,7 +41,7 @@ export class HeightDebugProvider extends MapProvider
 				{
 					const resolution = 256;
 
-					const canvas = new OffscreenCanvas(resolution, resolution);
+					const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
 					const context = canvas.getContext('2d');
 
 					context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);

@@ -5,6 +5,7 @@ import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
 import {MapNodeHeightGeometry} from '../geometries/MapNodeHeightGeometry';
+import {CanvasUtils} from '../utils/CanvasUtils';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -165,7 +166,7 @@ export class MapHeightNode extends MapNode
 
 		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
 		{
-			const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 
 			const context = canvas.getContext('2d');
 			context.imageSmoothingEnabled = false;

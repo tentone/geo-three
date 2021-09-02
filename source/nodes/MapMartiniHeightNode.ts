@@ -4,6 +4,7 @@ import {MapView} from '../MapView';
 import {Martini} from './Martini';
 import {MapHeightNode} from './MapHeightNode';
 import {MapNode} from './MapNode.js';
+import {CanvasUtils} from '../utils/CanvasUtils';
 
 /** 
  * Represents a height map tile node using the RTIN method from the paper "Right Triangulated Irregular Networks".
@@ -268,7 +269,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	{
 		const tileSize = image.width;
 		const gridSize = tileSize + 1;
-		var canvas = new OffscreenCanvas(tileSize, tileSize);
+		var canvas = CanvasUtils.createOffscreenCanvas(tileSize, tileSize);
 
 		var context = canvas.getContext('2d');
 		context.imageSmoothingEnabled = false;

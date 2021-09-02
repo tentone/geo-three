@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -152,6 +154,20 @@
 	    }
 	}
 
+	class CanvasUtils {
+	    static createOffscreenCanvas(width, height) {
+	        if (OffscreenCanvas) {
+	            return new OffscreenCanvas(width, height);
+	        }
+	        else {
+	            let canvas = document.createElement('canvas');
+	            canvas.width = width;
+	            canvas.height = height;
+	            return canvas;
+	        }
+	    }
+	}
+
 	class MapNode extends three.Mesh {
 	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
 	        super(geometry, material);
@@ -205,7 +221,7 @@
 	            this.material.map = texture;
 	            this.nodeReady();
 	        }).catch(() => {
-	            const canvas = new OffscreenCanvas(1, 1);
+	            const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
 	            const context = canvas.getContext('2d');
 	            context.fillStyle = '#FF0000';
 	            context.fillRect(0, 0, 1, 1);
@@ -468,7 +484,7 @@
 	            throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	        }
 	        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
-	            const canvas = new OffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+	            const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 	            const context = canvas.getContext('2d');
 	            context.imageSmoothingEnabled = false;
 	            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
@@ -1149,7 +1165,7 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            const tileSize = image.width;
 	            const gridSize = tileSize + 1;
-	            var canvas = new OffscreenCanvas(tileSize, tileSize);
+	            var canvas = CanvasUtils.createOffscreenCanvas(tileSize, tileSize);
 	            var context = canvas.getContext('2d');
 	            context.imageSmoothingEnabled = false;
 	            context.drawImage(image, 0, 0, tileSize, tileSize, 0, 0, canvas.width, canvas.height);
@@ -1630,7 +1646,7 @@
 	        this.resolution = 256;
 	    }
 	    fetchTile(zoom, x, y) {
-	        const canvas = new OffscreenCanvas(this.resolution, this.resolution);
+	        const canvas = CanvasUtils.createOffscreenCanvas(this.resolution, this.resolution);
 	        const context = canvas.getContext('2d');
 	        const green = new three.Color(0x00ff00);
 	        const red = new three.Color(0xff0000);
@@ -1660,7 +1676,7 @@
 	                .fetchTile(zoom, x, y)
 	                .then((image) => {
 	                const resolution = 256;
-	                const canvas = new OffscreenCanvas(resolution, resolution);
+	                const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
 	                const context = canvas.getContext('2d');
 	                context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
 	                const imageData = context.getImageData(0, 0, resolution, resolution);
@@ -1793,4 +1809,3 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=geo-three.js.map

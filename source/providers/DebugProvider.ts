@@ -1,6 +1,6 @@
 import {MapProvider} from './MapProvider';
 import {Color} from 'three';
-
+import {CanvasUtils} from '../utils/CanvasUtils';
 
 /**
  * Debug provider can be used to debug the levels of the map three based on the zoom level they change between green and red.
@@ -14,7 +14,7 @@ export class DebugProvider extends MapProvider
 
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>
 	{
-		const canvas = new OffscreenCanvas(this.resolution, this.resolution);
+		const canvas = CanvasUtils.createOffscreenCanvas(this.resolution, this.resolution);
 		const context = canvas.getContext('2d');
 
 		const green = new Color(0x00ff00);
