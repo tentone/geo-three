@@ -47,5 +47,8 @@
 		"three": "~0.125.0",
 		"typedoc": "^0.20.36",
 		"typescript": "^4.2.4"
+	},
+	"dependencies": {
+		"@types/offscreencanvas": "^2019.6.3"
 	}
 }
