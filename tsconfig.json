@@ -31,8 +31,8 @@
     "source/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "docs",
-    "build"
+    "node_modules/**/*",
+    "docs/**/*",
+    "build/**/*"
   ]
 }

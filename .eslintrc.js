@@ -7,11 +7,16 @@ module.exports = {
 		'eslint-plugin-import',
 		'eslint-plugin-tsdoc'
 	],
+	ignorePatterns: [
+		"docs/**/*",
+		"build/**/*"
+	],
 	parserOptions: {
 		sourceType: 'module',
 		tsconfigRootDir: __dirname,
 		project: ['./tsconfig.json'],
 	},
+	
 	extends: [
 		'eslint:recommended',
 		'plugin:@typescript-eslint/eslint-recommended',
