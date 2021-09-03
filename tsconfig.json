@@ -6,6 +6,7 @@
     "outDir": "./build",
     "rootDir": "./source",
     "sourceMap": true,
+    "skipLibCheck": true,
     "inlineSources": false,
     "declaration": true,
     "declarationDir": ".",

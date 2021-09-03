@@ -3,6 +3,7 @@ import typescript from '@rollup/plugin-typescript';
 import livereload from 'rollup-plugin-livereload';
 
 export default {
+	external: ['three'],
 	input: 'source/Main.ts',
 	plugins: [
 		typescript(),
@@ -22,7 +23,8 @@ export default {
 			format: 'umd',
 			name: 'Geo',
 			file: 'build/geo-three.js',
-			indent: '\t'
+			indent: '\t',
+			sourcemap: true
 		}
 	]
 };
