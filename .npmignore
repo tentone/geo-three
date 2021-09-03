@@ -1,6 +1,6 @@
 docs/
 examples/
 source/
-readme/
+readme/**/*
 .github/
 node_modules/
