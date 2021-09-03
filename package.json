@@ -12,7 +12,7 @@
 		"build": "rollup -c rollup.config.js",
 		"docs": "typedoc --out docs source",
 		"uglify": "uglifyjs --compress --mangle --output build/geo-three.min.js -- build/geo-three.js",
-		"pub": "npm run build && npm run docs && npm publish --access public .",
+		"pub": "npm publish --access public .",
 		"lint": "eslint --ext .ts .",
 		"lint-fix": "eslint --ext .ts --fix ."
 	},
@@ -45,7 +45,7 @@
 		"rollup-plugin-livereload": "^2.0.0",
 		"rollup-plugin-serve": "^1.1.0",
 		"three": "~0.125.0",
-		"typedoc": "^0.20.36",
+		"typedoc": "^0.21.9",
 		"typescript": "^4.2.4"
 	},
 	"dependencies": {

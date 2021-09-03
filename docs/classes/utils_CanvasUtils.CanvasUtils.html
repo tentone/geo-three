@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>LODControl | geo-three</title>
+	<title>CanvasUtils | geo-three</title>
 	<meta name="description" content="Documentation for geo-three">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -55,13 +55,13 @@
 					<a href="../modules.html">geo-three</a>
 				</li>
 				<li>
-					<a href="../modules/lod_LODControl.html">lod/LODControl</a>
+					<a href="../modules/utils_CanvasUtils.html">utils/CanvasUtils</a>
 				</li>
 				<li>
-					<a href="lod_LODControl.LODControl.html">LODControl</a>
+					<a href="utils_CanvasUtils.CanvasUtils.html">CanvasUtils</a>
 				</li>
 			</ul>
-			<h1>Interface LODControl</h1>
+			<h1>Class CanvasUtils</h1>
 		</div>
 	</div>
 </header>
@@ -71,7 +71,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>LOD control objects define how the map tiles are subsivided or simplified.</p>
+						<p>Contains utils to handle canvas element manipulation and common canvas operations.</p>
 					</div>
 				</div>
 			</section>
@@ -79,15 +79,8 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">LODControl</span>
+						<span class="target">CanvasUtils</span>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implemented by</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../classes/lod_LODRadial.LODRadial.html" class="tsd-signature-type" data-tsd-kind="Class">LODRadial</a></li>
-					<li><a href="../classes/lod_LODRaycast.LODRaycast.html" class="tsd-signature-type" data-tsd-kind="Class">LODRaycast</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -95,62 +88,74 @@
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class"><a href="utils_CanvasUtils.CanvasUtils.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="lod_LODControl.LODControl.html#updateLOD" class="tsd-kind-icon">updateLOD</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="utils_CanvasUtils.CanvasUtils.html#createOffscreenCanvas" class="tsd-kind-icon">create<wbr>Offscreen<wbr>Canvas</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Canvas<wbr>Utils<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="utils_CanvasUtils.CanvasUtils.html" class="tsd-signature-type" data-tsd-kind="Class">CanvasUtils</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+							</aside>
+							<h4 class="tsd-returns-title">Returns <a href="utils_CanvasUtils.CanvasUtils.html" class="tsd-signature-type" data-tsd-kind="Class">CanvasUtils</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="updateLOD" class="tsd-anchor"></a>
-					<h3>updateLOD</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">updateLOD<span class="tsd-signature-symbol">(</span>view<span class="tsd-signature-symbol">: </span><a href="../classes/MapView.MapView-1.html" class="tsd-signature-type" data-tsd-kind="Class">MapView</a>, camera<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Camera</span>, renderer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">WebGLRenderer</span>, scene<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Object3D</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="createOffscreenCanvas" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> create<wbr>Offscreen<wbr>Canvas</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Offscreen<wbr>Canvas<span class="tsd-signature-symbol">(</span>width<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, height<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">HTMLCanvasElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OffscreenCanvas</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/tentone/geo-three/blob/999fd30/source/lod/LODControl.ts#L17">source/lod/LODControl.ts:17</a></li>
+									<li>Defined in <a href="https://github.com/tentone/geo-three/blob/999fd30/source/utils/CanvasUtils.ts#L13">source/utils/CanvasUtils.ts:13</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Update LOD of the MapView and Camera position on the world.</p>
+									<p>Create a offscreen canvas, used to draw content that will not be displayed using DOM.</p>
 								</div>
+								<p>If OffscreenCanvas object is no available creates a regular DOM canvas object instead.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>view: <a href="../classes/MapView.MapView-1.html" class="tsd-signature-type" data-tsd-kind="Class">MapView</a></h5>
+									<h5>width: <span class="tsd-signature-type">number</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Map view for wich the LOD will be updated.</p>
+										<p>Width of the canvas in pixels.</p>
 									</div>
 								</li>
 								<li>
-									<h5>camera: <span class="tsd-signature-type">Camera</span></h5>
+									<h5>height: <span class="tsd-signature-type">number</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Camera used to view the scene.</p>
-									</div>
-								</li>
-								<li>
-									<h5>renderer: <span class="tsd-signature-type">WebGLRenderer</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Renderer object.</p>
-									</div>
-								</li>
-								<li>
-									<h5>scene: <span class="tsd-signature-type">Object3D</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>Scene that compose the mapview.</p>
+										<p>Height of the canvas in pixels.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">HTMLCanvasElement</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">OffscreenCanvas</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -163,7 +168,7 @@
 						<a href="../modules.html">Modules</a>
 					</li>
 					<li class="current tsd-kind-module">
-						<a href="../modules/lod_LODControl.html">lod/LODControl</a>
+						<a href="../modules/utils_CanvasUtils.html">utils/<wbr>Canvas<wbr>Utils</a>
 					</li>
 				</ul>
 			</nav>
@@ -171,11 +176,14 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-parent-kind-module">
-						<a href="lod_LODControl.LODControl.html" class="tsd-kind-icon">LODControl</a>
+					<li class="current tsd-kind-class tsd-parent-kind-module">
+						<a href="utils_CanvasUtils.CanvasUtils.html" class="tsd-kind-icon">Canvas<wbr>Utils</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="lod_LODControl.LODControl.html#updateLOD" class="tsd-kind-icon">updateLOD</a>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class">
+								<a href="utils_CanvasUtils.CanvasUtils.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="utils_CanvasUtils.CanvasUtils.html#createOffscreenCanvas" class="tsd-kind-icon">create<wbr>Offscreen<wbr>Canvas</a>
 							</li>
 						</ul>
 					</li>
@@ -191,12 +199,15 @@
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>
