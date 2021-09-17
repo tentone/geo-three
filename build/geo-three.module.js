@@ -30,7 +30,7 @@ class OpenStreetMapsProvider extends MapProvider {
                 reject();
             };
             image.crossOrigin = 'Anonymous';
-            image.src = this.address + '/' + zoom + '/' + x + '/' + y + '.' + this.format;
+            image.src = this.address + zoom + '/' + x + '/' + y + '.' + this.format;
         });
     }
 }
