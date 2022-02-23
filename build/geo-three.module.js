@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Mesh, Texture, RGBFormat, LinearFilter, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Matrix4, Quaternion, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
+import { BufferGeometry, Float32BufferAttribute, Mesh, Texture, RGBAFormat, LinearFilter, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Matrix4, Quaternion, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
 
 class MapProvider {
     constructor() {
@@ -208,7 +208,7 @@ class MapNode extends Mesh {
         this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
             const texture = new Texture(image);
             texture.generateMipmaps = false;
-            texture.format = RGBFormat;
+            texture.format = RGBAFormat;
             texture.magFilter = LinearFilter;
             texture.minFilter = LinearFilter;
             texture.needsUpdate = true;
@@ -426,7 +426,7 @@ class MapHeightNode extends MapNode {
         this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
             const texture = new Texture(image);
             texture.generateMipmaps = false;
-            texture.format = RGBFormat;
+            texture.format = RGBAFormat;
             texture.magFilter = LinearFilter;
             texture.minFilter = LinearFilter;
             texture.needsUpdate = true;
@@ -663,7 +663,7 @@ class MapHeightNodeShader extends MapHeightNode {
         this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
             const texture = new Texture(image);
             texture.generateMipmaps = false;
-            texture.format = RGBFormat;
+            texture.format = RGBAFormat;
             texture.magFilter = LinearFilter;
             texture.minFilter = LinearFilter;
             texture.needsUpdate = true;
@@ -685,7 +685,7 @@ class MapHeightNodeShader extends MapHeightNode {
         return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
             const texture = new Texture(image);
             texture.generateMipmaps = false;
-            texture.format = RGBFormat;
+            texture.format = RGBAFormat;
             texture.magFilter = NearestFilter;
             texture.minFilter = NearestFilter;
             texture.needsUpdate = true;
@@ -1177,7 +1177,7 @@ class MapMartiniHeightNode extends MapHeightNode {
             this.geometry.rotateX(Math.PI);
             var texture = new Texture(image);
             texture.generateMipmaps = false;
-            texture.format = RGBFormat;
+            texture.format = RGBAFormat;
             texture.magFilter = NearestFilter;
             texture.minFilter = NearestFilter;
             texture.needsUpdate = true;
