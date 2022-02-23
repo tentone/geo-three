@@ -1,6 +1,6 @@
 {
 	"name": "geo-three",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"description": "geo-three is library for tile based geographic map layers in with three.js supporting selective loading/unloading of real-time generated 3D tiles",
 	"main": "build/geo-three.js",
 	"repository": {
@@ -11,7 +11,6 @@
 		"start": "rollup -c rollup.dev.js --watch",
 		"build": "rollup -c rollup.config.js",
 		"docs": "typedoc --out docs source",
-		"uglify": "uglifyjs --compress --mangle --output build/geo-three.min.js -- build/geo-three.js",
 		"pub": "npm publish --access public .",
 		"lint": "eslint --ext .ts .",
 		"lint-fix": "eslint --ext .ts --fix ."
@@ -46,7 +45,7 @@
 		"rollup": "~2.68.0",
 		"rollup-plugin-livereload": "~2.0.5",
 		"rollup-plugin-serve": "~1.1.0",
-		"three": "^0.130.0",
+		"three": "^0.137.0",
 		"typedoc": "~0.22.12",
 		"typescript": "~4.5.5"
 	},
