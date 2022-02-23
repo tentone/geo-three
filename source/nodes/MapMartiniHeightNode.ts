@@ -1,4 +1,4 @@
-import {BufferGeometry, DoubleSide, Float32BufferAttribute, Material, MeshPhongMaterial, NearestFilter, RGBFormat, Texture, Uint32BufferAttribute} from 'three';
+import {BufferGeometry, DoubleSide, Float32BufferAttribute, Material, MeshPhongMaterial, NearestFilter, RGBAFormat, Texture, Uint32BufferAttribute} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapView} from '../MapView';
 import {Martini} from './Martini';
@@ -293,7 +293,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 		var texture = new Texture(image);
 		texture.generateMipmaps = false;
-		texture.format = RGBFormat;
+		texture.format = RGBAFormat;
 		texture.magFilter = NearestFilter;
 		texture.minFilter = NearestFilter;
 		texture.needsUpdate = true;
