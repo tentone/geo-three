@@ -1,10 +1,8 @@
-
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
 	(global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.Geo = {}, global.THREE));
-}(this, (function (exports, three) { 'use strict';
+})(this, (function (exports, three) { 'use strict';
 
 	class MapProvider {
 	    constructor() {
@@ -214,7 +212,7 @@
 	        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
 	            const texture = new three.Texture(image);
 	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
+	            texture.format = three.RGBAFormat;
 	            texture.magFilter = three.LinearFilter;
 	            texture.minFilter = three.LinearFilter;
 	            texture.needsUpdate = true;
@@ -432,7 +430,7 @@
 	        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
 	            const texture = new three.Texture(image);
 	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
+	            texture.format = three.RGBAFormat;
 	            texture.magFilter = three.LinearFilter;
 	            texture.minFilter = three.LinearFilter;
 	            texture.needsUpdate = true;
@@ -669,7 +667,7 @@
 	        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
 	            const texture = new three.Texture(image);
 	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
+	            texture.format = three.RGBAFormat;
 	            texture.magFilter = three.LinearFilter;
 	            texture.minFilter = three.LinearFilter;
 	            texture.needsUpdate = true;
@@ -691,7 +689,7 @@
 	        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
 	            const texture = new three.Texture(image);
 	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
+	            texture.format = three.RGBAFormat;
 	            texture.magFilter = three.NearestFilter;
 	            texture.minFilter = three.NearestFilter;
 	            texture.needsUpdate = true;
@@ -1183,7 +1181,7 @@
 	            this.geometry.rotateX(Math.PI);
 	            var texture = new three.Texture(image);
 	            texture.generateMipmaps = false;
-	            texture.format = three.RGBFormat;
+	            texture.format = three.RGBAFormat;
 	            texture.magFilter = three.NearestFilter;
 	            texture.minFilter = three.NearestFilter;
 	            texture.needsUpdate = true;
@@ -1808,5 +1806,5 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));
 //# sourceMappingURL=geo-three.js.map

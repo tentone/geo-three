@@ -1,4 +1,4 @@
-import {LinearFilter, Material, Mesh, RGBFormat, Texture, Vector3, BufferGeometry, Object3D} from 'three';
+import {LinearFilter, Material, Mesh, RGBAFormat, Texture, Vector3, BufferGeometry, Object3D} from 'three';
 import {MapView} from '../MapView';
 import {CanvasUtils} from '../utils/CanvasUtils';
 
@@ -217,7 +217,7 @@ export abstract class MapNode extends Mesh
 		{
 			const texture = new Texture(image);
 			texture.generateMipmaps = false;
-			texture.format = RGBFormat;
+			texture.format = RGBAFormat;
 			texture.magFilter = LinearFilter;
 			texture.minFilter = LinearFilter;
 			texture.needsUpdate = true;

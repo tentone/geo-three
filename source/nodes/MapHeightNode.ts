@@ -1,4 +1,4 @@
-import {LinearFilter, Material, MeshPhongMaterial, BufferGeometry, RGBFormat, Texture, Vector3, Raycaster, Intersection} from 'three';
+import {LinearFilter, Material, MeshPhongMaterial, BufferGeometry, RGBAFormat, Texture, Vector3, Raycaster, Intersection} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapNode} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
@@ -90,7 +90,7 @@ export class MapHeightNode extends MapNode
 		{
 			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
-			texture.format = RGBFormat;
+			texture.format = RGBAFormat;
 			texture.magFilter = LinearFilter;
 			texture.minFilter = LinearFilter;
 			texture.needsUpdate = true;
