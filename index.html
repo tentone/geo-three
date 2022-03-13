@@ -2,14 +2,42 @@
 <html>
 <head>
 	<title></title>
+	<style>
+		body {
+			color: #FFFFFF;
+		}
+
+		input {
+			background-color: #FFFFFF88;
+			position: absolute;
+			width: 200px;
+			height: 25px;
+		}
+
+		select {
+			background-color: #FFFFFF88;
+			width: 200px;
+			height: 25px;
+		}
+	</style>
 </head>
 <body>
 	<!-- GUI -->
 	<canvas id="canvas" style="position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;"></canvas>
-	<select id="mode" style="position: absolute; top: 20px; right: 20px; width: 200px; height: 25px;"></select>
-	<select id="providerColor" style="position: absolute; top: 50px; right: 20px; width: 200px; height: 25px;"></select>
-	<select id="providerHeight" style="position: absolute; top: 80px; right: 20px; width: 200px; height: 25px;"></select>
-	<select id="lod" style="position: absolute; top: 110px; right: 20px; width: 200px; height: 25px;"></select>
+
+	<select id="mode" style="position: absolute; top: 20px; right: 20px;"></select>
+	<select id="providerColor" style="position: absolute; top: 50px; right: 20px;"></select>
+	<select id="providerHeight" style="position: absolute; top: 80px; right: 20px;"></select>
+	<select id="lod" style="position: absolute; top: 110px; right: 20px;"></select>
+
+	<!-- API KEys -->
+	<input id="mapbox_api" placeholder="Mapbox API KEY" style="top: 140px; right: 20px;"></input>
+	<input id="heremaps_id" placeholder="HERE Maps ID" style="top: 170px; right: 20px; "></input>
+	<input id="heremaps_code" placeholder="HERE Maps Code" style="top: 200px; right: 20px;"></input>
+	<input id="bing_api" placeholder="Bing API KEY" style="top: 230px; right: 20px;"></input>
+	<input id="maptiler_api" placeholder="MapTiler API KEY" style="top: 260px; right: 20px;"></input>
+	<input id="openmap_tiles_server" placeholder="OpenMap Tiles URL" style="top: 290px; right: 20px;"></input>
+
 
 	<!-- Code -->
 	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
@@ -29,35 +57,38 @@
 
 		var sky = createSky();
 		scene.add(sky);
+		var providers = createProviders();
 
-		var DEV_MAPBOX_API_KEY = "";
-		var DEV_HEREMAPS_APP_ID = "";
-		var DEV_HEREMAPS_APP_CODE = "";
-		var DEV_BING_API_KEY = "";
-		var DEV_MAPTILER_API_KEY = "";
-		var OPEN_MAP_TILES_SERVER_MAP = "";
-		
-		var providers = [
-			["Vector OpenSteet Maps", new Geo.OpenStreetMapsProvider()],
-			["Vector OpenTile Maps", new Geo.OpenMapTilesProvider(OPEN_MAP_TILES_SERVER_MAP)],
-			["Vector Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/streets-v10", Geo.MapBoxProvider.STYLE)],
-			["Vector Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.day")],
-			["Vector Here Maps Night", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.night")],
-			["Vector Here Maps Terrain", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "terrain.day")],
-			["Vector Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.ROAD)],
-			["Vector Map Tiler Basic", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "basic", "png")],
-			["Vector Map Tiler Outdoor", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "outdoor", "png")],	
-			["Satellite Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.satellite", Geo.MapBoxProvider.MAP_ID, "jpg70", false)],
-			["Satellite Map Box Labels", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/satellite-streets-v10", Geo.MapBoxProvider.STYLE, "jpg70")],
-			["Satellite Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "satellite.day", "jpg")],
-			["Satellite Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.AERIAL)],
-			["Satellite Maps Tiler Labels", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "hybrid", "jpg")],
-			["Satellite Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "satellite", "jpg")],
-			["Height Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw")],
-			["Height Map Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "terrain-rgb", "png")],
-			["Debug Height Map Box", new Geo.HeightDebugProvider(new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw"))],
-			["Debug", new Geo.DebugProvider()]
-		];
+		function createProviders() {
+			var DEV_MAPBOX_API_KEY = document.getElementById("mapbox_api").value;
+			var DEV_HEREMAPS_APP_ID = document.getElementById("heremaps_id").value;;
+			var DEV_HEREMAPS_APP_CODE = document.getElementById("heremaps_code").value;
+			var DEV_BING_API_KEY = document.getElementById("bing_api").value;
+			var DEV_MAPTILER_API_KEY = document.getElementById("maptiler_api").value;
+			var OPEN_MAP_TILES_SERVER_MAP = document.getElementById("openmap_tiles_server").value;
+
+			return [
+				["Vector OpenSteet Maps", new Geo.OpenStreetMapsProvider(),],
+				["Vector OpenTile Maps", new Geo.OpenMapTilesProvider(OPEN_MAP_TILES_SERVER_MAP)],
+				["Vector Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/streets-v10", Geo.MapBoxProvider.STYLE)],
+				["Vector Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.day")],
+				["Vector Here Maps Night", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.night")],
+				["Vector Here Maps Terrain", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "terrain.day")],
+				["Vector Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.ROAD)],
+				["Vector Map Tiler Basic", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "basic", "png")],
+				["Vector Map Tiler Outdoor", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "outdoor", "png")],	
+				["Satellite Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.satellite", Geo.MapBoxProvider.MAP_ID, "jpg70", false)],
+				["Satellite Map Box Labels", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/satellite-streets-v10", Geo.MapBoxProvider.STYLE, "jpg70")],
+				["Satellite Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "satellite.day", "jpg")],
+				["Satellite Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.AERIAL)],
+				["Satellite Maps Tiler Labels", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "hybrid", "jpg")],
+				["Satellite Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "satellite", "jpg")],
+				["Height Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw")],
+				["Height Map Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "terrain-rgb", "png")],
+				["Debug Height Map Box", new Geo.HeightDebugProvider(new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw"))],
+				["Debug", new Geo.DebugProvider()]
+			];
+		}
 
 		var modes = [
 			["Planar", Geo.MapView.PLANAR],
@@ -72,6 +103,18 @@
 			["Frustum", Geo.LODFrustum],
 			["Radial", Geo.LODRadial]
 		];
+
+		var ids = ["mapbox_api", "heremaps_id", "heremaps_code", "bing_api", "maptiler_api", "openmap_tiles_server"];
+		for(var i = 0; i < ids.length; i++) {
+			var box = document.getElementById(ids[i]);
+			box.onchange = function(event)
+			{
+				providers = createProviders();
+				scene.remove(map);
+				map = new Geo.MapView(modes[mode.selectedIndex][0], providers[providerColor.selectedIndex][0], providers[providerHeight.selectedIndex][1]);
+				scene.add(map);
+			};
+		}
 
 		var lod = document.getElementById("lod");
 		lod.onchange = function(event)
@@ -94,7 +137,6 @@
 			if(map !== undefined)
 			{
 				scene.remove(map);
-
 				map = new Geo.MapView(modes[mode.selectedIndex][0], providers[providerColor.selectedIndex][0], providers[providerHeight.selectedIndex][1]);
 				scene.add(map);
 			}
