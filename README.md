@@ -1,6 +1,7 @@
 # Geo-Three
 
 [![npm version](https://badge.fury.io/js/geo-three.svg)](https://badge.fury.io/js/geo-three)[![GitHub version](https://badge.fury.io/gh/tentone%2Fgeo-three.svg)](https://badge.fury.io/gh/tentone%2Fgeo-three)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftentone%2Fgeo-three.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftentone%2Fgeo-three?ref=badge_shield)
 
 - Library to display maps using `three.js`. Allows for full world scale visualization of geographic data using tile based chunks.
 - Can generate 3D geometry for terrain from terrain height data using software generated tiles or using GPU displacement maps.
@@ -238,3 +239,6 @@ export class CustomMapNode extends MapNode
 - Project uses a MIT license that allow for commercial usage of the platform without any cost.
 - The license is available on the project GitHub page
 
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ftentone%2Fgeo-three.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Ftentone%2Fgeo-three?ref=badge_large)
