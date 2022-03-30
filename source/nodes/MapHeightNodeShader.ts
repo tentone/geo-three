@@ -88,60 +88,46 @@ export class MapHeightNodeShader extends MapHeightNode
 		return material;
 	}
 
-	public loadTexture(): void 
+	public async loadTexture(): Promise<void> 
 	{
-		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => 
-		{
-			const texture = new Texture(image as any);
-			texture.generateMipmaps = false;
-			texture.format = RGBAFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
-			
-			// @ts-ignore
-			this.material.map = texture;
-			this.textureLoaded = true;
-			this.nodeReady();
-		}).catch((err) => 
-		{
-			console.error('GeoThree: Failed to load color node data.', err);
-		}).finally(() =>
-		{
-			this.textureLoaded = true;
-			this.nodeReady();
-		});
+		const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 
-		this.loadHeightGeometry();
+		const texture = new Texture(image as any);
+		texture.generateMipmaps = false;
+		texture.format = RGBAFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
+		
+		// @ts-ignore
+		this.material.map = texture;
+		this.textureLoaded = true;
+		this.nodeReady();
+
+		await this.loadHeightGeometry();
 	}
 
-	public loadHeightGeometry(): Promise<any> 
+	public async loadHeightGeometry(): Promise<void> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
-		{
-			const texture = new Texture(image as any);
-			texture.generateMipmaps = false;
-			texture.format = RGBAFormat;
-			texture.magFilter = NearestFilter;
-			texture.minFilter = NearestFilter;
-			texture.needsUpdate = true;
-			
-			// @ts-ignore
-			this.material.userData.heightMap.value = texture;
+		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
 
-		}).catch((err) =>  
-		{
-			console.error('GeoThree: Failed to load height node data.', err);
-		}).finally(() =>
-		{
-			this.heightLoaded = true;
-			this.nodeReady();
-		});
+		const texture = new Texture(image as any);
+		texture.generateMipmaps = false;
+		texture.format = RGBAFormat;
+		texture.magFilter = NearestFilter;
+		texture.minFilter = NearestFilter;
+		texture.needsUpdate = true;
+		
+		// @ts-ignore
+		this.material.userData.heightMap.value = texture;
+
+		this.heightLoaded = true;
+		this.nodeReady();
 	}
 
 	/**

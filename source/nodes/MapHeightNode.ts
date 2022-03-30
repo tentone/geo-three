@@ -84,24 +84,22 @@ export class MapHeightNode extends MapNode
 	 *
 	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
 	 */
-	public loadTexture(): void 
+	public async loadTexture(): Promise<void> 
 	{
-		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => 
-		{
-			const texture = new Texture(image as any);
-			texture.generateMipmaps = false;
-			texture.format = RGBAFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
+		const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 
-			// @ts-ignore
-			this.material.map = texture;
-		}).finally(() =>
-		{
-			this.textureLoaded = true;
-			this.nodeReady();
-		});
+		const texture = new Texture(image as any);
+		texture.generateMipmaps = false;
+		texture.format = RGBAFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
+
+		// @ts-ignore
+		this.material.map = texture;
+
+		this.textureLoaded = true;
+		this.nodeReady();
 	}
 
 	public nodeReady(): void 
@@ -157,34 +155,26 @@ export class MapHeightNode extends MapNode
 	 *
 	 * @returns Returns a promise indicating when the geometry generation has finished.
 	 */
-	public loadHeightGeometry(): Promise<any> 
+	public async loadHeightGeometry(): Promise<any> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => 
-		{
-			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
 
-			const context = canvas.getContext('2d');
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+		const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		const context = canvas.getContext('2d');
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
 
-			const geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+		const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-			this.geometry = geometry;
-		}).catch(() =>
-		{
-			console.error('GeoThree: Failed to load height node data.', this);
-		}).finally(() =>
-		{
-			this.heightLoaded = true;
-			this.nodeReady();
-		});
+		this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+		this.heightLoaded = true;
+		this.nodeReady();
 	}
 
 	/**

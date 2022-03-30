@@ -61,7 +61,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 	public meshMaxError: number | Function = 10;
 
-	public material: MeshPhongMaterial
+	public material: MeshPhongMaterial;
 
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
 	{
@@ -80,7 +80,6 @@ export class MapMartiniHeightNode extends MapHeightNode
 		this.exageration = exageration;
 		this.frustumCulled = false;
 	}
-
 
 	public static prepareMaterial(material: Material, level: number, exageration: number = 1.0): any 
 	{
@@ -303,20 +302,18 @@ export class MapMartiniHeightNode extends MapHeightNode
 	/**
 	 * Load height texture from the server and create a geometry to match it.
 	 */
-	public loadHeightGeometry(): Promise<any> 
+	public async loadHeightGeometry(): Promise<void> 
 	{
 		if (this.mapView.heightProvider === null) 
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then(async(image) => 
-		{
-			this.onHeightImage(image);
-		}).finally(() => 
-		{
-			this.heightLoaded = true;
-			this.nodeReady();
-		});
+		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+		
+		this.onHeightImage(image);
+
+		this.heightLoaded = true;
+		this.nodeReady();
 	}
 }

@@ -211,10 +211,11 @@ export abstract class MapNode extends Mesh
 	 *
 	 * This base method assumes the existence of a material attribute with a map texture.
 	 */
-	public loadTexture(): void
+	public async loadTexture(): Promise<void>
 	{
-		this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image: HTMLImageElement) =>
-		{
+		try {
+			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
+		
 			const texture = new Texture(image);
 			texture.generateMipmaps = false;
 			texture.format = RGBAFormat;
@@ -225,8 +226,7 @@ export abstract class MapNode extends Mesh
 			// @ts-ignore
 			this.material.map = texture;
 			this.nodeReady();
-		}).catch(() => 
-		{
+		} catch (e) {
 			const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
 			const context = canvas.getContext('2d');
 			context.fillStyle = '#FF0000';
@@ -239,7 +239,7 @@ export abstract class MapNode extends Mesh
 			// @ts-ignore
 			this.material.map = texture;
 			this.nodeReady();
-		});
+		}
 	}
 
 	/**
