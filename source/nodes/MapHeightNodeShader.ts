@@ -101,6 +101,9 @@ export class MapHeightNodeShader extends MapHeightNode
 		
 		// @ts-ignore
 		this.material.map = texture;
+		// @ts-ignore
+		this.material.needsUpdate = true;
+
 		this.textureLoaded = true;
 		this.nodeReady();
 
@@ -114,9 +117,8 @@ export class MapHeightNodeShader extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-
-		const texture = new Texture(image as any);
+		const texture = new Texture();
+		texture.image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
 		texture.generateMipmaps = false;
 		texture.format = RGBAFormat;
 		texture.magFilter = NearestFilter;
@@ -125,6 +127,10 @@ export class MapHeightNodeShader extends MapHeightNode
 		
 		// @ts-ignore
 		this.material.userData.heightMap.value = texture;
+		// @ts-ignore
+		this.material.map = texture;
+		// @ts-ignore
+		this.material.needsUpdate = true;
 
 		this.heightLoaded = true;
 		this.nodeReady();

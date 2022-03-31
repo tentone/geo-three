@@ -31,48 +31,40 @@ export class HeightDebugProvider extends MapProvider
 		this.provider = provider;
 	}
 
-	public fetchTile(zoom: number, x: number, y: number): Promise<any>
+	public async fetchTile(zoom: number, x: number, y: number): Promise<any>
 	{
-		return new Promise((resolve, reject) => 
+		const image = await this.provider.fetchTile(zoom, x, y);
+		const resolution = 256;
+
+		const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
+		const context = canvas.getContext('2d');
+
+		context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
+
+		const imageData = context.getImageData(0, 0, resolution, resolution);
+		const data = imageData.data;
+		for (let i = 0; i < data.length; i += 4) 
 		{
-			this.provider
-				.fetchTile(zoom, x, y)
-				.then((image) => 
-				{
-					const resolution = 256;
+			const r = data[i];
+			const g = data[i + 1];
+			const b = data[i + 2];
 
-					const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
-					const context = canvas.getContext('2d');
+			// The value will be composed of the bits RGB
+			const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
 
-					context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
+			// (16777216 * 0.1) - 1e4
+			const max = 1667721.6;
 
-					const imageData = context.getImageData(0, 0, resolution, resolution);
-					const data = imageData.data;
-					for (let i = 0; i < data.length; i += 4) 
-					{
-						const r = data[i];
-						const g = data[i + 1];
-						const b = data[i + 2];
+			const color = this.fromColor.clone().lerpHSL(this.toColor, value / max);
 
-						// The value will be composed of the bits RGB
-						const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
+			// Set pixel color
+			data[i] = color.r * 255;
+			data[i + 1] = color.g * 255;
+			data[i + 2] = color.b * 255;
+		}
 
-						// (16777216 * 0.1) - 1e4
-						const max = 1667721.6;
+		context.putImageData(imageData, 0, 0);
 
-						const color = this.fromColor.clone().lerpHSL(this.toColor, value / max);
-
-						// Set pixel color
-						data[i] = color.r * 255;
-						data[i + 1] = color.g * 255;
-						data[i + 2] = color.b * 255;
-					}
-
-					context.putImageData(imageData, 0, 0);
-
-					resolve(canvas);
-				})
-				.catch(reject);
-		});
+		return canvas;
 	}
 }

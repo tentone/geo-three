@@ -86,9 +86,8 @@ export class MapHeightNode extends MapNode
 	 */
 	public async loadTexture(): Promise<void> 
 	{
-		const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
-
-		const texture = new Texture(image as any);
+		const texture = new Texture();
+		texture.image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 		texture.generateMipmaps = false;
 		texture.format = RGBAFormat;
 		texture.magFilter = LinearFilter;
@@ -97,6 +96,8 @@ export class MapHeightNode extends MapNode
 
 		// @ts-ignore
 		this.material.map = texture;
+		// @ts-ignore
+		this.material.needsUpdate = true;
 
 		this.textureLoaded = true;
 		this.nodeReady();

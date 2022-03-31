@@ -296,7 +296,12 @@ export class MapMartiniHeightNode extends MapHeightNode
 		texture.magFilter = NearestFilter;
 		texture.minFilter = NearestFilter;
 		texture.needsUpdate = true;
+
 		this.material.userData.heightMap.value = texture;
+		// @ts-ignore
+		this.material.map = texture;
+		// @ts-ignore
+		this.material.needsUpdate = true;
 	}
 	
 	/**
@@ -309,9 +314,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		
-		this.onHeightImage(image);
+		this.onHeightImage(await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y));
 
 		this.heightLoaded = true;
 		this.nodeReady();
