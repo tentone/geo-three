@@ -38,7 +38,6 @@
 	<input id="maptiler_api" placeholder="MapTiler API KEY" style="top: 260px; right: 20px;"></input>
 	<input id="openmap_tiles_server" placeholder="OpenMap Tiles URL" style="top: 290px; right: 20px;"></input>
 
-
 	<!-- Code -->
 	<script type="text/javascript" src="https://threejs.org/build/three.min.js"></script>
 	<script type="text/javascript" src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
@@ -111,7 +110,7 @@
 			{
 				providers = createProviders();
 				scene.remove(map);
-				map = new Geo.MapView(modes[mode.selectedIndex][0], providers[providerColor.selectedIndex][0], providers[providerHeight.selectedIndex][1]);
+				map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
 				scene.add(map);
 			};
 		}
@@ -137,7 +136,7 @@
 			if(map !== undefined)
 			{
 				scene.remove(map);
-				map = new Geo.MapView(modes[mode.selectedIndex][0], providers[providerColor.selectedIndex][0], providers[providerHeight.selectedIndex][1]);
+				map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
 				scene.add(map);
 			}
 		};
@@ -145,6 +144,7 @@
 		{
 			var option = document.createElement("option");
 			option.innerHTML = modes[i][0];
+			option.value = modes[i][1];
 			mode.appendChild(option);
 		}
 

@@ -54,6 +54,7 @@ export class BingMapsProvider extends MapProvider
 
 		this.apiKey = apiKey;
 		this.type = type;
+		this.maxZoom = 19;
 	}
 
 	/**

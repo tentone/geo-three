@@ -26,6 +26,7 @@ export class OpenStreetMapsProvider extends MapProvider
 
 		this.address = address;
 		this.format = 'png';
+		this.maxZoom = 19;
 	}
 
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>

@@ -128,6 +128,7 @@ export class MapView extends Mesh
 			root = new rootConstructor(null, this);
 		}
 
+		// Remove old root
 		if (this.root !== null) 
 		{
 			this.remove(this.root);
@@ -137,8 +138,12 @@ export class MapView extends Mesh
 		// @ts-ignore
 		this.root = root;
 
+		// Initialize root node
 		if (this.root !== null) 
 		{
+			// TODO <REMOVE THIS>
+			console.log(this.root);
+
 			// @ts-ignore
 			this.geometry = this.root.constructor.baseGeometry;
 
