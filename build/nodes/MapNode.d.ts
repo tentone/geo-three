@@ -25,7 +25,7 @@ export declare abstract class MapNode extends Mesh {
     createChildNodes(): void;
     subdivide(): void;
     simplify(): void;
-    loadTexture(): void;
+    loadTexture(): Promise<void>;
     nodeReady(): void;
     getNeighborsDirection(direction: number): MapNode[];
     getNeighbors(): MapNode[];

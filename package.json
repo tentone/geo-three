@@ -10,7 +10,7 @@
 	"scripts": {
 		"start": "rollup -c rollup.dev.js --watch",
 		"build": "rollup -c rollup.config.js",
-		"docs": "typedoc --out docs source",
+		"docs": "typedoc --out docs ./source/Main.ts",
 		"pub": "npm publish --access public .",
 		"lint": "eslint --ext .ts .",
 		"lint-fix": "eslint --ext .ts --fix ."

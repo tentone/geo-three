@@ -29,5 +29,5 @@ export declare class MapMartiniHeightNode extends MapHeightNode {
         };
     };
     onHeightImage(image: HTMLImageElement): Promise<void>;
-    loadHeightGeometry(): Promise<any>;
+    loadHeightGeometry(): Promise<void>;
 }

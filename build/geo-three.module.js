@@ -19,6 +19,7 @@ class OpenStreetMapsProvider extends MapProvider {
         super();
         this.address = address;
         this.format = 'png';
+        this.maxZoom = 19;
     }
     fetchTile(zoom, x, y) {
         return new Promise((resolve, reject) => {
@@ -33,6 +34,31 @@ class OpenStreetMapsProvider extends MapProvider {
             image.src = this.address + zoom + '/' + x + '/' + y + '.' + this.format;
         });
     }
+}
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 }
 
 class MapNodeGeometry extends BufferGeometry {
@@ -205,25 +231,29 @@ class MapNode extends Mesh {
         this.children = [];
     }
     loadTexture() {
-        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
-            const texture = new Texture(image);
-            texture.generateMipmaps = false;
-            texture.format = RGBAFormat;
-            texture.magFilter = LinearFilter;
-            texture.minFilter = LinearFilter;
-            texture.needsUpdate = true;
-            this.material.map = texture;
-            this.nodeReady();
-        }).catch(() => {
-            const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
-            const context = canvas.getContext('2d');
-            context.fillStyle = '#FF0000';
-            context.fillRect(0, 0, 1, 1);
-            const texture = new Texture(canvas);
-            texture.generateMipmaps = false;
-            texture.needsUpdate = true;
-            this.material.map = texture;
-            this.nodeReady();
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+                const texture = new Texture(image);
+                texture.generateMipmaps = false;
+                texture.format = RGBAFormat;
+                texture.magFilter = LinearFilter;
+                texture.minFilter = LinearFilter;
+                texture.needsUpdate = true;
+                this.material.map = texture;
+                this.nodeReady();
+            }
+            catch (e) {
+                const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
+                const context = canvas.getContext('2d');
+                context.fillStyle = '#FF0000';
+                context.fillRect(0, 0, 1, 1);
+                const texture = new Texture(canvas);
+                texture.generateMipmaps = false;
+                texture.needsUpdate = true;
+                this.material.map = texture;
+                this.nodeReady();
+            }
         });
     }
     nodeReady() {
@@ -423,15 +453,16 @@ class MapHeightNode extends MapNode {
         this.loadHeightGeometry();
     }
     loadTexture() {
-        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
-            const texture = new Texture(image);
+        return __awaiter(this, void 0, void 0, function* () {
+            const texture = new Texture();
+            texture.image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
             texture.generateMipmaps = false;
             texture.format = RGBAFormat;
             texture.magFilter = LinearFilter;
             texture.minFilter = LinearFilter;
             texture.needsUpdate = true;
             this.material.map = texture;
-        }).finally(() => {
+            this.material.needsUpdate = true;
             this.textureLoaded = true;
             this.nodeReady();
         });
@@ -474,20 +505,17 @@ class MapHeightNode extends MapNode {
         node.updateMatrixWorld(true);
     }
     loadHeightGeometry() {
-        if (this.mapView.heightProvider === null) {
-            throw new Error('GeoThree: MapView.heightProvider provider is null.');
-        }
-        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.mapView.heightProvider === null) {
+                throw new Error('GeoThree: MapView.heightProvider provider is null.');
+            }
+            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
             const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
             const context = canvas.getContext('2d');
             context.imageSmoothingEnabled = false;
             context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
             const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            const geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
-            this.geometry = geometry;
-        }).catch(() => {
-            console.error('GeoThree: Failed to load height node data.', this);
-        }).finally(() => {
+            this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
             this.heightLoaded = true;
             this.nodeReady();
         });
@@ -660,7 +688,8 @@ class MapHeightNodeShader extends MapHeightNode {
         return material;
     }
     loadTexture() {
-        this.mapView.provider.fetchTile(this.level, this.x, this.y).then((image) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
             const texture = new Texture(image);
             texture.generateMipmaps = false;
             texture.format = RGBAFormat;
@@ -668,31 +697,27 @@ class MapHeightNodeShader extends MapHeightNode {
             texture.minFilter = LinearFilter;
             texture.needsUpdate = true;
             this.material.map = texture;
+            this.material.needsUpdate = true;
             this.textureLoaded = true;
             this.nodeReady();
-        }).catch((err) => {
-            console.error('GeoThree: Failed to load color node data.', err);
-        }).finally(() => {
-            this.textureLoaded = true;
-            this.nodeReady();
+            yield this.loadHeightGeometry();
         });
-        this.loadHeightGeometry();
     }
     loadHeightGeometry() {
-        if (this.mapView.heightProvider === null) {
-            throw new Error('GeoThree: MapView.heightProvider provider is null.');
-        }
-        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => {
-            const texture = new Texture(image);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.mapView.heightProvider === null) {
+                throw new Error('GeoThree: MapView.heightProvider provider is null.');
+            }
+            const texture = new Texture();
+            texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
             texture.generateMipmaps = false;
             texture.format = RGBAFormat;
             texture.magFilter = NearestFilter;
             texture.minFilter = NearestFilter;
             texture.needsUpdate = true;
             this.material.userData.heightMap.value = texture;
-        }).catch((err) => {
-            console.error('GeoThree: Failed to load height node data.', err);
-        }).finally(() => {
+            this.material.map = texture;
+            this.material.needsUpdate = true;
             this.heightLoaded = true;
             this.nodeReady();
         });
@@ -753,31 +778,6 @@ class LODRaycast {
             }
         }
     }
-}
-
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation.
-
-Permission to use, copy, modify, and/or distribute this software for any
-purpose with or without fee is hereby granted.
-
-THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
-AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
-LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THIS SOFTWARE.
-***************************************************************************** */
-
-function __awaiter(thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
 }
 
 class Martini {
@@ -1182,15 +1182,16 @@ class MapMartiniHeightNode extends MapHeightNode {
             texture.minFilter = NearestFilter;
             texture.needsUpdate = true;
             this.material.userData.heightMap.value = texture;
+            this.material.map = texture;
+            this.material.needsUpdate = true;
         });
     }
     loadHeightGeometry() {
-        if (this.mapView.heightProvider === null) {
-            throw new Error('GeoThree: MapView.heightProvider provider is null.');
-        }
-        return this.mapView.heightProvider.fetchTile(this.level, this.x, this.y).then((image) => __awaiter(this, void 0, void 0, function* () {
-            this.onHeightImage(image);
-        })).finally(() => {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.mapView.heightProvider === null) {
+                throw new Error('GeoThree: MapView.heightProvider provider is null.');
+            }
+            this.onHeightImage(yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y));
             this.heightLoaded = true;
             this.nodeReady();
         });
@@ -1230,6 +1231,7 @@ class MapView extends Mesh {
         }
         this.root = root;
         if (this.root !== null) {
+            console.log(this.root);
             this.geometry = this.root.constructor.baseGeometry;
             this.scale.copy(this.root.constructor.baseScale);
             this.root.mapView = this;
@@ -1411,6 +1413,7 @@ class BingMapsProvider extends MapProvider {
         this.subdomain = 't1';
         this.apiKey = apiKey;
         this.type = type;
+        this.maxZoom = 19;
     }
     getMetaData() {
         const address = 'http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
@@ -1665,31 +1668,27 @@ class HeightDebugProvider extends MapProvider {
         this.provider = provider;
     }
     fetchTile(zoom, x, y) {
-        return new Promise((resolve, reject) => {
-            this.provider
-                .fetchTile(zoom, x, y)
-                .then((image) => {
-                const resolution = 256;
-                const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
-                const context = canvas.getContext('2d');
-                context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
-                const imageData = context.getImageData(0, 0, resolution, resolution);
-                const data = imageData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i];
-                    const g = data[i + 1];
-                    const b = data[i + 2];
-                    const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
-                    const max = 1667721.6;
-                    const color = this.fromColor.clone().lerpHSL(this.toColor, value / max);
-                    data[i] = color.r * 255;
-                    data[i + 1] = color.g * 255;
-                    data[i + 2] = color.b * 255;
-                }
-                context.putImageData(imageData, 0, 0);
-                resolve(canvas);
-            })
-                .catch(reject);
+        return __awaiter(this, void 0, void 0, function* () {
+            const image = yield this.provider.fetchTile(zoom, x, y);
+            const resolution = 256;
+            const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
+            const context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
+            const imageData = context.getImageData(0, 0, resolution, resolution);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i];
+                const g = data[i + 1];
+                const b = data[i + 2];
+                const value = (r * 65536 + g * 256 + b) * 0.1 - 1e4;
+                const max = 1667721.6;
+                const color = this.fromColor.clone().lerpHSL(this.toColor, value / max);
+                data[i] = color.r * 255;
+                data[i + 1] = color.g * 255;
+                data[i + 2] = color.b * 255;
+            }
+            context.putImageData(imageData, 0, 0);
+            return canvas;
         });
     }
 }
