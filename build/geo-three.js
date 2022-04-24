@@ -213,7 +213,8 @@
 	    initialize() { }
 	    createChildNodes() { }
 	    subdivide() {
-	        const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider.maxZoom);
+	        var _a, _b;
+	        const maxZoom = Math.min(this.mapView.provider.maxZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.maxZoom) !== null && _b !== void 0 ? _b : Infinity);
 	        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
 	            return;
 	        }
