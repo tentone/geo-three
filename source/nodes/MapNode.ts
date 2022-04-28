@@ -213,7 +213,8 @@ export abstract class MapNode extends Mesh
 	 */
 	public async loadTexture(): Promise<void>
 	{
-		try {
+		try 
+		{
 			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 		
 			const texture = new Texture(image);
@@ -226,7 +227,9 @@ export abstract class MapNode extends Mesh
 			// @ts-ignore
 			this.material.map = texture;
 			this.nodeReady();
-		} catch (e) {
+		}
+		catch (e) 
+		{
 			const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
 			const context = canvas.getContext('2d');
 			context.fillStyle = '#FF0000';
