@@ -7,23 +7,27 @@ export default {
 	plugins: [
 		typescript({ tsconfig: './tsconfig.json' }),
 		strip({
-			functions: ['assert.*', 'debug', 'alert']
+			functions: ['assert.*', 'debug', 'alert', 'console.*']
 		})
 	],
 	output: [
 		{
 			format: 'es',
 			file: 'build/geo-three.module.js',
-			indent: '\t',
-			sourcemap: true
+			indent: '\t'
+		},
+		{
+			format: 'cjs',
+			name: 'Geo',
+			file: 'build/geo-three.cjs',
+			indent: '\t'
 		},
 		{
 			globals: {three: 'THREE'},
 			format: 'umd',
 			name: 'Geo',
 			file: 'build/geo-three.js',
-			indent: '\t',
-			sourcemap: true
+			indent: '\t'
 		}
 	]
 };

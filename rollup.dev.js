@@ -6,7 +6,7 @@ export default {
 	external: ['three'],
 	input: 'source/Main.ts',
 	plugins: [
-		typescript(),
+		typescript({ tsconfig: './tsconfig.json' }),
 		serve({
 			open: true,
 			contentBase: '.',

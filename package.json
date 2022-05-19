@@ -1,9 +1,17 @@
 {
 	"name": "geo-three",
-	"version": "0.0.18",
+	"version": "0.1.0",
+	"type": "module",
 	"description": "geo-three is library for tile based geographic map layers in with three.js supporting selective loading/unloading of real-time generated 3D tiles",
 	"main": "build/geo-three.js",
-  "module": "build/geo-three.module.js",
+	"module": "build/geo-three.module.js",
+	"exports": {
+		".": {
+		  "import": "./build/geo-three.module.js",
+		  "require": "./build/geo-three.cjs"
+		},
+		"./source/*": "./source/*"
+	  },
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/tentone/geothree.git"
@@ -16,6 +24,7 @@
 		"lint": "eslint --ext .ts .",
 		"lint-fix": "eslint --ext .ts --fix ."
 	},
+	"sideEffects": false,
 	"keywords": [
 		"maps",
 		"tiles",
@@ -36,7 +45,7 @@
 		"@rollup/plugin-typescript": "~8.3.1",
 		"@types/offscreencanvas": "~2019.6.4",
 		"@types/node": "~16.9.0",
-		"@types/three": "^0.139.0",
+		"@types/three": "^0.140.0",
 		"@typescript-eslint/eslint-plugin": "~5.12.1",
 		"@typescript-eslint/parser": "~5.17.0",
 		"eslint": "~8.12.0",
@@ -46,7 +55,7 @@
 		"rollup": "~2.70.0",
 		"rollup-plugin-livereload": "~2.0.5",
 		"rollup-plugin-serve": "~1.1.0",
-		"three": "^0.139.0",
+		"three": "^0.140.2",
 		"typedoc": "~0.22.13",
 		"typescript": "~4.5.5"
 	},
