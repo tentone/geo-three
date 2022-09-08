@@ -81,7 +81,6 @@ export class GoogleMapsProvider extends MapProvider
 
 		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, data, (response, xhr) =>
 		{
-			console.log('Created google maps session.', response, xhr);
 			this.sessionToken = response.session;
 		}, function(xhr) 
 		{

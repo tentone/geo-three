@@ -1232,7 +1232,6 @@ class MapView extends Mesh {
         }
         this.root = root;
         if (this.root !== null) {
-            console.log(this.root);
             this.geometry = this.root.constructor.baseGeometry;
             this.scale.copy(this.root.constructor.baseScale);
             this.root.mapView = this;
@@ -1479,7 +1478,6 @@ class GoogleMapsProvider extends MapProvider {
             scale: 'scaleFactor1x'
         });
         XHRUtils.request(address, 'GET', { 'Content-Type': 'text/json' }, data, (response, xhr) => {
-            console.log('Created google maps session.', response, xhr);
             this.sessionToken = response.session;
         }, function (xhr) {
             console.warn('Unable to create a google maps session.', xhr);

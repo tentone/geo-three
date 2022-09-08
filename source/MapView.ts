@@ -141,9 +141,6 @@ export class MapView extends Mesh
 		// Initialize root node
 		if (this.root !== null) 
 		{
-			// TODO <REMOVE THIS>
-			console.log(this.root);
-
 			// @ts-ignore
 			this.geometry = this.root.constructor.baseGeometry;
 
