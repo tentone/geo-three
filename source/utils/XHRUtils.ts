@@ -126,14 +126,7 @@ export class XHRUtils
 			xhr.onprogress = onProgress;
 		}
 
-		if (body !== undefined) 
-		{
-			xhr.send(body);
-		}
-		else 
-		{
-			xhr.send(null);
-		}
+		xhr.send(body !== undefined ? body : null);
 
 		return xhr;
 	}

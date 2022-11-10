@@ -8,9 +8,9 @@ import {Vector2} from 'three';
 export class UnitsUtils 
 {
 	/**
-	 * Aproximated radius of earth in meters.
+	 * Average radius of earth in meters.
 	 */
-	public static EARTH_RADIUS: number = 6378137;
+	public static EARTH_RADIUS: number = 6371008;
 
 	/**
 	 * Earth equator perimeter in meters.
