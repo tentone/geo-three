@@ -1,5 +1,6 @@
 import {MapProvider} from './MapProvider';
 import {XHRUtils} from '../utils/XHRUtils';
+import { MapBoxProvider } from './MapBoxProvider';
 
 /**
  * Bing maps tile provider.
@@ -11,6 +12,11 @@ import {XHRUtils} from '../utils/XHRUtils';
  */
 export class BingMapsProvider extends MapProvider 
 {
+	/**
+	 * Base address of the bing map provider.
+	 */
+	 public static ADDRESS: string = "https://dev.virtualearth.net";
+
 	/**
 	 * Maximum zoom level allows by the provider.
 	 */
@@ -91,7 +97,7 @@ export class BingMapsProvider extends MapProvider
 	 */
 	public getMetaData(): void 
 	{
-		const address = 'http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
+		const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
 
 		XHRUtils.get(address, function(data) 
 		{

@@ -10,6 +10,9 @@ import {XHRUtils} from '../utils/XHRUtils';
  */
 export class MapBoxProvider extends MapProvider 
 {
+	/**
+	 * Base adress of the mapbox service.
+	 */
 	public static ADDRESS: string = 'https://api.mapbox.com/';
 
 	/**
