@@ -180,7 +180,7 @@ class MapNodeGeometry extends three.BufferGeometry {
 
 class CanvasUtils {
     static createOffscreenCanvas(width, height) {
-        if (OffscreenCanvas) {
+        if (typeof OffscreenCanvas !== 'undefined') {
             return new OffscreenCanvas(width, height);
         }
         else {
@@ -320,7 +320,7 @@ class UnitsUtils {
         return { latitude: latitude, longitude: longitude };
     }
 }
-UnitsUtils.EARTH_RADIUS = 6378137;
+UnitsUtils.EARTH_RADIUS = 6371008;
 UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 
@@ -1398,12 +1398,7 @@ class XHRUtils {
         if (onProgress !== undefined) {
             xhr.onprogress = onProgress;
         }
-        if (body !== undefined) {
-            xhr.send(body);
-        }
-        else {
-            xhr.send(null);
-        }
+        xhr.send(body !== undefined ? body : null);
         return xhr;
     }
 }
@@ -1420,7 +1415,7 @@ class BingMapsProvider extends MapProvider {
         this.maxZoom = 19;
     }
     getMetaData() {
-        const address = 'http://dev.virtualearth.net/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
+        const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
         XHRUtils.get(address, function (data) {
             JSON.parse(data);
         });
@@ -1454,6 +1449,7 @@ class BingMapsProvider extends MapProvider {
         });
     }
 }
+BingMapsProvider.ADDRESS = "https://dev.virtualearth.net";
 BingMapsProvider.AERIAL = 'a';
 BingMapsProvider.ROAD = 'r';
 BingMapsProvider.AERIAL_LABELS = 'h';
