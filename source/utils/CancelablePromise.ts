@@ -10,13 +10,33 @@ export class CancelablePromise<T>
 	public onReject: (error: any)=> void;
 
 	public onCancel: ()=> void;
-
+	
+	/**
+	 * Flag to indicate if the promise has been fulfilled.
+	 * 
+	 * Promise has ben fulfilled when value/error is set.
+	 */
 	public fulfilled: boolean = false;
 
+	/**
+	 * Flag to indicate if the promise was rejected.
+	 * 
+	 * Only set when the promise is fulfilled.
+	 */
 	public rejected: boolean = false;
 
+	/**
+	 * Flag set true when the resolve of reject method are called.
+	 */
 	public called: boolean = false;
 
+	/**
+	 * Output value of the promise.
+	 * 
+	 * Set with the output value if promise was fulfilled and not rejected.
+	 * 
+	 * Stores the error value if the promise was rejected.
+	 */
 	public value: T;
 
 	public constructor(executor: (resolve: (value: T | PromiseLike<T>)=> void, reject: (reason?: any)=> void)=> void) 
