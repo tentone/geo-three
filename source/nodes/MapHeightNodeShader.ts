@@ -117,6 +117,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
+
 		const texture = new Texture();
 		texture.image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
 		texture.generateMipmaps = false;
@@ -127,8 +128,6 @@ export class MapHeightNodeShader extends MapHeightNode
 		
 		// @ts-ignore
 		this.material.userData.heightMap.value = texture;
-		// @ts-ignore
-		this.material.map = texture;
 		// @ts-ignore
 		this.material.needsUpdate = true;
 

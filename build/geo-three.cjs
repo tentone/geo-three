@@ -721,7 +721,6 @@ class MapHeightNodeShader extends MapHeightNode {
             texture.minFilter = three.NearestFilter;
             texture.needsUpdate = true;
             this.material.userData.heightMap.value = texture;
-            this.material.map = texture;
             this.material.needsUpdate = true;
             this.heightLoaded = true;
             this.nodeReady();
