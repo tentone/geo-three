@@ -29,7 +29,7 @@ export class MapPlaneNode extends MapNode
 	{
 		super.initialize();
 		
-		this.loadTexture();
+		this.loadData();
 	}
 
 	public createChildNodes(): void

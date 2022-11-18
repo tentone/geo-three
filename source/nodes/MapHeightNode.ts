@@ -75,7 +75,7 @@ export class MapHeightNode extends MapNode
 	{
 		super.initialize();
 
-		this.loadTexture();
+		this.loadData();
 		this.loadHeightGeometry();
 	}
 
@@ -84,7 +84,7 @@ export class MapHeightNode extends MapNode
 	 *
 	 * Aditionally in this height node it loads elevation data from the height provider and generate the appropiate maps.
 	 */
-	public async loadTexture(): Promise<void> 
+	public async loadData(): Promise<void> 
 	{
 		const texture = new Texture();
 		texture.image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);

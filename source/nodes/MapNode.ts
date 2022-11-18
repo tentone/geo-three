@@ -211,7 +211,7 @@ export abstract class MapNode extends Mesh
 	 *
 	 * This base method assumes the existence of a material attribute with a map texture.
 	 */
-	public async loadTexture(): Promise<void>
+	public async loadData(): Promise<void>
 	{
 		try 
 		{

@@ -88,7 +88,7 @@ export class MapHeightNodeShader extends MapHeightNode
 		return material;
 	}
 
-	public async loadTexture(): Promise<void> 
+	public async loadData(): Promise<void> 
 	{
 		const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 

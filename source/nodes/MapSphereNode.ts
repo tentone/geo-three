@@ -36,7 +36,7 @@ export class MapSphereNode extends MapNode
 	{
 		super.initialize();
 		
-		this.loadTexture();
+		this.loadData();
 	}
 
 	/**
