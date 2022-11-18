@@ -9,7 +9,7 @@ export declare class MapHeightNodeShader extends MapHeightNode {
     static baseGeometry: BufferGeometry;
     static baseScale: Vector3;
     static prepareMaterial(material: Material): Material;
-    loadTexture(): Promise<void>;
+    loadData(): Promise<void>;
     loadHeightGeometry(): Promise<void>;
     raycast(raycaster: Raycaster, intersects: Intersection[]): void;
 }

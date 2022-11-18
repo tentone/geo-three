@@ -152,7 +152,7 @@ export abstract class MapNode extends Mesh
 	 *
 	 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
 	 */
-	public initialize(): void {}
+	public async initialize(): Promise<void> {}
 
 	/**
 	 * Create the child nodes to represent the next tree level.
@@ -226,7 +226,6 @@ export abstract class MapNode extends Mesh
 			
 			// @ts-ignore
 			this.material.map = texture;
-			this.nodeReady();
 		}
 		catch (e) 
 		{
@@ -241,7 +240,8 @@ export abstract class MapNode extends Mesh
 
 			// @ts-ignore
 			this.material.map = texture;
-			this.nodeReady();
+			// @ts-ignore
+			this.material.needsUpdate = true;
 		}
 	}
 

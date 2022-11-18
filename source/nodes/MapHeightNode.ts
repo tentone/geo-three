@@ -46,8 +46,14 @@ export class MapHeightNode extends MapNode
 	 */
 	public static geometry: BufferGeometry = new MapNodeGeometry(1, 1, 1, 1);
 
+	/**
+	 * Base geometry shared across all the nodes.
+	 */
 	public static baseGeometry: BufferGeometry = MapPlaneNode.geometry;
 
+	/**
+	 * Scale to apply to each node.
+	 */
 	public static baseScale: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1, UnitsUtils.EARTH_PERIMETER);
 
 	/**
@@ -71,12 +77,14 @@ export class MapHeightNode extends MapNode
 		this.matrixAutoUpdate = false;
 	}
 
-	public initialize(): void 
+	public async initialize(): Promise<void> 
 	{
 		super.initialize();
+		
+		await this.loadData();
+		await this.loadHeightGeometry();
 
-		this.loadData();
-		this.loadHeightGeometry();
+		this.nodeReady();
 	}
 
 	/**
@@ -98,10 +106,36 @@ export class MapHeightNode extends MapNode
 		this.material.map = texture;
 		// @ts-ignore
 		this.material.needsUpdate = true;
-
+		
 		this.textureLoaded = true;
-		this.nodeReady();
 	}
+
+	/**
+	 * Load height texture from the server and create a geometry to match it.
+	 *
+	 * @returns Returns a promise indicating when the geometry generation has finished.
+	 */
+	 public async loadHeightGeometry(): Promise<any> 
+	 {
+		 if (this.mapView.heightProvider === null) 
+		 {
+			 throw new Error('GeoThree: MapView.heightProvider provider is null.');
+		 }
+ 
+		 const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+ 
+		 const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+ 
+		 const context = canvas.getContext('2d');
+		 context.imageSmoothingEnabled = false;
+		 context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+ 
+		 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+ 
+		 this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+		 this.heightLoaded = true;
+	 }
+
 
 	public nodeReady(): void 
 	{
@@ -151,32 +185,7 @@ export class MapHeightNode extends MapNode
 		node.updateMatrixWorld(true);
 	}
 
-	/**
-	 * Load height texture from the server and create a geometry to match it.
-	 *
-	 * @returns Returns a promise indicating when the geometry generation has finished.
-	 */
-	public async loadHeightGeometry(): Promise<any> 
-	{
-		if (this.mapView.heightProvider === null) 
-		{
-			throw new Error('GeoThree: MapView.heightProvider provider is null.');
-		}
 
-		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-
-		const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
-
-		const context = canvas.getContext('2d');
-		context.imageSmoothingEnabled = false;
-		context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
-
-		const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-		this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
-		this.heightLoaded = true;
-		this.nodeReady();
-	}
 
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.

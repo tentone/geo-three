@@ -32,7 +32,7 @@ export class MapSphereNode extends MapNode
 		this.visible = false;
 	}
 	
-	public initialize(): void
+	public async initialize(): Promise<void>
 	{
 		super.initialize();
 		

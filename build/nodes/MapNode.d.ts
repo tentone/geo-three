@@ -21,11 +21,11 @@ export declare abstract class MapNode extends Mesh {
     static bottomLeft: number;
     static bottomRight: number;
     constructor(parentNode?: MapNode, mapView?: MapView, location?: number, level?: number, x?: number, y?: number, geometry?: BufferGeometry, material?: Material);
-    initialize(): void;
+    initialize(): Promise<void>;
     createChildNodes(): void;
     subdivide(): void;
     simplify(): void;
-    loadTexture(): Promise<void>;
+    loadData(): Promise<void>;
     nodeReady(): void;
     getNeighborsDirection(direction: number): MapNode[];
     getNeighbors(): MapNode[];

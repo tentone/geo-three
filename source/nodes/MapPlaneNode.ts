@@ -25,11 +25,13 @@ export class MapPlaneNode extends MapNode
 
 	public static baseScale: Vector3 = new Vector3(UnitsUtils.EARTH_PERIMETER, 1.0, UnitsUtils.EARTH_PERIMETER);
 
-	public initialize(): void
+	public async initialize(): Promise<void>
 	{
 		super.initialize();
 		
-		this.loadData();
+		await this.loadData();
+		
+		this.nodeReady();
 	}
 
 	public createChildNodes(): void

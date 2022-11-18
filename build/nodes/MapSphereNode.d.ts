@@ -6,7 +6,7 @@ export declare class MapSphereNode extends MapNode {
     static baseScale: Vector3;
     static segments: number;
     constructor(parentNode?: any, mapView?: any, location?: number, level?: number, x?: number, y?: number);
-    initialize(): void;
+    initialize(): Promise<void>;
     static createGeometry(zoom: number, x: number, y: number): MapSphereNodeGeometry;
     applyScaleNode(): void;
     updateMatrix(): void;

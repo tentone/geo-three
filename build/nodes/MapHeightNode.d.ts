@@ -11,10 +11,10 @@ export declare class MapHeightNode extends MapNode {
     static baseGeometry: BufferGeometry;
     static baseScale: Vector3;
     constructor(parentNode?: MapHeightNode, mapView?: MapView, location?: number, level?: number, x?: number, y?: number, geometry?: BufferGeometry, material?: Material);
-    initialize(): void;
-    loadTexture(): Promise<void>;
+    initialize(): Promise<void>;
+    loadData(): Promise<void>;
+    loadHeightGeometry(): Promise<any>;
     nodeReady(): void;
     createChildNodes(): void;
-    loadHeightGeometry(): Promise<any>;
     raycast(raycaster: Raycaster, intersects: Intersection[]): void;
 }

@@ -206,7 +206,9 @@ class MapNode extends Mesh {
         this.y = y;
         this.initialize();
     }
-    initialize() { }
+    initialize() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
     createChildNodes() { }
     subdivide() {
         var _a, _b;
@@ -231,7 +233,7 @@ class MapNode extends Mesh {
         this.isMesh = true;
         this.children = [];
     }
-    loadTexture() {
+    loadData() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
@@ -242,7 +244,6 @@ class MapNode extends Mesh {
                 texture.minFilter = LinearFilter;
                 texture.needsUpdate = true;
                 this.material.map = texture;
-                this.nodeReady();
             }
             catch (e) {
                 const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
@@ -253,7 +254,7 @@ class MapNode extends Mesh {
                 texture.generateMipmaps = false;
                 texture.needsUpdate = true;
                 this.material.map = texture;
-                this.nodeReady();
+                this.material.needsUpdate = true;
             }
         });
     }
@@ -328,8 +329,14 @@ class MapPlaneNode extends MapNode {
         this.visible = false;
     }
     initialize() {
-        super.initialize();
-        this.loadTexture();
+        const _super = Object.create(null, {
+            initialize: { get: () => super.initialize }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.initialize.call(this);
+            yield this.loadData();
+            this.nodeReady();
+        });
     }
     createChildNodes() {
         const level = this.level + 1;
@@ -449,11 +456,17 @@ class MapHeightNode extends MapNode {
         this.matrixAutoUpdate = false;
     }
     initialize() {
-        super.initialize();
-        this.loadTexture();
-        this.loadHeightGeometry();
+        const _super = Object.create(null, {
+            initialize: { get: () => super.initialize }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.initialize.call(this);
+            yield this.loadData();
+            yield this.loadHeightGeometry();
+            this.nodeReady();
+        });
     }
-    loadTexture() {
+    loadData() {
         return __awaiter(this, void 0, void 0, function* () {
             const texture = new Texture();
             texture.image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
@@ -465,7 +478,21 @@ class MapHeightNode extends MapNode {
             this.material.map = texture;
             this.material.needsUpdate = true;
             this.textureLoaded = true;
-            this.nodeReady();
+        });
+    }
+    loadHeightGeometry() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.mapView.heightProvider === null) {
+                throw new Error('GeoThree: MapView.heightProvider provider is null.');
+            }
+            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+            const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+            const context = canvas.getContext('2d');
+            context.imageSmoothingEnabled = false;
+            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+            this.heightLoaded = true;
         });
     }
     nodeReady() {
@@ -504,22 +531,6 @@ class MapHeightNode extends MapNode {
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-    }
-    loadHeightGeometry() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.mapView.heightProvider === null) {
-                throw new Error('GeoThree: MapView.heightProvider provider is null.');
-            }
-            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-            const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
-            const context = canvas.getContext('2d');
-            context.imageSmoothingEnabled = false;
-            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
-            this.heightLoaded = true;
-            this.nodeReady();
-        });
     }
     raycast(raycaster, intersects) {
         if (this.isMesh === true) {
@@ -591,8 +602,13 @@ class MapSphereNode extends MapNode {
         this.visible = false;
     }
     initialize() {
-        super.initialize();
-        this.loadTexture();
+        const _super = Object.create(null, {
+            initialize: { get: () => super.initialize }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.initialize.call(this);
+            this.loadData();
+        });
     }
     static createGeometry(zoom, x, y) {
         const range = Math.pow(2, zoom);
@@ -688,7 +704,7 @@ class MapHeightNodeShader extends MapHeightNode {
         };
         return material;
     }
-    loadTexture() {
+    loadData() {
         return __awaiter(this, void 0, void 0, function* () {
             const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
             const texture = new Texture(image);
@@ -700,7 +716,6 @@ class MapHeightNodeShader extends MapHeightNode {
             this.material.map = texture;
             this.material.needsUpdate = true;
             this.textureLoaded = true;
-            this.nodeReady();
             yield this.loadHeightGeometry();
         });
     }
@@ -719,7 +734,6 @@ class MapHeightNodeShader extends MapHeightNode {
             this.material.userData.heightMap.value = texture;
             this.material.needsUpdate = true;
             this.heightLoaded = true;
-            this.nodeReady();
         });
     }
     raycast(raycaster, intersects) {

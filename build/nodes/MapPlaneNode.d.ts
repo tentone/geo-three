@@ -5,7 +5,7 @@ export declare class MapPlaneNode extends MapNode {
     static geometry: BufferGeometry;
     static baseGeometry: BufferGeometry;
     static baseScale: Vector3;
-    initialize(): void;
+    initialize(): Promise<void>;
     createChildNodes(): void;
     raycast(raycaster: Raycaster, intersects: Intersection[]): void;
 }

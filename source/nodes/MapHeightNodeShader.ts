@@ -105,7 +105,6 @@ export class MapHeightNodeShader extends MapHeightNode
 		this.material.needsUpdate = true;
 
 		this.textureLoaded = true;
-		this.nodeReady();
 
 		await this.loadHeightGeometry();
 	}
@@ -116,7 +115,6 @@ export class MapHeightNodeShader extends MapHeightNode
 		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
-
 
 		const texture = new Texture();
 		texture.image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
@@ -132,7 +130,7 @@ export class MapHeightNodeShader extends MapHeightNode
 		this.material.needsUpdate = true;
 
 		this.heightLoaded = true;
-		this.nodeReady();
+
 	}
 
 	/**
