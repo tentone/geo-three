@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -200,7 +202,7 @@
 	        this.nodesLoaded = 0;
 	        this.subdivided = false;
 	        this.childrenCache = null;
-	        this.cacheChild = false;
+	        this.cacheTiles = false;
 	        this.isMesh = true;
 	        this.mapView = mapView;
 	        this.parentNode = parentNode;
@@ -221,7 +223,7 @@
 	            return;
 	        }
 	        this.subdivided = true;
-	        if (this.cacheChild && this.childrenCache !== null) {
+	        if (this.cacheTiles && this.childrenCache !== null) {
 	            this.isMesh = false;
 	            this.children = this.childrenCache;
 	        }
@@ -230,8 +232,17 @@
 	        }
 	    }
 	    simplify() {
-	        if (this.cacheChild && this.children.length > 0) {
-	            this.childrenCache = this.children;
+	        if (this.cacheTiles) {
+	            if (this.children.length > 0) {
+	                this.childrenCache = this.children;
+	            }
+	        }
+	        else {
+	            for (let i = 0; i < this.children.length; i++) {
+	                const child = this.children[i];
+	                child.material.dispose();
+	                child.geometry.dispose();
+	            }
 	        }
 	        this.subdivided = false;
 	        this.isMesh = true;
@@ -277,13 +288,6 @@
 	        else {
 	            this.visible = true;
 	        }
-	    }
-	    getNeighborsDirection(direction) {
-	        return null;
-	    }
-	    getNeighbors() {
-	        const neighbors = [];
-	        return neighbors;
 	    }
 	}
 	MapNode.baseGeometry = null;
@@ -374,9 +378,8 @@
 	    }
 	    raycast(raycaster, intersects) {
 	        if (this.isMesh === true) {
-	            return super.raycast(raycaster, intersects);
+	            super.raycast(raycaster, intersects);
 	        }
-	        return false;
 	    }
 	}
 	MapPlaneNode.geometry = new MapNodeGeometry(1, 1, 1, 1, false);
@@ -538,9 +541,8 @@
 	    }
 	    raycast(raycaster, intersects) {
 	        if (this.isMesh === true) {
-	            return super.raycast(raycaster, intersects);
+	            super.raycast(raycaster, intersects);
 	        }
-	        return false;
 	    }
 	}
 	MapHeightNode.tileSize = 256;
@@ -669,9 +671,8 @@
 	    }
 	    raycast(raycaster, intersects) {
 	        if (this.isMesh === true) {
-	            return super.raycast(raycaster, intersects);
+	            super.raycast(raycaster, intersects);
 	        }
-	        return false;
 	    }
 	}
 	MapSphereNode.baseGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
@@ -743,11 +744,9 @@
 	    raycast(raycaster, intersects) {
 	        if (this.isMesh === true) {
 	            this.geometry = MapPlaneNode.geometry;
-	            const result = super.raycast(raycaster, intersects);
+	            super.raycast(raycaster, intersects);
 	            this.geometry = MapHeightNodeShader.geometry;
-	            return result;
 	        }
-	        return false;
 	    }
 	}
 	MapHeightNodeShader.emptyTexture = new three.Texture();
@@ -1227,6 +1226,7 @@
 	        this.provider = null;
 	        this.heightProvider = null;
 	        this.root = null;
+	        this.cacheChild = false;
 	        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
 	            this.lod.updateLOD(this, camera, renderer, scene);
 	        };
@@ -1814,3 +1814,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=geo-three.js.map

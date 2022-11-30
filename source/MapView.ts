@@ -78,6 +78,15 @@ export class MapView extends Mesh
 	public root: MapNode = null;
 
 	/**
+	 * Flag to indicate if objects of map nodes that are no longer in use should be kept in memory.
+	 * 
+	 * Usefull for fast moving scenarios to prevent reparsing data in fast moving scenes.
+	 * 
+	 * Should be kept off unless required.
+	 */
+	public cacheChild: boolean = false;
+
+	/**
 	 * Constructor for the map view objects.
 	 *
 	 * @param root - Map view node modes can be SPHERICAL, HEIGHT or PLANAR. PLANAR is used by default. Can also be a custom MapNode instance.

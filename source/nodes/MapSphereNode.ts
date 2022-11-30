@@ -135,10 +135,7 @@ export class MapSphereNode extends MapNode
 	{
 		if (this.isMesh === true) 
 		{
-			return super.raycast(raycaster, intersects);
+			super.raycast(raycaster, intersects);
 		}
-		
-		// @ts-ignore
-		return false;
 	}
 }

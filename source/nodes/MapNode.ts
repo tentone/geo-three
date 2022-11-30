@@ -60,7 +60,7 @@ export abstract class MapNode extends Mesh
 	 *
 	 * Used to avoid recreate object after simplification and subdivision.
 	 *
-	 * The default value is null. Only used if "cacheChild" is set to true.
+	 * The default value is null. Only used if "cacheTiles" is set to true.
 	 */
 	public childrenCache: Object3D[] = null;
 
@@ -69,7 +69,7 @@ export abstract class MapNode extends Mesh
 	 * 
 	 * Should only be used if the child generation process is time consuming.
 	 */
-	public cacheChild: boolean = false;
+	public cacheTiles: boolean = false;
 
 	/**
 	 * Variable to check if the node is a mesh.
@@ -137,7 +137,6 @@ export abstract class MapNode extends Mesh
 
 		this.mapView = mapView;
 		this.parentNode = parentNode;
-	
 
 		this.location = location;
 		this.level = level;
@@ -176,7 +175,7 @@ export abstract class MapNode extends Mesh
 
 		this.subdivided = true;
 		
-		if (this.cacheChild && this.childrenCache !== null) 
+		if (this.cacheTiles && this.childrenCache !== null) 
 		{
 			this.isMesh = false;
 			this.children = this.childrenCache;
@@ -196,11 +195,25 @@ export abstract class MapNode extends Mesh
 	 */
 	public simplify(): void
 	{
-		if (this.cacheChild && this.children.length > 0) 
+		if (this.cacheTiles) 
 		{
-			this.childrenCache = this.children;
+			// Store children
+			if (this.children.length > 0)
+			{
+				this.childrenCache = this.children;
+			}
 		}
-		
+		else
+		{
+			// Dispose resources in use
+			for (let i = 0; i < this.children.length; i++) {
+				const child = this.children[i] as Mesh;
+				(child.material as Material).dispose();
+				child.geometry.dispose();
+			}
+		}
+		 
+
 		this.subdivided = false;
 		this.isMesh = true;
 		this.children = [];
@@ -274,32 +287,5 @@ export abstract class MapNode extends Mesh
 		{
 			this.visible = true;
 		}
-	}
-
-	/**
-	 * Get all the neighbors in a specific direction (left, right, up down).
-	 *
-	 * @param direction - Direction to get neighbors.
-	 * @returns The neighbors array, if no neighbors found returns empty.
-	 */
-	public getNeighborsDirection(direction: number): MapNode[] 
-	{
-		// TODO <ADD CODE HERE>
-
-		return null;
-	}
-
-	/**
-	 * Get all the quad tree nodes neighbors. Are considered neighbors all the nodes directly in contact with a edge of this node.
-	 *
-	 * @returns The neighbors array, if no neighbors found returns empty.
-	 */
-	public getNeighbors(): MapNode[] 
-	{
-		const neighbors = [];
-
-		// TODO <ADD CODE HERE>
-
-		return neighbors;
 	}
 }

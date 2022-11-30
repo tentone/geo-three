@@ -185,8 +185,6 @@ export class MapHeightNode extends MapNode
 		node.updateMatrixWorld(true);
 	}
 
-
-
 	/**
 	 * Overrides normal raycasting, to avoid raycasting when isMesh is set to false.
 	 */
@@ -194,10 +192,7 @@ export class MapHeightNode extends MapNode
 	{
 		if (this.isMesh === true) 
 		{
-			return super.raycast(raycaster, intersects);
+			super.raycast(raycaster, intersects);
 		}
-
-		// @ts-ignore
-		return false;
 	}
 }

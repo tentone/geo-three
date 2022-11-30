@@ -10,7 +10,7 @@ export declare abstract class MapNode extends Mesh {
     nodesLoaded: number;
     subdivided: boolean;
     childrenCache: Object3D[];
-    cacheChild: boolean;
+    cacheTiles: boolean;
     isMesh: boolean;
     static baseGeometry: BufferGeometry;
     static baseScale: Vector3;
@@ -27,6 +27,4 @@ export declare abstract class MapNode extends Mesh {
     simplify(): void;
     loadData(): Promise<void>;
     nodeReady(): void;
-    getNeighborsDirection(direction: number): MapNode[];
-    getNeighbors(): MapNode[];
 }

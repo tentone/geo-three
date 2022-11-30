@@ -144,14 +144,9 @@ export class MapHeightNodeShader extends MapHeightNode
 		{
 			this.geometry = MapPlaneNode.geometry;
 
-			const result = super.raycast(raycaster, intersects);
+			super.raycast(raycaster, intersects);
 
 			this.geometry = MapHeightNodeShader.geometry;
-
-			return result;
 		}
-		
-		// @ts-ignore
-		return false;
 	}
 }
