@@ -266,6 +266,7 @@
 	                texture.minFilter = three.LinearFilter;
 	                texture.needsUpdate = true;
 	                this.material.map = texture;
+	                this.material.needsUpdate = true;
 	            }
 	            catch (e) {
 	                const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
@@ -775,13 +776,9 @@
 	            }
 	            if (distance > this.thresholdUp) {
 	                node.subdivide();
-	                return;
 	            }
-	            else if (distance < this.thresholdDown) {
-	                if (node.parentNode !== null) {
-	                    node.parentNode.simplify();
-	                }
-	                return;
+	            else if (distance < this.thresholdDown && node.parentNode) {
+	                node.parentNode.simplify();
 	            }
 	        }
 	    }
@@ -1243,6 +1240,7 @@
 	            this.scale.copy(this.root.constructor.baseScale);
 	            this.root.mapView = this;
 	            this.add(this.root);
+	            this.root.initialize();
 	        }
 	    }
 	    setProvider(provider) {

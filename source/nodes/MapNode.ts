@@ -135,8 +135,6 @@ export abstract class MapNode extends Mesh
 	 * For a quad-tree this value is 4.
 	 */
 	public static childrens: number = 4;
- 
-
 
 	public constructor(parentNode: MapNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = null, material: Material = null) 
 	{
@@ -246,6 +244,8 @@ export abstract class MapNode extends Mesh
 			
 			// @ts-ignore
 			this.material.map = texture;
+			// @ts-ignore
+			this.material.needsUpdate = true;
 		}
 		catch (e) 
 		{

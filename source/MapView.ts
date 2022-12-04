@@ -157,6 +157,7 @@ export class MapView extends Mesh
 
 			this.root.mapView = this;
 			this.add(this.root);
+			this.root.initialize();
 		}
 	}
 

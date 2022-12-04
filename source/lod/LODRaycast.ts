@@ -87,15 +87,10 @@ export class LODRaycast implements LODControl
 			if (distance > this.thresholdUp) 
 			{
 				node.subdivide();
-				return;
 			}
-			else if (distance < this.thresholdDown) 
+			else if (distance < this.thresholdDown && node.parentNode) 
 			{
-				if (node.parentNode !== null) 
-				{
-					node.parentNode.simplify();
-				}
-				return;
+				node.parentNode.simplify();
 			}
 		}
 	}
