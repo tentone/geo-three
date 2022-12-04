@@ -84,7 +84,7 @@ export class GoogleMapsProvider extends MapProvider
 			this.sessionToken = response.session;
 		}, function(xhr) 
 		{
-			console.warn('Unable to create a google maps session.', xhr);
+			throw new Error('Unable to create a google maps session.');
 		});
 	}
 

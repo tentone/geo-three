@@ -4,6 +4,6 @@ export declare class HeightDebugProvider extends MapProvider {
     provider: MapProvider;
     fromColor: Color;
     toColor: Color;
-    constructor(provider: any);
+    constructor(provider: MapProvider);
     fetchTile(zoom: number, x: number, y: number): Promise<any>;
 }

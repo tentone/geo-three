@@ -200,7 +200,7 @@ class MapNode extends three.Mesh {
         this.nodesLoaded = 0;
         this.subdivided = false;
         this.childrenCache = null;
-        this.cacheChild = false;
+        this.cacheTiles = false;
         this.isMesh = true;
         this.mapView = mapView;
         this.parentNode = parentNode;
@@ -221,7 +221,7 @@ class MapNode extends three.Mesh {
             return;
         }
         this.subdivided = true;
-        if (this.cacheChild && this.childrenCache !== null) {
+        if (this.cacheTiles && this.childrenCache !== null) {
             this.isMesh = false;
             this.children = this.childrenCache;
         }
@@ -230,8 +230,17 @@ class MapNode extends three.Mesh {
         }
     }
     simplify() {
-        if (this.cacheChild && this.children.length > 0) {
-            this.childrenCache = this.children;
+        if (this.cacheTiles) {
+            if (this.children.length > 0) {
+                this.childrenCache = this.children;
+            }
+        }
+        else {
+            for (let i = 0; i < this.children.length; i++) {
+                const child = this.children[i];
+                child.material.dispose();
+                child.geometry.dispose();
+            }
         }
         this.subdivided = false;
         this.isMesh = true;
@@ -277,13 +286,6 @@ class MapNode extends three.Mesh {
         else {
             this.visible = true;
         }
-    }
-    getNeighborsDirection(direction) {
-        return null;
-    }
-    getNeighbors() {
-        const neighbors = [];
-        return neighbors;
     }
 }
 MapNode.baseGeometry = null;
@@ -374,9 +376,8 @@ class MapPlaneNode extends MapNode {
     }
     raycast(raycaster, intersects) {
         if (this.isMesh === true) {
-            return super.raycast(raycaster, intersects);
+            super.raycast(raycaster, intersects);
         }
-        return false;
     }
 }
 MapPlaneNode.geometry = new MapNodeGeometry(1, 1, 1, 1, false);
@@ -538,9 +539,8 @@ class MapHeightNode extends MapNode {
     }
     raycast(raycaster, intersects) {
         if (this.isMesh === true) {
-            return super.raycast(raycaster, intersects);
+            super.raycast(raycaster, intersects);
         }
-        return false;
     }
 }
 MapHeightNode.tileSize = 256;
@@ -611,7 +611,8 @@ class MapSphereNode extends MapNode {
         });
         return __awaiter(this, void 0, void 0, function* () {
             _super.initialize.call(this);
-            this.loadData();
+            yield this.loadData();
+            this.nodeReady();
         });
     }
     static createGeometry(zoom, x, y) {
@@ -669,9 +670,8 @@ class MapSphereNode extends MapNode {
     }
     raycast(raycaster, intersects) {
         if (this.isMesh === true) {
-            return super.raycast(raycaster, intersects);
+            super.raycast(raycaster, intersects);
         }
-        return false;
     }
 }
 MapSphereNode.baseGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
@@ -743,11 +743,9 @@ class MapHeightNodeShader extends MapHeightNode {
     raycast(raycaster, intersects) {
         if (this.isMesh === true) {
             this.geometry = MapPlaneNode.geometry;
-            const result = super.raycast(raycaster, intersects);
+            super.raycast(raycaster, intersects);
             this.geometry = MapHeightNodeShader.geometry;
-            return result;
         }
-        return false;
     }
 }
 MapHeightNodeShader.emptyTexture = new three.Texture();
@@ -1227,6 +1225,7 @@ class MapView extends three.Mesh {
         this.provider = null;
         this.heightProvider = null;
         this.root = null;
+        this.cacheChild = false;
         this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
             this.lod.updateLOD(this, camera, renderer, scene);
         };
@@ -1493,7 +1492,7 @@ class GoogleMapsProvider extends MapProvider {
         XHRUtils.request(address, 'GET', { 'Content-Type': 'text/json' }, data, (response, xhr) => {
             this.sessionToken = response.session;
         }, function (xhr) {
-            console.warn('Unable to create a google maps session.', xhr);
+            throw new Error('Unable to create a google maps session.');
         });
     }
     fetchTile(zoom, x, y) {

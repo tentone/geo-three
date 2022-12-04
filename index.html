@@ -186,14 +186,8 @@
 		var map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
 		scene.add(map);
 		map.updateMatrixWorld(true);
-		
-
 
 		var camera = new THREE.PerspectiveCamera(80, 1, 1e2, 1e12);
-
-		// var test = new THREE.Mesh(new Geo.MapNodeGeometry(1e6, 1e6, 8.0, 8.0, true, 2e5), new THREE.MeshPhongMaterial({wireframe: false, color: 0xFFFFFF}));
-		// test.position.set(0, 1e6);
-		// scene.add(test);
 		
 		var controls = new THREE.MapControls(camera, canvas);
 		controls.minDistance = 1e1;

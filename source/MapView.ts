@@ -152,7 +152,6 @@ export class MapView extends Mesh
 		{
 			// @ts-ignore
 			this.geometry = this.root.constructor.baseGeometry;
-
 			// @ts-ignore
 			this.scale.copy(this.root.constructor.baseScale);
 

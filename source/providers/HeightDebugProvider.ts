@@ -24,7 +24,7 @@ export class HeightDebugProvider extends MapProvider
 	 */
 	public toColor: Color = new Color(0x00ff00);
 
-	public constructor(provider) 
+	public constructor(provider: MapProvider) 
 	{
 		super();
 

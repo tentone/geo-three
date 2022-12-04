@@ -1,5 +1,3 @@
-
-(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -613,7 +611,8 @@
 	        });
 	        return __awaiter(this, void 0, void 0, function* () {
 	            _super.initialize.call(this);
-	            this.loadData();
+	            yield this.loadData();
+	            this.nodeReady();
 	        });
 	    }
 	    static createGeometry(zoom, x, y) {
@@ -1493,7 +1492,7 @@
 	        XHRUtils.request(address, 'GET', { 'Content-Type': 'text/json' }, data, (response, xhr) => {
 	            this.sessionToken = response.session;
 	        }, function (xhr) {
-	            console.warn('Unable to create a google maps session.', xhr);
+	            throw new Error('Unable to create a google maps session.');
 	        });
 	    }
 	    fetchTile(zoom, x, y) {
@@ -1814,4 +1813,3 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-//# sourceMappingURL=geo-three.js.map

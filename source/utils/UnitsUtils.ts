@@ -73,6 +73,8 @@ export class UnitsUtils
 
 	/**
 	 * Converts quad tree zoom/x/y to lat/lon in WGS84 Datum.
+	 * 
+	 * The X and Y start from 0 from the top/left corner of the quadtree up to (4^zoom - 1)
 	 *
 	 * @param zoom - Zoom level of the quad tree.
 	 * @param x - X coordinate.
