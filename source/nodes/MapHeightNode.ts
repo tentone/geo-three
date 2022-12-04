@@ -1,6 +1,6 @@
 import {LinearFilter, Material, MeshPhongMaterial, BufferGeometry, RGBAFormat, Texture, Vector3, Raycaster, Intersection} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
-import {MapNode} from './MapNode';
+import {MapNode, QuadTreePosition} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
@@ -68,7 +68,7 @@ export class MapHeightNode extends MapNode
 	 * @param material - Material used to render this height node.
 	 * @param geometry - Geometry used to render this height node.
 	 */
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = MapHeightNode.geometry, material: Material = new MeshPhongMaterial({wireframe: false, color: 0xffffff})) 
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = MapHeightNode.geometry, material: Material = new MeshPhongMaterial({wireframe: false, color: 0xffffff})) 
 	{
 		super(parentNode, mapView, location, level, x, y, geometry, material);
 
@@ -156,28 +156,28 @@ export class MapHeightNode extends MapNode
 
 		const x = this.x * 2;
 		const y = this.y * 2;
-		let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+		let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
 		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(-0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+		node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
 		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(0.25, 0, -0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+		node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
 		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(-0.25, 0, 0.25);
 		this.add(node);
 		node.updateMatrix();
 		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+		node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
 		node.scale.set(0.5, 1.0, 0.5);
 		node.position.set(0.25, 0, 0.25);
 		this.add(node);

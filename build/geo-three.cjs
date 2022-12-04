@@ -298,11 +298,6 @@ MapNode.bottomLeft = 2;
 MapNode.bottomRight = 3;
 
 class UnitsUtils {
-    static get(onResult, onError) {
-        navigator.geolocation.getCurrentPosition(function (result) {
-            onResult(result.coords, result.timestamp);
-        }, onError);
-    }
     static datumsToSpherical(latitude, longitude) {
         const x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
         let y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);

@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -192,8 +194,15 @@
 	    }
 	}
 
+	class QuadTreePosition {
+	}
+	QuadTreePosition.root = -1;
+	QuadTreePosition.topLeft = 0;
+	QuadTreePosition.topRight = 1;
+	QuadTreePosition.bottomLeft = 2;
+	QuadTreePosition.bottomRight = 3;
 	class MapNode extends three.Mesh {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
+	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
 	        super(geometry, material);
 	        this.mapView = null;
 	        this.parentNode = null;
@@ -291,18 +300,8 @@
 	MapNode.baseGeometry = null;
 	MapNode.baseScale = null;
 	MapNode.childrens = 4;
-	MapNode.root = -1;
-	MapNode.topLeft = 0;
-	MapNode.topRight = 1;
-	MapNode.bottomLeft = 2;
-	MapNode.bottomRight = 3;
 
 	class UnitsUtils {
-	    static get(onResult, onError) {
-	        navigator.geolocation.getCurrentPosition(function (result) {
-	            onResult(result.coords, result.timestamp);
-	        }, onError);
-	    }
 	    static datumsToSpherical(latitude, longitude) {
 	        const x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
 	        let y = Math.log(Math.tan((90 + latitude) * Math.PI / 360.0)) / (Math.PI / 180.0);
@@ -328,7 +327,7 @@
 	UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 	class MapPlaneNode extends MapNode {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
+	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
 	        super(parentNode, mapView, location, level, x, y, MapPlaneNode.geometry, new three.MeshBasicMaterial({ wireframe: false }));
 	        this.matrixAutoUpdate = false;
 	        this.isMesh = true;
@@ -349,25 +348,25 @@
 	        const x = this.x * 2;
 	        const y = this.y * 2;
 	        const Constructor = Object.getPrototypeOf(this).constructor;
-	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+	        let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, 0.25);
 	        this.add(node);
@@ -450,7 +449,7 @@
 	}
 
 	class MapHeightNode extends MapNode {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new three.MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
+	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new three.MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
 	        super(parentNode, mapView, location, level, x, y, geometry, material);
 	        this.heightLoaded = false;
 	        this.textureLoaded = false;
@@ -512,25 +511,25 @@
 	        const Constructor = Object.getPrototypeOf(this).constructor;
 	        const x = this.x * 2;
 	        const y = this.y * 2;
-	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+	        let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, -0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(-0.25, 0, 0.25);
 	        this.add(node);
 	        node.updateMatrix();
 	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
 	        node.scale.set(0.5, 1.0, 0.5);
 	        node.position.set(0.25, 0, 0.25);
 	        this.add(node);
@@ -598,7 +597,7 @@
 	}
 
 	class MapSphereNode extends MapNode {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
+	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
 	        super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new three.MeshBasicMaterial({ wireframe: false }));
 	        this.applyScaleNode();
 	        this.matrixAutoUpdate = false;
@@ -651,22 +650,14 @@
 	        const x = this.x * 2;
 	        const y = this.y * 2;
 	        const Constructor = Object.getPrototypeOf(this).constructor;
-	        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+	        let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
 	        this.add(node);
-	        node.updateMatrix();
-	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
 	        this.add(node);
-	        node.updateMatrix();
-	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
 	        this.add(node);
-	        node.updateMatrix();
-	        node.updateMatrixWorld(true);
-	        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+	        node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
 	        this.add(node);
-	        node.updateMatrix();
-	        node.updateMatrixWorld(true);
 	    }
 	    raycast(raycaster, intersects) {
 	        if (this.isMesh === true) {
@@ -679,7 +670,7 @@
 	MapSphereNode.segments = 80;
 
 	class MapHeightNodeShader extends MapHeightNode {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
+	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
 	        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF }));
 	        super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
 	        this.frustumCulled = false;
@@ -789,8 +780,8 @@
 	            else if (distance < this.thresholdDown) {
 	                if (node.parentNode !== null) {
 	                    node.parentNode.simplify();
-	                    return;
 	                }
+	                return;
 	            }
 	        }
 	    }
@@ -1027,7 +1018,7 @@
 	}
 
 	class MapMartiniHeightNode extends MapHeightNode {
-	    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, { elevationDecoder = null, meshMaxError = 10, exageration = 1 } = {}) {
+	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, { elevationDecoder = null, meshMaxError = 10, exageration = 1 } = {}) {
 	        super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.geometry, MapMartiniHeightNode.prepareMaterial(new three.MeshPhongMaterial({
 	            map: MapMartiniHeightNode.emptyTexture,
 	            color: 0xFFFFFF,
@@ -1300,9 +1291,9 @@
 	const pov$1 = new three.Vector3();
 	const position$1 = new three.Vector3();
 	class LODRadial {
-	    constructor() {
-	        this.subdivideDistance = 50;
-	        this.simplifyDistance = 300;
+	    constructor(subdivideDistance = 50, simplifyDistance = 300) {
+	        this.subdivideDistance = subdivideDistance;
+	        this.simplifyDistance = simplifyDistance;
 	    }
 	    updateLOD(view, camera, renderer, scene) {
 	        camera.getWorldPosition(pov$1);
@@ -1325,10 +1316,8 @@
 	const frustum = new three.Frustum();
 	const position = new three.Vector3();
 	class LODFrustum extends LODRadial {
-	    constructor() {
-	        super(...arguments);
-	        this.subdivideDistance = 120;
-	        this.simplifyDistance = 400;
+	    constructor(subdivideDistance = 120, simplifyDistance = 400) {
+	        super(subdivideDistance, simplifyDistance);
 	        this.testCenter = true;
 	        this.pointOnly = false;
 	    }
@@ -1704,6 +1693,16 @@
 	    }
 	}
 
+	class GeolocationUtils {
+	    static get() {
+	        return new Promise(function (resolve, reject) {
+	            navigator.geolocation.getCurrentPosition(function (result) {
+	                resolve(result);
+	            }, reject);
+	        });
+	    }
+	}
+
 	class CancelablePromise {
 	    constructor(executor) {
 	        this.fulfilled = false;
@@ -1787,6 +1786,7 @@
 	exports.BingMapsProvider = BingMapsProvider;
 	exports.CancelablePromise = CancelablePromise;
 	exports.DebugProvider = DebugProvider;
+	exports.GeolocationUtils = GeolocationUtils;
 	exports.GoogleMapsProvider = GoogleMapsProvider;
 	exports.HeightDebugProvider = HeightDebugProvider;
 	exports.HereMapsProvider = HereMapsProvider;
@@ -1813,3 +1813,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=geo-three.js.map

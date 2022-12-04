@@ -1,9 +1,13 @@
 import {Vector2} from 'three';
 
 /**
- * Location utils contains utils to access the user location (GPS, IP location or wifi) and convert data between representations.
+ * Units utils contains methods to convert data between representations.
  *
- * Devices with a GPS, for example, can take a minute or more to get a GPS fix, so less accurate data (IP location or wifi) may be returned.
+ * Multiple methods are used to reprent world coordinates based on the type of data being presented.
+ * 
+ * WGS84 is the most commonly used representation with (latitude, longitude, altitude).
+ * 
+ * EPSG:900913 is used for planar coordinates in (X, Y, Z)
  */
 export class UnitsUtils 
 {
@@ -21,23 +25,6 @@ export class UnitsUtils
 	 * Earth equator perimeter in meters.
 	 */
 	public static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
-
-	/**
-	 * Get the current geolocation from the browser using the location API.
-	 *
-	 * This location can be provided from GPS measure, estimated IP location or any other system available in the host. Precision may vary.
-	 *
-	 * @param onResult - Callback function onResult(coords, timestamp).
-	 * @param onError - Callback to handle errors.
-	 */
-	public static get(onResult: Function, onError: Function): void
-	{
-		navigator.geolocation.getCurrentPosition(function(result) 
-		{
-			onResult(result.coords, result.timestamp);
-		// @ts-ignore
-		}, onError);
-	}
 
 	/**
 	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.

@@ -3,7 +3,7 @@ import {MapHeightNode} from './MapHeightNode';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
-import {MapNode} from './MapNode';
+import {QuadTreePosition} from './MapNode';
 import {MapView} from '../MapView';
 
 /**
@@ -20,7 +20,7 @@ import {MapView} from '../MapView';
  */
 export class MapHeightNodeShader extends MapHeightNode 
 {
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0) 
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0) 
 	{
 		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF}));
 

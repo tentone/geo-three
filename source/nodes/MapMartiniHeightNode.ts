@@ -3,8 +3,8 @@ import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapView} from '../MapView';
 import {Martini} from './Martini';
 import {MapHeightNode} from './MapHeightNode';
-import {MapNode} from './MapNode.js';
 import {CanvasUtils} from '../utils/CanvasUtils';
+import {QuadTreePosition} from './MapNode';
 
 /** 
  * Represents a height map tile node using the RTIN method from the paper "Right Triangulated Irregular Networks".
@@ -59,11 +59,14 @@ export class MapMartiniHeightNode extends MapHeightNode
 	 */
 	public exageration = 1.0;
 
+	/**
+	 * Max admissible error in the mesh generation.
+	 */
 	public meshMaxError: number | Function = 10;
 
 	public material: MeshPhongMaterial;
 
-	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
+	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0, {elevationDecoder = null, meshMaxError = 10, exageration = 1} = {})
 	{
 		super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.geometry, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
 			map: MapMartiniHeightNode.emptyTexture,
@@ -224,7 +227,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	 * @param exageration - Vertical exageration of the map scale.
 	 * @returns The position and UV coordinates of the mesh.
 	 */
-	public static getMeshAttributes(vertices: number[], terrain: Float32Array, tileSize: number, bounds: number[], exageration: number): {position: {value: Float32Array, size: number}, uv: {value: Float32Array, size: number}} // NORMAL: {}, - optional, but creates the high poly look with lighting}
+	public static getMeshAttributes(vertices: number[], terrain: Float32Array, tileSize: number, bounds: number[], exageration: number): {position: {value: Float32Array, size: number}, uv: {value: Float32Array, size: number}}
 	{
 		const gridSize = tileSize + 1;
 		const numOfVerticies = vertices.length / 2;

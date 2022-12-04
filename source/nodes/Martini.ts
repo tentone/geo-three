@@ -184,10 +184,10 @@ class Tile
 		const bottomSkirtIndices = [];
 		const topSkirtIndices = [];
 
-		// use an index grid to keep track of vertices that were already used to avoid duplication
+		// Use an index grid to keep track of vertices that were already used to avoid duplication
 		indices.fill(0);
 
-		// retrieve mesh in two stages that both traverse the error map:
+		// Retrieve mesh in two stages that both traverse the error map:
 		// - countElements: find used vertices (and assign each an index), and count triangles (for minimum allocation)
 		// - processTriangle: fill the allocated vertices & triangles typed arrays
 		function countElements(ax: number, ay: number, bx: number, by: number, cx: number, cy: number): void
@@ -301,14 +301,14 @@ class Tile
 
 			if (Math.abs(ax - cx) + Math.abs(ay - cy) > 1 && errors[my * size + mx] > maxError) 
 			{
-				// triangle doesn't approximate the surface well enough; drill down further
+				// Triangle doesn't approximate the surface well enough; drill down further
 				processTriangle(cx, cy, ax, ay, mx, my);
 				processTriangle(bx, by, cx, cy, mx, my);
 
 			}
 			else 
 			{
-				// add a triangle
+				// Add a triangle
 				const a = indices[ay * size + ax] - 1;
 				const b = indices[by * size + bx] - 1;
 				const c = indices[cy * size + cx] - 1;

@@ -27,5 +27,6 @@ export {MapSphereNode} from './nodes/MapSphereNode';
 export {MapHeightNodeShader} from './nodes/MapHeightNodeShader';
 
 export {UnitsUtils} from './utils/UnitsUtils';
+export {GeolocationUtils} from './utils/GeolocationUtils';
 export {CancelablePromise} from './utils/CancelablePromise';
 export {XHRUtils} from './utils/XHRUtils';

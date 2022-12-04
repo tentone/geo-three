@@ -199,6 +199,8 @@
 
 		scene.add(new THREE.AmbientLight(0x777777));
 
+		var raycaster = new THREE.Raycaster();
+
 		var directional = new THREE.DirectionalLight(0x888888);
 		directional.position.set(100, 10000, 700);
 		scene.add(directional);
@@ -213,9 +215,23 @@
 		}
 		document.body.onresize();
 
+		const pointer = new THREE.Vector2();
+		window.addEventListener('pointermove', function (event) {
+			pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+		});
+		
+		window.addEventListener('dblclick', function (event) {
+			const intersects = raycaster.intersectObjects(scene.children);
+			console.log('Raycasting intersections', intersects);
+		});
+
 		function animate()
 		{
 			requestAnimationFrame(animate);
+			
+			raycaster.setFromCamera(pointer, camera);
+
 			controls.update();
 			renderer.render(scene, camera);
 		}

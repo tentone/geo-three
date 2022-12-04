@@ -1,5 +1,5 @@
 import {Matrix4, BufferGeometry, MeshBasicMaterial, Quaternion, Vector3, Raycaster, Intersection} from 'three';
-import {MapNode} from './MapNode';
+import {MapNode, QuadTreePosition} from './MapNode';
 import {MapSphereNodeGeometry} from '../geometries/MapSphereNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
 
@@ -9,9 +9,21 @@ import {UnitsUtils} from '../utils/UnitsUtils';
  * A map node can be subdivided into other nodes (Quadtree).
  */
 export class MapSphereNode extends MapNode 
-{
+{	
+	/**
+	 * Base geometry contains the entire globe.
+	 * 
+	 * Individual geometries generated for the sphere nodes are not based on this base geometry.
+	 * 
+	 * Applied to the map view on initialization.
+	 */
 	public static baseGeometry: BufferGeometry = new MapSphereNodeGeometry(UnitsUtils.EARTH_RADIUS, 64, 64, 0, 2 * Math.PI, 0, Math.PI);
 
+	/**
+	 * Base scale of the node.
+	 * 
+	 * Applied to the map view on initialization.
+	 */
 	public static baseScale: Vector3 = new Vector3(1, 1, 1);
 
 	/**
@@ -21,7 +33,7 @@ export class MapSphereNode extends MapNode
 	 */
 	public static segments: number = 80;
 
-	public constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) 
+	public constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) 
 	{
 		super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}));
 	
@@ -102,31 +114,22 @@ export class MapSphereNode extends MapNode
 	public createChildNodes(): void
 	{
 		const level = this.level + 1;
-
 		const x = this.x * 2;
 		const y = this.y * 2;
 
 		const Constructor = Object.getPrototypeOf(this).constructor;
 
-		let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+		let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
 		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+		node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
 		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+		node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
 		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
 
-		node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+		node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
 		this.add(node);
-		node.updateMatrix();
-		node.updateMatrixWorld(true);
 	}
 	
 	/**

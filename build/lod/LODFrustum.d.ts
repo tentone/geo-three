@@ -6,5 +6,6 @@ export declare class LODFrustum extends LODRadial {
     simplifyDistance: number;
     testCenter: boolean;
     pointOnly: boolean;
+    constructor(subdivideDistance?: number, simplifyDistance?: number);
     updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void;
 }

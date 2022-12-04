@@ -17,12 +17,12 @@ export class LODFrustum extends LODRadial
 	/**
 	 * Distance to subdivide the tiles.
 	 */
-	public subdivideDistance: number = 120;
+	public subdivideDistance: number;
 
 	/**
 	 * Distance to simplify the tiles.
 	 */
-	public simplifyDistance: number = 400;
+	public simplifyDistance: number;
 
 	/**
 	 * If true only the central point of the plane geometry will be used
@@ -37,6 +37,10 @@ export class LODFrustum extends LODRadial
 	 * Otherwise the full bouding box of the objects are considered.
 	 */
 	public pointOnly: boolean = false;
+
+	constructor(subdivideDistance: number = 120, simplifyDistance: number = 400) {
+		super(subdivideDistance, simplifyDistance);
+	}
 
 	public updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void
 	{

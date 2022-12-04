@@ -47,6 +47,8 @@ export class LODRaycast implements LODControl
 
 	/**
 	 * Consider the scale of the node when calculating the distance.
+	 * 
+	 * If distance is not considered threshold values should be absolute distances.
 	 */
 	public scaleDistance: boolean = true;
 
@@ -56,7 +58,7 @@ export class LODRaycast implements LODControl
 
 		for (let t = 0; t < this.subdivisionRays; t++) 
 		{
-			// Raycast from random point
+			// Generate random point in viewport
 			this.mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
 
 			// Check intersection
@@ -76,6 +78,7 @@ export class LODRaycast implements LODControl
 
 			if (this.scaleDistance) 
 			{
+				// Get scale from transformation matrix directly
 				const matrix = node.matrixWorld.elements;
 				const vector = new Vector3(matrix[0], matrix[1], matrix[2]);
 				distance = vector.length() / distance;
@@ -91,8 +94,8 @@ export class LODRaycast implements LODControl
 				if (node.parentNode !== null) 
 				{
 					node.parentNode.simplify();
-					return;
 				}
+				return;
 			}
 		}
 	}

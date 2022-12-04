@@ -55,7 +55,7 @@
 		"rollup": "~2.70.0",
 		"rollup-plugin-livereload": "~2.0.5",
 		"rollup-plugin-serve": "~1.1.0",
-		"three": "^0.140.2",
+		"three": "^0.147.0",
 		"typedoc": "~0.22.13",
 		"typescript": "~4.5.5"
 	},

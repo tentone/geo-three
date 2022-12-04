@@ -15,12 +15,17 @@ export class LODRadial implements LODControl
 	/**
 	 * Minimum ditance to subdivide nodes.
 	 */
-	public subdivideDistance: number = 50;
+	public subdivideDistance: number;
 
 	/**
 	 * Minimum ditance to simplify far away nodes that are subdivided.
 	 */
-	public simplifyDistance: number = 300;
+	public simplifyDistance: number;
+
+	constructor(subdivideDistance: number = 50, simplifyDistance: number = 300) {
+		this.subdivideDistance = subdivideDistance;
+		this.simplifyDistance = simplifyDistance;
+	}
 
 	public updateLOD(view: MapView, camera: Camera, renderer: WebGLRenderer, scene: Object3D): void
 	{

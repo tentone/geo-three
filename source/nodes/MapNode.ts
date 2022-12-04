@@ -3,6 +3,44 @@ import {MapView} from '../MapView';
 import {CanvasUtils} from '../utils/CanvasUtils';
 
 /**
+ * Constants to store quad-tree positions.
+ */
+export class QuadTreePosition {
+	/**
+	 * Root node has no location.
+	 */
+	public static root: number = -1;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 */
+	public static topLeft: number = 0;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 */
+	public static topRight: number = 1;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 */
+	public static bottomLeft: number = 2;
+
+	/**
+	 * Index of top left quad-tree branch node.
+	 *
+	 * Can be used to navigate the children array looking for neighbors.
+	 */
+	public static bottomRight: number = 3;
+}
+
+/**
  * Represents a map tile node inside of the tiles quad-tree
  *
  * Each map node can be subdivided into other nodes.
@@ -98,40 +136,9 @@ export abstract class MapNode extends Mesh
 	 */
 	public static childrens: number = 4;
  
-	/**
-	 * Root node has no location.
-	 */
-	public static root: number = -1;
- 
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 */
-	public static topLeft: number = 0;
- 
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 */
-	public static topRight: number = 1;
- 
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 */
-	public static bottomLeft: number = 2;
- 
-	/**
-	 * Index of top left quad-tree branch node.
-	 *
-	 * Can be used to navigate the children array looking for neighbors.
-	 */
-	public static bottomRight: number = 3;
 
-	public constructor(parentNode: MapNode = null, mapView: MapView = null, location: number = MapNode.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = null, material: Material = null) 
+
+	public constructor(parentNode: MapNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = null, material: Material = null) 
 	{
 		super(geometry, material);
 
