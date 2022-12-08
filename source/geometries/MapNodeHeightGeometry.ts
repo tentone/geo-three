@@ -66,7 +66,6 @@ export class MapNodeHeightGeometry extends BufferGeometry
 	 */
 	public computeNormals(widthSegments: number, heightSegments: number): void 
 	{
-		
 		const positionAttribute = this.getAttribute('position');
 	
 		if (positionAttribute !== undefined)

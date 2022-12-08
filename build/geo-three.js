@@ -369,6 +369,9 @@
 	        const longitude = Math.atan2(dir.y, dir.x) * radToDeg;
 	        return new Geolocation(latitude, longitude);
 	    }
+	    static mapboxAltitude(color) {
+	        return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
+	    }
 	}
 	UnitsUtils.EARTH_RADIUS = 6371008;
 	UnitsUtils.EARTH_RADIUS_A = 6378137.0;
@@ -790,7 +793,7 @@
 	            }
 	            catch (e) {
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
-	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#000000');
+	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#26889f');
 	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
@@ -1851,6 +1854,7 @@
 	exports.BingMapsProvider = BingMapsProvider;
 	exports.CancelablePromise = CancelablePromise;
 	exports.DebugProvider = DebugProvider;
+	exports.Geolocation = Geolocation;
 	exports.GeolocationUtils = GeolocationUtils;
 	exports.GoogleMapsProvider = GoogleMapsProvider;
 	exports.HeightDebugProvider = HeightDebugProvider;

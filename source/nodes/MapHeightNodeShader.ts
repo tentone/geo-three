@@ -142,9 +142,10 @@ export class MapHeightNodeShader extends MapHeightNode
 		catch (e) 
 		{
 			console.error('Geo-Three: Failed to load node tile height data.', this);
-
+			
+			// Water level texture (assume that missing texture will be water level)
 			// @ts-ignore
-			this.material.userData.heightMap.value = TextureUtils.createFillTexture('#000000');
+			this.material.userData.heightMap.value = TextureUtils.createFillTexture('#26889f');
 		}
 
 		// @ts-ignore
