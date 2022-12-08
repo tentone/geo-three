@@ -194,7 +194,7 @@
 	    }
 	}
 
-	class TextureUtils$1 {
+	class TextureUtils {
 	    static createFillTexture(color = '#FF0000', width = 1, height = 1) {
 	        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
 	        const context = canvas.getContext('2d');
@@ -289,7 +289,7 @@
 	            }
 	            catch (e) {
 	                console.error('Geo-Three: Failed to load node tile data.', this);
-	                this.material.map = TextureUtils$1.createFillTexture();
+	                this.material.map = TextureUtils.createFillTexture();
 	            }
 	            this.material.needsUpdate = true;
 	        });
@@ -301,7 +301,7 @@
 	        }
 	        if (this.parentNode !== null) {
 	            this.parentNode.nodesLoaded++;
-	            if (this.parentNode.nodesLoaded == MapNode.childrens) {
+	            if (this.parentNode.nodesLoaded === MapNode.childrens) {
 	                if (this.parentNode.subdivided === true) {
 	                    this.parentNode.isMesh = false;
 	                }
@@ -771,7 +771,7 @@
 	            }
 	            catch (e) {
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
-	                this.material.map = TextureUtils.createFillTexture("#000000");
+	                this.material.map = TextureUtils.createFillTexture('#000000');
 	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
@@ -1289,6 +1289,8 @@
 	            this.root.initialize();
 	        }
 	    }
+	    preSubdivide() {
+	    }
 	    setProvider(provider) {
 	        if (provider !== this.provider) {
 	            this.provider = provider;
@@ -1494,7 +1496,7 @@
 	        });
 	    }
 	}
-	BingMapsProvider.ADDRESS = "https://dev.virtualearth.net";
+	BingMapsProvider.ADDRESS = 'https://dev.virtualearth.net';
 	BingMapsProvider.AERIAL = 'a';
 	BingMapsProvider.ROAD = 'r';
 	BingMapsProvider.AERIAL_LABELS = 'h';

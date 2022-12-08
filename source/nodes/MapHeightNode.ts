@@ -6,6 +6,7 @@ import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
 import {MapNodeHeightGeometry} from '../geometries/MapNodeHeightGeometry';
 import {CanvasUtils} from '../utils/CanvasUtils';
+import {TextureUtils} from '../utils/TextureUtils';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.

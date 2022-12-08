@@ -5,6 +5,7 @@ import {MapPlaneNode} from './MapPlaneNode';
 import {UnitsUtils} from '../utils/UnitsUtils';
 import {QuadTreePosition} from './MapNode';
 import {MapView} from '../MapView';
+import {TextureUtils} from '../utils/TextureUtils';
 
 /**
  * Map height node that uses GPU height calculation to generate the deformed plane mesh.
