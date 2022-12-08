@@ -1,4 +1,4 @@
-import { BufferGeometry, Float32BufferAttribute, Mesh, Texture, RGBAFormat, LinearFilter, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Matrix4, Quaternion, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
+import { BufferGeometry, Float32BufferAttribute, Texture, RGBAFormat, LinearFilter, Mesh, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Matrix4, Quaternion, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
 
 class MapProvider {
     constructor() {
@@ -188,18 +188,42 @@ class CanvasUtils {
     }
 }
 
+class TextureUtils {
+    static createFillTexture(color = '#FF0000', width = 1, height = 1) {
+        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
+        const context = canvas.getContext('2d');
+        context.fillStyle = color;
+        context.fillRect(0, 0, width, height);
+        const texture = new Texture(canvas);
+        texture.format = RGBAFormat;
+        texture.magFilter = LinearFilter;
+        texture.minFilter = LinearFilter;
+        texture.generateMipmaps = false;
+        texture.needsUpdate = true;
+        return texture;
+    }
+}
+
+class QuadTreePosition {
+}
+QuadTreePosition.root = -1;
+QuadTreePosition.topLeft = 0;
+QuadTreePosition.topRight = 1;
+QuadTreePosition.bottomLeft = 2;
+QuadTreePosition.bottomRight = 3;
 class MapNode extends Mesh {
-    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
         super(geometry, material);
         this.mapView = null;
         this.parentNode = null;
-        this.nodesLoaded = 0;
         this.subdivided = false;
+        this.disposed = false;
+        this.nodesLoaded = 0;
         this.childrenCache = null;
-        this.cacheTiles = false;
         this.isMesh = true;
         this.mapView = mapView;
         this.parentNode = parentNode;
+        this.disposed = false;
         this.location = location;
         this.level = level;
         this.x = x;
@@ -216,31 +240,34 @@ class MapNode extends Mesh {
         if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
             return;
         }
-        this.subdivided = true;
-        if (this.cacheTiles && this.childrenCache !== null) {
+        if (this.mapView.cacheTiles && this.childrenCache !== null) {
             this.isMesh = false;
             this.children = this.childrenCache;
+            this.nodesLoaded = this.childrenCache.length;
         }
         else {
             this.createChildNodes();
         }
+        this.subdivided = true;
     }
     simplify() {
-        if (this.cacheTiles) {
-            if (this.children.length > 0) {
-                this.childrenCache = this.children;
-            }
+        var _a, _b;
+        const minZoom = Math.max(this.mapView.provider.minZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+        if (this.level - 1 < minZoom) {
+            return;
+        }
+        if (this.mapView.cacheTiles) {
+            this.childrenCache = this.children;
         }
         else {
             for (let i = 0; i < this.children.length; i++) {
-                const child = this.children[i];
-                child.material.dispose();
-                child.geometry.dispose();
+                this.children[i].dispose();
             }
         }
         this.subdivided = false;
         this.isMesh = true;
         this.children = [];
+        this.nodesLoaded = 0;
     }
     loadData() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -255,22 +282,21 @@ class MapNode extends Mesh {
                 this.material.map = texture;
             }
             catch (e) {
-                const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
-                const context = canvas.getContext('2d');
-                context.fillStyle = '#FF0000';
-                context.fillRect(0, 0, 1, 1);
-                const texture = new Texture(canvas);
-                texture.generateMipmaps = false;
-                texture.needsUpdate = true;
-                this.material.map = texture;
-                this.material.needsUpdate = true;
+                console.error('Geo-Three: Failed to load node tile data.', this);
+                this.material.map = TextureUtils.createFillTexture();
             }
+            this.material.needsUpdate = true;
         });
     }
     nodeReady() {
+        if (this.disposed) {
+            console.error('Geo-Three: nodeReady() called for disposed node.', this);
+            this.dispose();
+            return;
+        }
         if (this.parentNode !== null) {
             this.parentNode.nodesLoaded++;
-            if (this.parentNode.nodesLoaded >= MapNode.childrens) {
+            if (this.parentNode.nodesLoaded === MapNode.childrens) {
                 if (this.parentNode.subdivided === true) {
                     this.parentNode.isMesh = false;
                 }
@@ -278,20 +304,38 @@ class MapNode extends Mesh {
                     this.parentNode.children[i].visible = true;
                 }
             }
+            if (this.parentNode.nodesLoaded > MapNode.childrens) {
+                console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
+            }
         }
         else {
             this.visible = true;
         }
     }
+    dispose() {
+        this.disposed = true;
+        const self = this;
+        try {
+            const material = self.material;
+            material.dispose();
+        }
+        catch (e) { }
+        try {
+            self.geometry.dispose();
+        }
+        catch (e) { }
+    }
 }
 MapNode.baseGeometry = null;
 MapNode.baseScale = null;
 MapNode.childrens = 4;
-MapNode.root = -1;
-MapNode.topLeft = 0;
-MapNode.topRight = 1;
-MapNode.bottomLeft = 2;
-MapNode.bottomRight = 3;
+
+class Geolocation {
+    constructor(latitude, longitude) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
+}
 
 class UnitsUtils {
     static datumsToSpherical(latitude, longitude) {
@@ -304,22 +348,30 @@ class UnitsUtils {
         const longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
         let latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
         latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
-        return { latitude: latitude, longitude: longitude };
+        return new Geolocation(latitude, longitude);
     }
     static quadtreeToDatums(zoom, x, y) {
         const n = Math.pow(2.0, zoom);
         const longitude = x / n * 360.0 - 180.0;
         const latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
         const latitude = 180.0 * (latitudeRad / Math.PI);
-        return { latitude: latitude, longitude: longitude };
+        return new Geolocation(latitude, longitude);
+    }
+    static vectorToDatums(dir) {
+        const radToDeg = 180 / Math.PI;
+        const latitude = Math.atan2(dir.z, Math.sqrt(dir.x * dir.x + dir.y * dir.y)) * radToDeg;
+        const longitude = Math.atan2(dir.y, dir.x) * radToDeg;
+        return new Geolocation(latitude, longitude);
     }
 }
 UnitsUtils.EARTH_RADIUS = 6371008;
+UnitsUtils.EARTH_RADIUS_A = 6378137.0;
+UnitsUtils.EARTH_RADIUS_B = 6356752.314245;
 UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 class MapPlaneNode extends MapNode {
-    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
         super(parentNode, mapView, location, level, x, y, MapPlaneNode.geometry, new MeshBasicMaterial({ wireframe: false }));
         this.matrixAutoUpdate = false;
         this.isMesh = true;
@@ -340,25 +392,25 @@ class MapPlaneNode extends MapNode {
         const x = this.x * 2;
         const y = this.y * 2;
         const Constructor = Object.getPrototypeOf(this).constructor;
-        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+        let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(-0.25, 0, -0.25);
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+        node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(0.25, 0, -0.25);
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+        node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(-0.25, 0, 0.25);
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+        node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(0.25, 0, 0.25);
         this.add(node);
@@ -441,7 +493,7 @@ class MapNodeHeightGeometry extends BufferGeometry {
 }
 
 class MapHeightNode extends MapNode {
-    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, geometry = MapHeightNode.geometry, material = new MeshPhongMaterial({ wireframe: false, color: 0xffffff })) {
         super(parentNode, mapView, location, level, x, y, geometry, material);
         this.heightLoaded = false;
         this.textureLoaded = false;
@@ -464,14 +516,20 @@ class MapHeightNode extends MapNode {
     }
     loadData() {
         return __awaiter(this, void 0, void 0, function* () {
-            const texture = new Texture();
-            texture.image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-            texture.generateMipmaps = false;
-            texture.format = RGBAFormat;
-            texture.magFilter = LinearFilter;
-            texture.minFilter = LinearFilter;
-            texture.needsUpdate = true;
-            this.material.map = texture;
+            try {
+                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+                const texture = new Texture(image);
+                texture.generateMipmaps = false;
+                texture.format = RGBAFormat;
+                texture.magFilter = LinearFilter;
+                texture.minFilter = LinearFilter;
+                texture.needsUpdate = true;
+                this.material.map = texture;
+            }
+            catch (e) {
+                console.error('Geo-Three: Failed to load node tile data.', this);
+                this.material.map = TextureUtils.createFillTexture();
+            }
             this.material.needsUpdate = true;
             this.textureLoaded = true;
         });
@@ -491,37 +549,30 @@ class MapHeightNode extends MapNode {
             this.heightLoaded = true;
         });
     }
-    nodeReady() {
-        if (!this.heightLoaded || !this.textureLoaded) {
-            return;
-        }
-        this.visible = true;
-        super.nodeReady();
-    }
     createChildNodes() {
         const level = this.level + 1;
         const Constructor = Object.getPrototypeOf(this).constructor;
         const x = this.x * 2;
         const y = this.y * 2;
-        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+        let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(-0.25, 0, -0.25);
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+        node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(0.25, 0, -0.25);
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+        node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(-0.25, 0, 0.25);
         this.add(node);
         node.updateMatrix();
         node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+        node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
         node.scale.set(0.5, 1.0, 0.5);
         node.position.set(0.25, 0, 0.25);
         this.add(node);
@@ -589,7 +640,7 @@ class MapSphereNodeGeometry extends BufferGeometry {
 }
 
 class MapSphereNode extends MapNode {
-    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
         super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({ wireframe: false }));
         this.applyScaleNode();
         this.matrixAutoUpdate = false;
@@ -642,22 +693,14 @@ class MapSphereNode extends MapNode {
         const x = this.x * 2;
         const y = this.y * 2;
         const Constructor = Object.getPrototypeOf(this).constructor;
-        let node = new Constructor(this, this.mapView, MapNode.topLeft, level, x, y);
+        let node = new Constructor(this, this.mapView, QuadTreePosition.topLeft, level, x, y);
         this.add(node);
-        node.updateMatrix();
-        node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.topRight, level, x + 1, y);
+        node = new Constructor(this, this.mapView, QuadTreePosition.topRight, level, x + 1, y);
         this.add(node);
-        node.updateMatrix();
-        node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.bottomLeft, level, x, y + 1);
+        node = new Constructor(this, this.mapView, QuadTreePosition.bottomLeft, level, x, y + 1);
         this.add(node);
-        node.updateMatrix();
-        node.updateMatrixWorld(true);
-        node = new Constructor(this, this.mapView, MapNode.bottomRight, level, x + 1, y + 1);
+        node = new Constructor(this, this.mapView, QuadTreePosition.bottomRight, level, x + 1, y + 1);
         this.add(node);
-        node.updateMatrix();
-        node.updateMatrixWorld(true);
     }
     raycast(raycaster, intersects) {
         if (this.isMesh === true) {
@@ -670,7 +713,7 @@ MapSphereNode.baseScale = new Vector3(1, 1, 1);
 MapSphereNode.segments = 80;
 
 class MapHeightNodeShader extends MapHeightNode {
-    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0) {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
         const material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({ map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF }));
         super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
         this.frustumCulled = false;
@@ -701,17 +744,22 @@ class MapHeightNodeShader extends MapHeightNode {
     }
     loadData() {
         return __awaiter(this, void 0, void 0, function* () {
-            const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-            const texture = new Texture(image);
-            texture.generateMipmaps = false;
-            texture.format = RGBAFormat;
-            texture.magFilter = LinearFilter;
-            texture.minFilter = LinearFilter;
-            texture.needsUpdate = true;
-            this.material.map = texture;
+            try {
+                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+                const texture = new Texture(image);
+                texture.generateMipmaps = false;
+                texture.format = RGBAFormat;
+                texture.magFilter = LinearFilter;
+                texture.minFilter = LinearFilter;
+                texture.needsUpdate = true;
+                this.material.map = texture;
+            }
+            catch (e) {
+                console.error('Geo-Three: Failed to load node tile data.', this);
+                this.material.map = TextureUtils.createFillTexture();
+            }
             this.material.needsUpdate = true;
             this.textureLoaded = true;
-            yield this.loadHeightGeometry();
         });
     }
     loadHeightGeometry() {
@@ -719,14 +767,20 @@ class MapHeightNodeShader extends MapHeightNode {
             if (this.mapView.heightProvider === null) {
                 throw new Error('GeoThree: MapView.heightProvider provider is null.');
             }
-            const texture = new Texture();
-            texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-            texture.generateMipmaps = false;
-            texture.format = RGBAFormat;
-            texture.magFilter = NearestFilter;
-            texture.minFilter = NearestFilter;
-            texture.needsUpdate = true;
-            this.material.userData.heightMap.value = texture;
+            try {
+                const texture = new Texture();
+                texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+                texture.generateMipmaps = false;
+                texture.format = RGBAFormat;
+                texture.magFilter = NearestFilter;
+                texture.minFilter = NearestFilter;
+                texture.needsUpdate = true;
+                this.material.userData.heightMap.value = texture;
+            }
+            catch (e) {
+                console.error('Geo-Three: Failed to load node tile height data.', this);
+                this.material.map = TextureUtils.createFillTexture('#000000');
+            }
             this.material.needsUpdate = true;
             this.heightLoaded = true;
         });
@@ -775,13 +829,9 @@ class LODRaycast {
             }
             if (distance > this.thresholdUp) {
                 node.subdivide();
-                return;
             }
-            else if (distance < this.thresholdDown) {
-                if (node.parentNode !== null) {
-                    node.parentNode.simplify();
-                    return;
-                }
+            else if (distance < this.thresholdDown && node.parentNode) {
+                node.parentNode.simplify();
             }
         }
     }
@@ -1018,7 +1068,7 @@ class Tile {
 }
 
 class MapMartiniHeightNode extends MapHeightNode {
-    constructor(parentNode = null, mapView = null, location = MapNode.root, level = 0, x = 0, y = 0, { elevationDecoder = null, meshMaxError = 10, exageration = 1 } = {}) {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, { elevationDecoder = null, meshMaxError = 10, exageration = 1 } = {}) {
         super(parentNode, mapView, location, level, x, y, MapMartiniHeightNode.geometry, MapMartiniHeightNode.prepareMaterial(new MeshPhongMaterial({
             map: MapMartiniHeightNode.emptyTexture,
             color: 0xFFFFFF,
@@ -1162,7 +1212,7 @@ class MapMartiniHeightNode extends MapHeightNode {
             uv: { value: texCoords, size: 2 }
         };
     }
-    onHeightImage(image) {
+    processHeight(image) {
         return __awaiter(this, void 0, void 0, function* () {
             const tileSize = image.width;
             const gridSize = tileSize + 1;
@@ -1198,7 +1248,8 @@ class MapMartiniHeightNode extends MapHeightNode {
             if (this.mapView.heightProvider === null) {
                 throw new Error('GeoThree: MapView.heightProvider provider is null.');
             }
-            this.onHeightImage(yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y));
+            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+            this.processHeight(image);
             this.heightLoaded = true;
             this.nodeReady();
         });
@@ -1216,7 +1267,7 @@ class MapView extends Mesh {
         this.provider = null;
         this.heightProvider = null;
         this.root = null;
-        this.cacheChild = false;
+        this.cacheTiles = false;
         this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
             this.lod.updateLOD(this, camera, renderer, scene);
         };
@@ -1243,7 +1294,10 @@ class MapView extends Mesh {
             this.scale.copy(this.root.constructor.baseScale);
             this.root.mapView = this;
             this.add(this.root);
+            this.root.initialize();
         }
+    }
+    preSubdivide() {
     }
     setProvider(provider) {
         if (provider !== this.provider) {
@@ -1291,9 +1345,9 @@ MapView.mapModes = new Map([
 const pov$1 = new Vector3();
 const position$1 = new Vector3();
 class LODRadial {
-    constructor() {
-        this.subdivideDistance = 50;
-        this.simplifyDistance = 300;
+    constructor(subdivideDistance = 50, simplifyDistance = 300) {
+        this.subdivideDistance = subdivideDistance;
+        this.simplifyDistance = simplifyDistance;
     }
     updateLOD(view, camera, renderer, scene) {
         camera.getWorldPosition(pov$1);
@@ -1316,10 +1370,8 @@ const pov = new Vector3();
 const frustum = new Frustum();
 const position = new Vector3();
 class LODFrustum extends LODRadial {
-    constructor() {
-        super(...arguments);
-        this.subdivideDistance = 120;
-        this.simplifyDistance = 400;
+    constructor(subdivideDistance = 120, simplifyDistance = 400) {
+        super(subdivideDistance, simplifyDistance);
         this.testCenter = true;
         this.pointOnly = false;
     }
@@ -1452,7 +1504,7 @@ class BingMapsProvider extends MapProvider {
         });
     }
 }
-BingMapsProvider.ADDRESS = "https://dev.virtualearth.net";
+BingMapsProvider.ADDRESS = 'https://dev.virtualearth.net';
 BingMapsProvider.AERIAL = 'a';
 BingMapsProvider.ROAD = 'r';
 BingMapsProvider.AERIAL_LABELS = 'h';
@@ -1695,6 +1747,16 @@ class HeightDebugProvider extends MapProvider {
     }
 }
 
+class GeolocationUtils {
+    static get() {
+        return new Promise(function (resolve, reject) {
+            navigator.geolocation.getCurrentPosition(function (result) {
+                resolve(result);
+            }, reject);
+        });
+    }
+}
+
 class CancelablePromise {
     constructor(executor) {
         this.fulfilled = false;
@@ -1775,4 +1837,4 @@ class CancelablePromise {
     }
 }
 
-export { BingMapsProvider, CancelablePromise, DebugProvider, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, UnitsUtils, XHRUtils };
+export { BingMapsProvider, CancelablePromise, DebugProvider, GeolocationUtils, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, UnitsUtils, XHRUtils };
