@@ -220,8 +220,8 @@ export abstract class MapNode extends Mesh
 		{
 			// Dispose resources in use
 			for (let i = 0; i < this.children.length; i++) 
-{
-				this.children[i] as MapNode.dispose();
+			{
+				(this.children[i] as MapNode).dispose();
 			}
 		}
 		
@@ -273,7 +273,7 @@ export abstract class MapNode extends Mesh
 	public nodeReady(): void
 	{
 		if (this.disposed) 
-{
+		{
 			console.error('Geo-Three: nodeReady() called for disposed node.', this);
 			return;
 		}
@@ -282,7 +282,7 @@ export abstract class MapNode extends Mesh
 		{
 			this.parentNode.nodesLoaded++;
 
-			if (this.parentNode.nodesLoaded == MapNode.childrens) 
+			if (this.parentNode.nodesLoaded === MapNode.childrens) 
 			{
 				if (this.parentNode.subdivided === true) 
 				{
@@ -296,7 +296,7 @@ export abstract class MapNode extends Mesh
 			}
 
 			if (this.parentNode.nodesLoaded > MapNode.childrens) 
-{
+			{
 				console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
 			}
 		}
@@ -313,11 +313,11 @@ export abstract class MapNode extends Mesh
 	 * Cancel all ongoing requests for data.
 	 */
 	public dispose(): void 
-{
+	{
 		this.disposed = true;
 
 		const self = this as Mesh;
-		self.material as Material.dispose();
+		(self.material as Material).dispose();
 		self.geometry.dispose();
 	}
 }

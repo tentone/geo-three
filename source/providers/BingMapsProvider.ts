@@ -15,7 +15,7 @@ export class BingMapsProvider extends MapProvider
 	/**
 	 * Base address of the bing map provider.
 	 */
-	 public static ADDRESS: string = 'https://dev.virtualearth.net';
+	public static ADDRESS: string = 'https://dev.virtualearth.net';
 
 	/**
 	 * Maximum zoom level allows by the provider.

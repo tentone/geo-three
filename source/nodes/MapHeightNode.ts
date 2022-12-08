@@ -127,26 +127,26 @@ export class MapHeightNode extends MapNode
 	 *
 	 * @returns Returns a promise indicating when the geometry generation has finished.
 	 */
-	 public async loadHeightGeometry(): Promise<any> 
-	 {
-		 if (this.mapView.heightProvider === null) 
-		 {
+	public async loadHeightGeometry(): Promise<any> 
+	{
+		if (this.mapView.heightProvider === null) 
+		{
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
-		 }
+		}
  
-		 const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
  
-		 const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+		const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
  
-		 const context = canvas.getContext('2d');
-		 context.imageSmoothingEnabled = false;
-		 context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+		const context = canvas.getContext('2d');
+		context.imageSmoothingEnabled = false;
+		context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
  
-		 const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+		const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
  
-		 this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
-		 this.heightLoaded = true;
-	 }
+		this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+		this.heightLoaded = true;
+	}
 
 	public createChildNodes(): void 
 	{
