@@ -15,8 +15,8 @@
 
 
 ### Examples
- - You can test the [live demo of the library running](https://tentone.github.io/geo-three/) from the GitHub page.
- - [Sandbox][https://tentone.github.io/geo-three/examples/index.html]
+ - You can test the live demo of the library running from the project page.
+     - [Sandbox](https://tentone.github.io/geo-three/examples/index.html)
 
 
 
