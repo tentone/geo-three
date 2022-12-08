@@ -194,7 +194,7 @@
 	    }
 	}
 
-	class TextureUtils {
+	class TextureUtils$1 {
 	    static createFillTexture(color = '#FF0000', width = 1, height = 1) {
 	        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
 	        const context = canvas.getContext('2d');
@@ -283,7 +283,8 @@
 	                this.material.map = texture;
 	            }
 	            catch (e) {
-	                this.material.map = TextureUtils.createFillTexture();
+	                console.error('Geo-Three: Failed to load node tile data.', this);
+	                this.material.map = TextureUtils$1.createFillTexture();
 	            }
 	            this.material.needsUpdate = true;
 	        });
@@ -493,14 +494,20 @@
 	    }
 	    loadData() {
 	        return __awaiter(this, void 0, void 0, function* () {
-	            const texture = new three.Texture();
-	            texture.image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-	            texture.generateMipmaps = false;
-	            texture.format = three.RGBAFormat;
-	            texture.magFilter = three.LinearFilter;
-	            texture.minFilter = three.LinearFilter;
-	            texture.needsUpdate = true;
-	            this.material.map = texture;
+	            try {
+	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+	                const texture = new three.Texture(image);
+	                texture.generateMipmaps = false;
+	                texture.format = three.RGBAFormat;
+	                texture.magFilter = three.LinearFilter;
+	                texture.minFilter = three.LinearFilter;
+	                texture.needsUpdate = true;
+	                this.material.map = texture;
+	            }
+	            catch (e) {
+	                console.error('Geo-Three: Failed to load node tile data.', this);
+	                this.material.map = TextureUtils.createFillTexture();
+	            }
 	            this.material.needsUpdate = true;
 	            this.textureLoaded = true;
 	        });
@@ -715,17 +722,22 @@
 	    }
 	    loadData() {
 	        return __awaiter(this, void 0, void 0, function* () {
-	            const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-	            const texture = new three.Texture(image);
-	            texture.generateMipmaps = false;
-	            texture.format = three.RGBAFormat;
-	            texture.magFilter = three.LinearFilter;
-	            texture.minFilter = three.LinearFilter;
-	            texture.needsUpdate = true;
-	            this.material.map = texture;
+	            try {
+	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+	                const texture = new three.Texture(image);
+	                texture.generateMipmaps = false;
+	                texture.format = three.RGBAFormat;
+	                texture.magFilter = three.LinearFilter;
+	                texture.minFilter = three.LinearFilter;
+	                texture.needsUpdate = true;
+	                this.material.map = texture;
+	            }
+	            catch (e) {
+	                console.error('Geo-Three: Failed to load node tile data.', this);
+	                this.material.map = TextureUtils.createFillTexture();
+	            }
 	            this.material.needsUpdate = true;
 	            this.textureLoaded = true;
-	            yield this.loadHeightGeometry();
 	        });
 	    }
 	    loadHeightGeometry() {
@@ -733,14 +745,20 @@
 	            if (this.mapView.heightProvider === null) {
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	            }
-	            const texture = new three.Texture();
-	            texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-	            texture.generateMipmaps = false;
-	            texture.format = three.RGBAFormat;
-	            texture.magFilter = three.NearestFilter;
-	            texture.minFilter = three.NearestFilter;
-	            texture.needsUpdate = true;
-	            this.material.userData.heightMap.value = texture;
+	            try {
+	                const texture = new three.Texture();
+	                texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	                texture.generateMipmaps = false;
+	                texture.format = three.RGBAFormat;
+	                texture.magFilter = three.NearestFilter;
+	                texture.minFilter = three.NearestFilter;
+	                texture.needsUpdate = true;
+	                this.material.userData.heightMap.value = texture;
+	            }
+	            catch (e) {
+	                console.error('Geo-Three: Failed to load node tile height data.', this);
+	                this.material.map = TextureUtils.createFillTexture("#000000");
+	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
 	        });

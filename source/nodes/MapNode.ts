@@ -247,6 +247,8 @@ export abstract class MapNode extends Mesh
 		}
 		catch (e) 
 		{
+			console.error('Geo-Three: Failed to load node tile data.', this);
+
 			// @ts-ignore
 			this.material.map = TextureUtils.createFillTexture();
 		}
@@ -254,7 +256,7 @@ export abstract class MapNode extends Mesh
 		// @ts-ignore
 		this.material.needsUpdate = true;
 	}
-1
+
 	/**
 	 * Increment the child loaded counter.
 	 *

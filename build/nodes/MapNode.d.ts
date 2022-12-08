@@ -28,7 +28,6 @@ export declare abstract class MapNode extends Mesh {
     subdivide(): void;
     simplify(): void;
     loadData(): Promise<void>;
-    1: any;
     nodeReady(): void;
     dispose(): void;
 }

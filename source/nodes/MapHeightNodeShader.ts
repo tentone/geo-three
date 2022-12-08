@@ -90,23 +90,32 @@ export class MapHeightNodeShader extends MapHeightNode
 
 	public async loadData(): Promise<void> 
 	{
-		const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
+		try 
+		{
+			const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 
-		const texture = new Texture(image as any);
-		texture.generateMipmaps = false;
-		texture.format = RGBAFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.needsUpdate = true;
-		
-		// @ts-ignore
-		this.material.map = texture;
+			const texture = new Texture(image as any);
+			texture.generateMipmaps = false;
+			texture.format = RGBAFormat;
+			texture.magFilter = LinearFilter;
+			texture.minFilter = LinearFilter;
+			texture.needsUpdate = true;
+			
+			// @ts-ignore
+			this.material.map = texture;
+		}
+		catch (e) 
+		{
+			console.error('Geo-Three: Failed to load node tile data.', this);
+
+			// @ts-ignore
+			this.material.map = TextureUtils.createFillTexture();
+		}
+
 		// @ts-ignore
 		this.material.needsUpdate = true;
 
 		this.textureLoaded = true;
-
-		await this.loadHeightGeometry();
 	}
 
 	public async loadHeightGeometry(): Promise<void> 
@@ -116,21 +125,31 @@ export class MapHeightNodeShader extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		const texture = new Texture();
-		texture.image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-		texture.generateMipmaps = false;
-		texture.format = RGBAFormat;
-		texture.magFilter = NearestFilter;
-		texture.minFilter = NearestFilter;
-		texture.needsUpdate = true;
-		
-		// @ts-ignore
-		this.material.userData.heightMap.value = texture;
+		try 
+		{
+			const texture = new Texture();
+			texture.image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+			texture.generateMipmaps = false;
+			texture.format = RGBAFormat;
+			texture.magFilter = NearestFilter;
+			texture.minFilter = NearestFilter;
+			texture.needsUpdate = true;
+			
+			// @ts-ignore
+			this.material.userData.heightMap.value = texture;
+		}
+		catch (e) 
+		{
+			console.error('Geo-Three: Failed to load node tile height data.', this);
+
+			// @ts-ignore
+			this.material.map = TextureUtils.createFillTexture("#000000");
+		}
+
 		// @ts-ignore
 		this.material.needsUpdate = true;
 
 		this.heightLoaded = true;
-
 	}
 
 	/**

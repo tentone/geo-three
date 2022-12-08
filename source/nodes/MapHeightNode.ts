@@ -94,16 +94,28 @@ export class MapHeightNode extends MapNode
 	 */
 	public async loadData(): Promise<void> 
 	{
-		const texture = new Texture();
-		texture.image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
-		texture.generateMipmaps = false;
-		texture.format = RGBAFormat;
-		texture.magFilter = LinearFilter;
-		texture.minFilter = LinearFilter;
-		texture.needsUpdate = true;
+		try 
+		{
+			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
+		
+			const texture = new Texture(image);
+			texture.generateMipmaps = false;
+			texture.format = RGBAFormat;
+			texture.magFilter = LinearFilter;
+			texture.minFilter = LinearFilter;
+			texture.needsUpdate = true;
+			
+			// @ts-ignore
+			this.material.map = texture;
+		}
+		catch (e) 
+		{
+			console.error('Geo-Three: Failed to load node tile data.', this);
 
-		// @ts-ignore
-		this.material.map = texture;
+			// @ts-ignore
+			this.material.map = TextureUtils.createFillTexture();
+		}
+
 		// @ts-ignore
 		this.material.needsUpdate = true;
 		
