@@ -1172,7 +1172,7 @@
 	            uv: { value: texCoords, size: 2 }
 	        };
 	    }
-	    onHeightImage(image) {
+	    processHeight(image) {
 	        return __awaiter(this, void 0, void 0, function* () {
 	            const tileSize = image.width;
 	            const gridSize = tileSize + 1;
@@ -1208,7 +1208,8 @@
 	            if (this.mapView.heightProvider === null) {
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	            }
-	            this.onHeightImage(yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y));
+	            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	            this.processHeight(image);
 	            this.heightLoaded = true;
 	            this.nodeReady();
 	        });

@@ -16,7 +16,7 @@ export declare class MapMartiniHeightNode extends MapHeightNode {
         meshMaxError?: number;
         exageration?: number;
     });
-    static prepareMaterial(material: Material, level: number, exageration?: number): any;
+    static prepareMaterial(material: Material, level: number, exageration?: number): Material;
     static getTerrain(imageData: Uint8ClampedArray, tileSize: number, elevation: any): Float32Array;
     static getMeshAttributes(vertices: number[], terrain: Float32Array, tileSize: number, bounds: number[], exageration: number): {
         position: {
@@ -28,6 +28,6 @@ export declare class MapMartiniHeightNode extends MapHeightNode {
             size: number;
         };
     };
-    onHeightImage(image: HTMLImageElement): Promise<void>;
+    processHeight(image: HTMLImageElement): Promise<void>;
     loadHeightGeometry(): Promise<void>;
 }

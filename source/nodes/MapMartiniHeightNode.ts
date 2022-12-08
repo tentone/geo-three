@@ -74,6 +74,8 @@ export class MapMartiniHeightNode extends MapHeightNode
 			side: DoubleSide
 		}), level, exageration));
 
+		
+		// Set elevation decoder method
 		if (elevationDecoder) 
 		{
 			this.elevationDecoder = elevationDecoder;
@@ -84,7 +86,15 @@ export class MapMartiniHeightNode extends MapHeightNode
 		this.frustumCulled = false;
 	}
 
-	public static prepareMaterial(material: Material, level: number, exageration: number = 1.0): any 
+	/**
+	 * Prepare materia for usage in the height node.
+	 * 
+	 * @param material - Material to be prepared for usage.
+	 * @param level - Depth of the tree.
+	 * @param exageration - Exageration to apply to the terrain.
+	 * @returns The material trasnformed.
+	 */
+	public static prepareMaterial(material: Material, level: number, exageration: number = 1.0): Material 
 	{
 		material.userData = {
 			heightMap: {value: MapMartiniHeightNode.emptyTexture},
@@ -180,6 +190,14 @@ export class MapMartiniHeightNode extends MapHeightNode
 		return material;
 	}
 	
+	/**
+	 * Get terrain points from image data.
+	 * 
+	 * @param imageData Terrain data encoded as image.
+	 * @param tileSize Tile size.
+	 * @param elevation Elevation scale (r, g, b, offset) object.
+	 * @returns The terrain elevation as a Float32 array.
+	 */
 	public static getTerrain(imageData: Uint8ClampedArray, tileSize: number, elevation: any): Float32Array
 	{
 		const {rScaler, bScaler, gScaler, offset} = elevation;
@@ -267,7 +285,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 	 * 
 	 * @param image - Image element received by the tile provider.
 	 */
-	public async onHeightImage(image: HTMLImageElement): Promise<void> 
+	public async processHeight(image: HTMLImageElement): Promise<void> 
 	{
 		const tileSize = image.width;
 		const gridSize = tileSize + 1;
@@ -317,7 +335,9 @@ export class MapMartiniHeightNode extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		this.onHeightImage(await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y));
+		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+
+		this.processHeight(image);
 
 		this.heightLoaded = true;
 		this.nodeReady();
