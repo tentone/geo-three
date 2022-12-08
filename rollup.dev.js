@@ -11,7 +11,7 @@ export default {
 			open: true,
 			contentBase: '.',
 			verbose: true,
-			openPage: '/',
+			openPage: '/examples/index.html',
 			host: 'localhost',
 			port: 8080
 		}),
