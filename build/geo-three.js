@@ -793,7 +793,7 @@
 	            }
 	            catch (e) {
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
-	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#26889f');
+	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#019090');
 	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
