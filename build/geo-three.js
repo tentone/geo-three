@@ -297,6 +297,7 @@
 	    nodeReady() {
 	        if (this.disposed) {
 	            console.error('Geo-Three: nodeReady() called for disposed node.', this);
+	            this.dispose();
 	            return;
 	        }
 	        if (this.parentNode !== null) {
@@ -320,8 +321,15 @@
 	    dispose() {
 	        this.disposed = true;
 	        const self = this;
-	        self.material.dispose();
-	        self.geometry.dispose();
+	        try {
+	            const material = self.material;
+	            material.dispose();
+	        }
+	        catch (e) { }
+	        try {
+	            self.geometry.dispose();
+	        }
+	        catch (e) { }
 	    }
 	}
 	MapNode.baseGeometry = null;

@@ -275,6 +275,7 @@ export abstract class MapNode extends Mesh
 		if (this.disposed) 
 		{
 			console.error('Geo-Three: nodeReady() called for disposed node.', this);
+			this.dispose();
 			return;
 		}
 
@@ -310,14 +311,21 @@ export abstract class MapNode extends Mesh
 	/**
 	 * Dispose the map node and its resources.
 	 * 
-	 * Cancel all ongoing requests for data.
+	 * Should cancel all pending processing for the node.
 	 */
 	public dispose(): void 
 	{
 		this.disposed = true;
 
 		const self = this as Mesh;
-		(self.material as Material).dispose();
-		self.geometry.dispose();
+
+		try {
+			const material = (self.material as Material);
+			material.dispose();
+		} catch(e){}
+		
+		try {
+			self.geometry.dispose();
+		} catch(e) {}	
 	}
 }

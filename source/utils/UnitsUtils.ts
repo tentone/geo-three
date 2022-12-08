@@ -38,7 +38,7 @@ export class UnitsUtils
 	public static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 	/**
-	 * Converts given lat/lon in WGS84 Datum to XY in Spherical Mercator EPSG:900913.
+	 * Converts coordinates from WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 	 *
 	 * @param latitude - Latitude value in degrees.
 	 * @param longitude - Longitude value in degrees.
@@ -91,7 +91,10 @@ export class UnitsUtils
 	/**
 	 * Direction vector to WGS84 coordinates.
 	 * 
-	 * @param dir - Direction vector.
+	 * Can be used to transform surface points of world sphere to coordinates.
+	 * 
+	 * @param dir - Direction vector.~
+	 * @returns WGS84 coordinates.
 	 */
 	public static vectorToDatums(dir: Vector3): Geolocation {
 		const radToDeg = 180 / Math.PI;
