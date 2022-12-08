@@ -9,15 +9,9 @@
   - Each one of these map providers require a developer account and a API configuration to be used.
   - Its possible to implement new provides using the `MapProvider` interface.
   - Providers should have a tile based map system to be supported by the library.
-
+ - You can test the [live demo of the library](https://tentone.github.io/geo-three/examples/index.html) running from the project page.
 
 <img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/b.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/c.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/e.png" width="380"><img src="https://raw.githubusercontent.com/tentone/geo-three/master/readme/screenshot/d.png" width="380">
-
-
-### Examples
- - You can test the live demo of the library running from the project page.
-     - [Sandbox](https://tentone.github.io/geo-three/examples/index.html)
-
 
 
 ### Usage
