@@ -38,7 +38,8 @@ export class LODFrustum extends LODRadial
 	 */
 	public pointOnly: boolean = false;
 
-	constructor(subdivideDistance: number = 120, simplifyDistance: number = 400) {
+	constructor(subdivideDistance: number = 120, simplifyDistance: number = 400) 
+	{
 		super(subdivideDistance, simplifyDistance);
 	}
 

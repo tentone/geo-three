@@ -22,7 +22,8 @@ export class LODRadial implements LODControl
 	 */
 	public simplifyDistance: number;
 
-	constructor(subdivideDistance: number = 50, simplifyDistance: number = 300) {
+	constructor(subdivideDistance: number = 50, simplifyDistance: number = 300) 
+	{
 		this.subdivideDistance = subdivideDistance;
 		this.simplifyDistance = simplifyDistance;
 	}

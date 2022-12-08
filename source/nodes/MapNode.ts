@@ -1,11 +1,12 @@
 import {LinearFilter, Material, Mesh, Texture, Vector3, BufferGeometry, Object3D, RGBAFormat} from 'three';
 import {MapView} from '../MapView';
-import { TextureUtils } from '../utils/TextureUtils';
+import {TextureUtils} from '../utils/TextureUtils';
 
 /**
  * Constants to store quad-tree positions.
  */
-export class QuadTreePosition {
+export class QuadTreePosition 
+{
 	/**
 	 * Root node has no location.
 	 */
@@ -218,8 +219,9 @@ export abstract class MapNode extends Mesh
 		else
 		{
 			// Dispose resources in use
-			for (let i = 0; i < this.children.length; i++) {
-				(this.children[i] as MapNode).dispose();
+			for (let i = 0; i < this.children.length; i++) 
+{
+				this.children[i] as MapNode.dispose();
 			}
 		}
 		
@@ -270,7 +272,8 @@ export abstract class MapNode extends Mesh
 	 */
 	public nodeReady(): void
 	{
-		if (this.disposed) {
+		if (this.disposed) 
+{
 			console.error('Geo-Three: nodeReady() called for disposed node.', this);
 			return;
 		}
@@ -292,7 +295,8 @@ export abstract class MapNode extends Mesh
 				}
 			}
 
-			if (this.parentNode.nodesLoaded > MapNode.childrens) {
+			if (this.parentNode.nodesLoaded > MapNode.childrens) 
+{
 				console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
 			}
 		}
@@ -308,11 +312,12 @@ export abstract class MapNode extends Mesh
 	 * 
 	 * Cancel all ongoing requests for data.
 	 */
-	public dispose(): void {
+	public dispose(): void 
+{
 		this.disposed = true;
 
 		const self = this as Mesh;
-		(self.material as Material).dispose();
+		self.material as Material.dispose();
 		self.geometry.dispose();
 	}
 }

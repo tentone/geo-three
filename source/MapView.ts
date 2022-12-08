@@ -166,7 +166,8 @@ export class MapView extends Mesh
 	/**
 	 * Pre-subdivide map tree to create nodes of levels not available in the provider.
 	 */
-	public preSubdivide(): void {
+	public preSubdivide(): void 
+	{
 		// TODO <ADD CODE>
 	}
 

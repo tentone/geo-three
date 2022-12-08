@@ -11,7 +11,7 @@ import {QuadTreePosition} from './MapNode';
  * 
  * Based off the library https://github.com/mapbox/martini (Mapbox's Awesome Right-Triangulated Irregular Networks, Improved)
  *
- * @param parentNode  -The parent node of this node.
+ * @param parentNode - The parent node of this node.
  * @param mapView - Map view object where this node is placed.
  * @param location - Position in the node tree relative to the parent.
  * @param level - Zoom level in the tile tree of the node.
@@ -193,9 +193,9 @@ export class MapMartiniHeightNode extends MapHeightNode
 	/**
 	 * Get terrain points from image data.
 	 * 
-	 * @param imageData Terrain data encoded as image.
-	 * @param tileSize Tile size.
-	 * @param elevation Elevation scale (r, g, b, offset) object.
+	 * @param imageData - Terrain data encoded as image.
+	 * @param tileSize - Tile size.
+	 * @param elevation - Elevation scale (r, g, b, offset) object.
 	 * @returns The terrain elevation as a Float32 array.
 	 */
 	public static getTerrain(imageData: Uint8ClampedArray, tileSize: number, elevation: any): Float32Array

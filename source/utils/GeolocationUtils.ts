@@ -15,13 +15,14 @@ export class GeolocationUtils
 	 */
 	public static get(): Promise<{coords: any, timestamp: number}>
 	{
-        return new Promise(function (resolve, reject) {
-            navigator.geolocation.getCurrentPosition(function(result: any) 
-            {
-                resolve(result);
-            // @ts-ignore
-            }, reject);
-        });
+		return new Promise(function(resolve, reject) 
+		{
+			navigator.geolocation.getCurrentPosition(function(result: any) 
+			{
+				resolve(result);
+				// @ts-ignore
+			}, reject);
+		});
 
 	}
 }
