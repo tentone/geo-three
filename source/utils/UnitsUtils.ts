@@ -1,4 +1,5 @@
 import {Vector2} from 'three';
+import {Geolocation} from './Geolocation';
 
 /**
  * Units utils contains methods to convert data between representations.
@@ -15,6 +16,16 @@ export class UnitsUtils
 	 * Average radius of earth in meters.
 	 */
 	public static EARTH_RADIUS: number = 6371008;
+
+	/**
+	 * Earth radius in semi-major axis A as defined in WGS84.
+	 */
+	public static EARTH_RADIUS_A: number = 6378137.0;
+
+	/**
+	 * Earth radius in semi-minor axis B as defined in WGS84.
+	 */
+	public static EARTH_RADIUS_B: number = 6356752.314245;
 
 	/**
 	 * Earth equator perimeter in meters.
@@ -43,19 +54,19 @@ export class UnitsUtils
 	}
 
 	/**
-	 * Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum.
+	 * Converts XY point from Spherical Mercator EPSG:900913 to WGS84 Datum.
 	 *
 	 * @param x - X coordinate.
 	 * @param y - Y coordinate.
 	 */
-	public static sphericalToDatums(x: number, y: number): {latitude: number, longitude: number}
+	public static sphericalToDatums(x: number, y: number): Geolocation
 	{
 		const longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
 		let latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
 
 		latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
 
-		return {latitude: latitude, longitude: longitude};
+		return new Geolocation(latitude, longitude);
 	}
 
 	/**
@@ -67,13 +78,13 @@ export class UnitsUtils
 	 * @param x - X coordinate.
 	 * @param y - Y coordinate.
 	 */
-	public static quadtreeToDatums(zoom: number, x: number, y: number): {latitude: number, longitude: number}
+	public static quadtreeToDatums(zoom: number, x: number, y: number): Geolocation
 	{
 		const n = Math.pow(2.0, zoom);
 		const longitude = x / n * 360.0 - 180.0;
 		const latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
 		const latitude = 180.0 * (latitudeRad / Math.PI);
 
-		return {latitude: latitude, longitude: longitude};
+		return new Geolocation(latitude, longitude);
 	}
 }

@@ -162,6 +162,10 @@ export abstract class MapNode extends Mesh
 	public async initialize(): Promise<void> {}
 
 	/**
+	 * Subdivide node to 
+	 */
+
+	/**
 	 * Create the child nodes to represent the next tree level.
 	 *
 	 * These nodes should be added to the object, and their transformations matrix should be updated.
@@ -176,7 +180,6 @@ export abstract class MapNode extends Mesh
 	public subdivide(): void
 	{
 		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider?.maxZoom ?? Infinity);
-
 		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens)
 		{
 			return;

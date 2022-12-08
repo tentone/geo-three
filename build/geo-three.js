@@ -328,6 +328,13 @@
 	MapNode.baseScale = null;
 	MapNode.childrens = 4;
 
+	class Geolocation {
+	    constructor(latitude, longitude) {
+	        this.latitude = latitude;
+	        this.longitude = longitude;
+	    }
+	}
+
 	class UnitsUtils {
 	    static datumsToSpherical(latitude, longitude) {
 	        const x = longitude * UnitsUtils.EARTH_ORIGIN / 180.0;
@@ -339,17 +346,19 @@
 	        const longitude = x / UnitsUtils.EARTH_ORIGIN * 180.0;
 	        let latitude = y / UnitsUtils.EARTH_ORIGIN * 180.0;
 	        latitude = 180.0 / Math.PI * (2 * Math.atan(Math.exp(latitude * Math.PI / 180.0)) - Math.PI / 2.0);
-	        return { latitude: latitude, longitude: longitude };
+	        return new Geolocation(latitude, longitude);
 	    }
 	    static quadtreeToDatums(zoom, x, y) {
 	        const n = Math.pow(2.0, zoom);
 	        const longitude = x / n * 360.0 - 180.0;
 	        const latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
 	        const latitude = 180.0 * (latitudeRad / Math.PI);
-	        return { latitude: latitude, longitude: longitude };
+	        return new Geolocation(latitude, longitude);
 	    }
 	}
 	UnitsUtils.EARTH_RADIUS = 6371008;
+	UnitsUtils.EARTH_RADIUS_A = 6378137.0;
+	UnitsUtils.EARTH_RADIUS_B = 6356752.314245;
 	UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 	UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
 
