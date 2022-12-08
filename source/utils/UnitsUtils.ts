@@ -94,8 +94,9 @@ export class UnitsUtils
 	 * @param dir - Direction vector.
 	 */
 	public static vectorToDatums(dir: Vector3): Geolocation {
-		const latitude = Math.atan2(dir.z, Math.sqrt(dir.x*dir.x + dir.y*dir.y));
-		const longitude = Math.atan2(dir.y, dir.x);
+		const radToDeg = 180 / Math.PI;
+		const latitude = Math.atan2(dir.z, Math.sqrt(dir.x*dir.x + dir.y*dir.y)) * radToDeg;
+		const longitude = Math.atan2(dir.y, dir.x) * radToDeg;
 
 		return new Geolocation(latitude, longitude);
 	}

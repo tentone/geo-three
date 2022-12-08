@@ -224,6 +224,13 @@
 		window.addEventListener('dblclick', function (event) {
 			const intersects = raycaster.intersectObjects(scene.children);
 			console.log('Raycasting intersections', intersects);
+
+			if (intersects.length > 0) {
+				const pos = intersects[0].point;
+				const coords = Geo.UnitsUtils.vectorToDatums(pos);
+
+				console.log('Coordinates:', coords);
+			}
 		});
 
 		function animate()
