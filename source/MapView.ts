@@ -67,6 +67,8 @@ export class MapView extends Mesh
 
 	/**
 	 * Map height (terrain elevation) layer provider.
+	 * 
+	 * Only used for HEIGHT, HEIGHT_SHADER and MARTINI map modes.
 	 */
 	public heightProvider: MapProvider = null;
 
@@ -108,7 +110,7 @@ export class MapView extends Mesh
 	/**
 	 * Ajust node configuration depending on the camera distance.
 	 *
-	 * Called everytime before render.
+	 * Called everytime automatically before render by the renderer.
 	 */
 	public onBeforeRender: (renderer: WebGLRenderer, scene: Scene, camera: Camera, geometry: BufferGeometry, material: Material, group: Group)=> void = (renderer, scene, camera, geometry, material, group) => 
 	{
@@ -159,6 +161,13 @@ export class MapView extends Mesh
 			this.add(this.root);
 			this.root.initialize();
 		}
+	}
+
+	/**
+	 * Pre-subdivide map tree to create nodes of levels not available in the provider.
+	 */
+	public preSubdivide(): void {
+		// TODO <ADD CODE>
 	}
 
 	/**

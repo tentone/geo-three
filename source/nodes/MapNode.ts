@@ -160,11 +160,7 @@ export abstract class MapNode extends Mesh
 	 * Called automatically by the constructor for child nodes and MapView when a root node is attached to it.
 	 */
 	public async initialize(): Promise<void> {}
-
-	/**
-	 * Subdivide node to 
-	 */
-
+	
 	/**
 	 * Create the child nodes to represent the next tree level.
 	 *
