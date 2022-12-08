@@ -205,7 +205,7 @@
 	        texture.magFilter = three.LinearFilter;
 	        texture.minFilter = three.LinearFilter;
 	        texture.generateMipmaps = false;
-	        texture.needsUpdate;
+	        texture.needsUpdate = true;
 	        return texture;
 	    }
 	}
@@ -257,6 +257,11 @@
 	        this.subdivided = true;
 	    }
 	    simplify() {
+	        var _a, _b;
+	        const minZoom = Math.max(this.mapView.provider.minZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+	        if (this.level - 1 < minZoom) {
+	            return;
+	        }
 	        if (this.mapView.cacheTiles) {
 	            this.childrenCache = this.children;
 	        }

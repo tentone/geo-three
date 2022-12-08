@@ -27,7 +27,7 @@ import { CanvasUtils } from "./CanvasUtils";
         texture.magFilter = LinearFilter;
         texture.minFilter = LinearFilter;
         texture.generateMipmaps = false;
-        texture.needsUpdate;
+        texture.needsUpdate = true;
         
         return texture;
      }
