@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -791,7 +793,7 @@
 	            }
 	            catch (e) {
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
-	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#017090');
+	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#0185C0');
 	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
@@ -1880,3 +1882,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=geo-three.js.map
