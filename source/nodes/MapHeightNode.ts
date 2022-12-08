@@ -119,7 +119,7 @@ export class MapHeightNode extends MapNode
 	 {
 		 if (this.mapView.heightProvider === null) 
 		 {
-			 throw new Error('GeoThree: MapView.heightProvider provider is null.');
+			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		 }
  
 		 const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
@@ -135,19 +135,6 @@ export class MapHeightNode extends MapNode
 		 this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 		 this.heightLoaded = true;
 	 }
-
-
-	public nodeReady(): void 
-	{
-		if (!this.heightLoaded || !this.textureLoaded) 
-		{
-			return;
-		}
-
-		this.visible = true;
-
-		super.nodeReady();
-	}
 
 	public createChildNodes(): void 
 	{

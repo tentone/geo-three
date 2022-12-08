@@ -14,7 +14,6 @@ export declare class MapHeightNode extends MapNode {
     initialize(): Promise<void>;
     loadData(): Promise<void>;
     loadHeightGeometry(): Promise<any>;
-    nodeReady(): void;
     createChildNodes(): void;
     raycast(raycaster: Raycaster, intersects: Intersection[]): void;
 }

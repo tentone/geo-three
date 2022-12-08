@@ -194,6 +194,22 @@
 	    }
 	}
 
+	class TextureUtils {
+	    static createFillTexture(color = '#FF0000', width = 1, height = 1) {
+	        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
+	        const context = canvas.getContext('2d');
+	        context.fillStyle = color;
+	        context.fillRect(0, 0, width, height);
+	        const texture = new three.Texture(canvas);
+	        texture.format = three.RGBAFormat;
+	        texture.magFilter = three.LinearFilter;
+	        texture.minFilter = three.LinearFilter;
+	        texture.generateMipmaps = false;
+	        texture.needsUpdate;
+	        return texture;
+	    }
+	}
+
 	class QuadTreePosition {
 	}
 	QuadTreePosition.root = -1;
@@ -206,13 +222,14 @@
 	        super(geometry, material);
 	        this.mapView = null;
 	        this.parentNode = null;
-	        this.nodesLoaded = 0;
 	        this.subdivided = false;
+	        this.disposed = false;
+	        this.nodesLoaded = 0;
 	        this.childrenCache = null;
-	        this.cacheTiles = false;
 	        this.isMesh = true;
 	        this.mapView = mapView;
 	        this.parentNode = parentNode;
+	        this.disposed = false;
 	        this.location = location;
 	        this.level = level;
 	        this.x = x;
@@ -229,31 +246,29 @@
 	        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
 	            return;
 	        }
-	        this.subdivided = true;
-	        if (this.cacheTiles && this.childrenCache !== null) {
+	        if (this.mapView.cacheTiles && this.childrenCache !== null) {
 	            this.isMesh = false;
 	            this.children = this.childrenCache;
+	            this.nodesLoaded = this.childrenCache.length;
 	        }
 	        else {
 	            this.createChildNodes();
 	        }
+	        this.subdivided = true;
 	    }
 	    simplify() {
-	        if (this.cacheTiles) {
-	            if (this.children.length > 0) {
-	                this.childrenCache = this.children;
-	            }
+	        if (this.mapView.cacheTiles) {
+	            this.childrenCache = this.children;
 	        }
 	        else {
 	            for (let i = 0; i < this.children.length; i++) {
-	                const child = this.children[i];
-	                child.material.dispose();
-	                child.geometry.dispose();
+	                this.children[i].dispose();
 	            }
 	        }
 	        this.subdivided = false;
 	        this.isMesh = true;
 	        this.children = [];
+	        this.nodesLoaded = 0;
 	    }
 	    loadData() {
 	        return __awaiter(this, void 0, void 0, function* () {
@@ -266,25 +281,21 @@
 	                texture.minFilter = three.LinearFilter;
 	                texture.needsUpdate = true;
 	                this.material.map = texture;
-	                this.material.needsUpdate = true;
 	            }
 	            catch (e) {
-	                const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
-	                const context = canvas.getContext('2d');
-	                context.fillStyle = '#FF0000';
-	                context.fillRect(0, 0, 1, 1);
-	                const texture = new three.Texture(canvas);
-	                texture.generateMipmaps = false;
-	                texture.needsUpdate = true;
-	                this.material.map = texture;
-	                this.material.needsUpdate = true;
+	                this.material.map = TextureUtils.createFillTexture();
 	            }
+	            this.material.needsUpdate = true;
 	        });
 	    }
 	    nodeReady() {
+	        if (this.disposed) {
+	            console.error('Geo-Three: nodeReady() called for disposed node.', this);
+	            return;
+	        }
 	        if (this.parentNode !== null) {
 	            this.parentNode.nodesLoaded++;
-	            if (this.parentNode.nodesLoaded >= MapNode.childrens) {
+	            if (this.parentNode.nodesLoaded == MapNode.childrens) {
 	                if (this.parentNode.subdivided === true) {
 	                    this.parentNode.isMesh = false;
 	                }
@@ -292,10 +303,19 @@
 	                    this.parentNode.children[i].visible = true;
 	                }
 	            }
+	            if (this.parentNode.nodesLoaded > MapNode.childrens) {
+	                console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
+	            }
 	        }
 	        else {
 	            this.visible = true;
 	        }
+	    }
+	    dispose() {
+	        this.disposed = true;
+	        const self = this;
+	        self.material.dispose();
+	        self.geometry.dispose();
 	    }
 	}
 	MapNode.baseGeometry = null;
@@ -499,13 +519,6 @@
 	            this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 	            this.heightLoaded = true;
 	        });
-	    }
-	    nodeReady() {
-	        if (!this.heightLoaded || !this.textureLoaded) {
-	            return;
-	        }
-	        this.visible = true;
-	        super.nodeReady();
 	    }
 	    createChildNodes() {
 	        const level = this.level + 1;
@@ -1213,7 +1226,7 @@
 	        this.provider = null;
 	        this.heightProvider = null;
 	        this.root = null;
-	        this.cacheChild = false;
+	        this.cacheTiles = false;
 	        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
 	            this.lod.updateLOD(this, camera, renderer, scene);
 	        };

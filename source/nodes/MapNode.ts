@@ -1,6 +1,6 @@
-import {LinearFilter, Material, Mesh, RGBAFormat, Texture, Vector3, BufferGeometry, Object3D} from 'three';
+import {LinearFilter, Material, Mesh, Texture, Vector3, BufferGeometry, Object3D, RGBAFormat} from 'three';
 import {MapView} from '../MapView';
-import {CanvasUtils} from '../utils/CanvasUtils';
+import { TextureUtils } from '../utils/TextureUtils';
 
 /**
  * Constants to store quad-tree positions.
@@ -82,16 +82,25 @@ export abstract class MapNode extends Mesh
 	public y: number;
 
 	/**
-	 * Indicates how many children nodes where loaded.
-	 */
-	public nodesLoaded: number = 0;
-
-	/**
 	 * Variable to check if the node is subdivided.
 	 *
 	 * To avoid bad visibility changes on node load.
 	 */
 	public subdivided: boolean = false;
+
+	/**
+	 * Flag to indicate if the map node was disposed.
+	 * 
+	 * When a map node is disposed its resources are dealocated to save memory.
+	 */
+	public disposed: boolean = false;
+
+	/**
+	 * Indicates how many children nodes are loaded.
+	 * 
+	 * The child on become visible once all of them are loaded.
+	 */
+	public nodesLoaded: number = 0;
 
 	/**
 	 * Cache with the children objects created from subdivision.
@@ -101,21 +110,6 @@ export abstract class MapNode extends Mesh
 	 * The default value is null. Only used if "cacheTiles" is set to true.
 	 */
 	public childrenCache: Object3D[] = null;
-
-	/**
-	 * Indicate if the node should cache its children when it is simplified.
-	 * 
-	 * Should only be used if the child generation process is time consuming.
-	 */
-	public cacheTiles: boolean = false;
-
-	/**
-	 * Variable to check if the node is a mesh.
-	 *
-	 * Used to draw or not draw the node
-	 */
-	// @ts-ignore
-	public isMesh: boolean = true;
 
 	/**
 	 * Base geometry is attached to the map viewer object.
@@ -136,12 +130,21 @@ export abstract class MapNode extends Mesh
 	 */
 	public static childrens: number = 4;
 
+	/**
+	 * Flag to check if the node is a mesh by the renderer.
+	 *
+	 * Used to toggle the visibility of the node. The renderer skips the node rendering if this is set false.
+	 */
+	// @ts-ignore
+	public isMesh: boolean = true;
+
 	public constructor(parentNode: MapNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = null, material: Material = null) 
 	{
 		super(geometry, material);
 
 		this.mapView = mapView;
 		this.parentNode = parentNode;
+		this.disposed = false;
 
 		this.location = location;
 		this.level = level;
@@ -178,17 +181,18 @@ export abstract class MapNode extends Mesh
 			return;
 		}
 
-		this.subdivided = true;
-		
-		if (this.cacheTiles && this.childrenCache !== null) 
+		if (this.mapView.cacheTiles && this.childrenCache !== null) 
 		{
 			this.isMesh = false;
 			this.children = this.childrenCache;
+			this.nodesLoaded = this.childrenCache.length;
 		}
 		else 
 		{
 			this.createChildNodes();
 		}
+
+		this.subdivided = true;
 	}
 
 	/**
@@ -200,28 +204,24 @@ export abstract class MapNode extends Mesh
 	 */
 	public simplify(): void
 	{
-		if (this.cacheTiles) 
+		if (this.mapView.cacheTiles) 
 		{
-			// Store children
-			if (this.children.length > 0)
-			{
-				this.childrenCache = this.children;
-			}
+			// Store current children in cache.
+			this.childrenCache = this.children;
 		}
 		else
 		{
 			// Dispose resources in use
 			for (let i = 0; i < this.children.length; i++) {
-				const child = this.children[i] as Mesh;
-				(child.material as Material).dispose();
-				child.geometry.dispose();
+				(this.children[i] as MapNode).dispose();
 			}
 		}
-		 
-
+		
+		// Clear children and reset flags
 		this.subdivided = false;
 		this.isMesh = true;
 		this.children = [];
+		this.nodesLoaded = 0;
 	}
 
 	/**
@@ -244,27 +244,17 @@ export abstract class MapNode extends Mesh
 			
 			// @ts-ignore
 			this.material.map = texture;
-			// @ts-ignore
-			this.material.needsUpdate = true;
 		}
 		catch (e) 
 		{
-			const canvas = CanvasUtils.createOffscreenCanvas(1, 1);
-			const context = canvas.getContext('2d');
-			context.fillStyle = '#FF0000';
-			context.fillRect(0, 0, 1, 1);
-
-			const texture = new Texture(canvas as any);
-			texture.generateMipmaps = false;
-			texture.needsUpdate = true;
-
 			// @ts-ignore
-			this.material.map = texture;
-			// @ts-ignore
-			this.material.needsUpdate = true;
+			this.material.map = TextureUtils.createFillTexture();
 		}
-	}
 
+		// @ts-ignore
+		this.material.needsUpdate = true;
+	}
+1
 	/**
 	 * Increment the child loaded counter.
 	 *
@@ -272,11 +262,16 @@ export abstract class MapNode extends Mesh
 	 */
 	public nodeReady(): void
 	{
+		if (this.disposed) {
+			console.error('Geo-Three: nodeReady() called for disposed node.', this);
+			return;
+		}
+
 		if (this.parentNode !== null) 
 		{
 			this.parentNode.nodesLoaded++;
 
-			if (this.parentNode.nodesLoaded >= MapNode.childrens) 
+			if (this.parentNode.nodesLoaded == MapNode.childrens) 
 			{
 				if (this.parentNode.subdivided === true) 
 				{
@@ -288,11 +283,28 @@ export abstract class MapNode extends Mesh
 					this.parentNode.children[i].visible = true;
 				}
 			}
+
+			if (this.parentNode.nodesLoaded > MapNode.childrens) {
+				console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
+			}
 		}
 		// If its the root object just set visible
 		else
 		{
 			this.visible = true;
 		}
+	}
+
+	/**
+	 * Dispose the map node and its resources.
+	 * 
+	 * Cancel all ongoing requests for data.
+	 */
+	public dispose(): void {
+		this.disposed = true;
+
+		const self = this as Mesh;
+		(self.material as Material).dispose();
+		self.geometry.dispose();
 	}
 }

@@ -30,6 +30,7 @@ export class MapPlaneNode extends MapNode
 		super.initialize();
 		
 		await this.loadData();
+		
 		this.nodeReady();
 	}
 

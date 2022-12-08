@@ -78,13 +78,13 @@ export class MapView extends Mesh
 	public root: MapNode = null;
 
 	/**
-	 * Flag to indicate if objects of map nodes that are no longer in use should be kept in memory.
+	 * Indicate if the nodes should cache its children when it is simplified. Nodes that are no longer in use should be kept in memory.
 	 * 
 	 * Usefull for fast moving scenarios to prevent reparsing data in fast moving scenes.
 	 * 
-	 * Should be kept off unless required.
+	 * Should only be used if the child generation process is time consuming. Should be kept off unless required.
 	 */
-	public cacheChild: boolean = false;
+	public cacheTiles: boolean = false;
 
 	/**
 	 * Constructor for the map view objects.

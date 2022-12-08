@@ -14,19 +14,21 @@ export declare abstract class MapNode extends Mesh {
     level: number;
     x: number;
     y: number;
-    nodesLoaded: number;
     subdivided: boolean;
+    disposed: boolean;
+    nodesLoaded: number;
     childrenCache: Object3D[];
-    cacheTiles: boolean;
-    isMesh: boolean;
     static baseGeometry: BufferGeometry;
     static baseScale: Vector3;
     static childrens: number;
+    isMesh: boolean;
     constructor(parentNode?: MapNode, mapView?: MapView, location?: number, level?: number, x?: number, y?: number, geometry?: BufferGeometry, material?: Material);
     initialize(): Promise<void>;
     createChildNodes(): void;
     subdivide(): void;
     simplify(): void;
     loadData(): Promise<void>;
+    1: any;
     nodeReady(): void;
+    dispose(): void;
 }

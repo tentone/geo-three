@@ -49,6 +49,7 @@ export class MapSphereNode extends MapNode
 		super.initialize();
 		
 		await this.loadData();
+		
 		this.nodeReady();
 	}
 
