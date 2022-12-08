@@ -1,4 +1,4 @@
-import { Vector2 } from 'three';
+import { Vector2, Vector3 } from 'three';
 import { Geolocation } from './Geolocation';
 export declare class UnitsUtils {
     static EARTH_RADIUS: number;
@@ -9,4 +9,5 @@ export declare class UnitsUtils {
     static datumsToSpherical(latitude: number, longitude: number): Vector2;
     static sphericalToDatums(x: number, y: number): Geolocation;
     static quadtreeToDatums(zoom: number, x: number, y: number): Geolocation;
+    static vectorToDatums(dir: Vector3): Geolocation;
 }

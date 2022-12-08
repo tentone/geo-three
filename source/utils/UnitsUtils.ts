@@ -1,4 +1,4 @@
-import {Vector2} from 'three';
+import {Vector2, Vector3} from 'three';
 import {Geolocation} from './Geolocation';
 
 /**
@@ -84,6 +84,18 @@ export class UnitsUtils
 		const longitude = x / n * 360.0 - 180.0;
 		const latitudeRad = Math.atan(Math.sinh(Math.PI * (1.0 - 2.0 * y / n)));
 		const latitude = 180.0 * (latitudeRad / Math.PI);
+
+		return new Geolocation(latitude, longitude);
+	}
+
+	/**
+	 * Direction vector to WGS84 coordinates.
+	 * 
+	 * @param dir - Direction vector.
+	 */
+	public static vectorToDatums(dir: Vector3): Geolocation {
+		const latitude = Math.atan2(dir.z, Math.sqrt(dir.x*dir.x + dir.y*dir.y));
+		const longitude = Math.atan2(dir.y, dir.x);
 
 		return new Geolocation(latitude, longitude);
 	}

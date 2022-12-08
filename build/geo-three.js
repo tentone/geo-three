@@ -355,6 +355,11 @@
 	        const latitude = 180.0 * (latitudeRad / Math.PI);
 	        return new Geolocation(latitude, longitude);
 	    }
+	    static vectorToDatums(dir) {
+	        const latitude = Math.atan2(dir.z, Math.sqrt(dir.x * dir.x + dir.y * dir.y));
+	        const longitude = Math.atan2(dir.y, dir.x);
+	        return new Geolocation(latitude, longitude);
+	    }
 	}
 	UnitsUtils.EARTH_RADIUS = 6371008;
 	UnitsUtils.EARTH_RADIUS_A = 6378137.0;
