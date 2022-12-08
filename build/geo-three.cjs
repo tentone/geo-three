@@ -367,6 +367,9 @@ class UnitsUtils {
         const longitude = Math.atan2(dir.y, dir.x) * radToDeg;
         return new Geolocation(latitude, longitude);
     }
+    static mapboxAltitude(color) {
+        return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
+    }
 }
 UnitsUtils.EARTH_RADIUS = 6371008;
 UnitsUtils.EARTH_RADIUS_A = 6378137.0;
@@ -543,13 +546,18 @@ class MapHeightNode extends MapNode {
             if (this.mapView.heightProvider === null) {
                 throw new Error('GeoThree: MapView.heightProvider provider is null.');
             }
-            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-            const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
-            const context = canvas.getContext('2d');
-            context.imageSmoothingEnabled = false;
-            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
-            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-            this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+            try {
+                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+                const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+                const context = canvas.getContext('2d');
+                context.imageSmoothingEnabled = false;
+                context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+            }
+            catch (e) {
+                this.geometry = MapPlaneNode.baseGeometry;
+            }
             this.heightLoaded = true;
         });
     }
@@ -783,7 +791,7 @@ class MapHeightNodeShader extends MapHeightNode {
             }
             catch (e) {
                 console.error('Geo-Three: Failed to load node tile height data.', this);
-                this.material.map = TextureUtils.createFillTexture('#000000');
+                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#017090');
             }
             this.material.needsUpdate = true;
             this.heightLoaded = true;
@@ -1844,6 +1852,7 @@ class CancelablePromise {
 exports.BingMapsProvider = BingMapsProvider;
 exports.CancelablePromise = CancelablePromise;
 exports.DebugProvider = DebugProvider;
+exports.Geolocation = Geolocation;
 exports.GeolocationUtils = GeolocationUtils;
 exports.GoogleMapsProvider = GoogleMapsProvider;
 exports.HeightDebugProvider = HeightDebugProvider;

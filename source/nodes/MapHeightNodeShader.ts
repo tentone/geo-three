@@ -145,7 +145,7 @@ export class MapHeightNodeShader extends MapHeightNode
 			
 			// Water level texture (assume that missing texture will be water level)
 			// @ts-ignore
-			this.material.userData.heightMap.value = TextureUtils.createFillTexture('#019090');
+			this.material.userData.heightMap.value = TextureUtils.createFillTexture('#017090');
 		}
 
 		// @ts-ignore
