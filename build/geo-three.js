@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -543,13 +545,18 @@
 	            if (this.mapView.heightProvider === null) {
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	            }
-	            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-	            const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
-	            const context = canvas.getContext('2d');
-	            context.imageSmoothingEnabled = false;
-	            context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
-	            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-	            this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+	            try {
+	                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	                const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+	                const context = canvas.getContext('2d');
+	                context.imageSmoothingEnabled = false;
+	                context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+	                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+	                this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+	            }
+	            catch (e) {
+	                this.geometry = MapPlaneNode.baseGeometry;
+	            }
 	            this.heightLoaded = true;
 	        });
 	    }
@@ -783,7 +790,7 @@
 	            }
 	            catch (e) {
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
-	                this.material.map = TextureUtils.createFillTexture('#000000');
+	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#000000');
 	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
@@ -1871,3 +1878,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=geo-three.js.map

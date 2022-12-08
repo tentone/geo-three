@@ -135,17 +135,22 @@ export class MapHeightNode extends MapNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
  
-		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+		try {
+			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
  
-		const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
- 
-		const context = canvas.getContext('2d');
-		context.imageSmoothingEnabled = false;
-		context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
- 
-		const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
- 
-		this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+	 
+			const context = canvas.getContext('2d');
+			context.imageSmoothingEnabled = false;
+			context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+	 
+			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+	 
+			this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
+		} catch(e) {
+			this.geometry = MapPlaneNode.baseGeometry;
+		}
+
 		this.heightLoaded = true;
 	}
 
