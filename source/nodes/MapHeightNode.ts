@@ -98,7 +98,11 @@ export class MapHeightNode extends MapNode
 		try 
 		{
 			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
-		
+
+			if (this.disposed) {
+				return;
+			}
+
 			const texture = new Texture(image);
 			texture.generateMipmaps = false;
 			texture.format = RGBAFormat;
@@ -111,6 +115,10 @@ export class MapHeightNode extends MapNode
 		}
 		catch (e) 
 		{
+			if (this.disposed) {
+				return;
+			}
+
 			console.error('Geo-Three: Failed to load node tile data.', this);
 
 			// @ts-ignore
@@ -138,6 +146,10 @@ export class MapHeightNode extends MapNode
 		try {
 			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
  
+			if (this.disposed) {
+				return;
+			}
+
 			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 	 
 			const context = canvas.getContext('2d');
@@ -148,6 +160,10 @@ export class MapHeightNode extends MapNode
 	 
 			this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 		} catch(e) {
+			if (this.disposed) {
+				return;
+			}
+			
 			this.geometry = MapPlaneNode.baseGeometry;
 		}
 

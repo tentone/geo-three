@@ -26,7 +26,7 @@ export class CancelablePromise<T>
 	public rejected: boolean = false;
 
 	/**
-	 * Flag set true when the resolve of reject method are called.
+	 * Flag set true when the resolve or reject method are called.
 	 */
 	public called: boolean = false;
 
@@ -131,7 +131,7 @@ export class CancelablePromise<T>
 	 */
 	public finally(callback: Function): CancelablePromise<T>
 	{
-		// TODO: not implemented
+		// TODO <ADD CODE HERE>
 		return this;
 	}
 

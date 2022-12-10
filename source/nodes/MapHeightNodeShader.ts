@@ -95,6 +95,10 @@ export class MapHeightNodeShader extends MapHeightNode
 		{
 			const image = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 
+			if (this.disposed) {
+				return;
+			}
+
 			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
 			texture.format = RGBAFormat;
@@ -128,8 +132,13 @@ export class MapHeightNodeShader extends MapHeightNode
 
 		try 
 		{
-			const texture = new Texture();
-			texture.image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+
+			if (this.disposed) {
+				return;
+			}
+			
+			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
 			texture.format = RGBAFormat;
 			texture.magFilter = NearestFilter;
@@ -141,6 +150,10 @@ export class MapHeightNodeShader extends MapHeightNode
 		}
 		catch (e) 
 		{
+			if (this.disposed) {
+				return;
+			}
+			
 			console.error('Geo-Three: Failed to load node tile height data.', this);
 			
 			// Water level texture (assume that missing texture will be water level)

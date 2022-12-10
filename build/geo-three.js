@@ -1,3 +1,5 @@
+
+(function(l, r) { if (!l || l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (self.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(self.document);
 (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('three')) :
 	typeof define === 'function' && define.amd ? define(['exports', 'three'], factory) :
@@ -277,6 +279,9 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            try {
 	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+	                if (this.disposed) {
+	                    return;
+	                }
 	                const texture = new three.Texture(image);
 	                texture.generateMipmaps = false;
 	                texture.format = three.RGBAFormat;
@@ -286,6 +291,9 @@
 	                this.material.map = texture;
 	            }
 	            catch (e) {
+	                if (this.disposed) {
+	                    return;
+	                }
 	                console.error('Geo-Three: Failed to load node tile data.', this);
 	                this.material.map = TextureUtils.createFillTexture();
 	            }
@@ -525,6 +533,9 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            try {
 	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+	                if (this.disposed) {
+	                    return;
+	                }
 	                const texture = new three.Texture(image);
 	                texture.generateMipmaps = false;
 	                texture.format = three.RGBAFormat;
@@ -534,6 +545,9 @@
 	                this.material.map = texture;
 	            }
 	            catch (e) {
+	                if (this.disposed) {
+	                    return;
+	                }
 	                console.error('Geo-Three: Failed to load node tile data.', this);
 	                this.material.map = TextureUtils.createFillTexture();
 	            }
@@ -548,6 +562,9 @@
 	            }
 	            try {
 	                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	                if (this.disposed) {
+	                    return;
+	                }
 	                const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 	                const context = canvas.getContext('2d');
 	                context.imageSmoothingEnabled = false;
@@ -556,6 +573,9 @@
 	                this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 	            }
 	            catch (e) {
+	                if (this.disposed) {
+	                    return;
+	                }
 	                this.geometry = MapPlaneNode.baseGeometry;
 	            }
 	            this.heightLoaded = true;
@@ -758,6 +778,9 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            try {
 	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+	                if (this.disposed) {
+	                    return;
+	                }
 	                const texture = new three.Texture(image);
 	                texture.generateMipmaps = false;
 	                texture.format = three.RGBAFormat;
@@ -780,8 +803,11 @@
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	            }
 	            try {
-	                const texture = new three.Texture();
-	                texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	                if (this.disposed) {
+	                    return;
+	                }
+	                const texture = new three.Texture(image);
 	                texture.generateMipmaps = false;
 	                texture.format = three.RGBAFormat;
 	                texture.magFilter = three.NearestFilter;
@@ -790,6 +816,9 @@
 	                this.material.userData.heightMap.value = texture;
 	            }
 	            catch (e) {
+	                if (this.disposed) {
+	                    return;
+	                }
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
 	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#0186C0');
 	            }
@@ -1261,6 +1290,9 @@
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
 	            }
 	            const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+	            if (this.disposed) {
+	                return;
+	            }
 	            this.processHeight(image);
 	            this.heightLoaded = true;
 	            this.nodeReady();
@@ -1880,3 +1912,4 @@
 	Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+//# sourceMappingURL=geo-three.js.map

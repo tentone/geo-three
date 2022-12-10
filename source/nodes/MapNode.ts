@@ -243,6 +243,10 @@ export abstract class MapNode extends Mesh
 		{
 			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 		
+			if (this.disposed) {
+				return;
+			}
+			
 			const texture = new Texture(image);
 			texture.generateMipmaps = false;
 			texture.format = RGBAFormat;
@@ -255,6 +259,10 @@ export abstract class MapNode extends Mesh
 		}
 		catch (e) 
 		{
+			if (this.disposed) {
+				return;
+			}
+			
 			console.error('Geo-Three: Failed to load node tile data.', this);
 
 			// @ts-ignore
