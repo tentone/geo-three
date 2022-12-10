@@ -7,11 +7,11 @@
 	"module": "build/geo-three.module.js",
 	"exports": {
 		".": {
-		  "import": "./build/geo-three.module.js",
-		  "require": "./build/geo-three.cjs"
+			"import": "./build/geo-three.module.js",
+			"require": "./build/geo-three.cjs"
 		},
 		"./source/*": "./source/*"
-	  },
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/tentone/geothree.git"
@@ -43,8 +43,8 @@
 	"devDependencies": {
 		"@rollup/plugin-strip": "~2.1.0",
 		"@rollup/plugin-typescript": "~8.3.1",
-		"@types/offscreencanvas": "~2019.6.4",
 		"@types/node": "~16.9.0",
+		"@types/offscreencanvas": "~2019.6.4",
 		"@types/three": "^0.140.0",
 		"@typescript-eslint/eslint-plugin": "~5.12.1",
 		"@typescript-eslint/parser": "~5.17.0",
@@ -58,6 +58,5 @@
 		"three": "^0.147.0",
 		"typedoc": "~0.22.13",
 		"typescript": "~4.5.5"
-	},
-	"dependencies": {}
+	}
 }

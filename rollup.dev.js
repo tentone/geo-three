@@ -3,8 +3,8 @@ import typescript from '@rollup/plugin-typescript';
 import livereload from 'rollup-plugin-livereload';
 
 export default {
-	external: ['three'],
 	input: 'source/Main.ts',
+	external: ['three'],
 	plugins: [
 		typescript({ tsconfig: './tsconfig.json' }),
 		serve({
