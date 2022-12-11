@@ -1,8 +1,11 @@
 var canvas = document.getElementById("canvas");
 
+const SPACE = 0;
+const EARTH = 1;
+
 var scenes = [createWorldScene(), createMapScene()];
 
-var active = 0;
+var active = SPACE;
 
 
 var renderer = new THREE.WebGLRenderer({
@@ -14,26 +17,28 @@ function createWorldScene() {
     var scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
     
+    // Globe
     var loader = new THREE.TextureLoader();
     loader.load('assets/texture_16k.jpg', function(texture) {
-        loader.load('assets/clouds_8k.jpg', function(cloudsTexture) {
-            var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 128, 128), new THREE.MeshBasicMaterial({
-                map: texture
-            }));
-            scene.add(sphere);
-
-            // var clouds = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS + 3e5, 128, 128), new THREE.MeshBasicMaterial({
-            //     map: cloudsTexture,
-            //     transparent: true,
-            //     blending: THREE.AdditiveBlending
-            // }));
-            // clouds.onBeforeRender = function() {
-            //     clouds.rotation.y += 1e-5;
-            // };
-            // scene.add(clouds);
-        });
+        var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 256, 256), new THREE.MeshBasicMaterial({
+            map: texture
+        }));
+        scene.add(sphere);
     });
     
+    // Clouds
+    // loader.load('assets/clouds_8k.jpg', function(cloudsTexture) {
+    //     var clouds = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS + 3e5, 128, 128), new THREE.MeshBasicMaterial({
+    //         map: cloudsTexture,
+    //         transparent: true,
+    //         blending: THREE.AdditiveBlending
+    //     }));
+    //     clouds.onBeforeRender = function() {
+    //         clouds.rotation.y += 1e-5;
+    //     };
+    //     scene.add(clouds);
+    // });
+
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e8);
     
     var controls = new THREE.MapControls(camera, canvas);
@@ -88,33 +93,37 @@ document.body.onresize = function()
 }
 document.body.onresize();
 
-const pointer = new THREE.Vector2();
-window.addEventListener('pointermove', function (event) {
-    pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-});
-
-window.addEventListener('dblclick', function (event) {
-    const s = scenes[active];
-    const intersects = raycaster.intersectObjects(s.scene.children);
-    console.log('Raycasting intersections', intersects);
-    if (intersects.length > 0) {
-        const pos = Geo.UnitsUtils.vectorToDatums(intersects[0].point);
-        console.log(pos);
-    }
-    
-});
-
 function animate()
 {
     requestAnimationFrame(animate);
     
     const s = scenes[active];
 
-    raycaster.setFromCamera(pointer, s.camera);
-
     s.controls.update();
-    
     renderer.render(s.scene, s.camera);
+
+    if (active === SPACE) {
+        const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
+        if (distance < 1100000) {
+            console.log('Distance to earth', distance);
+
+            const pointer = new THREE.Vector2(0.5, 0.5);
+            raycaster.setFromCamera(pointer, s.camera);
+
+            const intersects = raycaster.intersectObjects(s.scene.children);
+            console.log('Raycasting intersections', intersects);
+            if (intersects.length > 0) {
+                const pos = Geo.UnitsUtils.vectorToDatums(intersects[0].point);
+                console.log('Calculated coordinates', pos);
+            }
+
+            
+
+
+        }
+    }
+
+
+    
 }
 animate();
