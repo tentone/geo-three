@@ -47,7 +47,7 @@ function createWorldScene() {
     controls.enablePan = false;
     controls.zoomSpeed = 1.0;
     controls.rotateSpeed = 0.3; 
-    camera.position.set(0, 0, Geo.UnitsUtils.EARTH_RADIUS);
+    camera.position.set(0, 0, Geo.UnitsUtils.EARTH_RADIUS + 1e7);
 
     return {camera: camera, controls: controls, scene: scene};
 }
