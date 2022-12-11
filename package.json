@@ -38,14 +38,14 @@
 	"author": "Tentone",
 	"license": "MIT",
 	"peerDependencies": {
-		"three": ">0.120.0"
+		"three": "^0.147.0"
 	},
 	"devDependencies": {
 		"@rollup/plugin-strip": "~2.1.0",
 		"@rollup/plugin-typescript": "~8.3.1",
 		"@types/node": "~16.9.0",
 		"@types/offscreencanvas": "~2019.6.4",
-		"@types/three": "^0.140.0",
+		"@types/three": "^0.146.0",
 		"@typescript-eslint/eslint-plugin": "~5.12.1",
 		"@typescript-eslint/parser": "~5.17.0",
 		"eslint": "~8.29.0",

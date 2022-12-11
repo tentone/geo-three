@@ -99,8 +99,8 @@ export class UnitsUtils
 	public static vectorToDatums(dir: Vector3): Geolocation {
 		const radToDeg = 180 / Math.PI;
 
-		const longitude = Math.atan2(-dir.z, Math.sqrt(dir.x*dir.x + dir.y*dir.y)) * radToDeg;
-		const latitude = Math.atan2(dir.y, dir.x) * radToDeg;
+		const latitude = Math.atan2(dir.y, Math.sqrt(Math.pow(dir.x, 2) + Math.pow(-dir.z, 2))) * radToDeg;
+		const longitude = Math.atan2(-dir.z, dir.x) * radToDeg;
 
 		return new Geolocation(latitude, longitude);
 	}
