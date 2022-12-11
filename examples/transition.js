@@ -15,11 +15,23 @@ function createWorldScene() {
     scene.background = new THREE.Color(0x000000);
     
     var loader = new THREE.TextureLoader();
-    loader.load('texture.jpg', function(texture) {
-        var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 128, 128), new THREE.MeshBasicMaterial({
-            map: texture
-        }));
-        scene.add(sphere);
+    loader.load('assets/texture_16k.jpg', function(texture) {
+        loader.load('assets/clouds_8k.jpg', function(cloudsTexture) {
+            var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 128, 128), new THREE.MeshBasicMaterial({
+                map: texture
+            }));
+            scene.add(sphere);
+
+            // var clouds = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS + 3e5, 128, 128), new THREE.MeshBasicMaterial({
+            //     map: cloudsTexture,
+            //     transparent: true,
+            //     blending: THREE.AdditiveBlending
+            // }));
+            // clouds.onBeforeRender = function() {
+            //     clouds.rotation.y += 1e-5;
+            // };
+            // scene.add(clouds);
+        });
     });
     
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e8);
@@ -83,7 +95,8 @@ window.addEventListener('pointermove', function (event) {
 });
 
 window.addEventListener('dblclick', function (event) {
-    const intersects = raycaster.intersectObjects(worldScene.children);
+    const s = scenes[active];
+    const intersects = raycaster.intersectObjects(s.scene.children);
     console.log('Raycasting intersections', intersects);
     if (intersects.length > 0) {
         const pos = Geo.UnitsUtils.vectorToDatums(intersects[0].point);
