@@ -108,3 +108,13 @@ pnpm-lock.yaml
 yarn.lock
 
 examples/texture.jpg
+
+examples/cities_16k.png
+
+examples/clouds_8k.jpg
+
+examples/texture_16k.jpg
+
+examples/texture_8k.jpg
+
+examples/water_16k.png

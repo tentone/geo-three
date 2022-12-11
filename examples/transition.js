@@ -1,54 +1,78 @@
 var canvas = document.getElementById("canvas");
 
+var scenes = [createWorldScene(), createMapScene()];
+
+var active = 0;
+
+
 var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true
 });
 
-var worldScene = new THREE.Scene();
-worldScene.background = new THREE.Color(0x000000);
+function createWorldScene() {
+    var scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+    
+    var loader = new THREE.TextureLoader();
+    loader.load('texture.jpg', function(texture) {
+        var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 128, 128), new THREE.MeshBasicMaterial({
+            map: texture
+        }));
+        scene.add(sphere);
+    });
+    
+    var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e8);
+    
+    var controls = new THREE.MapControls(camera, canvas);
+    controls.minDistance = Geo.UnitsUtils.EARTH_RADIUS + 3e4;
+    controls.maxDistance = Geo.UnitsUtils.EARTH_RADIUS * 1e1;
+    controls.enablePan = false;
+    controls.zoomSpeed = 1.0;
+    controls.rotateSpeed = 0.3; 
+    camera.position.set(0, 0, Geo.UnitsUtils.EARTH_RADIUS);
 
-var loader = new THREE.TextureLoader();
-loader.load('texture.jpg', function(texture) {
-    var sphere = new THREE.Mesh(new THREE.SphereGeometry(100, 128, 128), new THREE.MeshBasicMaterial({
-        map: texture
-    }));
-    worldScene.add(sphere);
-});
+    return {camera: camera, controls: controls, scene: scene};
+}
 
+function createMapScene() {
+    var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e12);
 
+    var controls = new THREE.OrbitControls(camera, canvas);
+    controls.minDistance = 1.0;
+    controls.maxDistance = 1.0;
+    controls.zoomSpeed = 2.0;
+    camera.position.set(0, 0, 100);
 
-var scene = new THREE.Scene();
-scene.background = new THREE.Color(0x444444);
+    var scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x444444);
 
-var map = new Geo.MapView(Geo.MapView.PLANAR, new Geo.OpenStreetMapsProvider());
-scene.add(map);
-map.updateMatrixWorld(true);
+    var map = new Geo.MapView(Geo.MapView.PLANAR, new Geo.OpenStreetMapsProvider());
+    scene.add(map);
+    map.updateMatrixWorld(true);
 
-var camera = new THREE.PerspectiveCamera(80, 1, 0.01, 1e12);
+    var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
+    controls.target.set(coords.x, 0, -coords.y);
+    camera.position.set(0, 1000, 0);
 
-var controls = new THREE.MapControls(camera, canvas);
-controls.minDistance = 0.0;
-controls.zoomSpeed = 2.0;
-camera.position.set(0, 200, 0);
-// controls.target.set(coords.x, 0, -coords.y);
-// camera.position.set(0, 1000, 0);
+    scene.add(new THREE.AmbientLight(0x777777));
 
-// var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
-// controls.target.set(coords.x, 0, -coords.y);
-// camera.position.set(0, 1000, 0);
+    return {camera: camera, controls: controls, scene: scene};
+}
 
-scene.add(new THREE.AmbientLight(0x777777));
 
 var raycaster = new THREE.Raycaster();
 
 document.body.onresize = function()
 {
+    const s = scenes[active];
+    
     var width = window.innerWidth;
     var height = window.innerHeight;
     renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
+    
+    s.camera.aspect = width / height;
+    s.camera.updateProjectionMatrix();
 }
 document.body.onresize();
 
@@ -72,11 +96,12 @@ function animate()
 {
     requestAnimationFrame(animate);
     
-    raycaster.setFromCamera(pointer, camera);
+    const s = scenes[active];
 
-    controls.update();
+    raycaster.setFromCamera(pointer, s.camera);
+
+    s.controls.update();
     
-    renderer.render(worldScene, camera);
-    //renderer.render(scene, camera);
+    renderer.render(s.scene, s.camera);
 }
 animate();
