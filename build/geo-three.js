@@ -67,119 +67,6 @@
 	    });
 	}
 
-	class MapNodeGeometry extends three.BufferGeometry {
-	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0) {
-	        super();
-	        const indices = [];
-	        const vertices = [];
-	        const normals = [];
-	        const uvs = [];
-	        MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
-	        if (skirt) {
-	            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
-	        }
-	        this.setIndex(indices);
-	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
-	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
-	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
-	    }
-	    static buildPlane(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, indices, vertices, normals, uvs) {
-	        const widthHalf = width / 2;
-	        const heightHalf = height / 2;
-	        const gridX = widthSegments + 1;
-	        const gridZ = heightSegments + 1;
-	        const segmentWidth = width / widthSegments;
-	        const segmentHeight = height / heightSegments;
-	        for (let iz = 0; iz < gridZ; iz++) {
-	            const z = iz * segmentHeight - heightHalf;
-	            for (let ix = 0; ix < gridX; ix++) {
-	                const x = ix * segmentWidth - widthHalf;
-	                vertices.push(x, 0, z);
-	                normals.push(0, 1, 0);
-	                uvs.push(ix / widthSegments, 1 - iz / heightSegments);
-	            }
-	        }
-	        for (let iz = 0; iz < heightSegments; iz++) {
-	            for (let ix = 0; ix < widthSegments; ix++) {
-	                const a = ix + gridX * iz;
-	                const b = ix + gridX * (iz + 1);
-	                const c = ix + 1 + gridX * (iz + 1);
-	                const d = ix + 1 + gridX * iz;
-	                indices.push(a, b, d, b, c, d);
-	            }
-	        }
-	    }
-	    static buildSkirt(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirtDepth, indices, vertices, normals, uvs) {
-	        const widthHalf = width / 2;
-	        const heightHalf = height / 2;
-	        const gridX = widthSegments + 1;
-	        const gridZ = heightSegments + 1;
-	        const segmentWidth = width / widthSegments;
-	        const segmentHeight = height / heightSegments;
-	        let start = vertices.length / 3;
-	        for (let ix = 0; ix < gridX; ix++) {
-	            const x = ix * segmentWidth - widthHalf;
-	            const z = -heightHalf;
-	            vertices.push(x, -skirtDepth, z);
-	            normals.push(0, 1, 0);
-	            uvs.push(ix / widthSegments, 1);
-	        }
-	        for (let ix = 0; ix < widthSegments; ix++) {
-	            const a = ix;
-	            const d = ix + 1;
-	            const b = ix + start;
-	            const c = ix + start + 1;
-	            indices.push(d, b, a, d, c, b);
-	        }
-	        start = vertices.length / 3;
-	        for (let ix = 0; ix < gridX; ix++) {
-	            const x = ix * segmentWidth - widthHalf;
-	            const z = heightSegments * segmentHeight - heightHalf;
-	            vertices.push(x, -skirtDepth, z);
-	            normals.push(0, 1, 0);
-	            uvs.push(ix / widthSegments, 0);
-	        }
-	        let offset = gridX * gridZ - widthSegments - 1;
-	        for (let ix = 0; ix < widthSegments; ix++) {
-	            const a = offset + ix;
-	            const d = offset + ix + 1;
-	            const b = ix + start;
-	            const c = ix + start + 1;
-	            indices.push(a, b, d, b, c, d);
-	        }
-	        start = vertices.length / 3;
-	        for (let iz = 0; iz < gridZ; iz++) {
-	            const z = iz * segmentHeight - heightHalf;
-	            const x = -widthHalf;
-	            vertices.push(x, -skirtDepth, z);
-	            normals.push(0, 1, 0);
-	            uvs.push(0, 1 - iz / heightSegments);
-	        }
-	        for (let iz = 0; iz < heightSegments; iz++) {
-	            const a = iz * gridZ;
-	            const d = (iz + 1) * gridZ;
-	            const b = iz + start;
-	            const c = iz + start + 1;
-	            indices.push(a, b, d, b, c, d);
-	        }
-	        start = vertices.length / 3;
-	        for (let iz = 0; iz < gridZ; iz++) {
-	            const z = iz * segmentHeight - heightHalf;
-	            const x = widthSegments * segmentWidth - widthHalf;
-	            vertices.push(x, -skirtDepth, z);
-	            normals.push(0, 1, 0);
-	            uvs.push(1.0, 1 - iz / heightSegments);
-	        }
-	        for (let iz = 0; iz < heightSegments; iz++) {
-	            const a = iz * gridZ + heightSegments;
-	            const d = (iz + 1) * gridZ + heightSegments;
-	            const b = iz + start;
-	            const c = iz + start + 1;
-	            indices.push(d, b, a, d, c, b);
-	        }
-	    }
-	}
-
 	class CanvasUtils {
 	    static createOffscreenCanvas(width, height) {
 	        if (typeof OffscreenCanvas !== 'undefined') {
@@ -195,7 +82,7 @@
 	}
 
 	class TextureUtils {
-	    static createFillTexture(color = '#FF0000', width = 1, height = 1) {
+	    static createFillTexture(color = '#000000', width = 1, height = 1) {
 	        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
 	        const context = canvas.getContext('2d');
 	        context.fillStyle = color;
@@ -341,6 +228,119 @@
 	MapNode.baseGeometry = null;
 	MapNode.baseScale = null;
 	MapNode.childrens = 4;
+
+	class MapNodeGeometry extends three.BufferGeometry {
+	    constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0) {
+	        super();
+	        const indices = [];
+	        const vertices = [];
+	        const normals = [];
+	        const uvs = [];
+	        MapNodeGeometry.buildPlane(width, height, widthSegments, heightSegments, indices, vertices, normals, uvs);
+	        if (skirt) {
+	            MapNodeGeometry.buildSkirt(width, height, widthSegments, heightSegments, skirtDepth, indices, vertices, normals, uvs);
+	        }
+	        this.setIndex(indices);
+	        this.setAttribute('position', new three.Float32BufferAttribute(vertices, 3));
+	        this.setAttribute('normal', new three.Float32BufferAttribute(normals, 3));
+	        this.setAttribute('uv', new three.Float32BufferAttribute(uvs, 2));
+	    }
+	    static buildPlane(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, indices, vertices, normals, uvs) {
+	        const widthHalf = width / 2;
+	        const heightHalf = height / 2;
+	        const gridX = widthSegments + 1;
+	        const gridZ = heightSegments + 1;
+	        const segmentWidth = width / widthSegments;
+	        const segmentHeight = height / heightSegments;
+	        for (let iz = 0; iz < gridZ; iz++) {
+	            const z = iz * segmentHeight - heightHalf;
+	            for (let ix = 0; ix < gridX; ix++) {
+	                const x = ix * segmentWidth - widthHalf;
+	                vertices.push(x, 0, z);
+	                normals.push(0, 1, 0);
+	                uvs.push(ix / widthSegments, 1 - iz / heightSegments);
+	            }
+	        }
+	        for (let iz = 0; iz < heightSegments; iz++) {
+	            for (let ix = 0; ix < widthSegments; ix++) {
+	                const a = ix + gridX * iz;
+	                const b = ix + gridX * (iz + 1);
+	                const c = ix + 1 + gridX * (iz + 1);
+	                const d = ix + 1 + gridX * iz;
+	                indices.push(a, b, d, b, c, d);
+	            }
+	        }
+	    }
+	    static buildSkirt(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirtDepth, indices, vertices, normals, uvs) {
+	        const widthHalf = width / 2;
+	        const heightHalf = height / 2;
+	        const gridX = widthSegments + 1;
+	        const gridZ = heightSegments + 1;
+	        const segmentWidth = width / widthSegments;
+	        const segmentHeight = height / heightSegments;
+	        let start = vertices.length / 3;
+	        for (let ix = 0; ix < gridX; ix++) {
+	            const x = ix * segmentWidth - widthHalf;
+	            const z = -heightHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(ix / widthSegments, 1);
+	        }
+	        for (let ix = 0; ix < widthSegments; ix++) {
+	            const a = ix;
+	            const d = ix + 1;
+	            const b = ix + start;
+	            const c = ix + start + 1;
+	            indices.push(d, b, a, d, c, b);
+	        }
+	        start = vertices.length / 3;
+	        for (let ix = 0; ix < gridX; ix++) {
+	            const x = ix * segmentWidth - widthHalf;
+	            const z = heightSegments * segmentHeight - heightHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(ix / widthSegments, 0);
+	        }
+	        let offset = gridX * gridZ - widthSegments - 1;
+	        for (let ix = 0; ix < widthSegments; ix++) {
+	            const a = offset + ix;
+	            const d = offset + ix + 1;
+	            const b = ix + start;
+	            const c = ix + start + 1;
+	            indices.push(a, b, d, b, c, d);
+	        }
+	        start = vertices.length / 3;
+	        for (let iz = 0; iz < gridZ; iz++) {
+	            const z = iz * segmentHeight - heightHalf;
+	            const x = -widthHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(0, 1 - iz / heightSegments);
+	        }
+	        for (let iz = 0; iz < heightSegments; iz++) {
+	            const a = iz * gridZ;
+	            const d = (iz + 1) * gridZ;
+	            const b = iz + start;
+	            const c = iz + start + 1;
+	            indices.push(a, b, d, b, c, d);
+	        }
+	        start = vertices.length / 3;
+	        for (let iz = 0; iz < gridZ; iz++) {
+	            const z = iz * segmentHeight - heightHalf;
+	            const x = widthSegments * segmentWidth - widthHalf;
+	            vertices.push(x, -skirtDepth, z);
+	            normals.push(0, 1, 0);
+	            uvs.push(1.0, 1 - iz / heightSegments);
+	        }
+	        for (let iz = 0; iz < heightSegments; iz++) {
+	            const a = iz * gridZ + heightSegments;
+	            const d = (iz + 1) * gridZ + heightSegments;
+	            const b = iz + start;
+	            const c = iz + start + 1;
+	            indices.push(d, b, a, d, c, b);
+	        }
+	    }
+	}
 
 	class Geolocation {
 	    constructor(latitude, longitude) {
@@ -1319,6 +1319,7 @@
 	        this.provider = provider;
 	        this.heightProvider = heightProvider;
 	        this.setRoot(root);
+	        this.preSubdivide();
 	    }
 	    setRoot(root) {
 	        if (typeof root === 'number') {
@@ -1341,7 +1342,25 @@
 	            this.root.initialize();
 	        }
 	    }
-	    preSubdivide() {
+	    preSubdivide(depth) {
+	        var _a, _b;
+	        function subdivide(node, depth) {
+	            if (depth <= 0) {
+	                return;
+	            }
+	            node.subdivide();
+	            for (let i = 0; i < node.children.length; i++) {
+	                if (node.children[i] instanceof MapNode) {
+	                    const child = node.children[i];
+	                    subdivide(child, depth - 1);
+	                }
+	            }
+	        }
+	        const minZoom = Math.max(this.provider.minZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+	        console.log(minZoom);
+	        if (minZoom > 0) {
+	            subdivide(this.root, minZoom);
+	        }
 	    }
 	    setProvider(provider) {
 	        if (provider !== this.provider) {
@@ -1506,12 +1525,12 @@
 	    constructor(apiKey = '', type = BingMapsProvider.AERIAL) {
 	        super();
 	        this.maxZoom = 19;
+	        this.minZoom = 1;
 	        this.format = 'jpeg';
 	        this.mapSize = 512;
 	        this.subdomain = 't1';
 	        this.apiKey = apiKey;
 	        this.type = type;
-	        this.maxZoom = 19;
 	    }
 	    getMetaData() {
 	        const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;

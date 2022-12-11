@@ -105,6 +105,8 @@ export class MapView extends Mesh
 		this.heightProvider = heightProvider;
 
 		this.setRoot(root);
+		this.preSubdivide();
+
 	}
 
 	/**
@@ -166,9 +168,29 @@ export class MapView extends Mesh
 	/**
 	 * Pre-subdivide map tree to create nodes of levels not available in the provider.
 	 */
-	public preSubdivide(): void 
+	public preSubdivide(depth: number): void 
 	{
-		// TODO <ADD CODE>
+		function subdivide(node: MapNode, depth: number): void {
+			if (depth <= 0) {
+				return;
+			}
+
+			node.subdivide();
+
+			for(let i = 0; i < node.children.length; i++) {
+				if (node.children[i] instanceof MapNode) {
+					const child = node.children[i] as MapNode;
+					subdivide(child, depth - 1);
+				}
+			}
+		}
+
+		const minZoom = Math.max(this.provider.minZoom, this.heightProvider?.minZoom ?? -Infinity);
+		console.log(minZoom);
+		if (minZoom > 0) {
+			
+			subdivide(this.root, minZoom);
+		}
 	}
 
 	/**

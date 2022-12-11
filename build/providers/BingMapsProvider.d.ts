@@ -2,6 +2,7 @@ import { MapProvider } from './MapProvider';
 export declare class BingMapsProvider extends MapProvider {
     static ADDRESS: string;
     maxZoom: number;
+    minZoom: number;
     apiKey: string;
     type: string;
     format: string;

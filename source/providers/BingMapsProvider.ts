@@ -18,9 +18,14 @@ export class BingMapsProvider extends MapProvider
 	public static ADDRESS: string = 'https://dev.virtualearth.net';
 
 	/**
-	 * Maximum zoom level allows by the provider.
+	 * Maximum zoom level allowed by the provider.
 	 */
 	public maxZoom: number = 19;
+
+	/**
+	 * Minimum zoom level allowed by the provider.
+	 */
+	public minZoom: number = 1;
 
 	/**
 	 * Server API access token.
@@ -60,7 +65,6 @@ export class BingMapsProvider extends MapProvider
 
 		this.apiKey = apiKey;
 		this.type = type;
-		this.maxZoom = 19;
 	}
 
 	/**
