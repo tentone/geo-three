@@ -1342,7 +1342,7 @@
 	            this.root.initialize();
 	        }
 	    }
-	    preSubdivide(depth) {
+	    preSubdivide() {
 	        var _a, _b;
 	        function subdivide(node, depth) {
 	            if (depth <= 0) {
@@ -1357,7 +1357,6 @@
 	            }
 	        }
 	        const minZoom = Math.max(this.provider.minZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
-	        console.log(minZoom);
 	        if (minZoom > 0) {
 	            subdivide(this.root, minZoom);
 	        }

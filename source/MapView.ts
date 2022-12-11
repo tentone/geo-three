@@ -167,8 +167,10 @@ export class MapView extends Mesh
 
 	/**
 	 * Pre-subdivide map tree to create nodes of levels not available in the provider.
+	 * 
+	 * Checks for the minimum zoom level in the providers attached to the map view.
 	 */
-	public preSubdivide(depth: number): void 
+	public preSubdivide(): void 
 	{
 		function subdivide(node: MapNode, depth: number): void {
 			if (depth <= 0) {
@@ -186,9 +188,7 @@ export class MapView extends Mesh
 		}
 
 		const minZoom = Math.max(this.provider.minZoom, this.heightProvider?.minZoom ?? -Infinity);
-		console.log(minZoom);
 		if (minZoom > 0) {
-			
 			subdivide(this.root, minZoom);
 		}
 	}
