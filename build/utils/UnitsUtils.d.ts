@@ -10,5 +10,6 @@ export declare class UnitsUtils {
     static sphericalToDatums(x: number, y: number): Geolocation;
     static quadtreeToDatums(zoom: number, x: number, y: number): Geolocation;
     static vectorToDatums(dir: Vector3): Geolocation;
+    static datumsToVector(latitude: number, longitude: number): Vector3;
     static mapboxAltitude(color: Color): number;
 }

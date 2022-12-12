@@ -93,7 +93,7 @@ export class UnitsUtils
 	 * 
 	 * Can be used to transform surface points of world sphere to coordinates.
 	 * 
-	 * @param dir - Direction vector.~
+	 * @param dir - Direction vector.
 	 * @returns WGS84 coordinates.
 	 */
 	public static vectorToDatums(dir: Vector3): Geolocation {
@@ -103,6 +103,24 @@ export class UnitsUtils
 		const longitude = Math.atan2(-dir.z, dir.x) * radToDeg;
 
 		return new Geolocation(latitude, longitude);
+	}
+
+	
+	/**
+	 * Get a direction vector from WGS84 coordinates.
+	 * 
+	 * The vector obtained will be normalized.
+	 * 
+	 * @param latitude - Latitude value in degrees.
+	 * @param longitude - Longitude value in degrees.
+	 * @returns Direction vector normalized.
+	 */
+	public static datumsToVector(latitude: number, longitude: number): Vector3 {
+		const degToRad = Math.PI / 180;
+
+		// TODO <ADD CODE HERE>
+		
+		return new Vector3();
 	}
 
 	/**

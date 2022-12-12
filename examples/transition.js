@@ -55,11 +55,9 @@ function createWorldScene() {
 function createMapScene() {
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e12);
 
-    var controls = new THREE.OrbitControls(camera, canvas);
+    var controls = new THREE.MapControls(camera, canvas);
     controls.minDistance = 1.0;
-    controls.maxDistance = 1.0;
     controls.zoomSpeed = 2.0;
-    camera.position.set(0, 0, 100);
 
     var scene = new THREE.Scene();
     scene.background = new THREE.Color(0x444444);
@@ -67,10 +65,6 @@ function createMapScene() {
     var map = new Geo.MapView(Geo.MapView.PLANAR, new Geo.OpenStreetMapsProvider());
     scene.add(map);
     map.updateMatrixWorld(true);
-
-    var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
-    controls.target.set(coords.x, 0, -coords.y);
-    camera.position.set(0, 1000, 0);
 
     scene.add(new THREE.AmbientLight(0x777777));
 
@@ -82,14 +76,17 @@ var raycaster = new THREE.Raycaster();
 
 document.body.onresize = function()
 {
-    const s = scenes[active];
-    
     var width = window.innerWidth;
     var height = window.innerHeight;
+
     renderer.setSize(width, height);
     
-    s.camera.aspect = width / height;
-    s.camera.updateProjectionMatrix();
+    for (let i = 0; i < scenes.length; i++) {
+        const s = scenes[i];
+        s.camera.aspect = width / height;
+        s.camera.updateProjectionMatrix();
+    }
+
 }
 document.body.onresize();
 
@@ -104,10 +101,10 @@ function animate()
 
     if (active === SPACE) {
         const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
-        if (distance < 1100000) {
+        if (distance < 11e5) {
             console.log('Distance to earth', distance);
 
-            const pointer = new THREE.Vector2(0.5, 0.5);
+            const pointer = new THREE.Vector2(0.0, 0.0);
             raycaster.setFromCamera(pointer, s.camera);
 
             const intersects = raycaster.intersectObjects(s.scene.children);
@@ -115,11 +112,21 @@ function animate()
             if (intersects.length > 0) {
                 const pos = Geo.UnitsUtils.vectorToDatums(intersects[0].point);
                 console.log('Calculated coordinates', pos);
+
+                const earthScene = scenes[EARTH];
+
+                var coords = Geo.UnitsUtils.datumsToSpherical(pos.latitude, pos.longitude);
+                earthScene.controls.target.set(coords.x, 0, -coords.y);
+                earthScene.camera.position.set(coords.x, distance, -coords.y);
+
+                active = EARTH;
             }
-
+        }
+    } else if (active === EARTH) {
+        const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
+        if (distance > 1e4) {
             
-
-
+            active = SPACE;
         }
     }
 

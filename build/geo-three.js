@@ -375,6 +375,9 @@
 	        const longitude = Math.atan2(-dir.z, dir.x) * radToDeg;
 	        return new Geolocation(latitude, longitude);
 	    }
+	    static datumsToVector(latitude, longitude) {
+	        return new three.Vector3();
+	    }
 	    static mapboxAltitude(color) {
 	        return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
 	    }
