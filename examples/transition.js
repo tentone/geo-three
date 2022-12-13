@@ -93,7 +93,7 @@ function animate()
     s.controls.update();
     renderer.render(s.scene, s.camera);
 
-    const toggleDistance = 11e5;
+    const toggleDistance = 2e6;
 
     if (active === SPHERE) {
         // Get distance to the surface of earth
@@ -129,7 +129,7 @@ function animate()
         if (distance > toggleDistance) {
             // Datum coordinates
             const target = s.controls.target;
-            const coords = Geo.UnitsUtils.sphericalToDatums(target.x, target.z);
+            const coords = Geo.UnitsUtils.sphericalToDatums(target.x, -target.z);
 
             // Get sphere surface point from coordinates
             const dir = Geo.UnitsUtils.datumsToVector(coords.latitude, coords.longitude);
