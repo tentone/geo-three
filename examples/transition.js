@@ -56,7 +56,7 @@ function createMapScene() {
     var scene = new THREE.Scene();
     scene.background = new THREE.Color(0x444444);
 
-    var provider = new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.AERIAL); // new Geo.OpenStreetMapsProvider()
+    var provider = new Geo.BingMapsProvider('', Geo.BingMapsProvider.AERIAL); // new Geo.OpenStreetMapsProvider()
 
     var map = new Geo.MapView(Geo.MapView.PLANAR, provider);
     scene.add(map);
