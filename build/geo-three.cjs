@@ -65,6 +65,173 @@ function __awaiter(thisArg, _arguments, P, generator) {
     });
 }
 
+class CanvasUtils {
+    static createOffscreenCanvas(width, height) {
+        if (typeof OffscreenCanvas !== 'undefined') {
+            return new OffscreenCanvas(width, height);
+        }
+        else {
+            let canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            return canvas;
+        }
+    }
+}
+
+class TextureUtils {
+    static createFillTexture(color = '#000000', width = 1, height = 1) {
+        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
+        const context = canvas.getContext('2d');
+        context.fillStyle = color;
+        context.fillRect(0, 0, width, height);
+        const texture = new three.Texture(canvas);
+        texture.format = three.RGBAFormat;
+        texture.magFilter = three.LinearFilter;
+        texture.minFilter = three.LinearFilter;
+        texture.generateMipmaps = false;
+        texture.needsUpdate = true;
+        return texture;
+    }
+}
+
+class QuadTreePosition {
+}
+QuadTreePosition.root = -1;
+QuadTreePosition.topLeft = 0;
+QuadTreePosition.topRight = 1;
+QuadTreePosition.bottomLeft = 2;
+QuadTreePosition.bottomRight = 3;
+class MapNode extends three.Mesh {
+    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
+        super(geometry, material);
+        this.mapView = null;
+        this.parentNode = null;
+        this.subdivided = false;
+        this.disposed = false;
+        this.nodesLoaded = 0;
+        this.childrenCache = null;
+        this.isMesh = true;
+        this.mapView = mapView;
+        this.parentNode = parentNode;
+        this.disposed = false;
+        this.location = location;
+        this.level = level;
+        this.x = x;
+        this.y = y;
+        this.initialize();
+    }
+    initialize() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    createChildNodes() { }
+    subdivide() {
+        const maxZoom = this.mapView.maxZoom();
+        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
+            return;
+        }
+        if (this.mapView.cacheTiles && this.childrenCache !== null) {
+            this.isMesh = false;
+            this.children = this.childrenCache;
+            this.nodesLoaded = this.childrenCache.length;
+        }
+        else {
+            this.createChildNodes();
+        }
+        this.subdivided = true;
+    }
+    simplify() {
+        const minZoom = this.mapView.minZoom();
+        if (this.level - 1 < minZoom) {
+            return;
+        }
+        if (this.mapView.cacheTiles) {
+            this.childrenCache = this.children;
+        }
+        else {
+            for (let i = 0; i < this.children.length; i++) {
+                this.children[i].dispose();
+            }
+        }
+        this.subdivided = false;
+        this.isMesh = true;
+        this.children = [];
+        this.nodesLoaded = 0;
+    }
+    loadData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.level < this.mapView.provider.minZoom || this.level > this.mapView.provider.maxZoom) {
+                console.warn('Geo-Three: Loading tile outside of provider range.', this);
+                this.material.map = MapNode.defaultTexture;
+                this.material.needsUpdate = true;
+                return;
+            }
+            try {
+                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
+                if (this.disposed) {
+                    return;
+                }
+                const texture = new three.Texture(image);
+                texture.generateMipmaps = false;
+                texture.format = three.RGBAFormat;
+                texture.magFilter = three.LinearFilter;
+                texture.minFilter = three.LinearFilter;
+                texture.needsUpdate = true;
+                this.material.map = texture;
+            }
+            catch (e) {
+                if (this.disposed) {
+                    return;
+                }
+                console.warn('Geo-Three: Failed to load node tile data.', this);
+                this.material.map = MapNode.defaultTexture;
+            }
+            this.material.needsUpdate = true;
+        });
+    }
+    nodeReady() {
+        if (this.disposed) {
+            console.warn('Geo-Three: nodeReady() called for disposed node.', this);
+            this.dispose();
+            return;
+        }
+        if (this.parentNode !== null) {
+            this.parentNode.nodesLoaded++;
+            if (this.parentNode.nodesLoaded === MapNode.childrens) {
+                if (this.parentNode.subdivided === true) {
+                    this.parentNode.isMesh = false;
+                }
+                for (let i = 0; i < this.parentNode.children.length; i++) {
+                    this.parentNode.children[i].visible = true;
+                }
+            }
+            if (this.parentNode.nodesLoaded > MapNode.childrens) {
+                console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
+            }
+        }
+        else {
+            this.visible = true;
+        }
+    }
+    dispose() {
+        this.disposed = true;
+        const self = this;
+        try {
+            const material = self.material;
+            material.dispose();
+        }
+        catch (e) { }
+        try {
+            self.geometry.dispose();
+        }
+        catch (e) { }
+    }
+}
+MapNode.defaultTexture = TextureUtils.createFillTexture();
+MapNode.baseGeometry = null;
+MapNode.baseScale = null;
+MapNode.childrens = 4;
+
 class MapNodeGeometry extends three.BufferGeometry {
     constructor(width = 1.0, height = 1.0, widthSegments = 1.0, heightSegments = 1.0, skirt = false, skirtDepth = 10.0) {
         super();
@@ -178,162 +345,6 @@ class MapNodeGeometry extends three.BufferGeometry {
     }
 }
 
-class CanvasUtils {
-    static createOffscreenCanvas(width, height) {
-        if (typeof OffscreenCanvas !== 'undefined') {
-            return new OffscreenCanvas(width, height);
-        }
-        else {
-            let canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            return canvas;
-        }
-    }
-}
-
-class TextureUtils {
-    static createFillTexture(color = '#FF0000', width = 1, height = 1) {
-        const canvas = CanvasUtils.createOffscreenCanvas(width, height);
-        const context = canvas.getContext('2d');
-        context.fillStyle = color;
-        context.fillRect(0, 0, width, height);
-        const texture = new three.Texture(canvas);
-        texture.format = three.RGBAFormat;
-        texture.magFilter = three.LinearFilter;
-        texture.minFilter = three.LinearFilter;
-        texture.generateMipmaps = false;
-        texture.needsUpdate = true;
-        return texture;
-    }
-}
-
-class QuadTreePosition {
-}
-QuadTreePosition.root = -1;
-QuadTreePosition.topLeft = 0;
-QuadTreePosition.topRight = 1;
-QuadTreePosition.bottomLeft = 2;
-QuadTreePosition.bottomRight = 3;
-class MapNode extends three.Mesh {
-    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0, geometry = null, material = null) {
-        super(geometry, material);
-        this.mapView = null;
-        this.parentNode = null;
-        this.subdivided = false;
-        this.disposed = false;
-        this.nodesLoaded = 0;
-        this.childrenCache = null;
-        this.isMesh = true;
-        this.mapView = mapView;
-        this.parentNode = parentNode;
-        this.disposed = false;
-        this.location = location;
-        this.level = level;
-        this.x = x;
-        this.y = y;
-        this.initialize();
-    }
-    initialize() {
-        return __awaiter(this, void 0, void 0, function* () { });
-    }
-    createChildNodes() { }
-    subdivide() {
-        var _a, _b;
-        const maxZoom = Math.min(this.mapView.provider.maxZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.maxZoom) !== null && _b !== void 0 ? _b : Infinity);
-        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
-            return;
-        }
-        if (this.mapView.cacheTiles && this.childrenCache !== null) {
-            this.isMesh = false;
-            this.children = this.childrenCache;
-            this.nodesLoaded = this.childrenCache.length;
-        }
-        else {
-            this.createChildNodes();
-        }
-        this.subdivided = true;
-    }
-    simplify() {
-        var _a, _b;
-        const minZoom = Math.max(this.mapView.provider.minZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
-        if (this.level - 1 < minZoom) {
-            return;
-        }
-        if (this.mapView.cacheTiles) {
-            this.childrenCache = this.children;
-        }
-        else {
-            for (let i = 0; i < this.children.length; i++) {
-                this.children[i].dispose();
-            }
-        }
-        this.subdivided = false;
-        this.isMesh = true;
-        this.children = [];
-        this.nodesLoaded = 0;
-    }
-    loadData() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-                const texture = new three.Texture(image);
-                texture.generateMipmaps = false;
-                texture.format = three.RGBAFormat;
-                texture.magFilter = three.LinearFilter;
-                texture.minFilter = three.LinearFilter;
-                texture.needsUpdate = true;
-                this.material.map = texture;
-            }
-            catch (e) {
-                console.error('Geo-Three: Failed to load node tile data.', this);
-                this.material.map = TextureUtils.createFillTexture();
-            }
-            this.material.needsUpdate = true;
-        });
-    }
-    nodeReady() {
-        if (this.disposed) {
-            console.error('Geo-Three: nodeReady() called for disposed node.', this);
-            this.dispose();
-            return;
-        }
-        if (this.parentNode !== null) {
-            this.parentNode.nodesLoaded++;
-            if (this.parentNode.nodesLoaded === MapNode.childrens) {
-                if (this.parentNode.subdivided === true) {
-                    this.parentNode.isMesh = false;
-                }
-                for (let i = 0; i < this.parentNode.children.length; i++) {
-                    this.parentNode.children[i].visible = true;
-                }
-            }
-            if (this.parentNode.nodesLoaded > MapNode.childrens) {
-                console.error('Geo-Three: Loaded more children objects than expected.', this.parentNode.nodesLoaded, this);
-            }
-        }
-        else {
-            this.visible = true;
-        }
-    }
-    dispose() {
-        this.disposed = true;
-        const self = this;
-        try {
-            const material = self.material;
-            material.dispose();
-        }
-        catch (e) { }
-        try {
-            self.geometry.dispose();
-        }
-        catch (e) { }
-    }
-}
-MapNode.baseGeometry = null;
-MapNode.baseScale = null;
-MapNode.childrens = 4;
-
 class Geolocation {
     constructor(latitude, longitude) {
         this.latitude = latitude;
@@ -363,9 +374,16 @@ class UnitsUtils {
     }
     static vectorToDatums(dir) {
         const radToDeg = 180 / Math.PI;
-        const latitude = Math.atan2(dir.z, Math.sqrt(dir.x * dir.x + dir.y * dir.y)) * radToDeg;
-        const longitude = Math.atan2(dir.y, dir.x) * radToDeg;
+        const latitude = Math.atan2(dir.y, Math.sqrt(Math.pow(dir.x, 2) + Math.pow(-dir.z, 2))) * radToDeg;
+        const longitude = Math.atan2(-dir.z, dir.x) * radToDeg;
         return new Geolocation(latitude, longitude);
+    }
+    static datumsToVector(latitude, longitude) {
+        const degToRad = Math.PI / 180;
+        const rotX = longitude * degToRad;
+        const rotY = latitude * degToRad;
+        var cos = Math.cos(rotY);
+        return new three.Vector3(-Math.cos(rotX + Math.PI) * cos, Math.sin(rotY), Math.sin(rotX + Math.PI) * cos);
     }
     static mapboxAltitude(color) {
         return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
@@ -522,22 +540,11 @@ class MapHeightNode extends MapNode {
         });
     }
     loadData() {
+        const _super = Object.create(null, {
+            loadData: { get: () => super.loadData }
+        });
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-                const texture = new three.Texture(image);
-                texture.generateMipmaps = false;
-                texture.format = three.RGBAFormat;
-                texture.magFilter = three.LinearFilter;
-                texture.minFilter = three.LinearFilter;
-                texture.needsUpdate = true;
-                this.material.map = texture;
-            }
-            catch (e) {
-                console.error('Geo-Three: Failed to load node tile data.', this);
-                this.material.map = TextureUtils.createFillTexture();
-            }
-            this.material.needsUpdate = true;
+            yield _super.loadData.call(this);
             this.textureLoaded = true;
         });
     }
@@ -546,8 +553,16 @@ class MapHeightNode extends MapNode {
             if (this.mapView.heightProvider === null) {
                 throw new Error('GeoThree: MapView.heightProvider provider is null.');
             }
+            if (this.level < this.mapView.heightProvider.minZoom || this.level > this.mapView.heightProvider.maxZoom) {
+                console.warn('Geo-Three: Loading tile outside of provider range.', this);
+                this.geometry = MapPlaneNode.baseGeometry;
+                return;
+            }
             try {
                 const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+                if (this.disposed) {
+                    return;
+                }
                 const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
                 const context = canvas.getContext('2d');
                 context.imageSmoothingEnabled = false;
@@ -556,6 +571,9 @@ class MapHeightNode extends MapNode {
                 this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
             }
             catch (e) {
+                if (this.disposed) {
+                    return;
+                }
                 this.geometry = MapPlaneNode.baseGeometry;
             }
             this.heightLoaded = true;
@@ -726,12 +744,12 @@ MapSphereNode.segments = 80;
 
 class MapHeightNodeShader extends MapHeightNode {
     constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
-        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF }));
+        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapNode.defaultTexture, color: 0xFFFFFF }));
         super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
         this.frustumCulled = false;
     }
     static prepareMaterial(material) {
-        material.userData = { heightMap: { value: MapHeightNodeShader.emptyTexture } };
+        material.userData = { heightMap: { value: MapHeightNodeShader.defaultHeightTexture } };
         material.onBeforeCompile = (shader) => {
             for (const i in material.userData) {
                 shader.uniforms[i] = material.userData[i];
@@ -755,22 +773,11 @@ class MapHeightNodeShader extends MapHeightNode {
         return material;
     }
     loadData() {
+        const _super = Object.create(null, {
+            loadData: { get: () => super.loadData }
+        });
         return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-                const texture = new three.Texture(image);
-                texture.generateMipmaps = false;
-                texture.format = three.RGBAFormat;
-                texture.magFilter = three.LinearFilter;
-                texture.minFilter = three.LinearFilter;
-                texture.needsUpdate = true;
-                this.material.map = texture;
-            }
-            catch (e) {
-                console.error('Geo-Three: Failed to load node tile data.', this);
-                this.material.map = TextureUtils.createFillTexture();
-            }
-            this.material.needsUpdate = true;
+            yield _super.loadData.call(this);
             this.textureLoaded = true;
         });
     }
@@ -779,9 +786,18 @@ class MapHeightNodeShader extends MapHeightNode {
             if (this.mapView.heightProvider === null) {
                 throw new Error('GeoThree: MapView.heightProvider provider is null.');
             }
+            if (this.level < this.mapView.heightProvider.minZoom || this.level > this.mapView.heightProvider.maxZoom) {
+                console.warn('Geo-Three: Loading tile outside of provider range.', this);
+                this.material.map = MapHeightNodeShader.defaultTexture;
+                this.material.needsUpdate = true;
+                return;
+            }
             try {
-                const texture = new three.Texture();
-                texture.image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+                if (this.disposed) {
+                    return;
+                }
+                const texture = new three.Texture(image);
                 texture.generateMipmaps = false;
                 texture.format = three.RGBAFormat;
                 texture.magFilter = three.NearestFilter;
@@ -790,8 +806,11 @@ class MapHeightNodeShader extends MapHeightNode {
                 this.material.userData.heightMap.value = texture;
             }
             catch (e) {
+                if (this.disposed) {
+                    return;
+                }
                 console.error('Geo-Three: Failed to load node tile height data.', this);
-                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#0186C0');
+                this.material.userData.heightMap.value = MapHeightNodeShader.defaultHeightTexture;
             }
             this.material.needsUpdate = true;
             this.heightLoaded = true;
@@ -805,7 +824,7 @@ class MapHeightNodeShader extends MapHeightNode {
         }
     }
 }
-MapHeightNodeShader.emptyTexture = new three.Texture();
+MapHeightNodeShader.defaultHeightTexture = TextureUtils.createFillTexture('#0186C0');
 MapHeightNodeShader.geometrySize = 256;
 MapHeightNodeShader.geometry = new MapNodeGeometry(1.0, 1.0, MapHeightNodeShader.geometrySize, MapHeightNodeShader.geometrySize, true);
 MapHeightNodeShader.baseGeometry = MapPlaneNode.geometry;
@@ -1261,6 +1280,9 @@ class MapMartiniHeightNode extends MapHeightNode {
                 throw new Error('GeoThree: MapView.heightProvider provider is null.');
             }
             const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+            if (this.disposed) {
+                return;
+            }
             this.processHeight(image);
             this.heightLoaded = true;
             this.nodeReady();
@@ -1287,6 +1309,7 @@ class MapView extends three.Mesh {
         this.provider = provider;
         this.heightProvider = heightProvider;
         this.setRoot(root);
+        this.preSubdivide();
     }
     setRoot(root) {
         if (typeof root === 'number') {
@@ -1310,6 +1333,23 @@ class MapView extends three.Mesh {
         }
     }
     preSubdivide() {
+        var _a, _b;
+        function subdivide(node, depth) {
+            if (depth <= 0) {
+                return;
+            }
+            node.subdivide();
+            for (let i = 0; i < node.children.length; i++) {
+                if (node.children[i] instanceof MapNode) {
+                    const child = node.children[i];
+                    subdivide(child, depth - 1);
+                }
+            }
+        }
+        const minZoom = Math.max(this.provider.minZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+        if (minZoom > 0) {
+            subdivide(this.root, minZoom);
+        }
     }
     setProvider(provider) {
         if (provider !== this.provider) {
@@ -1333,6 +1373,14 @@ class MapView extends three.Mesh {
             }
         });
         return this;
+    }
+    minZoom() {
+        var _a, _b;
+        return Math.max(this.provider.minZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+    }
+    maxZoom() {
+        var _a, _b;
+        return Math.min(this.provider.maxZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.maxZoom) !== null && _b !== void 0 ? _b : Infinity);
     }
     getMetaData() {
         this.provider.getMetaData();
@@ -1474,12 +1522,12 @@ class BingMapsProvider extends MapProvider {
     constructor(apiKey = '', type = BingMapsProvider.AERIAL) {
         super();
         this.maxZoom = 19;
+        this.minZoom = 1;
         this.format = 'jpeg';
         this.mapSize = 512;
         this.subdomain = 't1';
         this.apiKey = apiKey;
         this.type = type;
-        this.maxZoom = 19;
     }
     getMetaData() {
         const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
