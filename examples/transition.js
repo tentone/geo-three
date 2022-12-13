@@ -1,18 +1,22 @@
 var canvas = document.getElementById("canvas");
 
-const SPACE = 0;
-const EARTH = 1;
+// Spherical earth scene
+const SPHERE = 0;
 
-var scenes = [createWorldScene(), createMapScene()];
+// Planar earth scene
+const PLANE = 1;
 
-var active = SPACE;
+// List of scenes
+const scenes = [createWorldScene(), createMapScene()];
 
+let active = SPHERE;
 
-var renderer = new THREE.WebGLRenderer({
+let renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     antialias: true
 });
 
+// Create scene for spherical earth
 function createWorldScene() {
     var scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
@@ -25,19 +29,6 @@ function createWorldScene() {
         }));
         scene.add(sphere);
     });
-    
-    // Clouds
-    // loader.load('assets/clouds_8k.jpg', function(cloudsTexture) {
-    //     var clouds = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS + 3e5, 128, 128), new THREE.MeshBasicMaterial({
-    //         map: cloudsTexture,
-    //         transparent: true,
-    //         blending: THREE.AdditiveBlending
-    //     }));
-    //     clouds.onBeforeRender = function() {
-    //         clouds.rotation.y += 1e-5;
-    //     };
-    //     scene.add(clouds);
-    // });
 
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e8);
     
@@ -45,13 +36,16 @@ function createWorldScene() {
     controls.minDistance = Geo.UnitsUtils.EARTH_RADIUS + 3e4;
     controls.maxDistance = Geo.UnitsUtils.EARTH_RADIUS * 1e1;
     controls.enablePan = false;
-    controls.zoomSpeed = 1.0;
+    controls.zoomSpeed = 0.7;
     controls.rotateSpeed = 0.3; 
+
+    // Set initial camera position 
     camera.position.set(0, 0, Geo.UnitsUtils.EARTH_RADIUS + 1e7);
 
     return {camera: camera, controls: controls, scene: scene};
 }
 
+// Create scene for planar map
 function createMapScene() {
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e12);
 
@@ -99,38 +93,61 @@ function animate()
     s.controls.update();
     renderer.render(s.scene, s.camera);
 
-    if (active === SPACE) {
-        const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
-        if (distance < 11e5) {
-            console.log('Distance to earth', distance);
+    const toggleDistance = 11e5;
 
+    if (active === SPHERE) {
+        // Get distance to the surface of earth
+        const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
+        if (distance < toggleDistance) {
+            // Set raycaster to the camera center.
             const pointer = new THREE.Vector2(0.0, 0.0);
             raycaster.setFromCamera(pointer, s.camera);
-
+            
+            // Raycast from center of the camera to the sphere surface
             const intersects = raycaster.intersectObjects(s.scene.children);
-            console.log('Raycasting intersections', intersects);
             if (intersects.length > 0) {
-                const pos = Geo.UnitsUtils.vectorToDatums(intersects[0].point);
-                console.log('Calculated coordinates', pos);
+                const point = intersects[0].point;
 
-                const earthScene = scenes[EARTH];
+                // Get coordinates from sphere surface
+                const pos = Geo.UnitsUtils.vectorToDatums(point);
+                
+                const planeScene = scenes[PLANE];
 
+                // Calculate plane coordinates
                 var coords = Geo.UnitsUtils.datumsToSpherical(pos.latitude, pos.longitude);
-                earthScene.controls.target.set(coords.x, 0, -coords.y);
-                earthScene.camera.position.set(coords.x, distance, -coords.y);
+                planeScene.controls.target.set(coords.x, 0, -coords.y);
+                planeScene.camera.position.set(coords.x, distance, -coords.y);
 
-                active = EARTH;
+                console.log('Geo-Three: Switched scene from sphere to plane.', point, pos, coords);
+
+                // Change scene to "plane" earth
+                active = PLANE;
             }
         }
-    } else if (active === EARTH) {
-        const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
-        if (distance > 1e4) {
-            
-            active = SPACE;
+    } else if (active === PLANE) {
+        const distance = s.controls.getDistance();
+        console.log(distance);
+        if (distance > toggleDistance) {
+            // Datum coordinates
+            const target = s.controls.target;
+            const coords = Geo.UnitsUtils.sphericalToDatums(target.x, target.z);
+
+            // Get sphere surface point from coordinates
+            const dir = Geo.UnitsUtils.datumsToVector(coords.latitude, coords.longitude);
+
+            const sphereScene = scenes[SPHERE];
+
+            // Set camera position 
+            dir.multiplyScalar(Geo.UnitsUtils.EARTH_RADIUS + (distance * 0.8));
+            sphereScene.camera.position.copy(dir);
+
+            console.log('Geo-Three: Switched scene from plane to sphere.', s.controls, coords, dir);
+
+            // Change to spherical earth model
+            active = SPHERE;
         }
     }
-
-
-    
 }
+
+// Start animation loop
 animate();
