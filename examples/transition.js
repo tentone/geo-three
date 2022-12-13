@@ -126,7 +126,6 @@ function animate()
         }
     } else if (active === PLANE) {
         const distance = s.controls.getDistance();
-        console.log(distance);
         if (distance > toggleDistance) {
             // Datum coordinates
             const target = s.controls.target;
@@ -138,7 +137,7 @@ function animate()
             const sphereScene = scenes[SPHERE];
 
             // Set camera position 
-            dir.multiplyScalar(Geo.UnitsUtils.EARTH_RADIUS + (distance * 0.8));
+            dir.multiplyScalar(Geo.UnitsUtils.EARTH_RADIUS + distance);
             sphereScene.camera.position.copy(dir);
 
             console.log('Geo-Three: Switched scene from plane to sphere.', s.controls, coords, dir);
