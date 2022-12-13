@@ -117,12 +117,13 @@ export class UnitsUtils
 	 */
 	public static datumsToVector(latitude: number, longitude: number): Vector3 {
 		const degToRad = Math.PI / 180;
+		
 		const rotX = longitude * degToRad;
 		const rotY = latitude * degToRad;
 
 		var cos = Math.cos(rotY);
 		
-		return new Vector3(Math.sin(rotX + Math.PI) * cos, Math.sin(rotY), Math.cos(rotX + Math.PI) * cos);
+		return new Vector3(-Math.cos(rotX + Math.PI) * cos, Math.sin(rotY), Math.sin(rotX + Math.PI) * cos);
 	}
 
 	/**

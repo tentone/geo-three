@@ -385,7 +385,7 @@
 	        const rotX = longitude * degToRad;
 	        const rotY = latitude * degToRad;
 	        var cos = Math.cos(rotY);
-	        return new three.Vector3(Math.sin(rotX + Math.PI) * cos, Math.sin(rotY), Math.cos(rotX + Math.PI) * cos);
+	        return new three.Vector3(-Math.cos(rotX + Math.PI) * cos, Math.sin(rotY), Math.sin(rotX + Math.PI) * cos);
 	    }
 	    static mapboxAltitude(color) {
 	        return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;

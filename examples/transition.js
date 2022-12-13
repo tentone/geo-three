@@ -1,5 +1,3 @@
-const { Vector3 } = require("three");
-
 var canvas = document.getElementById("canvas");
 
 // Spherical earth scene
@@ -85,15 +83,6 @@ document.body.onresize = function()
 
 }
 document.body.onresize();
-
-const dir_a = Geo.UnitsUtils.vectorToDatums(new Vector3(0.23, 123, 1285));
-const position_a = Geo.UnitsUtils.datumsToSpherical(pos_a.latitude, pos_a.longitude);
-
-const coords_b = Geo.UnitsUtils.sphericalToDatums(position_a.x, position_a.y);
-const dir_b = Geo.UnitsUtils.datumsToVector(coords_b.latitude, coords_b.longitude);
-
-console.log(dir_a, position_a, coords_b, dir_b);
-
 
 function animate()
 {
