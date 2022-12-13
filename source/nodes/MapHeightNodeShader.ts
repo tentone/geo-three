@@ -99,7 +99,7 @@ export class MapHeightNodeShader extends MapHeightNode
 
 	public async loadData(): Promise<void> 
 	{
-		await this.loadData();
+		await super.loadData();
 
 		this.textureLoaded = true;
 	}

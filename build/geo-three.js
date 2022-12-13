@@ -775,8 +775,11 @@
 	        return material;
 	    }
 	    loadData() {
+	        const _super = Object.create(null, {
+	            loadData: { get: () => super.loadData }
+	        });
 	        return __awaiter(this, void 0, void 0, function* () {
-	            yield this.loadData();
+	            yield _super.loadData.call(this);
 	            this.textureLoaded = true;
 	        });
 	    }
