@@ -95,38 +95,7 @@ export class MapHeightNode extends MapNode
 	 */
 	public async loadData(): Promise<void> 
 	{
-		try 
-		{
-			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
-
-			if (this.disposed) {
-				return;
-			}
-
-			const texture = new Texture(image);
-			texture.generateMipmaps = false;
-			texture.format = RGBAFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
-			
-			// @ts-ignore
-			this.material.map = texture;
-		}
-		catch (e) 
-		{
-			if (this.disposed) {
-				return;
-			}
-
-			console.error('Geo-Three: Failed to load node tile data.', this);
-
-			// @ts-ignore
-			this.material.map = TextureUtils.createFillTexture();
-		}
-
-		// @ts-ignore
-		this.material.needsUpdate = true;
+		await super.loadData();
 		
 		this.textureLoaded = true;
 	}
@@ -143,6 +112,14 @@ export class MapHeightNode extends MapNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
  
+		if (this.level < this.mapView.heightProvider.minZoom || this.level > this.mapView.heightProvider.maxZoom)
+		{
+			console.warn('Geo-Three: Loading tile outside of provider range.', this);
+
+			this.geometry = MapPlaneNode.baseGeometry;
+			return;
+		}
+
 		try {
 			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
  

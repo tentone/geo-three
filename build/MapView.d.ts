@@ -21,6 +21,8 @@ export declare class MapView extends Mesh {
     setProvider(provider: MapProvider): void;
     setHeightProvider(heightProvider: MapProvider): void;
     clear(): any;
+    minZoom(): number;
+    maxZoom(): number;
     getMetaData(): void;
     raycast(raycaster: Raycaster, intersects: any[]): boolean;
 }

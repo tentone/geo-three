@@ -51,6 +51,11 @@ export class QuadTreePosition
 export abstract class MapNode extends Mesh 
 {
 	/**
+	 * Default texture used when texture fails to load.
+	 */
+	public static defaultTexture = TextureUtils.createFillTexture();
+
+	/**
 	 * The map view object where the node is placed.
 	 */
 	public mapView: MapView = null;
@@ -176,7 +181,7 @@ export abstract class MapNode extends Mesh
 	 */
 	public subdivide(): void
 	{
-		const maxZoom = Math.min(this.mapView.provider.maxZoom, this.mapView.heightProvider?.maxZoom ?? Infinity);
+		const maxZoom = this.mapView.maxZoom();
 		if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens)
 		{
 			return;
@@ -205,7 +210,7 @@ export abstract class MapNode extends Mesh
 	 */
 	public simplify(): void
 	{
-		const minZoom = Math.max(this.mapView.provider.minZoom, this.mapView.heightProvider?.minZoom ?? -Infinity);
+		const minZoom = this.mapView.minZoom();
 		if (this.level - 1 < minZoom)
 		{
 			return;
@@ -239,6 +244,17 @@ export abstract class MapNode extends Mesh
 	 */
 	public async loadData(): Promise<void>
 	{
+		if (this.level < this.mapView.provider.minZoom || this.level > this.mapView.provider.maxZoom)
+		{
+			console.warn('Geo-Three: Loading tile outside of provider range.', this);
+
+			// @ts-ignore
+			this.material.map = MapNode.defaultTexture;
+			// @ts-ignore
+			this.material.needsUpdate = true;
+			return;
+		}
+
 		try 
 		{
 			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
@@ -263,10 +279,10 @@ export abstract class MapNode extends Mesh
 				return;
 			}
 			
-			console.error('Geo-Three: Failed to load node tile data.', this);
+			console.warn('Geo-Three: Failed to load node tile data.', this);
 
 			// @ts-ignore
-			this.material.map = TextureUtils.createFillTexture();
+			this.material.map = MapNode.defaultTexture;
 		}
 
 		// @ts-ignore
@@ -282,7 +298,7 @@ export abstract class MapNode extends Mesh
 	{
 		if (this.disposed) 
 		{
-			console.error('Geo-Three: nodeReady() called for disposed node.', this);
+			console.warn('Geo-Three: nodeReady() called for disposed node.', this);
 			this.dispose();
 			return;
 		}

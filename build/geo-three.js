@@ -128,8 +128,7 @@
 	    }
 	    createChildNodes() { }
 	    subdivide() {
-	        var _a, _b;
-	        const maxZoom = Math.min(this.mapView.provider.maxZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.maxZoom) !== null && _b !== void 0 ? _b : Infinity);
+	        const maxZoom = this.mapView.maxZoom();
 	        if (this.children.length > 0 || this.level + 1 > maxZoom || this.parentNode !== null && this.parentNode.nodesLoaded < MapNode.childrens) {
 	            return;
 	        }
@@ -144,8 +143,7 @@
 	        this.subdivided = true;
 	    }
 	    simplify() {
-	        var _a, _b;
-	        const minZoom = Math.max(this.mapView.provider.minZoom, (_b = (_a = this.mapView.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+	        const minZoom = this.mapView.minZoom();
 	        if (this.level - 1 < minZoom) {
 	            return;
 	        }
@@ -164,6 +162,12 @@
 	    }
 	    loadData() {
 	        return __awaiter(this, void 0, void 0, function* () {
+	            if (this.level < this.mapView.provider.minZoom || this.level > this.mapView.provider.maxZoom) {
+	                console.warn('Geo-Three: Loading tile outside of provider range.', this);
+	                this.material.map = MapNode.defaultTexture;
+	                this.material.needsUpdate = true;
+	                return;
+	            }
 	            try {
 	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
 	                if (this.disposed) {
@@ -181,15 +185,15 @@
 	                if (this.disposed) {
 	                    return;
 	                }
-	                console.error('Geo-Three: Failed to load node tile data.', this);
-	                this.material.map = TextureUtils.createFillTexture();
+	                console.warn('Geo-Three: Failed to load node tile data.', this);
+	                this.material.map = MapNode.defaultTexture;
 	            }
 	            this.material.needsUpdate = true;
 	        });
 	    }
 	    nodeReady() {
 	        if (this.disposed) {
-	            console.error('Geo-Three: nodeReady() called for disposed node.', this);
+	            console.warn('Geo-Three: nodeReady() called for disposed node.', this);
 	            this.dispose();
 	            return;
 	        }
@@ -225,6 +229,7 @@
 	        catch (e) { }
 	    }
 	}
+	MapNode.defaultTexture = TextureUtils.createFillTexture();
 	MapNode.baseGeometry = null;
 	MapNode.baseScale = null;
 	MapNode.childrens = 4;
@@ -537,28 +542,11 @@
 	        });
 	    }
 	    loadData() {
+	        const _super = Object.create(null, {
+	            loadData: { get: () => super.loadData }
+	        });
 	        return __awaiter(this, void 0, void 0, function* () {
-	            try {
-	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-	                if (this.disposed) {
-	                    return;
-	                }
-	                const texture = new three.Texture(image);
-	                texture.generateMipmaps = false;
-	                texture.format = three.RGBAFormat;
-	                texture.magFilter = three.LinearFilter;
-	                texture.minFilter = three.LinearFilter;
-	                texture.needsUpdate = true;
-	                this.material.map = texture;
-	            }
-	            catch (e) {
-	                if (this.disposed) {
-	                    return;
-	                }
-	                console.error('Geo-Three: Failed to load node tile data.', this);
-	                this.material.map = TextureUtils.createFillTexture();
-	            }
-	            this.material.needsUpdate = true;
+	            yield _super.loadData.call(this);
 	            this.textureLoaded = true;
 	        });
 	    }
@@ -566,6 +554,11 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            if (this.mapView.heightProvider === null) {
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
+	            }
+	            if (this.level < this.mapView.heightProvider.minZoom || this.level > this.mapView.heightProvider.maxZoom) {
+	                console.warn('Geo-Three: Loading tile outside of provider range.', this);
+	                this.geometry = MapPlaneNode.baseGeometry;
+	                return;
 	            }
 	            try {
 	                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
@@ -753,12 +746,12 @@
 
 	class MapHeightNodeShader extends MapHeightNode {
 	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
-	        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapHeightNodeShader.emptyTexture, color: 0xFFFFFF }));
+	        const material = MapHeightNodeShader.prepareMaterial(new three.MeshPhongMaterial({ map: MapNode.defaultTexture, color: 0xFFFFFF }));
 	        super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
 	        this.frustumCulled = false;
 	    }
 	    static prepareMaterial(material) {
-	        material.userData = { heightMap: { value: MapHeightNodeShader.emptyTexture } };
+	        material.userData = { heightMap: { value: MapHeightNodeShader.defaultHeightTexture } };
 	        material.onBeforeCompile = (shader) => {
 	            for (const i in material.userData) {
 	                shader.uniforms[i] = material.userData[i];
@@ -783,24 +776,7 @@
 	    }
 	    loadData() {
 	        return __awaiter(this, void 0, void 0, function* () {
-	            try {
-	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-	                if (this.disposed) {
-	                    return;
-	                }
-	                const texture = new three.Texture(image);
-	                texture.generateMipmaps = false;
-	                texture.format = three.RGBAFormat;
-	                texture.magFilter = three.LinearFilter;
-	                texture.minFilter = three.LinearFilter;
-	                texture.needsUpdate = true;
-	                this.material.map = texture;
-	            }
-	            catch (e) {
-	                console.error('Geo-Three: Failed to load node tile data.', this);
-	                this.material.map = TextureUtils.createFillTexture();
-	            }
-	            this.material.needsUpdate = true;
+	            yield this.loadData();
 	            this.textureLoaded = true;
 	        });
 	    }
@@ -808,6 +784,12 @@
 	        return __awaiter(this, void 0, void 0, function* () {
 	            if (this.mapView.heightProvider === null) {
 	                throw new Error('GeoThree: MapView.heightProvider provider is null.');
+	            }
+	            if (this.level < this.mapView.heightProvider.minZoom || this.level > this.mapView.heightProvider.maxZoom) {
+	                console.warn('Geo-Three: Loading tile outside of provider range.', this);
+	                this.material.map = MapHeightNodeShader.defaultTexture;
+	                this.material.needsUpdate = true;
+	                return;
 	            }
 	            try {
 	                const image = yield this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
@@ -827,7 +809,7 @@
 	                    return;
 	                }
 	                console.error('Geo-Three: Failed to load node tile height data.', this);
-	                this.material.userData.heightMap.value = TextureUtils.createFillTexture('#0186C0');
+	                this.material.userData.heightMap.value = MapHeightNodeShader.defaultHeightTexture;
 	            }
 	            this.material.needsUpdate = true;
 	            this.heightLoaded = true;
@@ -841,7 +823,7 @@
 	        }
 	    }
 	}
-	MapHeightNodeShader.emptyTexture = new three.Texture();
+	MapHeightNodeShader.defaultHeightTexture = TextureUtils.createFillTexture('#0186C0');
 	MapHeightNodeShader.geometrySize = 256;
 	MapHeightNodeShader.geometry = new MapNodeGeometry(1.0, 1.0, MapHeightNodeShader.geometrySize, MapHeightNodeShader.geometrySize, true);
 	MapHeightNodeShader.baseGeometry = MapPlaneNode.geometry;
@@ -1390,6 +1372,14 @@
 	            }
 	        });
 	        return this;
+	    }
+	    minZoom() {
+	        var _a, _b;
+	        return Math.max(this.provider.minZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.minZoom) !== null && _b !== void 0 ? _b : -Infinity);
+	    }
+	    maxZoom() {
+	        var _a, _b;
+	        return Math.min(this.provider.maxZoom, (_b = (_a = this.heightProvider) === null || _a === void 0 ? void 0 : _a.maxZoom) !== null && _b !== void 0 ? _b : Infinity);
 	    }
 	    getMetaData() {
 	        this.provider.getMetaData();

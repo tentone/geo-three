@@ -106,7 +106,6 @@ export class MapView extends Mesh
 
 		this.setRoot(root);
 		this.preSubdivide();
-
 	}
 
 	/**
@@ -246,6 +245,24 @@ export class MapView extends Mesh
 		});
 
 		return this;
+	}
+
+	/**
+	 * Get the minimum zoom level available in the providers attached to the map view.
+	 * 
+	 * @returns Minimum zoom level available.
+	 */
+	public minZoom(): number {
+		return Math.max(this.provider.minZoom, this.heightProvider?.minZoom ?? -Infinity);
+	}
+
+	/**
+	 * Get the maximum zoom level available in the providers attached to the map view.
+	 * 
+	 * @returns Maximum zoom level available.
+	 */
+	public maxZoom(): number {
+		return Math.min(this.provider.maxZoom, this.heightProvider?.maxZoom ?? Infinity);
 	}
 
 	/**
