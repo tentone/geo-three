@@ -141,7 +141,7 @@ var map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.
 scene.add(map);
 map.updateMatrixWorld(true);
 
-var camera = new THREE.PerspectiveCamera(80, 1, 1e2, 1e12);
+var camera = new THREE.PerspectiveCamera(80, 1, 0.1, 1e12);
 
 var controls = new THREE.MapControls(camera, canvas);
 controls.minDistance = 1e1;
