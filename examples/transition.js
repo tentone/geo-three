@@ -23,7 +23,7 @@ function createWorldScene() {
     
     // Globe
     var loader = new THREE.TextureLoader();
-    loader.load('assets/texture_16k.jpg', function(texture) {
+    loader.load('2k_earth_daymap.jpg', function(texture) {
         var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 256, 256), new THREE.MeshBasicMaterial({
             map: texture
         }));
