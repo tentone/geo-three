@@ -38,6 +38,11 @@ function createWorldScene() {
     controls.enablePan = false;
     controls.zoomSpeed = 0.7;
     controls.rotateSpeed = 0.3; 
+    controls.mouseButtons = {
+        LEFT: THREE.MOUSE.ROTATE,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.PAN
+    };
 
     // Set initial camera position 
     camera.position.set(0, 0, Geo.UnitsUtils.EARTH_RADIUS + 1e7);
