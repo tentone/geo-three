@@ -22,7 +22,7 @@ export declare abstract class MapNode extends Mesh {
     static baseGeometry: BufferGeometry;
     static baseScale: Vector3;
     static childrens: number;
-    isMesh: boolean;
+    isMesh: true;
     constructor(parentNode?: MapNode, mapView?: MapView, location?: number, level?: number, x?: number, y?: number, geometry?: BufferGeometry, material?: Material);
     initialize(): Promise<void>;
     createChildNodes(): void;

@@ -142,7 +142,7 @@ export abstract class MapNode extends Mesh
 	 * Used to toggle the visibility of the node. The renderer skips the node rendering if this is set false.
 	 */
 	// @ts-ignore
-	public isMesh: boolean = true;
+	public isMesh: true = true;
 
 	public constructor(parentNode: MapNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0, geometry: BufferGeometry = null, material: Material = null) 
 	{
@@ -189,6 +189,7 @@ export abstract class MapNode extends Mesh
 
 		if (this.mapView.cacheTiles && this.childrenCache !== null) 
 		{
+			// @ts-ignore
 			this.isMesh = false;
 			this.children = this.childrenCache;
 			this.nodesLoaded = this.childrenCache.length;
@@ -311,6 +312,7 @@ export abstract class MapNode extends Mesh
 			{
 				if (this.parentNode.subdivided === true) 
 				{
+					// @ts-ignore
 					this.parentNode.isMesh = false;
 				}
 				
