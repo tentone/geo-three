@@ -1,41 +1,5 @@
 import { Texture, RGBAFormat, LinearFilter, Mesh, BufferGeometry, Float32BufferAttribute, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Matrix4, Quaternion, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
 
-class MapProvider {
-    constructor() {
-        this.name = '';
-        this.minZoom = 0;
-        this.maxZoom = 20;
-        this.bounds = [];
-        this.center = [];
-    }
-    fetchTile(zoom, x, y) {
-        return null;
-    }
-    getMetaData() { }
-}
-
-class OpenStreetMapsProvider extends MapProvider {
-    constructor(address = 'https://a.tile.openstreetmap.org/') {
-        super();
-        this.address = address;
-        this.format = 'png';
-        this.maxZoom = 19;
-    }
-    fetchTile(zoom, x, y) {
-        return new Promise((resolve, reject) => {
-            const image = document.createElement('img');
-            image.onload = function () {
-                resolve(image);
-            };
-            image.onerror = function () {
-                reject();
-            };
-            image.crossOrigin = 'Anonymous';
-            image.src = this.address + zoom + '/' + x + '/' + y + '.' + this.format;
-        });
-    }
-}
-
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
 
@@ -59,6 +23,44 @@ function __awaiter(thisArg, _arguments, P, generator) {
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
+}
+
+class MapProvider {
+    constructor() {
+        this.name = '';
+        this.minZoom = 0;
+        this.maxZoom = 20;
+        this.bounds = [];
+        this.center = [];
+    }
+    fetchTile(zoom, x, y) {
+        return null;
+    }
+    getMetaData() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+}
+
+class OpenStreetMapsProvider extends MapProvider {
+    constructor(address = 'https://a.tile.openstreetmap.org/') {
+        super();
+        this.address = address;
+        this.format = 'png';
+        this.maxZoom = 19;
+    }
+    fetchTile(zoom, x, y) {
+        return new Promise((resolve, reject) => {
+            const image = document.createElement('img');
+            image.onload = function () {
+                resolve(image);
+            };
+            image.onerror = function () {
+                reject();
+            };
+            image.crossOrigin = 'Anonymous';
+            image.src = this.address + zoom + '/' + x + '/' + y + '.' + this.format;
+        });
+    }
 }
 
 class CanvasUtils {
@@ -1451,35 +1453,33 @@ class LODFrustum extends LODRadial {
 }
 
 class XHRUtils {
-    static get(url, onLoad, onError) {
-        const xhr = new XMLHttpRequest();
-        xhr.overrideMimeType('text/plain');
-        xhr.open('GET', url, true);
-        if (onLoad !== undefined) {
-            xhr.onload = function () {
-                onLoad(xhr.response);
-            };
-        }
-        if (onError !== undefined) {
-            xhr.onerror = onError;
-        }
-        xhr.send(null);
-        return xhr;
+    static get(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise(function (resolve, reject) {
+                const xhr = new XMLHttpRequest();
+                xhr.overrideMimeType('text/plain');
+                xhr.open('GET', url, true);
+                xhr.onload = function () {
+                    resolve(xhr.response);
+                };
+                xhr.onerror = reject;
+                xhr.send(null);
+            });
+        });
     }
-    static getRaw(url, onLoad, onError) {
-        var xhr = new XMLHttpRequest();
-        xhr.responseType = 'arraybuffer';
-        xhr.open('GET', url, true);
-        if (onLoad !== undefined) {
-            xhr.onload = function () {
-                onLoad(xhr.response);
-            };
-        }
-        if (onError !== undefined) {
-            xhr.onerror = onError;
-        }
-        xhr.send(null);
-        return xhr;
+    static getRaw(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise(function (resolve, reject) {
+                var xhr = new XMLHttpRequest();
+                xhr.responseType = 'arraybuffer';
+                xhr.open('GET', url, true);
+                xhr.onload = function () {
+                    resolve(xhr.response);
+                };
+                xhr.onerror = reject;
+                xhr.send(null);
+            });
+        });
     }
     static request(url, type, header, body, onLoad, onError, onProgress) {
         function parseResponse(response) {
@@ -1522,13 +1522,15 @@ class BingMapsProvider extends MapProvider {
         this.format = 'jpeg';
         this.mapSize = 512;
         this.subdomain = 't1';
+        this.meta = null;
         this.apiKey = apiKey;
         this.type = type;
     }
     getMetaData() {
-        const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
-        XHRUtils.get(address, function (data) {
-            JSON.parse(data);
+        return __awaiter(this, void 0, void 0, function* () {
+            const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
+            const data = yield XHRUtils.get(address);
+            this.meta = JSON.parse(data);
         });
     }
     static quadKey(zoom, x, y) {
@@ -1624,7 +1626,9 @@ class HereMapsProvider extends MapProvider {
     nextServer() {
         this.server = this.server % 4 === 0 ? 1 : this.server + 1;
     }
-    getMetaData() { }
+    getMetaData() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
     fetchTile(zoom, x, y) {
         this.nextServer();
         return new Promise((resolve, reject) => {
@@ -1656,8 +1660,9 @@ class MapBoxProvider extends MapProvider {
         this.version = version;
     }
     getMetaData() {
-        const address = MapBoxProvider.ADDRESS + this.version + '/' + this.mapId + '.json?access_token=' + this.apiToken;
-        XHRUtils.get(address, (data) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const address = MapBoxProvider.ADDRESS + this.version + '/' + this.mapId + '.json?access_token=' + this.apiToken;
+            const data = yield XHRUtils.get(address);
             const meta = JSON.parse(data);
             this.name = meta.name;
             this.minZoom = meta.minZoom;
@@ -1721,8 +1726,9 @@ class OpenMapTilesProvider extends MapProvider {
         this.theme = theme;
     }
     getMetaData() {
-        const address = this.address + 'styles/' + this.theme + '.json';
-        XHRUtils.get(address, (data) => {
+        return __awaiter(this, void 0, void 0, function* () {
+            const address = this.address + 'styles/' + this.theme + '.json';
+            const data = yield XHRUtils.get(address);
             const meta = JSON.parse(data);
             this.name = meta.name;
             this.format = meta.format;

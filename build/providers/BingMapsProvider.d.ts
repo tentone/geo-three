@@ -8,13 +8,14 @@ export declare class BingMapsProvider extends MapProvider {
     format: string;
     mapSize: number;
     subdomain: string;
+    meta: any;
     constructor(apiKey?: string, type?: string);
     static AERIAL: string;
     static ROAD: string;
     static AERIAL_LABELS: string;
     static OBLIQUE: string;
     static OBLIQUE_LABELS: string;
-    getMetaData(): void;
+    getMetaData(): Promise<void>;
     static quadKey(zoom: number, x: number, y: number): string;
     fetchTile(zoom: number, x: number, y: number): Promise<any>;
 }

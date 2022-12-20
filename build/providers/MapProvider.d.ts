@@ -5,5 +5,5 @@ export declare abstract class MapProvider {
     bounds: number[];
     center: number[];
     fetchTile(zoom: number, x: number, y: number): Promise<any>;
-    getMetaData(): void;
+    getMetaData(): Promise<void>;
 }

@@ -120,7 +120,7 @@ export class HereMapsProvider extends MapProvider
 		this.server = this.server % 4 === 0 ? 1 : this.server + 1;
 	}
 
-	public getMetaData(): void {}
+	public async getMetaData(): Promise<void> {}
 
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>
 	{
