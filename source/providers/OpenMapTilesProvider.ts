@@ -40,20 +40,18 @@ export class OpenMapTilesProvider extends MapProvider
 		this.theme = theme;
 	}
 
-	public getMetaData(): void
+	public async getMetaData(): Promise<void>
 	{
 		const address = this.address + 'styles/' + this.theme + '.json';
 
-		XHRUtils.get(address, (data: any) => 
-		{
-			const meta = JSON.parse(data);
-			this.name = meta.name;
-			this.format = meta.format;
-			this.minZoom = meta.minZoom;
-			this.maxZoom = meta.maxZoom;
-			this.bounds = meta.bounds;
-			this.center = meta.center;
-		});
+		const data = await XHRUtils.get(address);
+		const meta = JSON.parse(data);
+		this.name = meta.name;
+		this.format = meta.format;
+		this.minZoom = meta.minZoom;
+		this.maxZoom = meta.maxZoom;
+		this.bounds = meta.bounds;
+		this.center = meta.center;
 	}
 
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>

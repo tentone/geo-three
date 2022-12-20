@@ -54,5 +54,5 @@ export abstract class MapProvider
 	 *
 	 * Usually map server have API method to retrieve TileJSON metadata.
 	 */
-	public getMetaData(): void {}
+	public async getMetaData(): Promise<void> {}
 }

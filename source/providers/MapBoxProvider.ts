@@ -111,20 +111,18 @@ export class MapBoxProvider extends MapProvider
 		this.version = version;
 	}
 
-	public getMetaData(): void
+	public async getMetaData(): Promise<void>
 	{
 		const address = MapBoxProvider.ADDRESS + this.version + '/' + this.mapId + '.json?access_token=' + this.apiToken;
 
-		XHRUtils.get(address, (data: any): void =>
-		{
-			const meta = JSON.parse(data);
-
-			this.name = meta.name;
-			this.minZoom = meta.minZoom;
-			this.maxZoom = meta.maxZoom;
-			this.bounds = meta.bounds;
-			this.center = meta.center;
-		});
+		const data = await XHRUtils.get(address);
+		
+		const meta = JSON.parse(data);
+		this.name = meta.name;
+		this.minZoom = meta.minZoom;
+		this.maxZoom = meta.maxZoom;
+		this.bounds = meta.bounds;
+		this.center = meta.center;
 	}
 
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>

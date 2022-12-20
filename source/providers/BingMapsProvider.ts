@@ -56,6 +56,11 @@ export class BingMapsProvider extends MapProvider
 	public subdomain: string = 't1';
 
 	/**
+	 * Metadata of the provider.
+	 */
+	public meta: any = null;
+
+	/**
 	 * @param apiKey - Bing API key.
 	 * @param type - Type provider.
 	 */
@@ -99,16 +104,12 @@ export class BingMapsProvider extends MapProvider
 	 * 
 	 * http://ecn.\{subdomain\}.tiles.virtualearth.net/tiles/r\{quadkey\}.jpeg?g=129&mkt=\{culture\}&shading=hill&stl=H
 	 */
-	public getMetaData(): void 
+	public async getMetaData(): Promise<void> 
 	{
 		const address = BingMapsProvider.ADDRESS + '/REST/V1/Imagery/Metadata/RoadOnDemand?output=json&include=ImageryProviders&key=' + this.apiKey;
+		const data = await XHRUtils.get(address);
 
-		XHRUtils.get(address, function(data) 
-		{
-			const meta = JSON.parse(data);
-
-			// TODO <FILL METADATA>
-		});
+		this.meta = JSON.parse(data);
 	}
 
 	/**

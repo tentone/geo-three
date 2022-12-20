@@ -10,29 +10,21 @@ export class XHRUtils
 	 * @param onLoad - On load callback.
 	 * @param onError - On progress callback.
 	 */
-	public static get(url: string, onLoad?: Function, onError?: Function): XMLHttpRequest
+	public static async get(url: string): Promise<any>
 	{
-		const xhr = new XMLHttpRequest();
-		xhr.overrideMimeType('text/plain');
-		xhr.open('GET', url, true);
+		return new Promise(function(resolve, reject) {
+			const xhr = new XMLHttpRequest();
+			xhr.overrideMimeType('text/plain');
+			xhr.open('GET', url, true);
 
-		if (onLoad !== undefined) 
-		{
 			xhr.onload = function() 
 			{
-				onLoad(xhr.response);
+				resolve(xhr.response);
 			};
-		}
 
-		if (onError !== undefined) 
-		{
-			// @ts-ignore
-			xhr.onerror = onError;
-		}
-
-		xhr.send(null);
-
-		return xhr;
+			xhr.onerror = reject;
+			xhr.send(null);
+		});
 	}
 
 	/**
@@ -42,29 +34,21 @@ export class XHRUtils
 	 * @param onLoad - On load callback.
 	 * @param onError - On progress callback.
 	 */
-	public static getRaw(url: string, onLoad?: Function, onError?: Function): XMLHttpRequest
+	public static async getRaw(url: string): Promise<ArrayBuffer>
 	{
-		var xhr = new XMLHttpRequest();
-		xhr.responseType = 'arraybuffer';
-		xhr.open('GET', url, true);
+		return new Promise(function(resolve, reject) {
+			var xhr = new XMLHttpRequest();
+			xhr.responseType = 'arraybuffer';
+			xhr.open('GET', url, true);
 
-		if (onLoad !== undefined)
-		{
-			xhr.onload = function()
+			xhr.onload = function() 
 			{
-				onLoad(xhr.response);
+				resolve(xhr.response);
 			};
-		}
 
-		if (onError !== undefined)
-		{
-			// @ts-ignore
-			xhr.onerror = onError;
-		}
-
-		xhr.send(null);
-
-		return xhr;
+			xhr.onerror = reject;
+			xhr.send(null);
+		});
 	}
 
 	/**
