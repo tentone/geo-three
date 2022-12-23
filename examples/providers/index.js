@@ -1,4 +1,4 @@
-import * as Geo from '../Main';
+import * as Geo from '../../source/Main';
 import * as THREE from "three";
 import {MapControls} from "three/examples/jsm/controls/OrbitControls.js";
 import {Sky} from "three/examples/jsm/controls/Sky.js";

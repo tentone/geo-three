@@ -30,7 +30,7 @@
   },
   "include": [
     "source/**/*"
-  ],
+, "examples/examples", "examples/transition/transition.js"  ],
   "exclude": [
     "node_modules/**/*",
     "docs/**/*",
