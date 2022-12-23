@@ -1,6 +1,7 @@
-import * as Geo from '../../source/Main';
-import * as THREE from "three";
+
+import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2} from 'three';
 import {MapControls} from "three/examples/jsm/controls/OrbitControls.js";
+import {UnitsUtils, BingMapsProvider, MapView} from '../../Main';
 
 var canvas = document.getElementById("canvas");
 
@@ -15,69 +16,69 @@ const scenes = [createWorldScene(), createMapScene()];
 
 let active = SPHERE;
 
-let renderer = new THREE.WebGLRenderer({
+let renderer = new WebGLRenderer({
     canvas: canvas,
     antialias: true
 });
 
 // Create scene for spherical earth
 function createWorldScene() {
-    var scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    var scene = new Scene();
+    scene.background = new Color(0x000000);
     
     // Globe
-    var loader = new THREE.TextureLoader();
+    var loader = new TextureLoader();
     loader.load('2k_earth_daymap.jpg', function(texture) {
-        var sphere = new THREE.Mesh(new THREE.SphereGeometry(Geo.UnitsUtils.EARTH_RADIUS, 256, 256), new THREE.MeshBasicMaterial({
+        var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({
             map: texture
         }));
         scene.add(sphere);
     });
 
-    var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e8);
+    var camera = new PerspectiveCamera(60, 1, 0.01, 1e8);
     
     var controls = new MapControls(camera, canvas);
-    controls.minDistance = Geo.UnitsUtils.EARTH_RADIUS + 3e4;
-    controls.maxDistance = Geo.UnitsUtils.EARTH_RADIUS * 1e1;
+    controls.minDistance = UnitsUtils.EARTH_RADIUS + 3e4;
+    controls.maxDistance = UnitsUtils.EARTH_RADIUS * 1e1;
     controls.enablePan = false;
     controls.zoomSpeed = 0.7;
     controls.rotateSpeed = 0.3; 
     controls.mouseButtons = {
-        LEFT: THREE.MOUSE.ROTATE,
-        MIDDLE: THREE.MOUSE.DOLLY,
-        RIGHT: THREE.MOUSE.PAN
+        LEFT: MOUSE.ROTATE,
+        MIDDLE: MOUSE.DOLLY,
+        RIGHT: MOUSE.PAN
     };
 
     // Set initial camera position 
-    camera.position.set(0, 0, Geo.UnitsUtils.EARTH_RADIUS + 1e7);
+    camera.position.set(0, 0, UnitsUtils.EARTH_RADIUS + 1e7);
 
     return {camera: camera, controls: controls, scene: scene};
 }
 
 // Create scene for planar map
 function createMapScene() {
-    var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e12);
+    var camera = new PerspectiveCamera(60, 1, 0.01, 1e12);
 
     var controls = new MapControls(camera, canvas);
     controls.minDistance = 1.0;
     controls.zoomSpeed = 2.0;
 
-    var scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x444444);
+    var scene = new Scene();
+    scene.background = new Color(0x444444);
 
-    var provider = new Geo.BingMapsProvider('', Geo.BingMapsProvider.AERIAL); // new Geo.OpenStreetMapsProvider()
+    var provider = new BingMapsProvider('', BingMapsProvider.AERIAL); // new OpenStreetMapsProvider()
 
-    var map = new Geo.MapView(Geo.MapView.PLANAR, provider);
+    var map = new MapView(MapView.PLANAR, provider);
     scene.add(map);
     map.updateMatrixWorld(true);
 
-    scene.add(new THREE.AmbientLight(0x777777));
+    scene.add(new AmbientLight(0x777777));
 
     return {camera: camera, controls: controls, scene: scene};
 }
 
 
-var raycaster = new THREE.Raycaster();
+var raycaster = new Raycaster();
 
 document.body.onresize = function()
 {
@@ -108,10 +109,10 @@ function animate()
 
     if (active === SPHERE) {
         // Get distance to the surface of earth
-        const distance = s.controls.getDistance() - Geo.UnitsUtils.EARTH_RADIUS;
+        const distance = s.controls.getDistance() - UnitsUtils.EARTH_RADIUS;
         if (distance < toggleDistance) {
             // Set raycaster to the camera center.
-            const pointer = new THREE.Vector2(0.0, 0.0);
+            const pointer = new Vector2(0.0, 0.0);
             raycaster.setFromCamera(pointer, s.camera);
             
             // Raycast from center of the camera to the sphere surface
@@ -120,12 +121,12 @@ function animate()
                 const point = intersects[0].point;
 
                 // Get coordinates from sphere surface
-                const pos = Geo.UnitsUtils.vectorToDatums(point);
+                const pos = UnitsUtils.vectorToDatums(point);
                 
                 const planeScene = scenes[PLANE];
 
                 // Calculate plane coordinates
-                var coords = Geo.UnitsUtils.datumsToSpherical(pos.latitude, pos.longitude);
+                var coords = UnitsUtils.datumsToSpherical(pos.latitude, pos.longitude);
                 planeScene.controls.target.set(coords.x, 0, -coords.y);
                 planeScene.camera.position.set(coords.x, distance, -coords.y);
 
@@ -140,15 +141,15 @@ function animate()
         if (distance > toggleDistance) {
             // Datum coordinates
             const target = s.controls.target;
-            const coords = Geo.UnitsUtils.sphericalToDatums(target.x, -target.z);
+            const coords = UnitsUtils.sphericalToDatums(target.x, -target.z);
 
             // Get sphere surface point from coordinates
-            const dir = Geo.UnitsUtils.datumsToVector(coords.latitude, coords.longitude);
+            const dir = UnitsUtils.datumsToVector(coords.latitude, coords.longitude);
 
             const sphereScene = scenes[SPHERE];
 
             // Set camera position 
-            dir.multiplyScalar(Geo.UnitsUtils.EARTH_RADIUS + distance);
+            dir.multiplyScalar(UnitsUtils.EARTH_RADIUS + distance);
             sphereScene.camera.position.copy(dir);
 
             console.log('Geo-Three: Switched scene from plane to sphere.', s.controls, coords, dir);

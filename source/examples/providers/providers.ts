@@ -1,17 +1,19 @@
-import * as Geo from '../../source/Main';
-import * as THREE from "three";
+
+import {WebGLRenderer, Scene, Color, AmbientLight, PerspectiveCamera, DirectionalLight, Vector3} from "three";
 import {MapControls} from "three/examples/jsm/controls/OrbitControls.js";
-import {Sky} from "three/examples/jsm/controls/Sky.js";
+import {Sky} from "three/examples/jsm/objects/Sky.js";
+import {HereMapsProvider, BingMapsProvider, MapTilerProvider, HeightDebugProvider, DebugProvider, LODRaycast, LODFrustum, LODRadial, UnitsUtils, OpenStreetMapsProvider, OpenMapTilesProvider, MapBoxProvider, MapView} from '../../Main';
+
 
 var canvas = document.getElementById("canvas");
 
-var renderer = new THREE.WebGLRenderer({
+var renderer = new WebGLRenderer({
     canvas: canvas,
     antialias: true
 });
 
-var scene = new THREE.Scene();
-scene.background = new THREE.Color(0.4, 0.4, 0.4);
+var scene = new Scene();
+scene.background = new Color(0.4, 0.4, 0.4);
 
 var sky = createSky();
 scene.add(sky);
@@ -26,40 +28,40 @@ function createProviders() {
     var OPEN_MAP_TILES_SERVER_MAP = document.getElementById("openmap_tiles_server").value;
 
     return [
-        ["Vector OpenSteet Maps", new Geo.OpenStreetMapsProvider(),],
-        ["Vector OpenTile Maps", new Geo.OpenMapTilesProvider(OPEN_MAP_TILES_SERVER_MAP)],
-        ["Vector Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/streets-v10", Geo.MapBoxProvider.STYLE)],
-        ["Vector Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.day")],
-        ["Vector Here Maps Night", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.night")],
-        ["Vector Here Maps Terrain", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "terrain.day")],
-        ["Vector Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.ROAD)],
-        ["Vector Map Tiler Basic", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "basic", "png")],
-        ["Vector Map Tiler Outdoor", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "outdoor", "png")],	
-        ["Satellite Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.satellite", Geo.MapBoxProvider.MAP_ID, "jpg70", false)],
-        ["Satellite Map Box Labels", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/satellite-streets-v10", Geo.MapBoxProvider.STYLE, "jpg70")],
-        ["Satellite Here Maps", new Geo.HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "satellite.day", "jpg")],
-        ["Satellite Bing Maps", new Geo.BingMapsProvider(DEV_BING_API_KEY, Geo.BingMapsProvider.AERIAL)],
-        ["Satellite Maps Tiler Labels", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "hybrid", "jpg")],
-        ["Satellite Maps Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "satellite", "jpg")],
-        ["Height Map Box", new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw")],
-        ["Height Map Tiler", new Geo.MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "terrain-rgb", "png")],
-        ["Debug Height Map Box", new Geo.HeightDebugProvider(new Geo.MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", Geo.MapBoxProvider.MAP_ID, "pngraw"))],
-        ["Debug", new Geo.DebugProvider()]
+        ["Vector OpenSteet Maps", new OpenStreetMapsProvider(),],
+        ["Vector OpenTile Maps", new OpenMapTilesProvider(OPEN_MAP_TILES_SERVER_MAP)],
+        ["Vector Map Box", new MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/streets-v10", MapBoxProvider.STYLE)],
+        ["Vector Here Maps", new HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.day")],
+        ["Vector Here Maps Night", new HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "base", "normal.night")],
+        ["Vector Here Maps Terrain", new HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "terrain.day")],
+        ["Vector Bing Maps", new BingMapsProvider(DEV_BING_API_KEY, BingMapsProvider.ROAD)],
+        ["Vector Map Tiler Basic", new MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "basic", "png")],
+        ["Vector Map Tiler Outdoor", new MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "outdoor", "png")],	
+        ["Satellite Map Box", new MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.satellite", MapBoxProvider.MAP_ID, "jpg70", false)],
+        ["Satellite Map Box Labels", new MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox/satellite-streets-v10", MapBoxProvider.STYLE, "jpg70")],
+        ["Satellite Here Maps", new HereMapsProvider(DEV_HEREMAPS_APP_ID, DEV_HEREMAPS_APP_CODE, "aerial", "satellite.day", "jpg")],
+        ["Satellite Bing Maps", new BingMapsProvider(DEV_BING_API_KEY, BingMapsProvider.AERIAL)],
+        ["Satellite Maps Tiler Labels", new MapTilerProvider(DEV_MAPTILER_API_KEY, "maps", "hybrid", "jpg")],
+        ["Satellite Maps Tiler", new MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "satellite", "jpg")],
+        ["Height Map Box", new MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", MapBoxProvider.MAP_ID, "pngraw")],
+        ["Height Map Tiler", new MapTilerProvider(DEV_MAPTILER_API_KEY, "tiles", "terrain-rgb", "png")],
+        ["Debug Height Map Box", new HeightDebugProvider(new MapBoxProvider(DEV_MAPBOX_API_KEY, "mapbox.terrain-rgb", MapBoxProvider.MAP_ID, "pngraw"))],
+        ["Debug", new DebugProvider()]
     ];
 }
 
 var modes = [
-    ["Planar", Geo.MapView.PLANAR],
-    ["Height", Geo.MapView.HEIGHT],
-    // ["Martini", Geo.MapView.MARTINI],
-    ["Height Shader", Geo.MapView.HEIGHT_SHADER],
-    ["Spherical", Geo.MapView.SPHERICAL]
+    ["Planar", MapView.PLANAR],
+    ["Height", MapView.HEIGHT],
+    // ["Martini", MapView.MARTINI],
+    ["Height Shader", MapView.HEIGHT_SHADER],
+    ["Spherical", MapView.SPHERICAL]
 ];
 
 var lods = [
-    ["Raycast", Geo.LODRaycast],
-    ["Frustum", Geo.LODFrustum],
-    ["Radial", Geo.LODRadial]
+    ["Raycast", LODRaycast],
+    ["Frustum", LODFrustum],
+    ["Radial", LODRadial]
 ];
 
 var ids = ["mapbox_api", "heremaps_id", "heremaps_code", "bing_api", "maptiler_api", "openmap_tiles_server"];
@@ -69,7 +71,7 @@ for(var i = 0; i < ids.length; i++) {
     {
         providers = createProviders();
         scene.remove(map);
-        map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
+        map = new MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
         scene.add(map);
     };
 }
@@ -95,7 +97,7 @@ mode.onchange = function(event)
     if(map !== undefined)
     {
         scene.remove(map);
-        map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
+        map = new MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
         scene.add(map);
     }
 };
@@ -142,23 +144,23 @@ mode.selectedIndex = 0;
 providerColor.selectedIndex = 12;
 providerHeight.selectedIndex = 15;
 
-var map = new Geo.MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
+var map = new MapView(modes[mode.selectedIndex][1], providers[providerColor.selectedIndex][1], providers[providerHeight.selectedIndex][1]);
 scene.add(map);
 map.updateMatrixWorld(true);
 
-var camera = new THREE.PerspectiveCamera(80, 1, 0.1, 1e12);
+var camera = new PerspectiveCamera(80, 1, 0.1, 1e12);
 
-var controls = new THREE.MapControls(camera, canvas);
+var controls = new MapControls(camera, canvas);
 controls.minDistance = 1e1;
 controls.zoomSpeed = 2.0;
 
-var coords = Geo.UnitsUtils.datumsToSpherical(40.940119, -8.535589);
+var coords = UnitsUtils.datumsToSpherical(40.940119, -8.535589);
 controls.target.set(coords.x, 0, -coords.y);
 camera.position.set(0, 1000, 0);
 
-scene.add(new THREE.AmbientLight(0x777777));
+scene.add(new AmbientLight(0x777777));
 
-var directional = new THREE.DirectionalLight(0x888888);
+var directional = new DirectionalLight(0x888888);
 directional.position.set(100, 10000, 700);
 scene.add(directional);
 
@@ -184,7 +186,7 @@ animate();
 function createSky()
 {
     // Add Sky
-    var sky = new THREE.Sky();
+    var sky = new Sky();
     sky.scale.setScalar(1e8);
 
     // GUI
@@ -207,7 +209,7 @@ function createSky()
     var theta = Math.PI * (effectController.inclination - 0.5);
     var phi = 2 * Math.PI * (effectController.azimuth - 0.5);
 
-    var sun = new THREE.Vector3();
+    var sun = new Vector3();
     sun.x = Math.cos(phi);
     sun.y = Math.sin(phi) * Math.sin(theta);
     sun.z = Math.sin(phi) * Math.cos(theta);

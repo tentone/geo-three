@@ -17,6 +17,7 @@
 		"url": "https://github.com/tentone/geothree.git"
 	},
 	"scripts": {
+		"build-example": "rollup -c rollup.example.js",
 		"start": "rollup -c rollup.dev.js --watch",
 		"build": "rollup -c rollup.config.js",
 		"docs": "typedoc --out docs ./source/Main.ts",
@@ -43,6 +44,7 @@
 	"devDependencies": {
 		"@rollup/plugin-strip": "~2.1.0",
 		"@rollup/plugin-typescript": "~8.3.1",
+		"@rollup/plugin-html": "1.0.1",
 		"@types/node": "~16.9.0",
 		"@types/offscreencanvas": "~2019.6.4",
 		"@types/three": "^0.146.0",
