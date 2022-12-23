@@ -12,7 +12,8 @@ export class XHRUtils
 	 */
 	public static async get(url: string): Promise<any>
 	{
-		return new Promise(function(resolve, reject) {
+		return new Promise(function(resolve, reject) 
+		{
 			const xhr = new XMLHttpRequest();
 			xhr.overrideMimeType('text/plain');
 			xhr.open('GET', url, true);
@@ -36,7 +37,8 @@ export class XHRUtils
 	 */
 	public static async getRaw(url: string): Promise<ArrayBuffer>
 	{
-		return new Promise(function(resolve, reject) {
+		return new Promise(function(resolve, reject) 
+		{
 			var xhr = new XMLHttpRequest();
 			xhr.responseType = 'arraybuffer';
 			xhr.open('GET', url, true);

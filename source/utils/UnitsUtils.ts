@@ -96,7 +96,8 @@ export class UnitsUtils
 	 * @param dir - Direction vector.
 	 * @returns WGS84 coordinates.
 	 */
-	public static vectorToDatums(dir: Vector3): Geolocation {
+	public static vectorToDatums(dir: Vector3): Geolocation 
+	{
 		const radToDeg = 180 / Math.PI;
 
 		const latitude = Math.atan2(dir.y, Math.sqrt(Math.pow(dir.x, 2) + Math.pow(-dir.z, 2))) * radToDeg;
@@ -115,7 +116,8 @@ export class UnitsUtils
 	 * @param longitude - Longitude value in degrees.
 	 * @returns Direction vector normalized.
 	 */
-	public static datumsToVector(latitude: number, longitude: number): Vector3 {
+	public static datumsToVector(latitude: number, longitude: number): Vector3 
+	{
 		const degToRad = Math.PI / 180;
 		
 		const rotX = longitude * degToRad;
@@ -134,7 +136,8 @@ export class UnitsUtils
 	 * @param color - Color of the pixel
 	 * @returns The altitude encoded in meters.
 	 */
-	 public static mapboxAltitude(color: Color): number {
-		return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
+	public static mapboxAltitude(color: Color): number 
+	{
+		return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
 	}
 }

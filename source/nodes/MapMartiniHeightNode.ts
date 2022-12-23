@@ -337,7 +337,8 @@ export class MapMartiniHeightNode extends MapHeightNode
 
 		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
 
-		if (this.disposed) {
+		if (this.disposed) 
+		{
 			return;
 		}
 

@@ -49,7 +49,7 @@ module.exports = {
 		'@typescript-eslint/prefer-for-of': 'off',
 		'@typescript-eslint/prefer-function-type': 'error',
 		'@typescript-eslint/prefer-namespace-keyword': 'error',
-		'@typescript-eslint/prefer-as-const': 'error',
+		'@typescript-eslint/prefer-as-const': 'off',
 		'@typescript-eslint/quotes': ['error', 'single'],
 		'@typescript-eslint/type-annotation-spacing': ['error', {before: false, after: true}],
 		'@typescript-eslint/triple-slash-reference': 'error',

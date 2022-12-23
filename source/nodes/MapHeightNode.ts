@@ -120,24 +120,29 @@ export class MapHeightNode extends MapNode
 			return;
 		}
 
-		try {
+		try 
+		{
 			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
  
-			if (this.disposed) {
+			if (this.disposed) 
+			{
 				return;
 			}
 
 			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
-	 
+
 			const context = canvas.getContext('2d');
 			context.imageSmoothingEnabled = false;
 			context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
-	 
+
 			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-	 
+
 			this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
-		} catch(e) {
-			if (this.disposed) {
+		}
+		catch (e) 
+		{
+			if (this.disposed) 
+			{
 				return;
 			}
 			

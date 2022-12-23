@@ -260,7 +260,8 @@ export abstract class MapNode extends Mesh
 		{
 			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
 		
-			if (this.disposed) {
+			if (this.disposed) 
+			{
 				return;
 			}
 			
@@ -276,7 +277,8 @@ export abstract class MapNode extends Mesh
 		}
 		catch (e) 
 		{
-			if (this.disposed) {
+			if (this.disposed) 
+			{
 				return;
 			}
 			
@@ -345,13 +347,17 @@ export abstract class MapNode extends Mesh
 
 		const self = this as Mesh;
 
-		try {
-			const material = (self.material as Material);
+		try 
+		{
+			const material = self.material as Material;
 			material.dispose();
-		} catch(e){}
+		}
+		catch (e) {}
 		
-		try {
+		try 
+		{
 			self.geometry.dispose();
-		} catch(e) {}	
+		}
+		catch (e) {}	
 	}
 }

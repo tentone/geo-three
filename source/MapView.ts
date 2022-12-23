@@ -171,15 +171,19 @@ export class MapView extends Mesh
 	 */
 	public preSubdivide(): void 
 	{
-		function subdivide(node: MapNode, depth: number): void {
-			if (depth <= 0) {
+		function subdivide(node: MapNode, depth: number): void 
+		{
+			if (depth <= 0) 
+			{
 				return;
 			}
 
 			node.subdivide();
 
-			for(let i = 0; i < node.children.length; i++) {
-				if (node.children[i] instanceof MapNode) {
+			for (let i = 0; i < node.children.length; i++) 
+			{
+				if (node.children[i] instanceof MapNode) 
+				{
 					const child = node.children[i] as MapNode;
 					subdivide(child, depth - 1);
 				}
@@ -187,7 +191,8 @@ export class MapView extends Mesh
 		}
 
 		const minZoom = Math.max(this.provider.minZoom, this.heightProvider?.minZoom ?? -Infinity);
-		if (minZoom > 0) {
+		if (minZoom > 0) 
+		{
 			subdivide(this.root, minZoom);
 		}
 	}
@@ -252,7 +257,8 @@ export class MapView extends Mesh
 	 * 
 	 * @returns Minimum zoom level available.
 	 */
-	public minZoom(): number {
+	public minZoom(): number 
+	{
 		return Math.max(this.provider.minZoom, this.heightProvider?.minZoom ?? -Infinity);
 	}
 
@@ -261,7 +267,8 @@ export class MapView extends Mesh
 	 * 
 	 * @returns Maximum zoom level available.
 	 */
-	public maxZoom(): number {
+	public maxZoom(): number 
+	{
 		return Math.min(this.provider.maxZoom, this.heightProvider?.maxZoom ?? Infinity);
 	}
 

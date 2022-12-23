@@ -50,7 +50,7 @@ export class MapHeightNodeShader extends MapHeightNode
 
 	public constructor(parentNode: MapHeightNode = null, mapView: MapView = null, location: number = QuadTreePosition.root, level: number = 0, x: number = 0, y: number = 0) 
 	{
-		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map:  MapNode.defaultTexture, color: 0xFFFFFF}));
+		const material: Material = MapHeightNodeShader.prepareMaterial(new MeshPhongMaterial({map: MapNode.defaultTexture, color: 0xFFFFFF}));
 
 		super(parentNode, mapView, location, level, x, y, MapHeightNodeShader.geometry, material);
 
@@ -127,7 +127,8 @@ export class MapHeightNodeShader extends MapHeightNode
 		{
 			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
 
-			if (this.disposed) {
+			if (this.disposed) 
+			{
 				return;
 			}
 			
@@ -143,7 +144,8 @@ export class MapHeightNodeShader extends MapHeightNode
 		}
 		catch (e) 
 		{
-			if (this.disposed) {
+			if (this.disposed) 
+			{
 				return;
 			}
 			
