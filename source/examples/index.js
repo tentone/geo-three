@@ -1,3 +1,8 @@
+import * as Geo from '../Main';
+import * as THREE from "three";
+import {MapControls} from "three/examples/jsm/controls/OrbitControls.js";
+import {Sky} from "three/examples/jsm/controls/Sky.js";
+
 var canvas = document.getElementById("canvas");
 
 var renderer = new THREE.WebGLRenderer({

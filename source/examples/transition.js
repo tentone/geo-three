@@ -1,3 +1,7 @@
+import * as Geo from '../Main';
+import * as THREE from "three";
+import {MapControls} from "three/examples/jsm/controls/OrbitControls.js";
+
 var canvas = document.getElementById("canvas");
 
 // Spherical earth scene
@@ -32,7 +36,7 @@ function createWorldScene() {
 
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e8);
     
-    var controls = new THREE.MapControls(camera, canvas);
+    var controls = new MapControls(camera, canvas);
     controls.minDistance = Geo.UnitsUtils.EARTH_RADIUS + 3e4;
     controls.maxDistance = Geo.UnitsUtils.EARTH_RADIUS * 1e1;
     controls.enablePan = false;
@@ -54,7 +58,7 @@ function createWorldScene() {
 function createMapScene() {
     var camera = new THREE.PerspectiveCamera(60, 1, 0.01, 1e12);
 
-    var controls = new THREE.MapControls(camera, canvas);
+    var controls = new MapControls(camera, canvas);
     controls.minDistance = 1.0;
     controls.zoomSpeed = 2.0;
 
