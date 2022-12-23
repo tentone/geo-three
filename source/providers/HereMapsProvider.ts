@@ -96,16 +96,16 @@ export class HereMapsProvider extends MapProvider
 	 * @param format - Image format.
 	 * @param size - Tile size.
 	 */
-	public constructor(appId: string, appCode: string, style: string, scheme: string, format: string, size: number) 
+	public constructor(appId: string = '', appCode: string = '', style: string = 'base', scheme: string = 'normal.day', format: string = 'png', size: number = 512) 
 	{
 		super();
 
-		this.appId = appId !== undefined ? appId : '';
-		this.appCode = appCode !== undefined ? appCode : '';
-		this.style = style !== undefined ? style : 'base';
-		this.scheme = scheme !== undefined ? scheme : 'normal.day';
-		this.format = format !== undefined ? format : 'png';
-		this.size = size !== undefined ? size : 512;
+		this.appId = appId;
+		this.appCode = appCode;
+		this.style = style;
+		this.scheme = scheme;
+		this.format = format;
+		this.size = size;
 		this.version = 'newest';
 		this.server = 1;
 	}

@@ -1,7 +1,7 @@
 
 import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2} from 'three';
 import {MapControls} from "three/examples/jsm/controls/OrbitControls.js";
-import {UnitsUtils, BingMapsProvider, MapView} from '../../Main';
+import {UnitsUtils, BingMapsProvider, MapView} from '../Main';
 
 var canvas = document.getElementById("canvas");
 

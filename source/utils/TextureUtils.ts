@@ -18,7 +18,8 @@ export class TextureUtils
 	public static createFillTexture(color: (string | CanvasGradient | CanvasPattern) = '#000000', width: number = 1, height: number = 1): Texture
 	{
 		const canvas = CanvasUtils.createOffscreenCanvas(width, height);
-		const context = canvas.getContext('2d');
+
+		const context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 		context.fillStyle = color;
 		context.fillRect(0, 0, width, height);
 

@@ -1,7 +1,7 @@
 import typescript from '@rollup/plugin-typescript';
 export default [
 	{
-		input: 'source/examples/transition/transition.js',
+		input: 'source/examples/transition.ts',
 		plugins: [
 			typescript({
 		 		declaration: false
@@ -9,14 +9,14 @@ export default [
 		],
 		output: [
 			{
-				format: 'umd',
+				format: 'iife',
 				file: 'example/transition.js',
 				indent: '\t'
 			}
 		]
 	},
 	{
-		input: 'source/examples/providers/providers.js',
+		input: 'source/examples/providers.ts',
 		plugins: [
 			typescript({
 				declaration: false
@@ -24,7 +24,7 @@ export default [
 		],
 		output: [
 			{
-				format: 'umd',
+				format: 'iife',
 				file: 'example/providers.js',
 				indent: '\t'
 			}
