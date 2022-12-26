@@ -31290,7 +31290,7 @@
 	        return new Vector3(-Math.cos(rotX + Math.PI) * cos, Math.sin(rotY), Math.sin(rotX + Math.PI) * cos);
 	    }
 	    static mapboxAltitude(color) {
-	        return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
+	        return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
 	    }
 	}
 	UnitsUtils.EARTH_RADIUS = 6371008;
@@ -32514,7 +32514,7 @@
 	MapBoxProvider.STYLE = 100;
 	MapBoxProvider.MAP_ID = 101;
 
-	var canvas = document.getElementById("canvas");
+	var canvas = document.getElementById('canvas');
 	const SPHERE = 0;
 	const PLANE = 1;
 	const scenes = [createWorldScene(), createMapScene()];
@@ -32528,9 +32528,7 @@
 	    scene.background = new Color(0x000000);
 	    var loader = new TextureLoader();
 	    loader.load('2k_earth_daymap.jpg', function (texture) {
-	        var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({
-	            map: texture
-	        }));
+	        var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({ map: texture }));
 	        scene.add(sphere);
 	    });
 	    var camera = new PerspectiveCamera(60, 1, 0.01, 1e8);
