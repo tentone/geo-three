@@ -384,7 +384,7 @@ class UnitsUtils {
         return new Vector3(-Math.cos(rotX + Math.PI) * cos, Math.sin(rotY), Math.sin(rotX + Math.PI) * cos);
     }
     static mapboxAltitude(color) {
-        return ((color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1) - 10000.0;
+        return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
     }
 }
 UnitsUtils.EARTH_RADIUS = 6371008;
@@ -1612,14 +1612,14 @@ class GoogleMapsProvider extends MapProvider {
 }
 
 class HereMapsProvider extends MapProvider {
-    constructor(appId, appCode, style, scheme, format, size) {
+    constructor(appId = '', appCode = '', style = 'base', scheme = 'normal.day', format = 'png', size = 512) {
         super();
-        this.appId = appId !== undefined ? appId : '';
-        this.appCode = appCode !== undefined ? appCode : '';
-        this.style = style !== undefined ? style : 'base';
-        this.scheme = scheme !== undefined ? scheme : 'normal.day';
-        this.format = format !== undefined ? format : 'png';
-        this.size = size !== undefined ? size : 512;
+        this.appId = appId;
+        this.appCode = appCode;
+        this.style = style;
+        this.scheme = scheme;
+        this.format = format;
+        this.size = size;
         this.version = 'newest';
         this.server = 1;
     }
@@ -1899,4 +1899,4 @@ class CancelablePromise {
     }
 }
 
-export { BingMapsProvider, CancelablePromise, DebugProvider, Geolocation, GeolocationUtils, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, UnitsUtils, XHRUtils };
+export { BingMapsProvider, CancelablePromise, CanvasUtils, DebugProvider, Geolocation, GeolocationUtils, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, TextureUtils, UnitsUtils, XHRUtils };

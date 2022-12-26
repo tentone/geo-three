@@ -37,7 +37,7 @@ export class HeightDebugProvider extends MapProvider
 		const resolution = 256;
 
 		const canvas = CanvasUtils.createOffscreenCanvas(resolution, resolution);
-		const context = canvas.getContext('2d');
+		const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 		context.drawImage(image, 0, 0, resolution, resolution, 0, 0, resolution, resolution);
 

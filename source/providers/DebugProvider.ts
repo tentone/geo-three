@@ -15,7 +15,7 @@ export class DebugProvider extends MapProvider
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>
 	{
 		const canvas = CanvasUtils.createOffscreenCanvas(this.resolution, this.resolution);
-		const context = canvas.getContext('2d');
+		const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
 		const green = new Color(0x00ff00);
 		const red = new Color(0xff0000);

@@ -291,7 +291,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 		const gridSize = tileSize + 1;
 		var canvas = CanvasUtils.createOffscreenCanvas(tileSize, tileSize);
 
-		var context = canvas.getContext('2d');
+		var context = canvas.getContext('2d') as CanvasRenderingContext2D;
 		context.imageSmoothingEnabled = false;
 		context.drawImage(image, 0, 0, tileSize, tileSize, 0, 0, canvas.width, canvas.height);
 		

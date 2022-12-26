@@ -9,7 +9,7 @@ export declare class HereMapsProvider extends MapProvider {
     size: number;
     version: string;
     server: number;
-    constructor(appId: string, appCode: string, style: string, scheme: string, format: string, size: number);
+    constructor(appId?: string, appCode?: string, style?: string, scheme?: string, format?: string, size?: number);
     nextServer(): void;
     getMetaData(): Promise<void>;
     fetchTile(zoom: number, x: number, y: number): Promise<any>;

@@ -24,6 +24,7 @@ export default [
 			resolve(),
 			typescript({
 				declaration: false
+				
 			})
 		],
 		output: [

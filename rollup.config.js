@@ -4,9 +4,12 @@ import typescript from '@rollup/plugin-typescript';
 export default [
 	{
 		input: 'source/Main.ts',
+	
 		external: ['three'],
 		plugins: [
-			typescript({ tsconfig: './tsconfig.json' }),
+			typescript({
+				tsconfig: './tsconfig.json'
+			}),
 			strip({
 				functions: ['assert.*', 'debug', 'alert', 'console.*']
 			})

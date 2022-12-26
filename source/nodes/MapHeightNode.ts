@@ -1,4 +1,4 @@
-import {LinearFilter, Material, MeshPhongMaterial, BufferGeometry, RGBAFormat, Texture, Vector3, Raycaster, Intersection} from 'three';
+import {Material, MeshPhongMaterial, BufferGeometry, Vector3, Raycaster, Intersection} from 'three';
 import {MapNodeGeometry} from '../geometries/MapNodeGeometry';
 import {MapNode, QuadTreePosition} from './MapNode';
 import {MapPlaneNode} from './MapPlaneNode';
@@ -6,7 +6,6 @@ import {UnitsUtils} from '../utils/UnitsUtils';
 import {MapView} from '../MapView';
 import {MapNodeHeightGeometry} from '../geometries/MapNodeHeightGeometry';
 import {CanvasUtils} from '../utils/CanvasUtils';
-import {TextureUtils} from '../utils/TextureUtils';
 
 /**
  * Represents a height map tile node that can be subdivided into other height nodes.
@@ -131,7 +130,7 @@ export class MapHeightNode extends MapNode
 
 			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
 
-			const context = canvas.getContext('2d');
+			const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 			context.imageSmoothingEnabled = false;
 			context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
 
