@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import {WebGLRenderer, Scene, Color, AmbientLight, PerspectiveCamera, DirectionalLight, Vector3} from 'three';
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -173,6 +174,7 @@ document.body.onresize = function(): void
 	camera.aspect = width / height;
 	camera.updateProjectionMatrix();
 };
+// @ts-ignore
 document.body.onresize();
 
 function animate(): void

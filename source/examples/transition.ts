@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2} from 'three';
 import {MapControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -96,6 +97,8 @@ document.body.onresize = function(): void
 	}
 
 };
+
+// @ts-ignore
 document.body.onresize();
 
 function animate(): void

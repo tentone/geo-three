@@ -7,7 +7,7 @@ export default [
 		plugins: [
 			resolve(),
 			typescript({
-		 		declaration: false
+				tsconfig: './tsconfig.examples.json',
 			})
 		],
 		output: [
@@ -23,8 +23,7 @@ export default [
 		plugins: [
 			resolve(),
 			typescript({
-				declaration: false
-				
+				tsconfig: './tsconfig.examples.json',
 			})
 		],
 		output: [
