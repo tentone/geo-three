@@ -13,7 +13,7 @@ export default [
 		output: [
 			{
 				format: 'iife',
-				file: 'example/transition.js',
+				file: 'examples/transition.js',
 				indent: '\t'
 			}
 		]
@@ -29,7 +29,7 @@ export default [
 		output: [
 			{
 				format: 'iife',
-				file: 'example/providers.js',
+				file: 'examples/providers.js',
 				indent: '\t'
 			}
 		]

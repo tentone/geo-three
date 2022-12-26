@@ -15,7 +15,7 @@
 ### Example
  - You can test some live demos of the library running from the project page.
  - Some of these examples might require API keys for the map services used.
-   - [Sandbox](https://tentone.github.io/geo-three/examples/index.html)
+   - [Sandbox](https://tentone.github.io/geo-three/examples/providers.html)
    - [Globe](https://tentone.github.io/geo-three/examples/transition.html)
 
 ### Usage
