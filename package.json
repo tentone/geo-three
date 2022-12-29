@@ -17,7 +17,7 @@
 		"url": "https://github.com/tentone/geothree.git"
 	},
 	"scripts": {
-		"start": "npm run examples && http-server example",
+		"start": "npm run examples && http-server examples",
 		"examples": "rollup -c rollup.example.js",
 		"build": "rollup -c rollup.config.js",
 		"docs": "typedoc --out docs ./source/Main.ts",

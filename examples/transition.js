@@ -32550,7 +32550,7 @@
 	    var camera = new PerspectiveCamera(60, 1, 0.01, 1e12);
 	    var controls = new MapControls(camera, canvas);
 	    controls.minDistance = 1.0;
-	    controls.zoomSpeed = 2.0;
+	    controls.zoomSpeed = 1.0;
 	    var scene = new Scene();
 	    scene.background = new Color(0x444444);
 	    var provider = new BingMapsProvider('', BingMapsProvider.AERIAL);
@@ -32598,6 +32598,17 @@
 	    }
 	    else if (active === PLANE) {
 	        const distance = s.controls.getDistance();
+	        s.controls.minPolarAngle = 0;
+	        s.controls.maxPolarAngle = Math.PI / 2;
+	        s.controls.minAzimuthAngle = -Math.PI;
+	        s.controls.maxAzimuthAngle = Math.PI;
+	        const ratio = 0.4;
+	        if (distance > toggleDistance * ratio) {
+	            const progress = (toggleDistance - distance) / (toggleDistance * (1 - ratio));
+	            s.controls.maxPolarAngle = progress * Math.PI / 2;
+	            s.controls.minAzimuthAngle = progress * -Math.PI;
+	            s.controls.maxAzimuthAngle = progress * Math.PI;
+	        }
 	        if (distance > toggleDistance) {
 	            const target = s.controls.target;
 	            const coords = UnitsUtils.sphericalToDatums(target.x, -target.z);

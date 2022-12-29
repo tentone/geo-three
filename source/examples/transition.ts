@@ -63,7 +63,7 @@ function createMapScene(): any
 
 	var controls = new MapControls(camera, canvas);
 	controls.minDistance = 1.0;
-	controls.zoomSpeed = 2.0;
+	controls.zoomSpeed = 1.0;
 
 	var scene = new Scene();
 	scene.background = new Color(0x444444);
@@ -148,6 +148,27 @@ function animate(): void
 	else if (active === PLANE) 
 	{
 		const distance = s.controls.getDistance();
+
+		s.controls.minPolarAngle = 0;
+		s.controls.maxPolarAngle = Math.PI / 2;
+
+		s.controls.minAzimuthAngle = -Math.PI;
+		s.controls.maxAzimuthAngle = Math.PI;
+		
+		const ratio = 0.4;
+		if (distance > toggleDistance * ratio) 
+		{
+			// Transition progres (0 to 1)
+			const progress = (toggleDistance - distance) / (toggleDistance * (1 - ratio));
+
+			// Limit polar angle
+			s.controls.maxPolarAngle = progress * Math.PI / 2;
+			
+			// Limit range of azimuth rotation
+			s.controls.minAzimuthAngle = progress * -Math.PI;
+			s.controls.maxAzimuthAngle = progress * Math.PI;
+		}
+
 		if (distance > toggleDistance) 
 		{
 			// Datum coordinates
