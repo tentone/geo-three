@@ -33,5 +33,21 @@ export default [
 				indent: '\t'
 			}
 		]
+	},
+	{
+		input: 'source/examples/basic.ts',
+		plugins: [
+			resolve(),
+			typescript({
+				tsconfig: './tsconfig.examples.json',
+			})
+		],
+		output: [
+			{
+				format: 'iife',
+				file: 'examples/basic.js',
+				indent: '\t'
+			}
+		]
 	}
 ];
