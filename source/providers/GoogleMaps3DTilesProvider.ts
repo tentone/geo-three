@@ -5,6 +5,7 @@ import {MapProvider} from './MapProvider';
  * Google 3D tiles provider, used to load 3D tiles using the library.
  *
  * API Reference
+ *  - https://cloud.google.com/blog/products/maps-platform/create-immersive-3d-map-experiences-photorealistic-3d-tiles
  *  - https://developers.google.com/maps/documentation/tile/3d-tiles-overview
  *  - https://developers.google.com/maps/documentation/tile/create-renderer
  */
