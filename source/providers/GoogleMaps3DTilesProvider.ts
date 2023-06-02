@@ -28,6 +28,8 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 		super();
 
 		this.key = apiToken !== undefined ? apiToken : '';
+
+		this.session = '';
 	}
 
 	/**
