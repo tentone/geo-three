@@ -23,12 +23,11 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 	 */
 	public session: string = null;
 
-	public constructor(apiToken: string) 
+	public constructor(key: string = '') 
 	{
 		super();
 
-		this.key = apiToken !== undefined ? apiToken : '';
-
+		this.key = key;
 		this.session = '';
 	}
 
