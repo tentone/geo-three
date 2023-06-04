@@ -16,14 +16,14 @@ export class GoogleMapsProvider extends MapProvider
 	/**
 	 * Server API access token.
 	 */
-	public apiToken: string;
+	public key: string;
 
 	/**
 	 * After the first call a session token is stored.
 	 *
 	 * The session token is required for subsequent requests for tile and viewport information.
 	 */
-	public sessionToken: string = null;
+	public session: string = null;
 
 	/**
 	 * The map orientation in degrees.
@@ -53,11 +53,11 @@ export class GoogleMapsProvider extends MapProvider
 	 */
 	public overlay: boolean = false;
 
-	public constructor(apiToken: string) 
+	public constructor(key: string) 
 	{
 		super();
 
-		this.apiToken = apiToken !== undefined ? apiToken : '';
+		this.key = key !== undefined ? key : '';
 
 		this.createSession();
 	}
@@ -69,7 +69,7 @@ export class GoogleMapsProvider extends MapProvider
 	 */
 	public createSession(): void 
 	{
-		const address = 'https://www.googleapis.com/tile/v1/createSession?key=' + this.apiToken;
+		const address = 'https://www.googleapis.com/tile/v1/createSession?key=' + this.key;
 		const data = JSON.stringify({
 			mapType: this.mapType,
 			language: 'en-EN',
@@ -81,7 +81,7 @@ export class GoogleMapsProvider extends MapProvider
 
 		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, data, (response, xhr) =>
 		{
-			this.sessionToken = response.session;
+			this.session = response.session;
 		}, function(xhr) 
 		{
 			throw new Error('Unable to create a google maps session.');
@@ -102,7 +102,7 @@ export class GoogleMapsProvider extends MapProvider
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';
-			image.src = 'https://www.googleapis.com/tile/v1/tiles/' + zoom + '/' + x + '/' + y + '?session=' + this.sessionToken + '&orientation=' + this.orientation + '&key=' + this.apiToken;
+			image.src = 'https://www.googleapis.com/tile/v1/tiles/' + zoom + '/' + x + '/' + y + '?session=' + this.session + '&orientation=' + this.orientation + '&key=' + this.key;
 		});
 	}
 }

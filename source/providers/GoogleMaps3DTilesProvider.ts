@@ -35,6 +35,8 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 	 * Get root tile.
 	 */
 	public getRoot() {
+
+		
 		// https://tile.googleapis.com/v1/3dtiles/root.json?key=YOUR_API_KEY
 	}
 
