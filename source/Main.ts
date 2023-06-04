@@ -15,6 +15,7 @@ export {OpenMapTilesProvider} from './providers/OpenMapTilesProvider';
 export {OpenStreetMapsProvider} from './providers/OpenStreetMapsProvider';
 export {DebugProvider} from './providers/DebugProvider';
 export {HeightDebugProvider} from './providers/HeightDebugProvider';
+export {GoogleMaps3DTilesProvider} from './providers/GoogleMaps3DTilesProvider';
 
 export {MapNodeGeometry} from './geometries/MapNodeGeometry';
 export {MapNodeHeightGeometry} from './geometries/MapNodeHeightGeometry';
@@ -25,6 +26,7 @@ export {MapHeightNode} from './nodes/MapHeightNode';
 export {MapPlaneNode} from './nodes/MapPlaneNode';
 export {MapSphereNode} from './nodes/MapSphereNode';
 export {MapHeightNodeShader} from './nodes/MapHeightNodeShader';
+export {Map3DTileNode} from './nodes/Map3DTileNode';
 
 export {UnitsUtils} from './utils/UnitsUtils';
 export {CanvasUtils} from './utils/CanvasUtils';

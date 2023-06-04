@@ -9,6 +9,7 @@ import {LODRaycast} from './lod/LODRaycast';
 import {MapProvider} from './providers/MapProvider';
 import {LODControl} from './lod/LODControl';
 import {MapMartiniHeightNode} from './nodes/MapMartiniHeightNode';
+import { Map3DTileNode } from './nodes/Map3DTileNode';
 
 /**
  * Map viewer is used to read and display map tiles from a server.
@@ -45,6 +46,11 @@ export class MapView extends Mesh
 	public static MARTINI: number = 204;
 
 	/**
+	 * 3D tiles.
+	 */
+	public static TILES_3D: number = 205;
+
+	/**
 	 * Map of the map node types available.
 	 */
 	public static mapModes: Map<number, any> = new Map<number, any>([
@@ -52,7 +58,8 @@ export class MapView extends Mesh
 		[MapView.SPHERICAL, MapSphereNode],
 		[MapView.HEIGHT, MapHeightNode],
 		[MapView.HEIGHT_SHADER, MapHeightNodeShader],
-		[MapView.MARTINI, MapMartiniHeightNode]
+		[MapView.MARTINI, MapMartiniHeightNode],
+		[MapView.TILES_3D, Map3DTileNode]
 	]);
 
 	/**

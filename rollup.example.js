@@ -49,5 +49,21 @@ export default [
 				indent: '\t'
 			}
 		]
+	},
+	{
+		input: 'source/examples/3dtiles.ts',
+		plugins: [
+			resolve(),
+			typescript({
+				tsconfig: './tsconfig.examples.json',
+			})
+		],
+		output: [
+			{
+				format: 'iife',
+				file: 'examples/3dtiles.js',
+				indent: '\t'
+			}
+		]
 	}
 ];
