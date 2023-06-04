@@ -32082,6 +32082,21 @@
 	MapBoxProvider.STYLE = 100;
 	MapBoxProvider.MAP_ID = 101;
 
+	class GoogleMaps3DTilesProvider extends MapProvider {
+	    constructor(key = '') {
+	        super();
+	        this.key = null;
+	        this.session = null;
+	        this.key = key;
+	        this.session = '';
+	    }
+	    getRoot() {
+	    }
+	    fetchTile(zoom, x, y) {
+	        return;
+	    }
+	}
+
 	var canvas = document.getElementById('canvas');
 	var renderer = new WebGLRenderer({
 	    canvas: canvas,
@@ -32089,8 +32104,8 @@
 	});
 	var scene = new Scene();
 	scene.background = new Color(0.4, 0.4, 0.4);
-	var provider = new BingMapsProvider('', BingMapsProvider.AERIAL);
-	var map = new MapView(MapView.PLANAR, provider);
+	var provider = new GoogleMaps3DTilesProvider('');
+	var map = new MapView(MapView.TILES_3D, provider);
 	scene.add(map);
 	map.updateMatrixWorld(true);
 	var camera = new PerspectiveCamera(80, 1, 0.1, 1e12);

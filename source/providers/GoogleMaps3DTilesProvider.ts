@@ -1,3 +1,4 @@
+import { XHRUtils } from '../utils/XHRUtils';
 import {MapProvider} from './MapProvider';
 
 
@@ -29,15 +30,26 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 
 		this.key = key;
 		this.session = '';
+
+
+		this.getRoot();
 	}
 
 	/**
 	 * Get root tile.
 	 */
 	public getRoot() {
+		const address = 'https://tile.googleapis.com/v1/3dtiles/root.json?key=' + this.key;
 
-		
-		// https://tile.googleapis.com/v1/3dtiles/root.json?key=YOUR_API_KEY
+		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, null, (response, xhr) =>
+		{
+			// TODO <ADD CODE HERE>
+			this.session = response.session;
+		}, function(xhr) 
+		{
+			throw new Error('Unable to create a google maps session.');
+		});
+
 	}
 
 
