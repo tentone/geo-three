@@ -38,18 +38,10 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 	/**
 	 * Get root tile.
 	 */
-	public getRoot() {
+	public async getRoot(): Promise<void> {
 		const address = 'https://tile.googleapis.com/v1/3dtiles/root.json?key=' + this.key;
 
-		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, null, (response, xhr) =>
-		{
-			// TODO <ADD CODE HERE>
-			this.session = response.session;
-		}, function(xhr) 
-		{
-			throw new Error('Unable to create a google maps session.');
-		});
-
+		const request = await XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, null);
 	}
 
 

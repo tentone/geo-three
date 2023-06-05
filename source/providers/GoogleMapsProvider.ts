@@ -58,8 +58,6 @@ export class GoogleMapsProvider extends MapProvider
 		super();
 
 		this.key = key !== undefined ? key : '';
-
-		this.createSession();
 	}
 
 	/**
@@ -67,7 +65,7 @@ export class GoogleMapsProvider extends MapProvider
 	 *
 	 * This method needs to be called before using the provider
 	 */
-	public createSession(): void 
+	public async createSession(): Promise<void> 
 	{
 		const address = 'https://www.googleapis.com/tile/v1/createSession?key=' + this.key;
 		const data = JSON.stringify({
@@ -79,13 +77,13 @@ export class GoogleMapsProvider extends MapProvider
 			scale: 'scaleFactor1x'
 		});
 
-		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, data, (response, xhr) =>
-		{
-			this.session = response.session;
-		}, function(xhr) 
-		{
+		try {
+			const request = await XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, data);
+			this.session = request.response.session;
+		}
+		catch (e) {
 			throw new Error('Unable to create a google maps session.');
-		});
+		}
 	}
 
 	public fetchTile(zoom: number, x: number, y: number): Promise<any>

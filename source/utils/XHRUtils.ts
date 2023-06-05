@@ -62,10 +62,9 @@ export class XHRUtils
 	 * @param type - Resquest type (POST, GET, ...)
 	 * @param header - Object with data to be added to the request header.
 	 * @param body - Data to be sent in the resquest.
-	 * @param onLoad - On load callback, receives data (String or Object) and XHR as arguments.
-	 * @param onError - XHR onError callback.
+	 * @param onProgress - On progress callback.
 	 */
-	public static request(url: string, type: string, header?: any, body?: any, onLoad?: Function, onError?: Function, onProgress?: Function): XMLHttpRequest 
+	public static request(url: string, type: string, header?: any, body?: any, onProgress?: Function): Promise<XMLHttpRequest> 
 	{
 		function parseResponse(response): void 
 		{
@@ -79,41 +78,43 @@ export class XHRUtils
 			}
 		}
 
-		const xhr = new XMLHttpRequest();
-		xhr.overrideMimeType('text/plain');
-		xhr.open(type, url, true);
-
-		// Fill header data from Object
-		if (header !== null && header !== undefined) 
+		return new Promise(function(resolve, reject) 
 		{
-			for (const i in header) 
+			const xhr = new XMLHttpRequest();
+			xhr.overrideMimeType('text/plain');
+			xhr.open(type, url, true);
+
+			// Fill header data from Object
+			if (header !== null && header !== undefined) 
 			{
-				xhr.setRequestHeader(i, header[i]);
+				for (const i in header) 
+				{
+					xhr.setRequestHeader(i, header[i]);
+				}
 			}
-		}
 
-		if (onLoad !== undefined) 
-		{
+	
 			xhr.onload = function(event) 
 			{
-				onLoad(parseResponse(xhr.response), xhr);
+				resolve({
+					response: parseResponse(xhr.response),
+					xhr: xhr
+				});
 			};
-		}
 
-		if (onError !== undefined) 
-		{
 			// @ts-ignore
-			xhr.onerror = onError;
-		}
+			xhr.onerror = reject;
 
-		if (onProgress !== undefined) 
-		{
-			// @ts-ignore
-			xhr.onprogress = onProgress;
-		}
+			if (onProgress !== undefined) 
+			{
+				// @ts-ignore
+				xhr.onprogress = onProgress;
+			}
 
-		xhr.send(body !== undefined ? body : null);
+			xhr.send(body !== undefined ? body : null);
 
-		return xhr;
+			return xhr;
+
+		});
 	}
 }
