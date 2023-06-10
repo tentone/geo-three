@@ -42,6 +42,8 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 		const address = 'https://tile.googleapis.com/v1/3dtiles/root.json?key=' + this.key;
 
 		const request = await XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, null);
+
+		console.log(request);
 	}
 
 

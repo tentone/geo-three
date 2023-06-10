@@ -32354,7 +32354,7 @@
 	            });
 	        });
 	    }
-	    static request(url, type, header, body, onLoad, onError, onProgress) {
+	    static request(url, type, header, body, onProgress) {
 	        function parseResponse(response) {
 	            try {
 	                return JSON.parse(response);
@@ -32363,27 +32363,28 @@
 	                return response;
 	            }
 	        }
-	        const xhr = new XMLHttpRequest();
-	        xhr.overrideMimeType('text/plain');
-	        xhr.open(type, url, true);
-	        if (header !== null && header !== undefined) {
-	            for (const i in header) {
-	                xhr.setRequestHeader(i, header[i]);
+	        return new Promise(function (resolve, reject) {
+	            const xhr = new XMLHttpRequest();
+	            xhr.overrideMimeType('text/plain');
+	            xhr.open(type, url, true);
+	            if (header !== null && header !== undefined) {
+	                for (const i in header) {
+	                    xhr.setRequestHeader(i, header[i]);
+	                }
 	            }
-	        }
-	        if (onLoad !== undefined) {
 	            xhr.onload = function (event) {
-	                onLoad(parseResponse(xhr.response), xhr);
+	                resolve({
+	                    response: parseResponse(xhr.response),
+	                    xhr: xhr
+	                });
 	            };
-	        }
-	        if (onError !== undefined) {
-	            xhr.onerror = onError;
-	        }
-	        if (onProgress !== undefined) {
-	            xhr.onprogress = onProgress;
-	        }
-	        xhr.send(body !== undefined ? body : null);
-	        return xhr;
+	            xhr.onerror = reject;
+	            if (onProgress !== undefined) {
+	                xhr.onprogress = onProgress;
+	            }
+	            xhr.send(body !== undefined ? body : null);
+	            return xhr;
+	        });
 	    }
 	}
 
