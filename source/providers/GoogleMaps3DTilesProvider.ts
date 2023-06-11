@@ -12,6 +12,7 @@ import {MapProvider} from './MapProvider';
  */
 export class GoogleMaps3DTilesProvider extends MapProvider 
 {
+	public base: string = "https://tile.googleapis.com/";
 	/**
 	 * The API key that you used to access 3D Tiles service. You must attach it to all subsequent tile requests.
 	 */
@@ -39,18 +40,20 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 	 * Get root tile.
 	 */
 	public async getRoot(): Promise<void> {
-		const address = 'https://tile.googleapis.com/v1/3dtiles/root.json?key=' + this.key;
+		const address = this.base + 'v1/3dtiles/root.json?key=' + this.key;
 
 		const request = await XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, null);
+
+		const root = request.response.root;
+		const uri = root.children[0].children[0].content.uri;
 
 		console.log(request);
 	}
 
-
-
-	public fetchTile(zoom: number, x: number, y: number): Promise<any>
+	// @ts-ignore
+	public fetchTile(uri: string, zoom: number, x: number, y: number): Promise<any>
 	{
-		// https://tile.googleapis.com/v1/3dtiles/datasets/CgA/files/UlRPVEYuYnVs.json?session=CIqhrPOFvdHSYg&key=YOUR_API_KEY
+		const url =  this.base + uri + "?session=" + this.session + "&key=" + this.key;
 
 		// /v1/3dtiles/datasets/CgA/files/UlRPVEYuYnVs.json?session=CIqhrPOFvdHSYg// 
 		 
