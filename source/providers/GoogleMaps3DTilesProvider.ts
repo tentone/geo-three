@@ -25,6 +25,11 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 	 */
 	public session: string = null;
 
+	/**
+	 * Indicates if the root was loaded for this provider.
+	 */
+	public root: any = false;
+
 	public constructor(key: string = '') 
 	{
 		super();
@@ -44,8 +49,8 @@ export class GoogleMaps3DTilesProvider extends MapProvider
 
 		const request = await XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, null);
 
-		const root = request.response.root;
-		const uri = root.children[0].children[0].content.uri;
+		this.root = request.response.root;
+		const uri = this.root.children[0].children[0].content.uri;
 
 		console.log(request);
 	}
