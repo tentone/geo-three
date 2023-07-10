@@ -221,6 +221,9 @@
 	        try {
 	            const material = self.material;
 	            material.dispose();
+	            if (material.map && material.map !== MapNode.defaultTexture) {
+	                material.map.dispose();
+	            }
 	        }
 	        catch (e) { }
 	        try {
@@ -823,6 +826,12 @@
 	            this.geometry = MapPlaneNode.geometry;
 	            super.raycast(raycaster, intersects);
 	            this.geometry = MapHeightNodeShader.geometry;
+	        }
+	    }
+	    dispose() {
+	        super.dispose();
+	        if (this.material.userData.heightMap.value && this.material.userData.heightMap.value !== MapHeightNodeShader.defaultHeightTexture) {
+	            this.material.userData.heightMap.value.dispose();
 	        }
 	    }
 	}
