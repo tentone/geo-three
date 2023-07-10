@@ -9,7 +9,8 @@ module.exports = {
 	],
 	ignorePatterns: [
 		"docs/**/*",
-		"build/**/*"
+		"build/**/*",
+		"source/examples/**/*"
 	],
 	parserOptions: {
 		sourceType: 'module',
