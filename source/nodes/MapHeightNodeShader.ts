@@ -178,4 +178,16 @@ export class MapHeightNodeShader extends MapHeightNode
 			this.geometry = MapHeightNodeShader.geometry;
 		}
 	}
+
+	public dispose(): void
+	{
+		super.dispose();
+
+		// @ts-ignore
+		if (this.material.userData.heightMap.value && this.material.userData.heightMap.value !== MapHeightNodeShader.defaultHeightTexture)
+		{
+			// @ts-ignore
+			this.material.userData.heightMap.value.dispose();
+		}
+	}
 }
