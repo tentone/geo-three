@@ -20,7 +20,7 @@ export {MapNodeGeometry} from './geometries/MapNodeGeometry';
 export {MapNodeHeightGeometry} from './geometries/MapNodeHeightGeometry';
 export {MapSphereNodeGeometry} from './geometries/MapSphereNodeGeometry';
 
-export {MapNode} from './nodes/MapNode';
+export {MapNode, QuadTreePosition} from './nodes/MapNode';
 export {MapHeightNode} from './nodes/MapHeightNode';
 export {MapPlaneNode} from './nodes/MapPlaneNode';
 export {MapSphereNode} from './nodes/MapSphereNode';
