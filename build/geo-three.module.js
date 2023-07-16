@@ -1908,4 +1908,4 @@ class CancelablePromise {
     }
 }
 
-export { BingMapsProvider, CancelablePromise, CanvasUtils, DebugProvider, Geolocation, GeolocationUtils, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, TextureUtils, UnitsUtils, XHRUtils };
+export { BingMapsProvider, CancelablePromise, CanvasUtils, DebugProvider, Geolocation, GeolocationUtils, GoogleMapsProvider, HeightDebugProvider, HereMapsProvider, LODFrustum, LODRadial, LODRaycast, MapBoxProvider, MapHeightNode, MapHeightNodeShader, MapNode, MapNodeGeometry, MapNodeHeightGeometry, MapPlaneNode, MapProvider, MapSphereNode, MapSphereNodeGeometry, MapTilerProvider, MapView, OpenMapTilesProvider, OpenStreetMapsProvider, QuadTreePosition, TextureUtils, UnitsUtils, XHRUtils };

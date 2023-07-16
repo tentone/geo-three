@@ -1938,6 +1938,7 @@
 	exports.MapView = MapView;
 	exports.OpenMapTilesProvider = OpenMapTilesProvider;
 	exports.OpenStreetMapsProvider = OpenStreetMapsProvider;
+	exports.QuadTreePosition = QuadTreePosition;
 	exports.TextureUtils = TextureUtils;
 	exports.UnitsUtils = UnitsUtils;
 	exports.XHRUtils = XHRUtils;
