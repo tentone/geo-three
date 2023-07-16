@@ -351,6 +351,13 @@ export abstract class MapNode extends Mesh
 		{
 			const material = self.material as Material;
 			material.dispose();
+
+			// @ts-ignore
+			if (material.map && material.map !== MapNode.defaultTexture)
+			{
+				// @ts-ignore
+				material.map.dispose();
+			}
 		}
 		catch (e) {}
 		

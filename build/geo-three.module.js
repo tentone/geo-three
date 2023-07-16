@@ -217,6 +217,9 @@ class MapNode extends Mesh {
         try {
             const material = self.material;
             material.dispose();
+            if (material.map && material.map !== MapNode.defaultTexture) {
+                material.map.dispose();
+            }
         }
         catch (e) { }
         try {
@@ -819,6 +822,12 @@ class MapHeightNodeShader extends MapHeightNode {
             this.geometry = MapPlaneNode.geometry;
             super.raycast(raycaster, intersects);
             this.geometry = MapHeightNodeShader.geometry;
+        }
+    }
+    dispose() {
+        super.dispose();
+        if (this.material.userData.heightMap.value && this.material.userData.heightMap.value !== MapHeightNodeShader.defaultHeightTexture) {
+            this.material.userData.heightMap.value.dispose();
         }
     }
 }

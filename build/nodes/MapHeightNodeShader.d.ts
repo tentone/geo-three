@@ -12,4 +12,5 @@ export declare class MapHeightNodeShader extends MapHeightNode {
     loadData(): Promise<void>;
     loadHeightGeometry(): Promise<void>;
     raycast(raycaster: Raycaster, intersects: Intersection[]): void;
+    dispose(): void;
 }
