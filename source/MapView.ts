@@ -97,7 +97,7 @@ export class MapView extends Mesh
 	 */
 	public constructor(root: (number | MapNode) = MapView.PLANAR, provider: MapProvider = new OpenStreetMapsProvider(), heightProvider: MapProvider = null) 
 	{
-		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0}));
+		super(undefined, new MeshBasicMaterial({transparent: true, opacity: 0.0, depthWrite: false, colorWrite: false}));
 
 		this.lod = new LODRaycast();
 
