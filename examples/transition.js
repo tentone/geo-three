@@ -34439,12 +34439,15 @@
 	var canvas = document.getElementById('canvas');
 	const SPHERE = 0;
 	const PLANE = 1;
+	ColorManagement.enabled = false;
 	const scenes = [createWorldScene(), createMapScene()];
 	let active = SPHERE;
 	let renderer = new WebGLRenderer({
 	    canvas: canvas,
 	    antialias: true
 	});
+	renderer.outputColorSpace = LinearSRGBColorSpace;
+	console.log(ColorManagement, renderer);
 	function createWorldScene() {
 	    var scene = new Scene();
 	    scene.background = new Color(0x000000);

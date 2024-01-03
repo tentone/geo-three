@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2} from 'three';
+import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2, LinearSRGBColorSpace, ColorManagement} from 'three';
 import {MapControls} from 'three/examples/jsm/controls/MapControls.js';
 import {UnitsUtils, BingMapsProvider, MapView} from '../Main';
 
@@ -12,6 +12,8 @@ const SPHERE = 0;
 // Planar earth scene
 const PLANE = 1;
 
+ColorManagement.enabled = false;
+
 // List of scenes
 const scenes = [createWorldScene(), createMapScene()];
 
@@ -21,6 +23,10 @@ let renderer = new WebGLRenderer({
 	canvas: canvas,
 	antialias: true
 });
+
+renderer.outputColorSpace = LinearSRGBColorSpace;
+
+console.log(ColorManagement, renderer);
 
 // Create scene for spherical earth
 function createWorldScene(): any
