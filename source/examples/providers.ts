@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import {WebGLRenderer, Scene, Color, AmbientLight, PerspectiveCamera, DirectionalLight, Vector3} from 'three';
-import {MapControls} from 'three/examples/jsm/controls/OrbitControls.js';
+import {MapControls} from 'three/examples/jsm/controls/MapControls.js';
 import {Sky} from 'three/examples/jsm/objects/Sky.js';
 import {HereMapsProvider, BingMapsProvider, MapTilerProvider, HeightDebugProvider, DebugProvider, LODRaycast, LODFrustum, LODRadial, UnitsUtils, OpenStreetMapsProvider, OpenMapTilesProvider, MapBoxProvider, MapView} from '../Main';
 
