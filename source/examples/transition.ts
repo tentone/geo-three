@@ -12,8 +12,6 @@ const SPHERE = 0;
 // Planar earth scene
 const PLANE = 1;
 
-ColorManagement.enabled = false;
-
 // List of scenes
 const scenes = [createWorldScene(), createMapScene()];
 
@@ -24,15 +22,11 @@ let renderer = new WebGLRenderer({
 	antialias: true
 });
 
-renderer.outputColorSpace = LinearSRGBColorSpace;
-
-console.log(ColorManagement, renderer);
-
 // Create scene for spherical earth
 function createWorldScene(): any
 {
 	var scene = new Scene();
-	scene.background = new Color(0x000000);
+	scene.background = new Color(0x000000, LinearSRGBColorSpace);
     
 	// Globe
 	var loader = new TextureLoader();
@@ -72,7 +66,7 @@ function createMapScene(): any
 	controls.zoomSpeed = 1.0;
 
 	var scene = new Scene();
-	scene.background = new Color(0x444444);
+	scene.background = new Color(0x444444, LinearSRGBColorSpace);
 
 	var provider = new BingMapsProvider('', BingMapsProvider.AERIAL); // new OpenStreetMapsProvider()
 
@@ -80,7 +74,7 @@ function createMapScene(): any
 	scene.add(map);
 	map.updateMatrixWorld(true);
 
-	scene.add(new AmbientLight(0x777777));
+	scene.add(new AmbientLight(0x777777, LinearSRGBColorSpace));
 
 	return {camera: camera, controls: controls, scene: scene};
 }

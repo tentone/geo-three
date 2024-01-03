@@ -33935,14 +33935,12 @@
 	MapBoxProvider.MAP_ID = 101;
 
 	var canvas = document.getElementById('canvas');
-	ColorManagement.enabled = false;
 	var renderer = new WebGLRenderer({
 	    canvas: canvas,
 	    antialias: true
 	});
-	renderer.outputColorSpace = LinearSRGBColorSpace;
 	var scene = new Scene();
-	scene.background = new Color(0.4, 0.4, 0.4);
+	scene.background = new Color(0.4, 0.4, 0.4, LinearSRGBColorSpace);
 	var provider = new BingMapsProvider('', BingMapsProvider.AERIAL);
 	var map = new MapView(MapView.PLANAR, provider);
 	scene.add(map);

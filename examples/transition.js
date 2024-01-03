@@ -34439,18 +34439,15 @@
 	var canvas = document.getElementById('canvas');
 	const SPHERE = 0;
 	const PLANE = 1;
-	ColorManagement.enabled = false;
 	const scenes = [createWorldScene(), createMapScene()];
 	let active = SPHERE;
 	let renderer = new WebGLRenderer({
 	    canvas: canvas,
 	    antialias: true
 	});
-	renderer.outputColorSpace = LinearSRGBColorSpace;
-	console.log(ColorManagement, renderer);
 	function createWorldScene() {
 	    var scene = new Scene();
-	    scene.background = new Color(0x000000);
+	    scene.background = new Color(0x000000, LinearSRGBColorSpace);
 	    var loader = new TextureLoader();
 	    loader.load('2k_earth_daymap.jpg', function (texture) {
 	        var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({ map: texture }));
@@ -34477,12 +34474,12 @@
 	    controls.minDistance = 1.0;
 	    controls.zoomSpeed = 1.0;
 	    var scene = new Scene();
-	    scene.background = new Color(0x444444);
+	    scene.background = new Color(0x444444, LinearSRGBColorSpace);
 	    var provider = new BingMapsProvider('', BingMapsProvider.AERIAL);
 	    var map = new MapView(MapView.PLANAR, provider);
 	    scene.add(map);
 	    map.updateMatrixWorld(true);
-	    scene.add(new AmbientLight(0x777777));
+	    scene.add(new AmbientLight(0x777777, LinearSRGBColorSpace));
 	    return { camera: camera, controls: controls, scene: scene };
 	}
 	var raycaster = new Raycaster();

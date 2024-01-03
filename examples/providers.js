@@ -34493,14 +34493,12 @@
 	}
 
 	var canvas = document.getElementById('canvas');
-	ColorManagement.enabled = false;
 	var renderer = new WebGLRenderer({
 	    canvas: canvas,
 	    antialias: true
 	});
-	renderer.outputColorSpace = LinearSRGBColorSpace;
 	var scene = new Scene();
-	scene.background = new Color(0.4, 0.4, 0.4);
+	scene.background = new Color(0.4, 0.4, 0.4, LinearSRGBColorSpace);
 	var sky = createSky();
 	scene.add(sky);
 	var providers = createProviders();
