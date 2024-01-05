@@ -63,7 +63,13 @@ export class LODRaycast implements LODControl
 
 			// Check intersection
 			this.raycaster.setFromCamera(this.mouse, camera);
-			this.raycaster.intersectObjects(view.children, true, intersects);
+
+			let myIntersects = [];
+			this.raycaster.intersectObjects(view.children, true, myIntersects);
+			if (myIntersects.length > 0) {
+				// Only use first intersection with the terrain
+				intersects.push(myIntersects[0]);
+			}
 		}
 
 		for (let i = 0; i < intersects.length; i++) 
