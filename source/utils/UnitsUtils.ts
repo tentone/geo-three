@@ -38,6 +38,11 @@ export class UnitsUtils
 	public static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 	/**
+	 * Largest web mercator coordinate value, both X and Y range from negative extent to positive extent
+	 */
+	public static MERCATOR_MAX_EXTENT: number = 20037508.34;
+
+	/**
 	 * Converts coordinates from WGS84 Datum to XY in Spherical Mercator EPSG:900913.
 	 *
 	 * @param latitude - Latitude value in degrees.
@@ -139,5 +144,32 @@ export class UnitsUtils
 	public static mapboxAltitude(color: Color): number 
 	{
 		return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
+	}
+
+	public static getTileSize(zoom: number): number
+	{
+		const maxExtent = UnitsUtils.MERCATOR_MAX_EXTENT;
+		const numTiles = Math.pow(2, zoom);
+		return 2 * maxExtent / numTiles;	
+	}
+
+	public static tileBounds(zoom: number, x: number, y: number): number[]
+	{
+		const tileSize = UnitsUtils.getTileSize(zoom);
+		const minX = -UnitsUtils.MERCATOR_MAX_EXTENT + x * tileSize;
+		const minY = UnitsUtils.MERCATOR_MAX_EXTENT - (y + 1) * tileSize;
+		return [minX, tileSize, minY, tileSize];
+	}
+
+	public static mercatorToLatitude(zoom: number, y: number): number 
+	{
+		const yMerc = UnitsUtils.MERCATOR_MAX_EXTENT - y * UnitsUtils.getTileSize(zoom);
+		return Math.atan(Math.sinh(yMerc / UnitsUtils.EARTH_RADIUS));
+	}
+
+	public static mercatorToLongitude(zoom: number, x: number): number 
+	{
+		const xMerc = -UnitsUtils.MERCATOR_MAX_EXTENT + x * UnitsUtils.getTileSize(zoom);
+		return xMerc / UnitsUtils.EARTH_RADIUS;
 	}
 }

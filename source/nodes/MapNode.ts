@@ -259,21 +259,7 @@ export abstract class MapNode extends Mesh
 		try 
 		{
 			const image: HTMLImageElement = await this.mapView.provider.fetchTile(this.level, this.x, this.y);
-		
-			if (this.disposed) 
-			{
-				return;
-			}
-			
-			const texture = new Texture(image);
-			texture.generateMipmaps = false;
-			texture.format = RGBAFormat;
-			texture.magFilter = LinearFilter;
-			texture.minFilter = LinearFilter;
-			texture.needsUpdate = true;
-			
-			// @ts-ignore
-			this.material.map = texture;
+			await this.applyTexture(image);
 		}
 		catch (e) 
 		{
@@ -290,6 +276,24 @@ export abstract class MapNode extends Mesh
 
 		// @ts-ignore
 		this.material.needsUpdate = true;
+	}
+
+	public async applyTexture(image: HTMLImageElement): Promise<void> 
+	{
+		if (this.disposed) 
+		{
+			return;
+		}
+	
+		const texture = new Texture(image);
+		texture.generateMipmaps = false;
+		texture.format = RGBAFormat;
+		texture.magFilter = LinearFilter;
+		texture.minFilter = LinearFilter;
+		texture.needsUpdate = true;
+
+		// @ts-ignore
+		this.material.map = texture;
 	}
 
 	/**
