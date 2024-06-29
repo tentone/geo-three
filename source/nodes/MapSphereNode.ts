@@ -50,7 +50,7 @@ export class MapSphereNode extends MapNode
 		const fragmentShader = `
 		#define PI 3.1415926538
 		varying vec3 vPosition;
-        uniform sampler2D uTexture;
+		uniform sampler2D uTexture;
 		uniform vec4 mercatorBounds;
 
 		void main() {
@@ -58,7 +58,7 @@ export class MapSphereNode extends MapNode
 			float radius = length(vPosition);
 
 			float latitude = asin(vPosition.y / radius);
-    		float longitude = atan(-vPosition.z, vPosition.x);
+			float longitude = atan(-vPosition.z, vPosition.x);
 
 			float mercator_x = radius * longitude;
 			float mercator_y = radius * log(tan(PI / 4.0 + latitude / 2.0));
