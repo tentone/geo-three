@@ -146,6 +146,12 @@ export class UnitsUtils
 		return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
 	}
 
+	/**
+	 * Get the size of a web mercator tile in mercator coordinates
+	 * 	 * 
+	 * @param zoom - the zoom level of the tile
+	 * @returns the size of the tile in mercator coordinates
+	 */
 	public static getTileSize(zoom: number): number
 	{
 		const maxExtent = UnitsUtils.MERCATOR_MAX_EXTENT;
@@ -153,6 +159,14 @@ export class UnitsUtils
 		return 2 * maxExtent / numTiles;	
 	}
 
+	/**
+	 * Get the bounds of a web mercator tile in mercator coordinates
+	 * 	 * 
+	 * @param zoom - the zoom level of the tile
+	 * @param x - the x coordinate of the tile
+	 * @param y - the y coordinate of the tile
+	 * @returns list of bounds - [startX, sizeX, startY, sizeY]
+	 */
 	public static tileBounds(zoom: number, x: number, y: number): number[]
 	{
 		const tileSize = UnitsUtils.getTileSize(zoom);
@@ -161,12 +175,26 @@ export class UnitsUtils
 		return [minX, tileSize, minY, tileSize];
 	}
 
+	/**
+	 * Get the latitude value of a given mercator coordinate and zoom level
+	 * 
+	 * @param zoom - the zoom level of the coordinate
+	 * @param y - the y mercator coordinate
+	 * @returns - latitude of coordinate in radians
+	 */
 	public static mercatorToLatitude(zoom: number, y: number): number 
 	{
 		const yMerc = UnitsUtils.MERCATOR_MAX_EXTENT - y * UnitsUtils.getTileSize(zoom);
 		return Math.atan(Math.sinh(yMerc / UnitsUtils.EARTH_RADIUS));
 	}
 
+	/**
+	 * Get the latitude value of a given mercator coordinate and zoom level
+	 * 
+	 * @param zoom - the zoom level of the coordinate
+	 * @param x - the x mercator coordinate
+	 * @returns - longitude of coordinate in radians
+	 */
 	public static mercatorToLongitude(zoom: number, x: number): number 
 	{
 		const xMerc = -UnitsUtils.MERCATOR_MAX_EXTENT + x * UnitsUtils.getTileSize(zoom);

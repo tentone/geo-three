@@ -1,4 +1,4 @@
-import { Texture, RGBAFormat, LinearFilter, Mesh, BufferGeometry, Float32BufferAttribute, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Vector4, ShaderMaterial, Matrix4, Quaternion, TextureLoader, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
+import { Texture, RGBAFormat, LinearFilter, Mesh, BufferGeometry, Float32BufferAttribute, Vector2, Vector3, MeshBasicMaterial, MeshPhongMaterial, Matrix4, Quaternion, NearestFilter, Raycaster, DoubleSide, Uint32BufferAttribute, Frustum, Color } from 'three';
 
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation.
@@ -166,7 +166,16 @@ class MapNode extends Mesh {
             }
             try {
                 const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-                yield this.applyTexture(image);
+                if (this.disposed) {
+                    return;
+                }
+                const texture = new Texture(image);
+                texture.generateMipmaps = false;
+                texture.format = RGBAFormat;
+                texture.magFilter = LinearFilter;
+                texture.minFilter = LinearFilter;
+                texture.needsUpdate = true;
+                this.material.map = texture;
             }
             catch (e) {
                 if (this.disposed) {
@@ -176,20 +185,6 @@ class MapNode extends Mesh {
                 this.material.map = MapNode.defaultTexture;
             }
             this.material.needsUpdate = true;
-        });
-    }
-    applyTexture(image) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.disposed) {
-                return;
-            }
-            const texture = new Texture(image);
-            texture.generateMipmaps = false;
-            texture.format = RGBAFormat;
-            texture.magFilter = LinearFilter;
-            texture.minFilter = LinearFilter;
-            texture.needsUpdate = true;
-            this.material.map = texture;
         });
     }
     nodeReady() {
@@ -394,32 +389,12 @@ class UnitsUtils {
     static mapboxAltitude(color) {
         return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
     }
-    static getTileSize(zoom) {
-        const maxExtent = UnitsUtils.MERCATOR_MAX_EXTENT;
-        const numTiles = Math.pow(2, zoom);
-        return 2 * maxExtent / numTiles;
-    }
-    static tileBounds(zoom, x, y) {
-        const tileSize = UnitsUtils.getTileSize(zoom);
-        const minX = -UnitsUtils.MERCATOR_MAX_EXTENT + x * tileSize;
-        const minY = UnitsUtils.MERCATOR_MAX_EXTENT - (y + 1) * tileSize;
-        return [minX, tileSize, minY, tileSize];
-    }
-    static mercatorToLatitude(zoom, y) {
-        const yMerc = UnitsUtils.MERCATOR_MAX_EXTENT - y * UnitsUtils.getTileSize(zoom);
-        return Math.atan(Math.sinh(yMerc / UnitsUtils.EARTH_RADIUS));
-    }
-    static mercatorToLongitude(zoom, x) {
-        const xMerc = -UnitsUtils.MERCATOR_MAX_EXTENT + x * UnitsUtils.getTileSize(zoom);
-        return xMerc / UnitsUtils.EARTH_RADIUS;
-    }
 }
 UnitsUtils.EARTH_RADIUS = 6371008;
 UnitsUtils.EARTH_RADIUS_A = 6378137.0;
 UnitsUtils.EARTH_RADIUS_B = 6356752.314245;
 UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
-UnitsUtils.MERCATOR_MAX_EXTENT = 20037508.34;
 
 class MapPlaneNode extends MapNode {
     constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
@@ -697,44 +672,7 @@ class MapSphereNodeGeometry extends BufferGeometry {
 
 class MapSphereNode extends MapNode {
     constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
-        let bounds = UnitsUtils.tileBounds(level, x, y);
-        const vertexShader = `
-		varying vec3 vPosition;
-
-		void main() {
-			vPosition = position;
-			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-		}
-		`;
-        const fragmentShader = `
-		#define PI 3.1415926538
-		varying vec3 vPosition;
-        uniform sampler2D uTexture;
-		uniform vec4 mercatorBounds;
-
-		void main() {
-			// this could also be a constant, but for some reason using a constant causes more visible tile gaps at high zoom
-			float radius = length(vPosition);
-
-			float latitude = asin(vPosition.y / radius);
-    		float longitude = atan(-vPosition.z, vPosition.x);
-
-			float mercator_x = radius * longitude;
-			float mercator_y = radius * log(tan(PI / 4.0 + latitude / 2.0));
-			float y = (mercator_y - mercatorBounds.z) / mercatorBounds.w;
-			float x = (mercator_x - mercatorBounds.x) / mercatorBounds.y;
-
-			vec4 color = texture2D(uTexture, vec2(x, y));
-			gl_FragColor = color;
-		}
-		`;
-        let vBounds = new Vector4(...bounds);
-        const material = new ShaderMaterial({
-            uniforms: { uTexture: { value: new Texture() }, mercatorBounds: { value: vBounds } },
-            vertexShader: vertexShader,
-            fragmentShader: fragmentShader
-        });
-        super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), material);
+        super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({ wireframe: false }));
         this.applyScaleNode();
         this.matrixAutoUpdate = false;
         this.isMesh = true;
@@ -754,23 +692,11 @@ class MapSphereNode extends MapNode {
         const range = Math.pow(2, zoom);
         const max = 40;
         const segments = Math.floor(MapSphereNode.segments * (max / (zoom + 1)) / max);
-        const lon1 = x > 0 ? UnitsUtils.mercatorToLongitude(zoom, x) + Math.PI : 0;
-        const lon2 = x < range - 1 ? UnitsUtils.mercatorToLongitude(zoom, x + 1) + Math.PI : 2 * Math.PI;
-        const phiStart = lon1;
-        const phiLength = lon2 - lon1;
-        const lat1 = y > 0 ? UnitsUtils.mercatorToLatitude(zoom, y) : Math.PI / 2;
-        const lat2 = y < range - 1 ? UnitsUtils.mercatorToLatitude(zoom, y + 1) : -Math.PI / 2;
-        const thetaLength = lat1 - lat2;
-        const thetaStart = Math.PI - (lat1 + Math.PI / 2);
+        const phiLength = 1 / range * 2 * Math.PI;
+        const phiStart = x * phiLength;
+        const thetaLength = 1 / range * Math.PI;
+        const thetaStart = y * thetaLength;
         return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
-    }
-    applyTexture(image) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const textureLoader = new TextureLoader();
-            const texture = textureLoader.load(image.src, function () { });
-            this.material.uniforms.uTexture.value = texture;
-            this.material.uniforms.uTexture.needsUpdate = true;
-        });
     }
     applyScaleNode() {
         this.geometry.computeBoundingBox();

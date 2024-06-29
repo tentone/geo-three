@@ -6,15 +6,10 @@ export declare class UnitsUtils {
     static EARTH_RADIUS_B: number;
     static EARTH_PERIMETER: number;
     static EARTH_ORIGIN: number;
-    static MERCATOR_MAX_EXTENT: number;
     static datumsToSpherical(latitude: number, longitude: number): Vector2;
     static sphericalToDatums(x: number, y: number): Geolocation;
     static quadtreeToDatums(zoom: number, x: number, y: number): Geolocation;
     static vectorToDatums(dir: Vector3): Geolocation;
     static datumsToVector(latitude: number, longitude: number): Vector3;
     static mapboxAltitude(color: Color): number;
-    static getTileSize(zoom: number): number;
-    static tileBounds(zoom: number, x: number, y: number): number[];
-    static mercatorToLatitude(zoom: number, y: number): number;
-    static mercatorToLongitude(zoom: number, x: number): number;
 }
