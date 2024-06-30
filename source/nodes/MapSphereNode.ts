@@ -51,7 +51,7 @@ export class MapSphereNode extends MapNode
 		#define PI 3.1415926538
 		varying vec3 vPosition;
 		uniform sampler2D uTexture;
-		uniform vec4 mercatorBounds;
+		uniform vec4 webMercatorBounds;
 
 		void main() {
 			// this could also be a constant, but for some reason using a constant causes more visible tile gaps at high zoom
@@ -60,10 +60,10 @@ export class MapSphereNode extends MapNode
 			float latitude = asin(vPosition.y / radius);
 			float longitude = atan(-vPosition.z, vPosition.x);
 
-			float mercator_x = radius * longitude;
-			float mercator_y = radius * log(tan(PI / 4.0 + latitude / 2.0));
-			float y = (mercator_y - mercatorBounds.z) / mercatorBounds.w;
-			float x = (mercator_x - mercatorBounds.x) / mercatorBounds.y;
+			float web_mercator_x = radius * longitude;
+			float web_mercator_y = radius * log(tan(PI / 4.0 + latitude / 2.0));
+			float y = (web_mercator_y - webMercatorBounds.z) / webMercatorBounds.w;
+			float x = (web_mercator_x - webMercatorBounds.x) / webMercatorBounds.y;
 
 			vec4 color = texture2D(uTexture, vec2(x, y));
 			gl_FragColor = color;
@@ -73,7 +73,7 @@ export class MapSphereNode extends MapNode
 		// Create shader material
 		let vBounds = new Vector4(...bounds);
 		const material = new ShaderMaterial({
-			uniforms: {uTexture: {value: new Texture()}, mercatorBounds: {value: vBounds}},
+			uniforms: {uTexture: {value: new Texture()}, webMercatorBounds: {value: vBounds}},
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader
 		});
@@ -110,14 +110,14 @@ export class MapSphereNode extends MapNode
 		const segments = Math.floor(MapSphereNode.segments * (max / (zoom + 1)) / max);
 	
 		// X
-		const lon1 = x > 0 ? UnitsUtils.mercatorToLongitude(zoom, x) + Math.PI : 0;
-		const lon2 = x < range - 1 ? UnitsUtils.mercatorToLongitude(zoom, x+1) + Math.PI : 2 * Math.PI;
+		const lon1 = x > 0 ? UnitsUtils.webMercatorToLongitude(zoom, x) + Math.PI : 0;
+		const lon2 = x < range - 1 ? UnitsUtils.webMercatorToLongitude(zoom, x+1) + Math.PI : 2 * Math.PI;
 		const phiStart = lon1;
 		const phiLength = lon2 - lon1;
 		
 		// Y
-		const lat1 = y > 0 ? UnitsUtils.mercatorToLatitude(zoom, y) : Math.PI / 2;
-		const lat2 = y < range - 1 ? UnitsUtils.mercatorToLatitude(zoom, y+1) : -Math.PI / 2;
+		const lat1 = y > 0 ? UnitsUtils.webMercatorToLatitude(zoom, y) : Math.PI / 2;
+		const lat2 = y < range - 1 ? UnitsUtils.webMercatorToLatitude(zoom, y+1) : -Math.PI / 2;
 		const thetaLength = lat1 - lat2;
 		const thetaStart = Math.PI - (lat1 + Math.PI / 2);
 
