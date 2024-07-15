@@ -38,7 +38,12 @@ export class UnitsUtils
 	public static EARTH_ORIGIN: number = UnitsUtils.EARTH_PERIMETER / 2.0;
 
 	/**
-	 * Converts coordinates from WGS84 Datum to XY in Spherical Mercator EPSG:900913.
+	 * Largest web mercator coordinate value, both X and Y range from negative extent to positive extent
+	 */
+	public static WEB_MERCATOR_MAX_EXTENT: number = 20037508.34;
+
+	/**
+	 * Converts coordinates from WGS84 Datum to XY in Spherical Web Mercator EPSG:900913.
 	 *
 	 * @param latitude - Latitude value in degrees.
 	 * @param longitude - Longitude value in degrees.
@@ -54,7 +59,7 @@ export class UnitsUtils
 	}
 
 	/**
-	 * Converts XY point from Spherical Mercator EPSG:900913 to WGS84 Datum.
+	 * Converts XY point from Spherical Web Mercator EPSG:900913 to WGS84 Datum.
 	 *
 	 * @param x - X coordinate.
 	 * @param y - Y coordinate.
@@ -139,5 +144,60 @@ export class UnitsUtils
 	public static mapboxAltitude(color: Color): number 
 	{
 		return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
+	}
+
+	/**
+	 * Get the size of a tile in web mercator coordinates
+	 * 	 * 
+	 * @param zoom - the zoom level of the tile
+	 * @returns the size of the tile in web mercator coordinates
+	 */
+	public static getTileSize(zoom: number): number
+	{
+		const maxExtent = UnitsUtils.WEB_MERCATOR_MAX_EXTENT;
+		const numTiles = Math.pow(2, zoom);
+		return 2 * maxExtent / numTiles;	
+	}
+
+	/**
+	 * Get the bounds of a tile in web mercator coordinates
+	 * 	 * 
+	 * @param zoom - the zoom level of the tile
+	 * @param x - the x coordinate of the tile
+	 * @param y - the y coordinate of the tile
+	 * @returns list of bounds - [startX, sizeX, startY, sizeY]
+	 */
+	public static tileBounds(zoom: number, x: number, y: number): number[]
+	{
+		const tileSize = UnitsUtils.getTileSize(zoom);
+		const minX = -UnitsUtils.WEB_MERCATOR_MAX_EXTENT + x * tileSize;
+		const minY = UnitsUtils.WEB_MERCATOR_MAX_EXTENT - (y + 1) * tileSize;
+		return [minX, tileSize, minY, tileSize];
+	}
+
+	/**
+	 * Get the latitude value of a given web mercator coordinate and zoom level
+	 * 
+	 * @param zoom - the zoom level of the coordinate
+	 * @param y - the y web mercator coordinate
+	 * @returns - latitude of coordinate in radians
+	 */
+	public static webMercatorToLatitude(zoom: number, y: number): number 
+	{
+		const yMerc = UnitsUtils.WEB_MERCATOR_MAX_EXTENT - y * UnitsUtils.getTileSize(zoom);
+		return Math.atan(Math.sinh(yMerc / UnitsUtils.EARTH_RADIUS));
+	}
+
+	/**
+	 * Get the latitude value of a given web mercator coordinate and zoom level
+	 * 
+	 * @param zoom - the zoom level of the coordinate
+	 * @param x - the x web mercator coordinate
+	 * @returns - longitude of coordinate in radians
+	 */
+	public static webMercatorToLongitude(zoom: number, x: number): number 
+	{
+		const xMerc = -UnitsUtils.WEB_MERCATOR_MAX_EXTENT + x * UnitsUtils.getTileSize(zoom);
+		return xMerc / UnitsUtils.EARTH_RADIUS;
 	}
 }

@@ -7,3 +7,5 @@ pnpm-lock.yaml
 yarn.lock
 
 examples/assets/
+
+.history/

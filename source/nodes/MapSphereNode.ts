@@ -1,4 +1,4 @@
-import {Matrix4, BufferGeometry, MeshBasicMaterial, Quaternion, Vector3, Raycaster, Intersection} from 'three';
+import {Matrix4, BufferGeometry, Quaternion, Vector3, Raycaster, Intersection, ShaderMaterial, TextureLoader, Texture, Vector4} from 'three';
 import {MapNode, QuadTreePosition} from './MapNode';
 import {MapSphereNodeGeometry} from '../geometries/MapSphereNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
@@ -35,7 +35,50 @@ export class MapSphereNode extends MapNode
 
 	public constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) 
 	{
-		super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({wireframe: false}));
+		let bounds = UnitsUtils.tileBounds(level, x, y);
+
+		// Load shaders
+		const vertexShader = `
+		varying vec3 vPosition;
+
+		void main() {
+			vPosition = position;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}
+		`;
+
+		const fragmentShader = `
+		#define PI 3.1415926538
+		varying vec3 vPosition;
+		uniform sampler2D uTexture;
+		uniform vec4 webMercatorBounds;
+
+		void main() {
+			// this could also be a constant, but for some reason using a constant causes more visible tile gaps at high zoom
+			float radius = length(vPosition);
+
+			float latitude = asin(vPosition.y / radius);
+			float longitude = atan(-vPosition.z, vPosition.x);
+
+			float web_mercator_x = radius * longitude;
+			float web_mercator_y = radius * log(tan(PI / 4.0 + latitude / 2.0));
+			float y = (web_mercator_y - webMercatorBounds.z) / webMercatorBounds.w;
+			float x = (web_mercator_x - webMercatorBounds.x) / webMercatorBounds.y;
+
+			vec4 color = texture2D(uTexture, vec2(x, y));
+			gl_FragColor = color;
+		}
+		`;
+		
+		// Create shader material
+		let vBounds = new Vector4(...bounds);
+		const material = new ShaderMaterial({
+			uniforms: {uTexture: {value: new Texture()}, webMercatorBounds: {value: vBounds}},
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader
+		});
+
+		super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), material);
 	
 		this.applyScaleNode();
 	
@@ -67,16 +110,30 @@ export class MapSphereNode extends MapNode
 		const segments = Math.floor(MapSphereNode.segments * (max / (zoom + 1)) / max);
 	
 		// X
-		const phiLength = 1 / range * 2 * Math.PI;
-		const phiStart = x * phiLength;
-	
+		const lon1 = x > 0 ? UnitsUtils.webMercatorToLongitude(zoom, x) + Math.PI : 0;
+		const lon2 = x < range - 1 ? UnitsUtils.webMercatorToLongitude(zoom, x+1) + Math.PI : 2 * Math.PI;
+		const phiStart = lon1;
+		const phiLength = lon2 - lon1;
+		
 		// Y
-		const thetaLength = 1 / range * Math.PI;
-		const thetaStart = y * thetaLength;
-	
+		const lat1 = y > 0 ? UnitsUtils.webMercatorToLatitude(zoom, y) : Math.PI / 2;
+		const lat2 = y < range - 1 ? UnitsUtils.webMercatorToLatitude(zoom, y+1) : -Math.PI / 2;
+		const thetaLength = lat1 - lat2;
+		const thetaStart = Math.PI - (lat1 + Math.PI / 2);
+
 		return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
 	}
 	
+	public async applyTexture(image: HTMLImageElement): Promise<void>
+	{		
+		const textureLoader = new TextureLoader();
+		const texture = textureLoader.load(image.src, function() {});
+		// @ts-ignore
+		this.material.uniforms.uTexture.value = texture;
+		// @ts-ignore
+		this.material.uniforms.uTexture.needsUpdate = true;
+	}
+
 	/** 
 	 * Apply scale and offset position to the sphere node geometry.
 	 */
