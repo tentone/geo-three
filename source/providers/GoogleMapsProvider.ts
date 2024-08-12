@@ -102,7 +102,7 @@ export class GoogleMapsProvider extends MapProvider
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';
-			image.src = 'https://tile.googleapis.com/v1/2dtiles/' + zoom + '/' + x + '/' + y + '?session=' + this.sessionToken /*+ '&orientation=' + this.orientation */+ '&key=' + this.apiToken;
+			image.src = 'https://tile.googleapis.com/v1/2dtiles/' + zoom + '/' + x + '/' + y + '?session=' + this.sessionToken + '&orientation=' + this.orientation + '&key=' + this.apiToken;
 		});
 	}
 }
