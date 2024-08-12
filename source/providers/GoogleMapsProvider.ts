@@ -69,7 +69,7 @@ export class GoogleMapsProvider extends MapProvider
 	 */
 	public createSession(): void 
 	{
-		const address = 'https://www.googleapis.com/tile/v1/createSession?key=' + this.apiToken;
+		const address = 'https://tile.googleapis.com/v1/createSession?key=' + this.apiToken;
 		const data = JSON.stringify({
 			mapType: this.mapType,
 			language: 'en-EN',
@@ -79,7 +79,7 @@ export class GoogleMapsProvider extends MapProvider
 			scale: 'scaleFactor1x'
 		});
 
-		XHRUtils.request(address, 'GET', {'Content-Type': 'text/json'}, data, (response, xhr) =>
+		XHRUtils.request(address, 'POST', {'Content-Type': 'text/json'}, data, (response, xhr) =>
 		{
 			this.sessionToken = response.session;
 		}, function(xhr) 
@@ -102,7 +102,7 @@ export class GoogleMapsProvider extends MapProvider
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';
-			image.src = 'https://www.googleapis.com/tile/v1/tiles/' + zoom + '/' + x + '/' + y + '?session=' + this.sessionToken + '&orientation=' + this.orientation + '&key=' + this.apiToken;
+			image.src = 'https://tile.googleapis.com/v1/2dtiles/' + zoom + '/' + x + '/' + y + '?session=' + this.sessionToken + '&orientation=' + this.orientation + '&key=' + this.apiToken;
 		});
 	}
 }
