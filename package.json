@@ -8,7 +8,8 @@
 	"exports": {
 		".": {
 			"import": "./build/geo-three.module.js",
-			"require": "./build/geo-three.cjs"
+			"require": "./build/geo-three.cjs",
+			"types": "./build/Main.d.ts"
 		},
 		"./source/*": "./source/*"
 	},
