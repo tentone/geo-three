@@ -8,6 +8,7 @@ export declare class MapSphereNode extends MapNode {
     constructor(parentNode?: any, mapView?: any, location?: number, level?: number, x?: number, y?: number);
     initialize(): Promise<void>;
     static createGeometry(zoom: number, x: number, y: number): MapSphereNodeGeometry;
+    applyTexture(image: HTMLImageElement): Promise<void>;
     applyScaleNode(): void;
     updateMatrix(): void;
     updateMatrixWorld(force?: boolean): void;
