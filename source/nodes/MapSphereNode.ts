@@ -1,4 +1,4 @@
-import {Matrix4, BufferGeometry, Quaternion, Vector3, Raycaster, Intersection, ShaderMaterial, TextureLoader, Texture, Vector4} from 'three';
+import {Matrix4, BufferGeometry, Quaternion, Vector3, Raycaster, Intersection, ShaderMaterial, TextureLoader, Texture, Vector4, REVISION} from 'three';
 import {MapNode, QuadTreePosition} from './MapNode';
 import {MapSphereNodeGeometry} from '../geometries/MapSphereNodeGeometry';
 import {UnitsUtils} from '../utils/UnitsUtils';
@@ -67,6 +67,12 @@ export class MapSphereNode extends MapNode
 
 			vec4 color = texture2D(uTexture, vec2(x, y));
 			gl_FragColor = color;
+			${
+				parseInt(REVISION) < 152 ? '' : `
+				#include <tonemapping_fragment>
+				#include ${(parseInt(REVISION) >= 154)  ? '<colorspace_fragment>' : '<encodings_fragment>'}
+				`
+			}
 		}
 		`;
 		
@@ -127,7 +133,11 @@ export class MapSphereNode extends MapNode
 	public async applyTexture(image: HTMLImageElement): Promise<void>
 	{		
 		const textureLoader = new TextureLoader();
-		const texture = textureLoader.load(image.src, function() {});
+		const texture = textureLoader.load(image.src, function() {
+			if(parseInt(REVISION) >= 152) {
+				texture.colorSpace = 'srgb'
+			}
+		});
 		// @ts-ignore
 		this.material.uniforms.uTexture.value = texture;
 		// @ts-ignore

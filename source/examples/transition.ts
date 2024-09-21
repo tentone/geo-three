@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2, LinearSRGBColorSpace, ColorManagement} from 'three';
+import {WebGLRenderer, Scene, Color, TextureLoader, Mesh, SphereGeometry, MeshBasicMaterial, PerspectiveCamera, MOUSE, AmbientLight, Raycaster, Vector2, LinearSRGBColorSpace, ColorManagement, REVISION} from 'three';
 import {MapControls} from 'three/examples/jsm/controls/MapControls.js';
 import {UnitsUtils, BingMapsProvider, MapView} from '../Main';
 
@@ -32,6 +32,9 @@ function createWorldScene(): any
 	var loader = new TextureLoader();
 	loader.load('2k_earth_daymap.jpg', function(texture) 
 	{
+		if(parseInt(REVISION) >= 152) {
+			texture.colorSpace = 'srgb'
+		}
 		var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({map: texture}));
 		scene.add(sphere);
 	});
