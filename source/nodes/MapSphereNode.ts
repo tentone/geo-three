@@ -68,11 +68,11 @@ export class MapSphereNode extends MapNode
 			vec4 color = texture2D(uTexture, vec2(x, y));
 			gl_FragColor = color;
 			${
-				parseInt(REVISION) < 152 ? '' : `
+	parseInt(REVISION) < 152 ? '' : `
 				#include <tonemapping_fragment>
-				#include ${(parseInt(REVISION) >= 154)  ? '<colorspace_fragment>' : '<encodings_fragment>'}
+				#include ${parseInt(REVISION) >= 154 ? '<colorspace_fragment>' : '<encodings_fragment>'}
 				`
-			}
+}
 		}
 		`;
 		
@@ -133,9 +133,11 @@ export class MapSphereNode extends MapNode
 	public async applyTexture(image: HTMLImageElement): Promise<void>
 	{		
 		const textureLoader = new TextureLoader();
-		const texture = textureLoader.load(image.src, function() {
-			if(parseInt(REVISION) >= 152) {
-				texture.colorSpace = 'srgb'
+		const texture = textureLoader.load(image.src, function() 
+		{
+			if (parseInt(REVISION) >= 152) 
+			{
+				texture.colorSpace = 'srgb';
 			}
 		});
 		// @ts-ignore

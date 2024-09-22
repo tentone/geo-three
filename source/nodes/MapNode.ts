@@ -286,8 +286,9 @@ export abstract class MapNode extends Mesh
 		}
 	
 		const texture = new Texture(image);
-		if(parseInt(REVISION) >= 152) {
-			texture.colorSpace = 'srgb'
+		if (parseInt(REVISION) >= 152) 
+		{
+			texture.colorSpace = 'srgb';
 		}
 		texture.generateMipmaps = false;
 		texture.format = RGBAFormat;
