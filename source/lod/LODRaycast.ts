@@ -66,7 +66,8 @@ export class LODRaycast implements LODControl
 
 			let myIntersects = [];
 			this.raycaster.intersectObjects(view.children, true, myIntersects);
-			if (myIntersects.length > 0) {
+			if (myIntersects.length > 0) 
+			{
 				// Only use first intersection with the terrain
 				intersects.push(myIntersects[0]);
 			}

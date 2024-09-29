@@ -1,4 +1,4 @@
-import {LinearFilter, Material, Mesh, Texture, Vector3, BufferGeometry, Object3D, RGBAFormat} from 'three';
+import {LinearFilter, Material, Mesh, Texture, Vector3, BufferGeometry, Object3D, RGBAFormat, REVISION} from 'three';
 import {MapView} from '../MapView';
 import {TextureUtils} from '../utils/TextureUtils';
 
@@ -286,6 +286,10 @@ export abstract class MapNode extends Mesh
 		}
 	
 		const texture = new Texture(image);
+		if (parseInt(REVISION) >= 152) 
+		{
+			texture.colorSpace = 'srgb';
+		}
 		texture.generateMipmaps = false;
 		texture.format = RGBAFormat;
 		texture.magFilter = LinearFilter;
