@@ -24,7 +24,8 @@
 		"docs": "typedoc --out docs ./source/Main.ts",
 		"pub": "npm run build && npm run docs && npm run examples && npm publish --access public .",
 		"lint": "eslint --ext .ts .",
-		"lint-fix": "eslint --ext .ts --fix ."
+		"lint-fix": "eslint --ext .ts --fix .",
+		"changeset": "changeset"
 	},
 	"sideEffects": false,
 	"keywords": [
@@ -43,9 +44,10 @@
 		"three": ">0.120.0"
 	},
 	"devDependencies": {
+		"@changesets/cli": "^2.27.8",
+		"@rollup/plugin-node-resolve": "15.0.1",
 		"@rollup/plugin-strip": "3.0.2",
 		"@rollup/plugin-typescript": "10.0.1",
-		"@rollup/plugin-node-resolve": "15.0.1",
 		"@types/offscreencanvas": "2019.7.0",
 		"@types/three": "^0.160.0",
 		"@typescript-eslint/eslint-plugin": "5.47.0",
@@ -57,7 +59,6 @@
 		"rollup": "3.29.5",
 		"three": "^0.160.0",
 		"typedoc": "0.23.23",
-		"typescript": "4.9.4",
-		"http-server": "14.1.1"
+		"typescript": "4.9.4"
 	}
 }
