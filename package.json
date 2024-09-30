@@ -24,7 +24,8 @@
 		"docs": "typedoc --out docs ./source/Main.ts",
 		"pub": "npm run build && npm run docs && npm run examples && npm publish --access public .",
 		"lint": "eslint --ext .ts .",
-		"lint-fix": "eslint --ext .ts --fix ."
+		"lint-fix": "eslint --ext .ts --fix .",
+		"changeset": "changeset"
 	},
 	"sideEffects": false,
 	"keywords": [
