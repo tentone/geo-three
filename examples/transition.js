@@ -31860,6 +31860,8 @@
 			const pointers = [];
 			const pointerPositions = {};
 
+			let controlActive = false;
+
 			function getAutoRotationAngle( deltaTime ) {
 
 				if ( deltaTime !== null ) {
@@ -31876,8 +31878,8 @@
 
 			function getZoomScale( delta ) {
 
-				const normalized_delta = Math.abs( delta ) / ( 100 * ( window.devicePixelRatio | 0 ) );
-				return Math.pow( 0.95, scope.zoomSpeed * normalized_delta );
+				const normalizedDelta = Math.abs( delta * 0.01 );
+				return Math.pow( 0.95, scope.zoomSpeed * normalizedDelta );
 
 			}
 
@@ -32574,9 +32576,67 @@
 
 				scope.dispatchEvent( _startEvent );
 
-				handleMouseWheel( event );
+				handleMouseWheel( customWheelEvent( event ) );
 
 				scope.dispatchEvent( _endEvent );
+
+			}
+
+			function customWheelEvent( event ) {
+
+				const mode = event.deltaMode;
+
+				// minimal wheel event altered to meet delta-zoom demand
+				const newEvent = {
+					clientX: event.clientX,
+					clientY: event.clientY,
+					deltaY: event.deltaY,
+				};
+
+				switch ( mode ) {
+
+					case 1: // LINE_MODE
+						newEvent.deltaY *= 16;
+						break;
+
+					case 2: // PAGE_MODE
+						newEvent.deltaY *= 100;
+						break;
+
+				}
+
+				// detect if event was triggered by pinching
+				if ( event.ctrlKey && !controlActive ) {
+
+					newEvent.deltaY *= 10;
+
+				}
+
+				return newEvent;
+
+			}
+
+			function interceptControlDown( event ) {
+
+				if ( event.key === "Control" ) {
+
+					controlActive = true;
+					
+					document.addEventListener('keyup', interceptControlUp, { passive: true, capture: true });
+
+				}
+
+			}
+
+			function interceptControlUp( event ) {
+
+				if ( event.key === "Control" ) {
+
+					controlActive = false;
+					
+					document.removeEventListener('keyup', interceptControlUp, { passive: true, capture: true });
+
+				}
 
 			}
 
@@ -32788,6 +32848,8 @@
 			scope.domElement.addEventListener( 'pointercancel', onPointerUp );
 			scope.domElement.addEventListener( 'wheel', onMouseWheel, { passive: false } );
 
+			document.addEventListener( 'keydown', interceptControlDown, { passive: true, capture: true } );
+
 			// force an update at start
 
 			this.update();
@@ -32833,6 +32895,8 @@
 	OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 	PERFORMANCE OF THIS SOFTWARE.
 	***************************************************************************** */
+	/* global Reflect, Promise */
+
 
 	function __awaiter(thisArg, _arguments, P, generator) {
 	    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32985,16 +33049,7 @@
 	            }
 	            try {
 	                const image = yield this.mapView.provider.fetchTile(this.level, this.x, this.y);
-	                if (this.disposed) {
-	                    return;
-	                }
-	                const texture = new Texture(image);
-	                texture.generateMipmaps = false;
-	                texture.format = RGBAFormat;
-	                texture.magFilter = LinearFilter;
-	                texture.minFilter = LinearFilter;
-	                texture.needsUpdate = true;
-	                this.material.map = texture;
+	                yield this.applyTexture(image);
 	            }
 	            catch (e) {
 	                if (this.disposed) {
@@ -33004,6 +33059,23 @@
 	                this.material.map = MapNode.defaultTexture;
 	            }
 	            this.material.needsUpdate = true;
+	        });
+	    }
+	    applyTexture(image) {
+	        return __awaiter(this, void 0, void 0, function* () {
+	            if (this.disposed) {
+	                return;
+	            }
+	            const texture = new Texture(image);
+	            if (parseInt(REVISION) >= 152) {
+	                texture.colorSpace = 'srgb';
+	            }
+	            texture.generateMipmaps = false;
+	            texture.format = RGBAFormat;
+	            texture.magFilter = LinearFilter;
+	            texture.minFilter = LinearFilter;
+	            texture.needsUpdate = true;
+	            this.material.map = texture;
 	        });
 	    }
 	    nodeReady() {
@@ -33208,12 +33280,32 @@
 	    static mapboxAltitude(color) {
 	        return (color.r * 255.0 * 65536.0 + color.g * 255.0 * 256.0 + color.b * 255.0) * 0.1 - 10000.0;
 	    }
+	    static getTileSize(zoom) {
+	        const maxExtent = UnitsUtils.WEB_MERCATOR_MAX_EXTENT;
+	        const numTiles = Math.pow(2, zoom);
+	        return 2 * maxExtent / numTiles;
+	    }
+	    static tileBounds(zoom, x, y) {
+	        const tileSize = UnitsUtils.getTileSize(zoom);
+	        const minX = -UnitsUtils.WEB_MERCATOR_MAX_EXTENT + x * tileSize;
+	        const minY = UnitsUtils.WEB_MERCATOR_MAX_EXTENT - (y + 1) * tileSize;
+	        return [minX, tileSize, minY, tileSize];
+	    }
+	    static webMercatorToLatitude(zoom, y) {
+	        const yMerc = UnitsUtils.WEB_MERCATOR_MAX_EXTENT - y * UnitsUtils.getTileSize(zoom);
+	        return Math.atan(Math.sinh(yMerc / UnitsUtils.EARTH_RADIUS));
+	    }
+	    static webMercatorToLongitude(zoom, x) {
+	        const xMerc = -UnitsUtils.WEB_MERCATOR_MAX_EXTENT + x * UnitsUtils.getTileSize(zoom);
+	        return xMerc / UnitsUtils.EARTH_RADIUS;
+	    }
 	}
 	UnitsUtils.EARTH_RADIUS = 6371008;
 	UnitsUtils.EARTH_RADIUS_A = 6378137.0;
 	UnitsUtils.EARTH_RADIUS_B = 6356752.314245;
 	UnitsUtils.EARTH_PERIMETER = 2 * Math.PI * UnitsUtils.EARTH_RADIUS;
 	UnitsUtils.EARTH_ORIGIN = UnitsUtils.EARTH_PERIMETER / 2.0;
+	UnitsUtils.WEB_MERCATOR_MAX_EXTENT = 20037508.34;
 
 	class MapPlaneNode extends MapNode {
 	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
@@ -33491,7 +33583,48 @@
 
 	class MapSphereNode extends MapNode {
 	    constructor(parentNode = null, mapView = null, location = QuadTreePosition.root, level = 0, x = 0, y = 0) {
-	        super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), new MeshBasicMaterial({ wireframe: false }));
+	        let bounds = UnitsUtils.tileBounds(level, x, y);
+	        const vertexShader = `
+		varying vec3 vPosition;
+
+		void main() {
+			vPosition = position;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+		}
+		`;
+	        const fragmentShader = `
+		#define PI 3.1415926538
+		varying vec3 vPosition;
+		uniform sampler2D uTexture;
+		uniform vec4 webMercatorBounds;
+
+		void main() {
+			// this could also be a constant, but for some reason using a constant causes more visible tile gaps at high zoom
+			float radius = length(vPosition);
+
+			float latitude = asin(vPosition.y / radius);
+			float longitude = atan(-vPosition.z, vPosition.x);
+
+			float web_mercator_x = radius * longitude;
+			float web_mercator_y = radius * log(tan(PI / 4.0 + latitude / 2.0));
+			float y = (web_mercator_y - webMercatorBounds.z) / webMercatorBounds.w;
+			float x = (web_mercator_x - webMercatorBounds.x) / webMercatorBounds.y;
+
+			vec4 color = texture2D(uTexture, vec2(x, y));
+			gl_FragColor = color;
+			${parseInt(REVISION) < 152 ? '' : `
+				#include <tonemapping_fragment>
+				#include ${parseInt(REVISION) >= 154 ? '<colorspace_fragment>' : '<encodings_fragment>'}
+				`}
+		}
+		`;
+	        let vBounds = new Vector4(...bounds);
+	        const material = new ShaderMaterial({
+	            uniforms: { uTexture: { value: new Texture() }, webMercatorBounds: { value: vBounds } },
+	            vertexShader: vertexShader,
+	            fragmentShader: fragmentShader
+	        });
+	        super(parentNode, mapView, location, level, x, y, MapSphereNode.createGeometry(level, x, y), material);
 	        this.applyScaleNode();
 	        this.matrixAutoUpdate = false;
 	        this.isMesh = true;
@@ -33511,11 +33644,27 @@
 	        const range = Math.pow(2, zoom);
 	        const max = 40;
 	        const segments = Math.floor(MapSphereNode.segments * (max / (zoom + 1)) / max);
-	        const phiLength = 1 / range * 2 * Math.PI;
-	        const phiStart = x * phiLength;
-	        const thetaLength = 1 / range * Math.PI;
-	        const thetaStart = y * thetaLength;
+	        const lon1 = x > 0 ? UnitsUtils.webMercatorToLongitude(zoom, x) + Math.PI : 0;
+	        const lon2 = x < range - 1 ? UnitsUtils.webMercatorToLongitude(zoom, x + 1) + Math.PI : 2 * Math.PI;
+	        const phiStart = lon1;
+	        const phiLength = lon2 - lon1;
+	        const lat1 = y > 0 ? UnitsUtils.webMercatorToLatitude(zoom, y) : Math.PI / 2;
+	        const lat2 = y < range - 1 ? UnitsUtils.webMercatorToLatitude(zoom, y + 1) : -Math.PI / 2;
+	        const thetaLength = lat1 - lat2;
+	        const thetaStart = Math.PI - (lat1 + Math.PI / 2);
 	        return new MapSphereNodeGeometry(1, segments, segments, phiStart, phiLength, thetaStart, thetaLength);
+	    }
+	    applyTexture(image) {
+	        return __awaiter(this, void 0, void 0, function* () {
+	            const textureLoader = new TextureLoader();
+	            const texture = textureLoader.load(image.src, function () {
+	                if (parseInt(REVISION) >= 152) {
+	                    texture.colorSpace = 'srgb';
+	                }
+	            });
+	            this.material.uniforms.uTexture.value = texture;
+	            this.material.uniforms.uTexture.needsUpdate = true;
+	        });
 	    }
 	    applyScaleNode() {
 	        this.geometry.computeBoundingBox();
@@ -33671,7 +33820,11 @@
 	        for (let t = 0; t < this.subdivisionRays; t++) {
 	            this.mouse.set(Math.random() * 2 - 1, Math.random() * 2 - 1);
 	            this.raycaster.setFromCamera(this.mouse, camera);
-	            this.raycaster.intersectObjects(view.children, true, intersects);
+	            let myIntersects = [];
+	            this.raycaster.intersectObjects(view.children, true, myIntersects);
+	            if (myIntersects.length > 0) {
+	                intersects.push(myIntersects[0]);
+	            }
 	        }
 	        for (let i = 0; i < intersects.length; i++) {
 	            const node = intersects[i].object;
@@ -34450,6 +34603,9 @@
 	    scene.background = new Color(0x000000, LinearSRGBColorSpace);
 	    var loader = new TextureLoader();
 	    loader.load('2k_earth_daymap.jpg', function (texture) {
+	        if (parseInt(REVISION) >= 152) {
+	            texture.colorSpace = 'srgb';
+	        }
 	        var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({ map: texture }));
 	        scene.add(sphere);
 	    });
