@@ -20,8 +20,9 @@
 
 ### Usage
 
-- To add the library to your project, get the library through NPM alongside with three.js and use it as an ES module.
-- You can also include the library directly in your webpage, but ensure first that THREE is available globally.
+- To add the library to your project get the library through NPM alongside with three.js and use it as a ES module.
+- You can also include the library directly in you webpage but ensure first that THREE is available globally.
+
 
 ```javascript
 // Create a map tiles provider object
