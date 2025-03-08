@@ -30497,138 +30497,6 @@
 
 	}
 
-	class SphereGeometry extends BufferGeometry {
-
-		constructor( radius = 1, widthSegments = 32, heightSegments = 16, phiStart = 0, phiLength = Math.PI * 2, thetaStart = 0, thetaLength = Math.PI ) {
-
-			super();
-
-			this.type = 'SphereGeometry';
-
-			this.parameters = {
-				radius: radius,
-				widthSegments: widthSegments,
-				heightSegments: heightSegments,
-				phiStart: phiStart,
-				phiLength: phiLength,
-				thetaStart: thetaStart,
-				thetaLength: thetaLength
-			};
-
-			widthSegments = Math.max( 3, Math.floor( widthSegments ) );
-			heightSegments = Math.max( 2, Math.floor( heightSegments ) );
-
-			const thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
-
-			let index = 0;
-			const grid = [];
-
-			const vertex = new Vector3();
-			const normal = new Vector3();
-
-			// buffers
-
-			const indices = [];
-			const vertices = [];
-			const normals = [];
-			const uvs = [];
-
-			// generate vertices, normals and uvs
-
-			for ( let iy = 0; iy <= heightSegments; iy ++ ) {
-
-				const verticesRow = [];
-
-				const v = iy / heightSegments;
-
-				// special case for the poles
-
-				let uOffset = 0;
-
-				if ( iy === 0 && thetaStart === 0 ) {
-
-					uOffset = 0.5 / widthSegments;
-
-				} else if ( iy === heightSegments && thetaEnd === Math.PI ) {
-
-					uOffset = - 0.5 / widthSegments;
-
-				}
-
-				for ( let ix = 0; ix <= widthSegments; ix ++ ) {
-
-					const u = ix / widthSegments;
-
-					// vertex
-
-					vertex.x = - radius * Math.cos( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-					vertex.y = radius * Math.cos( thetaStart + v * thetaLength );
-					vertex.z = radius * Math.sin( phiStart + u * phiLength ) * Math.sin( thetaStart + v * thetaLength );
-
-					vertices.push( vertex.x, vertex.y, vertex.z );
-
-					// normal
-
-					normal.copy( vertex ).normalize();
-					normals.push( normal.x, normal.y, normal.z );
-
-					// uv
-
-					uvs.push( u + uOffset, 1 - v );
-
-					verticesRow.push( index ++ );
-
-				}
-
-				grid.push( verticesRow );
-
-			}
-
-			// indices
-
-			for ( let iy = 0; iy < heightSegments; iy ++ ) {
-
-				for ( let ix = 0; ix < widthSegments; ix ++ ) {
-
-					const a = grid[ iy ][ ix + 1 ];
-					const b = grid[ iy ][ ix ];
-					const c = grid[ iy + 1 ][ ix ];
-					const d = grid[ iy + 1 ][ ix + 1 ];
-
-					if ( iy !== 0 || thetaStart > 0 ) indices.push( a, b, d );
-					if ( iy !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( b, c, d );
-
-				}
-
-			}
-
-			// build geometry
-
-			this.setIndex( indices );
-			this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-			this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-
-		}
-
-		copy( source ) {
-
-			super.copy( source );
-
-			this.parameters = Object.assign( {}, source.parameters );
-
-			return this;
-
-		}
-
-		static fromJSON( data ) {
-
-			return new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
-
-		}
-
-	}
-
 	class MeshPhongMaterial extends Material {
 
 		constructor( parameters ) {
@@ -34381,18 +34249,108 @@
 	    [MapView.MARTINI, MapMartiniHeightNode]
 	]);
 
-	new Vector3();
-	new Vector3();
+	const pov$2 = new Vector3();
+	const position$2 = new Vector3();
+	class LODRadial {
+	    constructor(subdivideDistance = 50, simplifyDistance = 300) {
+	        this.subdivideDistance = subdivideDistance;
+	        this.simplifyDistance = simplifyDistance;
+	    }
+	    updateLOD(view, camera, renderer, scene) {
+	        camera.getWorldPosition(pov$2);
+	        view.children[0].traverse((node) => {
+	            node.getWorldPosition(position$2);
+	            let distance = pov$2.distanceTo(position$2);
+	            distance /= Math.pow(2, view.provider.maxZoom - node.level);
+	            if (distance < this.subdivideDistance) {
+	                node.subdivide();
+	            }
+	            else if (distance > this.simplifyDistance && node.parentNode) {
+	                node.parentNode.simplify();
+	            }
+	        });
+	    }
+	}
 
-	new Matrix4();
-	new Vector3();
-	new Frustum();
-	new Vector3();
+	const projection$1 = new Matrix4();
+	const pov$1 = new Vector3();
+	const frustum$1 = new Frustum();
+	const position$1 = new Vector3();
+	class LODFrustum extends LODRadial {
+	    constructor(subdivideDistance = 120, simplifyDistance = 400) {
+	        super(subdivideDistance, simplifyDistance);
+	        this.testCenter = true;
+	        this.pointOnly = false;
+	    }
+	    updateLOD(view, camera, renderer, scene) {
+	        projection$1.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+	        frustum$1.setFromProjectionMatrix(projection$1);
+	        camera.getWorldPosition(pov$1);
+	        view.children[0].traverse((node) => {
+	            node.getWorldPosition(position$1);
+	            let distance = pov$1.distanceTo(position$1);
+	            distance /= Math.pow(2, view.provider.maxZoom - node.level);
+	            const inFrustum = this.pointOnly ? frustum$1.containsPoint(position$1) : frustum$1.intersectsObject(node);
+	            if (distance < this.subdivideDistance && inFrustum) {
+	                node.subdivide();
+	            }
+	            else if (distance > this.simplifyDistance && node.parentNode) {
+	                node.parentNode.simplify();
+	            }
+	        });
+	    }
+	}
 
-	new Matrix4();
-	new Vector3();
-	new Frustum();
-	new Vector3();
+	const projection = new Matrix4();
+	const pov = new Vector3();
+	const frustum = new Frustum();
+	const position = new Vector3();
+	const zoomLevelPixelRatios = [
+	    78271.484, 39135.742, 19567.871, 9783.936, 4891.968, 2445.984, 1222.992,
+	    611.496, 305.748, 152.874, 76.437, 38.218, 19.109, 9.555, 4.777, 2.389, 1.194,
+	    0.597, 0.299, 0.149, 0.075, 0.037, 0.019
+	];
+	class LODFrustumOrthographic extends LODFrustum {
+	    updateLOD(view, camera, renderer, scene) {
+	        const isOrthographic = camera.isOrthographicCamera;
+	        if (!isOrthographic) {
+	            super.updateLOD(view, camera, renderer, scene);
+	            return;
+	        }
+	        projection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+	        frustum.setFromProjectionMatrix(projection);
+	        camera.getWorldPosition(pov);
+	        view.children[0].traverse((obj) => {
+	            var _a;
+	            const node = obj;
+	            node.getWorldPosition(position);
+	            const nodeBox = new Box3().setFromObject(node);
+	            let distance = nodeBox.distanceToPoint(pov);
+	            distance /= Math.pow(2, (view.provider.maxZoom - node.level));
+	            const inFrustum = frustum.intersectsObject(node);
+	            if (inFrustum) {
+	                const metresPerPixel = 1 / camera.zoom;
+	                let closestZoomLevel = 0;
+	                let minDifference = Number.POSITIVE_INFINITY;
+	                for (let i = 0; i < zoomLevelPixelRatios.length; i++) {
+	                    const difference = Math.abs(zoomLevelPixelRatios[i] - metresPerPixel);
+	                    if (difference < minDifference) {
+	                        minDifference = difference;
+	                        closestZoomLevel = i;
+	                    }
+	                }
+	                if (node.level < closestZoomLevel) {
+	                    if (!(node.children.length > 0)) {
+	                        node.subdivide();
+	                    }
+	                }
+	                else if (node.level > closestZoomLevel) {
+	                    (_a = node.parentNode) === null || _a === void 0 ? void 0 : _a.simplify();
+	                }
+	            }
+	        });
+	    }
+	}
 
 	class XHRUtils {
 	    static get(url) {
@@ -34595,114 +34553,39 @@
 	MapBoxProvider.MAP_ID = 101;
 
 	var canvas = document.getElementById('canvas');
-	const SPHERE = 0;
-	const PLANE = 1;
-	const scenes = [createWorldScene(), createMapScene()];
-	let active = SPHERE;
-	let renderer = new WebGLRenderer({
+	var renderer = new WebGLRenderer({
 	    canvas: canvas,
 	    antialias: true
 	});
-	function createWorldScene() {
-	    var scene = new Scene();
-	    scene.background = new Color(0x000000, LinearSRGBColorSpace);
-	    var loader = new TextureLoader();
-	    loader.load('2k_earth_daymap.jpg', function (texture) {
-	        if (parseInt(REVISION) >= 152) {
-	            texture.colorSpace = 'srgb';
-	        }
-	        var sphere = new Mesh(new SphereGeometry(UnitsUtils.EARTH_RADIUS, 256, 256), new MeshBasicMaterial({ map: texture }));
-	        scene.add(sphere);
-	    });
-	    var camera = new PerspectiveCamera(60, 1, 0.01, 1e8);
-	    var controls = new MapControls(camera, canvas);
-	    controls.minDistance = UnitsUtils.EARTH_RADIUS + 3e4;
-	    controls.maxDistance = UnitsUtils.EARTH_RADIUS * 1e1;
-	    controls.enablePan = false;
-	    controls.zoomSpeed = 0.7;
-	    controls.rotateSpeed = 0.3;
-	    controls.mouseButtons = {
-	        LEFT: MOUSE.ROTATE,
-	        MIDDLE: MOUSE.DOLLY,
-	        RIGHT: MOUSE.PAN
-	    };
-	    camera.position.set(0, 0, UnitsUtils.EARTH_RADIUS + 1e7);
-	    return { camera: camera, controls: controls, scene: scene };
-	}
-	function createMapScene() {
-	    var camera = new PerspectiveCamera(60, 1, 0.01, 1e12);
-	    var controls = new MapControls(camera, canvas);
-	    controls.minDistance = 1.0;
-	    controls.zoomSpeed = 1.0;
-	    var scene = new Scene();
-	    scene.background = new Color(0x444444, LinearSRGBColorSpace);
-	    var provider = new BingMapsProvider('', BingMapsProvider.AERIAL);
-	    var map = new MapView(MapView.PLANAR, provider);
-	    scene.add(map);
-	    map.updateMatrixWorld(true);
-	    scene.add(new AmbientLight(0x777777, LinearSRGBColorSpace));
-	    return { camera: camera, controls: controls, scene: scene };
-	}
-	var raycaster = new Raycaster();
+	var scene = new Scene();
+	scene.background = new Color(0.4, 0.4, 0.4, LinearSRGBColorSpace);
+	var provider = new BingMapsProvider('', BingMapsProvider.AERIAL);
+	var map = new MapView(MapView.PLANAR, provider, undefined, new LODFrustumOrthographic());
+	scene.add(map);
+	map.updateMatrixWorld(true);
+	var camera = new OrthographicCamera(-1, 1, 1, -1, 0.1, 2e12);
+	camera.rotation.set(0, -Math.PI / 2, 0);
+	camera.position.set(0, 0, 0);
+	var controls = new MapControls(camera, canvas);
+	controls.enableRotate = false;
+	controls.minDistance = 2e3;
+	controls.zoomSpeed = 2.0;
+	scene.add(new AmbientLight(0x777777));
 	document.body.onresize = function () {
 	    var width = window.innerWidth;
 	    var height = window.innerHeight;
 	    renderer.setSize(width, height);
-	    for (let i = 0; i < scenes.length; i++) {
-	        const s = scenes[i];
-	        s.camera.aspect = width / height;
-	        s.camera.updateProjectionMatrix();
-	    }
+	    camera.left = -width / 2;
+	    camera.right = width / 2;
+	    camera.top = height / 2;
+	    camera.bottom = -height / 2;
+	    camera.updateProjectionMatrix();
 	};
 	document.body.onresize();
 	function animate() {
 	    requestAnimationFrame(animate);
-	    const s = scenes[active];
-	    s.controls.update();
-	    renderer.render(s.scene, s.camera);
-	    const toggleDistance = 2e6;
-	    if (active === SPHERE) {
-	        const distance = s.controls.getDistance() - UnitsUtils.EARTH_RADIUS;
-	        if (distance < toggleDistance) {
-	            const pointer = new Vector2(0.0, 0.0);
-	            raycaster.setFromCamera(pointer, s.camera);
-	            const intersects = raycaster.intersectObjects(s.scene.children);
-	            if (intersects.length > 0) {
-	                const point = intersects[0].point;
-	                const pos = UnitsUtils.vectorToDatums(point);
-	                const planeScene = scenes[PLANE];
-	                var coords = UnitsUtils.datumsToSpherical(pos.latitude, pos.longitude);
-	                planeScene.controls.target.set(coords.x, 0, -coords.y);
-	                planeScene.camera.position.set(coords.x, distance, -coords.y);
-	                console.log('Geo-Three: Switched scene from sphere to plane.', point, pos, coords);
-	                active = PLANE;
-	            }
-	        }
-	    }
-	    else if (active === PLANE) {
-	        const distance = s.controls.getDistance();
-	        s.controls.minPolarAngle = 0;
-	        s.controls.maxPolarAngle = Math.PI / 2;
-	        s.controls.minAzimuthAngle = -Math.PI;
-	        s.controls.maxAzimuthAngle = Math.PI;
-	        const ratio = 0.4;
-	        if (distance > toggleDistance * ratio) {
-	            const progress = (toggleDistance - distance) / (toggleDistance * (1 - ratio));
-	            s.controls.maxPolarAngle = progress * Math.PI / 2;
-	            s.controls.minAzimuthAngle = progress * -Math.PI;
-	            s.controls.maxAzimuthAngle = progress * Math.PI;
-	        }
-	        if (distance > toggleDistance) {
-	            const target = s.controls.target;
-	            const coords = UnitsUtils.sphericalToDatums(target.x, -target.z);
-	            const dir = UnitsUtils.datumsToVector(coords.latitude, coords.longitude);
-	            const sphereScene = scenes[SPHERE];
-	            dir.multiplyScalar(UnitsUtils.EARTH_RADIUS + distance);
-	            sphereScene.camera.position.copy(dir);
-	            console.log('Geo-Three: Switched scene from plane to sphere.', s.controls, coords, dir);
-	            active = SPHERE;
-	        }
-	    }
+	    controls.update();
+	    renderer.render(scene, camera);
 	}
 	animate();
 

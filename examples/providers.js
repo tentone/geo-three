@@ -33998,7 +33998,7 @@
 			#include <fog_vertex>
 	
 			// Calculate height of the title
-			vec4 _theight = texture2D(heightMap, vUv);
+			vec4 _theight = texture2D(heightMap, vMapUv);
 			float _height = ((_theight.r * 255.0 * 65536.0 + _theight.g * 255.0 * 256.0 + _theight.b * 255.0) * 0.1) - 10000.0;
 			vec3 _transformed = position + _height * normal;
 	
@@ -34541,7 +34541,7 @@
 	MapMartiniHeightNode.tileSize = 256;
 
 	class MapView extends Mesh {
-	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null) {
+	    constructor(root = MapView.PLANAR, provider = new OpenStreetMapsProvider(), heightProvider = null, lod = new LODRaycast()) {
 	        super(undefined, new MeshBasicMaterial({ transparent: true, opacity: 0.0, depthWrite: false, colorWrite: false }));
 	        this.lod = null;
 	        this.provider = null;
@@ -34551,7 +34551,7 @@
 	        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
 	            this.lod.updateLOD(this, camera, renderer, scene);
 	        };
-	        this.lod = new LODRaycast();
+	        this.lod = lod;
 	        this.provider = provider;
 	        this.heightProvider = heightProvider;
 	        this.setRoot(root);
@@ -34699,6 +34699,11 @@
 	        });
 	    }
 	}
+
+	new Matrix4();
+	new Vector3();
+	new Frustum();
+	new Vector3();
 
 	class XHRUtils {
 	    static get(url) {
