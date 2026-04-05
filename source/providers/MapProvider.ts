@@ -50,6 +50,24 @@ export abstract class MapProvider
 	}
 
 	/**
+	 * Get a tile as a raw ArrayBuffer for the x, y, zoom based on the provider configuration.
+	 *
+	 * Returns null by default. Providers that support direct binary fetching (e.g. MapBoxProvider)
+	 * override this method. When available this should be preferred over fetchTile() for height
+	 * data because it allows PNG decoding without canvas, avoiding fingerprinting noise introduced
+	 * by Firefox Enhanced Tracking Protection.
+	 *
+	 * @param zoom - Zoom level.
+	 * @param x - Tile x.
+	 * @param y - Tile y.
+	 * @returns Promise with the raw tile data as ArrayBuffer, or null if not supported.
+	 */
+	public fetchTileBuffer(zoom: number, x: number, y: number): Promise<ArrayBuffer | null>
+	{
+		return Promise.resolve(null);
+	}
+
+	/**
 	 * Get map meta data from server if supported.
 	 *
 	 * Usually map server have API method to retrieve TileJSON metadata.

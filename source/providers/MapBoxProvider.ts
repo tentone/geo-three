@@ -139,15 +139,37 @@ export class MapBoxProvider extends MapProvider
 				reject();
 			};
 			image.crossOrigin = 'Anonymous';
-
-			if (this.mode === MapBoxProvider.STYLE) 
-			{
-				image.src = MapBoxProvider.ADDRESS + 'styles/v1/' + this.style + '/tiles/' + zoom + '/' + x + '/' + y + (this.useHDPI ? '@2x?access_token=' : '?access_token=') + this.apiToken;
-			}
-			else 
-			{
-				image.src = MapBoxProvider.ADDRESS + 'v4/' + this.mapId + '/' + zoom + '/' + x + '/' + y + (this.useHDPI ? '@2x.' : '.') + this.format + '?access_token=' + this.apiToken;
-			}
+			image.src = this.getTileUrl(zoom, x, y);
 		});
+	}
+
+	public async fetchTileBuffer(zoom: number, x: number, y: number): Promise<ArrayBuffer | null>
+	{
+		const response = await fetch(this.getTileUrl(zoom, x, y));
+		if (!response.ok)
+		{
+			throw new Error('MapBoxProvider: Failed to fetch tile buffer. Status ' + response.status);
+		}
+		return response.arrayBuffer();
+	}
+
+	/**
+	 * Build the URL for a tile given its zoom, x, and y coordinates.
+	 *
+	 * @param zoom - Zoom level.
+	 * @param x - Tile x.
+	 * @param y - Tile y.
+	 * @returns URL string for the tile.
+	 */
+	private getTileUrl(zoom: number, x: number, y: number): string
+	{
+		if (this.mode === MapBoxProvider.STYLE)
+		{
+			return MapBoxProvider.ADDRESS + 'styles/v1/' + this.style + '/tiles/' + zoom + '/' + x + '/' + y + (this.useHDPI ? '@2x?access_token=' : '?access_token=') + this.apiToken;
+		}
+		else
+		{
+			return MapBoxProvider.ADDRESS + 'v4/' + this.mapId + '/' + zoom + '/' + x + '/' + y + (this.useHDPI ? '@2x.' : '.') + this.format + '?access_token=' + this.apiToken;
+		}
 	}
 }

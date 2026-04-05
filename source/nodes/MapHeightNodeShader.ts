@@ -125,14 +125,40 @@ export class MapHeightNodeShader extends MapHeightNode
 
 		try 
 		{
-			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+			let texture: Texture;
+
+			const tileBuffer = await this.mapView.heightProvider.fetchTileBuffer(this.level, this.x, this.y);
+			if (tileBuffer !== null)
+			{
+				// Use the browser to decode the image from the raw bytes, bypassing the <img> element
+				// to avoid fingerprinting noise introduced by Firefox Enhanced Tracking Protection
+				const bitmap = await createImageBitmap(new Blob([tileBuffer]));
+
+				if (this.disposed)
+				{
+					return;
+				}
+
+				texture = new Texture(bitmap as any);
+			}
+			else
+			{
+				// Fallback: load image via HTML element
+				const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+
+				if (this.disposed)
+				{
+					return;
+				}
+
+				texture = new Texture(image as any);
+			}
 
 			if (this.disposed) 
 			{
 				return;
 			}
 			
-			const texture = new Texture(image as any);
 			texture.generateMipmaps = false;
 			texture.format = RGBAFormat;
 			texture.magFilter = NearestFilter;

@@ -121,20 +121,47 @@ export class MapHeightNode extends MapNode
 
 		try 
 		{
-			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
- 
-			if (this.disposed) 
+			let imageData: ImageData;
+
+			const tileBuffer = await this.mapView.heightProvider.fetchTileBuffer(this.level, this.x, this.y);
+			if (tileBuffer !== null)
+			{
+				// Use the browser to decode the image from the raw bytes, bypassing the <img> element
+				// to avoid fingerprinting noise introduced by Firefox Enhanced Tracking Protection
+				const bitmap = await createImageBitmap(new Blob([tileBuffer]));
+
+				if (this.disposed)
+				{
+					return;
+				}
+
+				const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+				const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+				context.imageSmoothingEnabled = false;
+				context.drawImage(bitmap, 0, 0, bitmap.width, bitmap.height, 0, 0, canvas.width, canvas.height);
+				imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+			}
+			else
+			{
+				// Fallback: load image via HTML element and use canvas for pixel read
+				const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+
+				if (this.disposed) 
+				{
+					return;
+				}
+
+				const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
+				const context = canvas.getContext('2d') as CanvasRenderingContext2D;
+				context.imageSmoothingEnabled = false;
+				context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
+				imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+			}
+
+			if (this.disposed)
 			{
 				return;
 			}
-
-			const canvas = CanvasUtils.createOffscreenCanvas(this.geometrySize + 1, this.geometrySize + 1);
-
-			const context = canvas.getContext('2d') as CanvasRenderingContext2D;
-			context.imageSmoothingEnabled = false;
-			context.drawImage(image, 0, 0, MapHeightNode.tileSize, MapHeightNode.tileSize, 0, 0, canvas.width, canvas.height);
-
-			const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
 			this.geometry = new MapNodeHeightGeometry(1, 1, this.geometrySize, this.geometrySize, true, 10.0, imageData, true);
 		}

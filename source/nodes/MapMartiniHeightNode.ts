@@ -283,9 +283,9 @@ export class MapMartiniHeightNode extends MapHeightNode
 	/**
 	 * Process the height texture received from the tile data provider.
 	 * 
-	 * @param image - Image element received by the tile provider.
+	 * @param image - Image element or ImageBitmap received by the tile provider.
 	 */
-	public async processHeight(image: HTMLImageElement): Promise<void> 
+	public async processHeight(image: HTMLImageElement | ImageBitmap): Promise<void> 
 	{
 		const tileSize = image.width;
 		const gridSize = tileSize + 1;
@@ -311,7 +311,7 @@ export class MapMartiniHeightNode extends MapHeightNode
 		this.geometry.setAttribute('uv', new Float32BufferAttribute( attributes.uv.value, attributes.uv.size));
 		this.geometry.rotateX(Math.PI);
 
-		var texture = new Texture(image);
+		var texture = new Texture(image as any);
 		texture.generateMipmaps = false;
 		texture.format = RGBAFormat;
 		texture.magFilter = NearestFilter;
@@ -335,14 +335,32 @@ export class MapMartiniHeightNode extends MapHeightNode
 			throw new Error('GeoThree: MapView.heightProvider provider is null.');
 		}
 
-		const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
-
-		if (this.disposed) 
+		const tileBuffer = await this.mapView.heightProvider.fetchTileBuffer(this.level, this.x, this.y);
+		if (tileBuffer !== null)
 		{
-			return;
-		}
+			// Use the browser to decode the image from the raw bytes, bypassing the <img> element
+			// to avoid fingerprinting noise introduced by Firefox Enhanced Tracking Protection
+			const bitmap = await createImageBitmap(new Blob([tileBuffer]));
 
-		this.processHeight(image);
+			if (this.disposed)
+			{
+				return;
+			}
+
+			await this.processHeight(bitmap);
+		}
+		else
+		{
+			// Fallback: load image via HTML element and use canvas for pixel read
+			const image = await this.mapView.heightProvider.fetchTile(this.level, this.x, this.y);
+
+			if (this.disposed) 
+			{
+				return;
+			}
+
+			await this.processHeight(image);
+		}
 
 		this.heightLoaded = true;
 		this.nodeReady();
